@@ -257,7 +257,7 @@ class System {
 	
 	private static function tryLoad (name:String, library:String, func:String, args:Int):Dynamic {
 		
-		#if (sys && !html5 || nodejs)
+		#if (sys && !html5)
 		
 		try {
 			

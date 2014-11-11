@@ -18,8 +18,13 @@ import lime.utils.IMemoryRange;
 #if format
 import format.tools.Inflate;
 #end
+#if nodejs
+import nodejs.DataView;
+import nodejs.Uint8Array;
+#else
 import js.html.DataView;
 import js.html.Uint8Array;
+#end
 #elseif cpp
 import cpp.NativeArray;
 #end

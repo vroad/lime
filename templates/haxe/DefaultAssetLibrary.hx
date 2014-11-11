@@ -12,7 +12,7 @@ import lime.utils.ByteArray;
 import lime.utils.UInt8Array;
 import lime.Assets;
 
-#if (sys || nodejs)
+#if sys
 import sys.FileSystem;
 #end
 
