@@ -138,32 +138,47 @@ class Application extends Module {
 		
 		#if nodejs
 		
-		lime_application_init(__handle);
-		var prevTime = untyped __js__('Date.now()');
-		var eventLoop = function() {
-			var active = lime_application_update(__handle);
+		lime_application_init (__handle);
+		
+		var prevTime = untyped __js__ ('Date.now ()');
+		var eventLoop = function () {
+			
+			var active = lime_application_update (__handle);
+			
 			if (!active) {
-				var result = lime_application_quit(__handle);
-				__cleanup();
-				Sys.exit(result);
+				
+				var result = lime_application_quit (__handle);
+				__cleanup ();
+				Sys.exit (result);
+				
 			}
-			var time =  untyped __js__('Date.now()');
-			if (time - prevTime <= 16)
-				untyped setTimeout(eventLoop, 0);
-			else
-				untyped setImmediate(eventLoop);
+			
+			var time =  untyped __js__ ('Date.now ()');
+			if (time - prevTime <= 16) {
+				
+				untyped setTimeout (eventLoop, 0);
+				
+			}
+			else {
+				
+				untyped setImmediate (eventLoop);
+				
+			}
+			
 			prevTime = time;
+			
 		}
-		untyped setImmediate(eventLoop);
+		
+		untyped setImmediate (eventLoop);
 		
 		#elseif (cpp || neko)
-
-		lime_application_init(__handle);
-		while(lime_application_update(__handle))
-			{}
-		var result = lime_application_quit (__handle);
 		
-		__cleanup();
+		lime_application_init (__handle);
+		
+		while (lime_application_update (__handle)) {}
+		
+		var result = lime_application_quit (__handle);
+		__cleanup ();
 		
 		return result;
 		
@@ -411,8 +426,8 @@ class Application extends Module {
 	#if (cpp || neko || nodejs)
 	private static var lime_application_create = System.load ("lime", "lime_application_create", 1);
 	private static var lime_application_init = System.load ("lime", "lime_application_init", 1);
-    private static var lime_application_update = System.load ("lime", "lime_application_update", 1);
-    private static var lime_application_quit = System.load ("lime", "lime_application_quit", 1);
+	private static var lime_application_update = System.load ("lime", "lime_application_update", 1);
+	private static var lime_application_quit = System.load ("lime", "lime_application_quit", 1);
 	private static var lime_application_get_ticks = System.load ("lime", "lime_application_get_ticks", 0);
 	private static var lime_update_event_manager_register = System.load ("lime", "lime_update_event_manager_register", 2);
 	#end

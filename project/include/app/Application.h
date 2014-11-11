@@ -17,10 +17,10 @@ namespace lime {
 			
 			static AutoGCRoot* callback;
 			
-			virtual void Init() = 0;
 			virtual int Exec () = 0;
-			virtual bool Update() = 0;
-			virtual int Quit() = 0;
+			virtual void Init () = 0;
+			virtual int Quit () = 0;
+			virtual bool Update () = 0;
 		
 		
 	};

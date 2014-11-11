@@ -83,7 +83,6 @@ class ProjectXMLParser extends HXProject {
 			
 			defines.set ("native", "1");
 			defines.set ("nodejs", "1");
-			defines.set ("openfl_next", "1");
 			
 		} else if (target == Platform.FIREFOX) {
 			

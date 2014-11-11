@@ -1,10 +1,8 @@
 package lime.utils;
 
 
-#if html5
+#if js
 typedef ArrayBuffer = js.html.ArrayBuffer;
-#elseif nodejs
-typedef ArrayBuffer = nodejs.ArrayBuffer;
 #else
 typedef ArrayBuffer = lime.utils.ByteArray;
 #end

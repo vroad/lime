@@ -1,8 +1,6 @@
 package lime.utils;
-#if html5
+#if js
 typedef Float32Array = js.html.Float32Array;
-#elseif nodejs
-typedef Float32Array = nodejs.Float32Array;
 #else
 
 

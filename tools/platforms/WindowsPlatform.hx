@@ -8,6 +8,7 @@ import helpers.CPPHelper;
 import helpers.FileHelper;
 import helpers.IconHelper;
 import helpers.NekoHelper;
+import helpers.NodeJSHelper;
 import helpers.PathHelper;
 import helpers.PlatformHelper;
 import helpers.ProcessHelper;
@@ -17,7 +18,7 @@ import project.HXProject;
 import project.PlatformTarget;
 import sys.io.File;
 import sys.FileSystem;
-import platforms.Target;
+
 
 class WindowsPlatform extends PlatformTarget {
 	
@@ -25,31 +26,28 @@ class WindowsPlatform extends PlatformTarget {
 	private var applicationDirectory:String;
 	private var executablePath:String;
 	private var targetDirectory:String;
-	private var target:Target;
+	private var targetType:String;
 	
 	
 	public function new (command:String, _project:HXProject, targetFlags:Map <String, String> ) {
 		
 		super (command, _project, targetFlags);
 		
-		targetDirectory = project.app.path + "/windows/cpp";
-		
-		if (project.targetFlags.exists ("neko")) {
+		if (project.targetFlags.exists ("neko") || project.target != PlatformHelper.hostPlatform) {
 			
-			targetDirectory = project.app.path + "/windows/neko";
-			target = Target.Neko;
+			targetType = "neko";
 			
 		} else if (project.targetFlags.exists ("nodejs")) {
-            
-            targetDirectory = project.app.path + "/windows/nodejs";
-			target = Target.NodeJs;
-            
-        } else {
-            
-            target = Target.Cpp;
-            
-        }
 		
+			targetType = "nodejs";
+			
+		} else {
+			
+			targetType = "cpp";
+			
+		}
+		
+		targetDirectory = project.app.path + "/windows/" + targetType;
 		applicationDirectory = targetDirectory + "/bin/";
 		executablePath = applicationDirectory + "/" + project.app.file + ".exe";
 		
@@ -85,7 +83,7 @@ class WindowsPlatform extends PlatformTarget {
 			
 		}
 		
-		if (!project.targetFlags.exists ("static")) {
+		if (!project.targetFlags.exists ("static") || targetType != "cpp") {
 			
 			for (ndll in project.ndlls) {
 				
@@ -95,20 +93,19 @@ class WindowsPlatform extends PlatformTarget {
 			
 		}
 		
-		if (target == Target.Neko) {
+		if (targetType == "neko") {
 			
 			ProcessHelper.runCommand ("", "haxe", [ hxml ]);
 			NekoHelper.createExecutable (project.templatePaths, "windows", targetDirectory + "/obj/ApplicationMain.n", executablePath);
 			NekoHelper.copyLibraries (project.templatePaths, "windows", applicationDirectory);
 			
-		} else if (target == Target.NodeJs) {
-            
-            ProcessHelper.runCommand ("", "haxe", [ hxml ]);
+		} else if (targetType == "nodejs") {
+			
+			ProcessHelper.runCommand ("", "haxe", [ hxml ]);
 			//NekoHelper.createExecutable (project.templatePaths, "windows", targetDirectory + "/obj/ApplicationMain.n", executablePath);
 			NekoHelper.copyLibraries (project.templatePaths, "windows", applicationDirectory);
-            
-        }
-        else {
+			
+		} else {
 			
 			var haxeArgs = [ hxml ];
 			var flags = [];
@@ -177,7 +174,7 @@ class WindowsPlatform extends PlatformTarget {
 			
 		}
 		
-		var hxml = PathHelper.findTemplate (project.templatePaths, (target == Target.Neko ? "neko" : target == Target.NodeJs ? "nodejs" : "cpp") + "/hxml/" + type + ".hxml");
+		var hxml = PathHelper.findTemplate (project.templatePaths, targetType + "/hxml/" + type + ".hxml");
 		var template = new Template (File.getContent (hxml));
 		Sys.println (template.execute (generateContext ()));
 		
@@ -189,7 +186,7 @@ class WindowsPlatform extends PlatformTarget {
 		var context = project.templateContext;
 		
 		context.NEKO_FILE = targetDirectory + "/obj/ApplicationMain.n";
-        context.NODE_FILE = targetDirectory + "/bin/ApplicationMain.js";
+		context.NODE_FILE = targetDirectory + "/bin/ApplicationMain.js";
 		context.CPP_DIR = targetDirectory + "/obj";
 		context.BUILD_DIR = project.app.path + "/windows";
 		
@@ -216,7 +213,11 @@ class WindowsPlatform extends PlatformTarget {
 		
 		var arguments = additionalArguments.copy ();
 		
-		if (project.target == PlatformHelper.hostPlatform) {
+		if (targetType == "nodejs") {
+			
+			NodeJSHelper.run (project, targetDirectory + "/bin/ApplicationMain.js", arguments);
+			
+		} else if (project.target == PlatformHelper.hostPlatform) {
 			
 			arguments = arguments.concat ([ "-livereload" ]);
 			ProcessHelper.runCommand (applicationDirectory, Path.withoutDirectory (executablePath), arguments);
@@ -238,7 +239,7 @@ class WindowsPlatform extends PlatformTarget {
 		
 		var context = generateContext ();
 		
-		if (project.targetFlags.exists ("static")) {
+		if (targetType == "cpp" && project.targetFlags.exists ("static")) {
 			
 			for (i in 0...project.ndlls.length) {
 				
@@ -262,9 +263,9 @@ class WindowsPlatform extends PlatformTarget {
 		//SWFHelper.generateSWFClasses (project, targetDirectory + "/haxe");
 		
 		FileHelper.recursiveCopyTemplate (project.templatePaths, "haxe", targetDirectory + "/haxe", context);
-		FileHelper.recursiveCopyTemplate (project.templatePaths, (target == Target.Neko ? "neko" : target == Target.NodeJs ? "nodejs" : "cpp") + "/hxml", targetDirectory + "/haxe", context);
+		FileHelper.recursiveCopyTemplate (project.templatePaths, targetType + "/hxml", targetDirectory + "/haxe", context);
 		
-		if (project.targetFlags.exists ("static")) {
+		if (targetType == "cpp" && project.targetFlags.exists ("static")) {
 			
 			FileHelper.recursiveCopyTemplate (project.templatePaths, "cpp/static", targetDirectory + "/obj", context);
 			

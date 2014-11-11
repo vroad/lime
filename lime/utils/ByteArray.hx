@@ -18,13 +18,8 @@ import lime.utils.IMemoryRange;
 #if format
 import format.tools.Inflate;
 #end
-#if nodejs
-import nodejs.DataView;
-import nodejs.Uint8Array;
-#else
 import js.html.DataView;
 import js.html.Uint8Array;
-#end
 #elseif cpp
 import cpp.NativeArray;
 #end
@@ -94,21 +89,21 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 				trace("Couldn't get BytesData:" + bytes);
 			return null;
 		}
-        var slen = function (bytes:ByteArray) {
-            if (Std.is (bytes, ByteArray))
+		var slen = function (bytes:ByteArray) {
+			if (Std.is (bytes, ByteArray))
 				return untyped bytes.length;
 			else if (Std.is (bytes, UInt8Array) ||
 				Std.is (bytes, UInt16Array) ||
 				Std.is (bytes, Int16Array) ||
 				Std.is (bytes, Float32Array))
 				return untyped bytes.byteLength;
-            
-            return 0;
-        }
+			
+			return 0;
+		}
 		#else
 		var bytes = function (bytes:ByteArray) { return bytes == null ? null : bytes.b; }
 		var slen = function (bytes:ByteArray){ return bytes == null ? 0 : bytes.length; }
-        #end
+		#end
 		
 		var init = System.load ("lime", "lime_byte_array_init", 4);
 		init (factory, slen, resize, bytes);

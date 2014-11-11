@@ -22,10 +22,10 @@ namespace lime {
 			SDLApplication ();
 			~SDLApplication ();
 			
-			virtual void Init();
 			virtual int Exec ();
-			virtual bool Update();
-			virtual int Quit();
+			virtual void Init ();
+			virtual int Quit ();
+			virtual bool Update ();
 		
 		private:
 			

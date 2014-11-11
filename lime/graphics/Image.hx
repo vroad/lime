@@ -30,7 +30,7 @@ import format.png.Reader;
 import format.png.Tools;
 import format.png.Writer;
 import format.tools.Deflate;
-#if sys
+#if (sys || nodejs)
 import sys.io.File;
 #end
 #end
@@ -866,7 +866,7 @@ class Image {
 			buffer = new ImageBuffer (u8a, data.width, data.height, data.bpp);
 		}
 		
-		#else
+		#elseif format
 		
 		try {
 			

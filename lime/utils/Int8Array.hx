@@ -1,8 +1,6 @@
 package lime.utils;
-#if html5
+#if js
 typedef Int8Array = js.html.Int8Array;
-#elseif nodejs
-typedef Int8Array = nodejs.Int8Array;
 #else
 
 

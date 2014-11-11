@@ -1092,7 +1092,12 @@ class CommandLineTools {
 				
 				target = PlatformHelper.hostPlatform;
 				targetFlags.set ("neko", "");
+			
+			case "nodejs":
 				
+				target = PlatformHelper.hostPlatform;
+				targetFlags.set ("nodejs", "");
+			
 			case "iphone", "iphoneos":
 				
 				target = Platform.IOS;
@@ -1106,11 +1111,6 @@ class CommandLineTools {
 				
 				target = Platform.FIREFOX;
 				overrides.haxedefs.set ("firefoxos", "");
-            
-            case "nodejs":
-                
-                target = PlatformHelper.hostPlatform;
-                targetFlags.set ("nodejs", "");
 			
 			default:
 				

@@ -163,8 +163,8 @@ class System {
 			#elseif neko
 			return neko.Lib.load (__moduleNames.get (library), method, args);
 			#elseif nodejs
-            return js.Lib.load (__moduleNames.get (library), method, args);
-            #else
+			return js.Lib.load (__moduleNames.get (library), method, args);
+			#else
 			return null;
 			#end
 			
@@ -257,7 +257,7 @@ class System {
 	
 	private static function tryLoad (name:String, library:String, func:String, args:Int):Dynamic {
 		
-		#if (sys && !html5)
+		#if (sys && !html5 || nodejs)
 		
 		try {
 			
@@ -266,8 +266,8 @@ class System {
 			#elseif (neko)
 			var result = neko.Lib.load (name, func, args);
 			#elseif nodejs
-            var result = js.Lib.load (name, func, args);
-            #else
+			var result = js.Lib.load (name, func, args);
+			#else
 			var result = null;
 			#end
 			
