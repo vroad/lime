@@ -17,7 +17,7 @@ class ApplicationMain {
 		preloader.onComplete = start;
 		preloader.create (config);
 		
-		#if js
+		#if html5
 		var urls = [];
 		var types = [];
 		
@@ -58,7 +58,7 @@ class ApplicationMain {
 			
 		}
 		
-		#if js
+		#if html5
 		#if munit
 		embed (null, ::WIN_WIDTH::, ::WIN_HEIGHT::, "::WIN_FLASHBACKGROUND::");
 		#end
