@@ -1,4 +1,5 @@
 #include "SDLApplication.h"
+#include "SDLRenderer.h"
 
 #ifdef HX_MACOS
 #include <CoreFoundation/CoreFoundation.h>
@@ -162,6 +163,23 @@ namespace lime {
 	
 	
 	void SDLApplication::Init() {
+
+		useTimer = true;
+		if (SDLRenderer::sdlRendererInfo.flags & SDL_RENDERER_PRESENTVSYNC)
+		{
+			int numVideoDisplays = SDL_GetNumVideoDisplays();
+			if (numVideoDisplays > 0)
+			{
+				SDL_DisplayMode current;
+				int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
+
+				if(should_be_zero == 0 && current.refresh_rate == 60)
+				{
+					useTimer = false;
+					printf("Timer is disabled.\n");
+				}
+			}
+		}
 		
 		framePeriod = 1000.0 / 60.0;
 		active = true;
@@ -324,19 +342,26 @@ namespace lime {
 				
 			}
 			
-			currentUpdate = SDL_GetTicks ();
-			
-			if (currentUpdate >= nextUpdate) {
+			if (useTimer)
+			{
 				
-				SDL_RemoveTimer (timerID);
-				OnTimer (0, 0);
+				currentUpdate = SDL_GetTicks ();
 				
-			} else if (!timerActive) {
-				
-				timerActive = true;
-				timerID = SDL_AddTimer (nextUpdate - currentUpdate, OnTimer, 0);
-				
+				if (currentUpdate >= nextUpdate) {
+					
+					SDL_RemoveTimer (timerID);
+					OnTimer (0, 0);
+					
+				} else if (!timerActive) {
+					
+					timerActive = true;
+					timerID = SDL_AddTimer (nextUpdate - currentUpdate, OnTimer, 0);
+					
+				}
+
 			}
+			else
+				OnTimer (0, 0);
 			
 		}
 		

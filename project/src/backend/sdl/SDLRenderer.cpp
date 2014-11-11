@@ -5,6 +5,7 @@
 
 namespace lime {
 	
+	SDL_RendererInfo SDLRenderer::sdlRendererInfo = SDL_RendererInfo();
 	
 	SDLRenderer::SDLRenderer (Window* window) {
 		
@@ -16,9 +17,12 @@ namespace lime {
 		if (window->flags & WINDOW_FLAG_VSYNC) sdlFlags |= SDL_RENDERER_PRESENTVSYNC;
 		
 		sdlRenderer = SDL_CreateRenderer (sdlWindow, -1, sdlFlags);
+		if (sdlRenderer)
+			SDL_GetRendererInfo(sdlRenderer, &SDLRenderer::sdlRendererInfo);
 		
 		OpenGLBindings::Init ();
-		
+		lastRenderTime = SDL_GetTicks();
+		mod_lastRenderTime = 0;
 	}
 	
 	
