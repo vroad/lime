@@ -16,7 +16,7 @@ typedef Float32Array = nodejs.Float32Array;
 	
 	public function new<T> (bufferOrArray:T, start:Int = 0, length:Null<Int> = null) {
 		
-		#if (openfl && neko)
+		#if (openfl && neko && !lime_legacy)
 		if (Std.is (bufferOrArray, openfl.Vector.VectorData)) {
 			
 			var vector:openfl.Vector<Float> = cast bufferOrArray;

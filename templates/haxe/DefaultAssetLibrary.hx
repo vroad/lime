@@ -6,6 +6,7 @@ import haxe.Unserializer;
 import lime.app.Preloader;
 import lime.audio.openal.AL;
 import lime.audio.AudioBuffer;
+import lime.graphics.Font;
 import lime.graphics.Image;
 import lime.utils.ByteArray;
 import lime.utils.UInt8Array;
@@ -57,6 +58,12 @@ class DefaultAssetLibrary extends AssetLibrary {
 		::end::::end::
 		
 		#else
+		
+		#if openfl
+		::if (assets != null)::
+		::foreach assets::::if (type == "font")::openfl.text.Font.registerFont (__ASSET__::flatName::);::end::
+		::end::::end::
+		#end
 		
 		#if (windows || mac || linux)
 		
@@ -647,16 +654,25 @@ class DefaultAssetLibrary extends AssetLibrary {
 ::end::
 #end
 
-#elseif (windows || mac || linux)
+#else
 
-::if (assets != null)::
+#if openfl
+::if (assets != null)::::foreach assets::::if (type == "font")::class __ASSET__::flatName:: extends openfl.text.Font { public function new () { super (); __fontPath = "::targetPath::"; fontName = "::fontName::"; }}
+::end::::end::::end::
+#end
+
+#if (windows || mac || linux)
+
+//::if (assets != null)::
 //::foreach assets::::if (embed)::::if (type == "image")::@:bitmap("::sourcePath::") class __ASSET__::flatName:: extends openfl.display.BitmapData {}
 //::elseif (type == "sound")::@:sound("::sourcePath::") class __ASSET__::flatName:: extends openfl.media.Sound {}
 //::elseif (type == "music")::@:sound("::sourcePath::") class __ASSET__::flatName:: extends openfl.media.Sound {}
 //::elseif (type == "font")::@:font("::sourcePath::") class __ASSET__::flatName:: extends openfl.text.Font {}
 //::else::@:file("::sourcePath::") class __ASSET__::flatName:: extends lime.utils.ByteArray {}
 //::end::::end::::end::
-::end::
+//::end::
+
+#end
 
 #end
 #end
