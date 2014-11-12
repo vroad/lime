@@ -174,10 +174,7 @@ namespace lime {
 				int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
 
 				if(should_be_zero == 0 && current.refresh_rate == 60)
-				{
 					useTimer = false;
-					printf("Timer is disabled.\n");
-				}
 			}
 		}
 		
