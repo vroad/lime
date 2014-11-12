@@ -22,8 +22,6 @@ namespace lime {
 			SDL_Window* sdlWindow;
 
 			static SDL_RendererInfo sdlRendererInfo;
-			Uint32 lastRenderTime;
-			Uint32 mod_lastRenderTime;
 		
 	};
 	

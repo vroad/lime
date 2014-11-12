@@ -21,8 +21,6 @@ namespace lime {
 			SDL_GetRendererInfo(sdlRenderer, &SDLRenderer::sdlRendererInfo);
 		
 		OpenGLBindings::Init ();
-		lastRenderTime = SDL_GetTicks();
-		mod_lastRenderTime = 0;
 	}
 	
 	
