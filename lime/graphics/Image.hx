@@ -15,9 +15,10 @@ import lime.utils.ByteArray;
 import lime.utils.UInt8Array;
 import lime.system.System;
 
-#if html5
+#if (js && html5)
 import js.html.CanvasElement;
 import js.html.ImageElement;
+import js.html.Image in JSImage;
 import js.Browser;
 #elseif flash
 import flash.display.BitmapData;
@@ -146,7 +147,7 @@ class Image {
 	
 	public function clone ():Image {
 		
-		#if html5
+		#if (js && html5)
 		ImageCanvasUtil.sync (this);
 		#end
 		
@@ -169,7 +170,7 @@ class Image {
 			
 			case DATA:
 				
-				#if html5
+				#if (js && html5)
 				ImageCanvasUtil.convertToData (this);
 				#end
 				
@@ -205,7 +206,7 @@ class Image {
 			
 			case DATA:
 				
-				#if html5
+				#if (js && html5)
 				ImageCanvasUtil.convertToData (this);
 				#end
 				
@@ -255,7 +256,7 @@ class Image {
 			
 			case DATA:
 				
-				#if html5
+				#if (js && html5)
 				ImageCanvasUtil.convertToData (this);
 				ImageCanvasUtil.convertToData (sourceImage);
 				#end
@@ -282,13 +283,19 @@ class Image {
 	}
 	
 	
-	public function encode (format:String = "png"):ByteArray {
+	public function encode (format:String = "png", quality:Int = 90):ByteArray {
 		
 		#if (!html5 && !flash)
-		#if format
+		
 		switch (format) {
 			
 			case "png":
+				
+				#if (sys && (!disable_cffi || !format))
+				
+				return lime_image_encode (buffer, 0, quality);
+				
+				#else
 				
 				try {
 					
@@ -318,12 +325,21 @@ class Image {
 					return ByteArray.fromBytes (output.getBytes ());
 					
 				} catch (e:Dynamic) {}
+				
+				#end
+			
+			case "jpg", "jpeg":
+				
+				#if (sys && (!disable_cffi || !format))
+				
+				return lime_image_encode (buffer, 1, quality);
+				
+				#end
 			
 			default:
-				
 			
 		}
-		#end
+		
 		#end
 		
 		return null;
@@ -344,7 +360,7 @@ class Image {
 			
 			case DATA:
 				
-				#if html5
+				#if (js && html5)
 				ImageCanvasUtil.convertToData (this);
 				#end
 				
@@ -374,7 +390,7 @@ class Image {
 			
 			case DATA:
 				
-				#if html5
+				#if (js && html5)
 				ImageCanvasUtil.convertToData (this);
 				#end
 				
@@ -418,7 +434,7 @@ class Image {
 	}
 	
 	
-	public static function fromCanvas (canvas:#if html5 CanvasElement #else Dynamic #end):Image {
+	public static function fromCanvas (canvas:#if (js && html5) CanvasElement #else Dynamic #end):Image {
 		
 		var buffer = new ImageBuffer (null, canvas.width, canvas.height);
 		buffer.src = canvas;
@@ -436,7 +452,7 @@ class Image {
 	}
 	
 	
-	public static function fromImageElement (image:#if html5 ImageElement #else Dynamic #end):Image {
+	public static function fromImageElement (image:#if (js && html5) ImageElement #else Dynamic #end):Image {
 		
 		var buffer = new ImageBuffer (null, image.width, image.height);
 		buffer.src = image;
@@ -457,7 +473,7 @@ class Image {
 			
 			case DATA:
 				
-				#if html5
+				#if (js && html5)
 				ImageCanvasUtil.convertToData (this);
 				#end
 				
@@ -488,7 +504,7 @@ class Image {
 			
 			case DATA:
 				
-				#if html5
+				#if (js && html5)
 				ImageCanvasUtil.convertToData (this);
 				#end
 				
@@ -519,7 +535,7 @@ class Image {
 			
 			case DATA:
 				
-				#if html5
+				#if (js && html5)
 				ImageCanvasUtil.convertToData (this);
 				#end
 				
@@ -588,7 +604,7 @@ class Image {
 			
 			case DATA:
 				
-				#if html5
+				#if (js && html5)
 				ImageCanvasUtil.convertToData (this);
 				#end
 				
@@ -617,7 +633,7 @@ class Image {
 			
 			case DATA:
 				
-				#if html5
+				#if (js && html5)
 				ImageCanvasUtil.convertToData (this);
 				#end
 				
@@ -647,7 +663,7 @@ class Image {
 			
 			case DATA:
 				
-				#if html5
+				#if (js && html5)
 				ImageCanvasUtil.convertToData (this);
 				#end
 				
@@ -667,7 +683,7 @@ class Image {
 	
 	private static function __base64Encode (bytes:ByteArray):String {
 		
-		#if html5
+		#if (js && html5)
 		var extension = switch (bytes.length % 3) {
 			
 			case 1: "==";
@@ -735,8 +751,8 @@ class Image {
 	
 	private function __fromBase64 (base64:String, type:String, onload:Image -> Void = null):Void {
 		
-		#if html5
-		var image:ImageElement = cast Browser.document.createElement ("img");
+		#if (js && html5)
+		var image = new JSImage ();
 		
 		var image_onLoaded = function (event) {
 			
@@ -765,7 +781,7 @@ class Image {
 	
 	private function __fromBytes (bytes:ByteArray, onload:Image -> Void):Void {
 		
-		#if html5
+		#if (js && html5)
 		
 		var type = "";
 		
@@ -816,9 +832,9 @@ class Image {
 	
 	private function __fromFile (path:String, onload:Image -> Void, onerror:Void -> Void):Void {
 		
-		#if html5
+		#if (js && html5)
 		
-		var image = cast Browser.document.createElement ("img");
+		var image = new JSImage ();
 		
 		image.onload = function (_) {
 			
@@ -986,7 +1002,7 @@ class Image {
 		
 		if (buffer.data == null && buffer.width > 0 && buffer.height > 0) {
 			
-			#if html5
+			#if (js && html5)
 			ImageCanvasUtil.convertToCanvas (this);
 			ImageCanvasUtil.createImageData (this);
 			#elseif flash
@@ -1080,7 +1096,7 @@ class Image {
 				
 				case DATA:
 					
-					#if html5
+					#if (js && html5)
 					ImageCanvasUtil.convertToData (this);
 					#end
 					
@@ -1098,7 +1114,7 @@ class Image {
 				
 				case DATA:
 					
-					#if html5
+					#if (js && html5)
 					ImageCanvasUtil.convertToData (this);
 					#end
 					
@@ -1162,6 +1178,7 @@ class Image {
 	
 	
 	#if (cpp || neko || nodejs)
+	private static var lime_image_encode:ImageBuffer -> Int -> Int -> ByteArray = System.load ("lime", "lime_image_encode", 3);
 	private static var lime_image_load:Dynamic = System.load ("lime", "lime_image_load", 1);
 	#end
 	
