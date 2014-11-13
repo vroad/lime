@@ -1028,7 +1028,7 @@ namespace lime {
 	
 	value lime_alc_open_device (value devicename) {
 		
-		ALCdevice* alcDevice = alcOpenDevice (devicename == val_null ? 0 : val_string (devicename));
+		ALCdevice* alcDevice = alcOpenDevice(val_is_null(devicename) ? 0 : val_string(devicename));
 		return alloc_float ((intptr_t)alcDevice);
 		
 	}
