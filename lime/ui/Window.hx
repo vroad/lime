@@ -89,7 +89,8 @@ class Window {
 			
 			#if dom
 			div = cast Browser.document.createElement ("div");
-			#else
+			#end
+			#if (!dom || (dom && webgl))
 			canvas = cast Browser.document.createElement ("canvas");
 			#end
 			

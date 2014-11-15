@@ -13,6 +13,7 @@ enum RenderContext {
 	CANVAS (context:CanvasRenderContext);
 	DOM (element:DOMRenderContext);
 	FLASH (stage:FlashRenderContext);
+	STAGE3D ();
 	CUSTOM (data:Dynamic);
 	
 }

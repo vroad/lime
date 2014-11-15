@@ -46,18 +46,33 @@ class Renderer {
 		
 		#if (js && html5)
 		
+		var useWebGL = false;
+		
 		if (window.div != null) {
 			
 			context = DOM (window.div);
+			
+			#if webgl
+			
+			useWebGL = true;
+			
+			#end
 			
 		} else if (window.canvas != null) {
 			
 			#if canvas
 			
-			var webgl = null;
+			context = CANVAS (cast window.canvas.getContext ("2d"));
 			
 			#else
 			
+			useWebGL = true;
+			
+			#end
+		}
+		
+		if (useWebGL)
+		{
 			var options = {
 				alpha: true,
 				antialias: window.config.antialiasing > 0,
@@ -69,33 +84,24 @@ class Renderer {
 			
 			var webgl:RenderingContext = cast window.canvas.getContextWebGL(options);
 			
+			#if debug
+			webgl = untyped WebGLDebugUtils.makeDebugContext (webgl);
 			#end
 			
-			if (webgl == null) {
-				
-				context = CANVAS (cast window.canvas.getContext ("2d"));
-				
-			} else {
-				
-				#if debug
-				webgl = untyped WebGLDebugUtils.makeDebugContext (webgl);
-				#end
-				
-				GL.context = webgl;
-				#if (js && html5)
-				context = OPENGL (cast GL.context);
-				#else
-				context = OPENGL (new GLRenderContext ());
-				#end
-				
-			}
-			
+			GL.context = webgl;
+			#if !dom
+			context = OPENGL (cast GL.context);
+			#end
 		}
 		
 		#elseif (cpp || neko || nodejs)
 		
 		handle = lime_renderer_create (window.handle);
+#if !disable_gl_renderer
 		context = OPENGL (new GLRenderContext ());
+#else
+		context = CUSTOM (null);
+#end
 		
 		#elseif flash
 		
