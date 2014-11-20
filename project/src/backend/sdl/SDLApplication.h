@@ -37,6 +37,8 @@ namespace lime {
 			
 			bool active;
 			bool useTimer;
+			bool useVSync;
+			bool minimized;
 			Uint32 currentUpdate;
 			double framePeriod;
 			KeyEvent keyEvent;

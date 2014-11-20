@@ -146,6 +146,18 @@ namespace lime {
 						ProcessWindowEvent (event);
 						active = false;
 						break;
+								
+					case SDL_WINDOWEVENT_MINIMIZED:
+
+						ProcessWindowEvent (event);
+						minimized = true;
+						break;
+
+					case SDL_WINDOWEVENT_RESTORED:
+
+						ProcessWindowEvent (event);
+						minimized = false;
+						break;
 					
 				}
 				
@@ -165,6 +177,8 @@ namespace lime {
 	void SDLApplication::Init() {
 
 		useTimer = true;
+		useVSync = false;
+		minimized = false;
 		if (SDLRenderer::sdlRendererInfo.flags & SDL_RENDERER_PRESENTVSYNC)
 		{
 			int numVideoDisplays = SDL_GetNumVideoDisplays();
@@ -174,7 +188,10 @@ namespace lime {
 				int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
 
 				if(should_be_zero == 0 && current.refresh_rate == 60)
-					useTimer = false;
+				{
+					useTimer = true;
+					useVSync = true;
+				}
 			}
 		}
 		
@@ -337,6 +354,16 @@ namespace lime {
 				HandleEvent (&event);
 				event.type = -1;
 				
+			}
+
+			if (useVSync)
+			{
+				useTimer = minimized;
+				if (!useTimer && timerActive)
+				{
+					SDL_RemoveTimer(timerID);
+					timerActive = false;
+				}
 			}
 			
 			if (useTimer)
