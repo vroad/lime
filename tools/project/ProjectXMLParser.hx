@@ -1660,15 +1660,13 @@ class ProjectXMLParser extends HXProject {
 				var path = PathHelper.getHaxelib (new Haxelib (substring.substr (8)), true);
 				substring = PathHelper.standardize (path);
 				
-			} else {
+			} else if (defines.exists (substring)) {
 				
 				substring = defines.get (substring);
 				
-			}
-			
-			if (substring == null) {
+			} else if (environment != null && environment.exists (substring)) {
 				
-				substring = "";
+				substring = environment.get (substring);
 				
 			}
 			
