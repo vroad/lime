@@ -19,6 +19,8 @@ namespace lime {
 		sdlRenderer = SDL_CreateRenderer (sdlWindow, -1, sdlFlags);
 		if (sdlRenderer)
 			SDL_GetRendererInfo(sdlRenderer, &SDLRenderer::sdlRendererInfo);
+
+		SDL_GL_SetSwapInterval(-1);
 		
 		OpenGLBindings::Init ();
 	}
