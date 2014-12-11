@@ -14,7 +14,7 @@ typedef UInt32Array = nodejs.Uint32Array;
 	public var length (default, null) : Int;
 	
 	
-	public function new<T> (bufferOrArray:T, start:Int = 0, length:Null<Int> = null) {
+	public function new #if !java <T> #end (bufferOrArray:#if !java T #else Dynamic #end, start:Int = 0, length:Null<Int> = null) {
 		
 		if (Std.is (bufferOrArray, Int)) {
 			
@@ -87,7 +87,7 @@ typedef UInt32Array = nodejs.Uint32Array;
 	}
 	
 	
-	public function set<T> (bufferOrArray:T, offset:Int = 0):Void {
+	public function set #if !java <T> #end (bufferOrArray:#if !java T #else Dynamic #end, offset:Int = 0):Void {
 		
 		if (Std.is (bufferOrArray, Array)) {
 			

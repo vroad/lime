@@ -14,8 +14,11 @@ import js.html.HtmlElement;
 import js.Browser;
 #elseif flash
 import flash.Lib;
+#elseif java
+import haxe.Int64;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.system.glfw.GLFW;
 #end
-
 
 @:access(lime.app.Application)
 
@@ -51,6 +54,8 @@ class Window {
 	#end
 	#elseif (cpp || neko || nodejs)
 	public var handle:Dynamic;
+	#elseif java
+	public var handle:Int64;
 	#end
 	
 	private var setHeight:Int;
@@ -198,8 +203,23 @@ class Window {
 		
 		handle = lime_window_create (application.__handle, width, height, flags, config.title);
 		
+		#elseif java
+		
+		GLFW.glfwWindowHint (GLFW.GLFW_SAMPLES, config.antialiasing);
+		
+		if (config.borderless) GLFW.glfwWindowHint (GLFW.GLFW_DECORATED, GL11.GL_TRUE);
+		if (!config.depthBuffer) GLFW.glfwWindowHint (GLFW.GLFW_DEPTH_BITS, 0);
+		//if (config.fullscreen) GLFW.glfwWindowHint (GLFW.GLFW_DECORATED, GL11.GL_TRUE);
+		if (!config.resizable) GLFW.glfwWindowHint (GLFW.GLFW_RESIZABLE, GL11.GL_FALSE);
+		if (!config.stencilBuffer) GLFW.glfwWindowHint (GLFW.GLFW_STENCIL_BITS, 0);
+		
+		handle = GLFW.glfwCreateWindow (width, height, config.title, null, null);
+		
+		if (config.vsync) GLFW.glfwSwapInterval (1);
+		
 		#end
 		
+		KeyEventManager.registerWindow (this);
 		MouseEventManager.registerWindow (this);
 		TouchEventManager.registerWindow (this);
 		

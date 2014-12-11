@@ -7,6 +7,7 @@ import helpers.AssetHelper;
 import helpers.CPPHelper;
 import helpers.FileHelper;
 import helpers.IconHelper;
+import helpers.JavaHelper;
 import helpers.NekoHelper;
 import helpers.NodeJSHelper;
 import helpers.PathHelper;
@@ -14,6 +15,7 @@ import helpers.PlatformHelper;
 import helpers.ProcessHelper;
 import project.AssetType;
 import project.Architecture;
+import project.Haxelib;
 import project.HXProject;
 import project.Platform;
 import project.PlatformTarget;
@@ -50,6 +52,10 @@ class MacPlatform extends PlatformTarget {
 		if (project.targetFlags.exists ("neko") || project.target != PlatformHelper.hostPlatform) {
 			
 			targetType = "neko";
+			
+		} else if (project.targetFlags.exists ("java")) {
+			
+			targetType = "java";
 			
 		} else if (project.targetFlags.exists ("nodejs")) {
 			
@@ -104,6 +110,16 @@ class MacPlatform extends PlatformTarget {
 			NekoHelper.createExecutable (project.templatePaths, "Mac" + (is64 ? "64" : ""), targetDirectory + "/obj/ApplicationMain.n", executablePath);
 			NekoHelper.copyLibraries (project.templatePaths, "Mac" + (is64 ? "64" : ""), executableDirectory);
 			
+		} else if (targetType == "java") {
+			
+			var libPath = PathHelper.combine (PathHelper.getHaxelib (new Haxelib ("lime")), "templates/java/lib/");
+			
+			ProcessHelper.runCommand ("", "haxe", [ hxml, "-java-lib", libPath + "disruptor.jar", "-java-lib", libPath + "lwjgl.jar" ]);
+			ProcessHelper.runCommand (targetDirectory + "/obj", "haxelib", [ "run", "hxjava", "hxjava_build.txt", "--haxe-version", "3103" ]);
+			FileHelper.recursiveCopy (targetDirectory + "/obj/lib", PathHelper.combine (executableDirectory, "lib"));
+			FileHelper.copyFile (targetDirectory + "/obj/ApplicationMain" + (project.debug ? "-Debug" : "") + ".jar", PathHelper.combine (executableDirectory, project.app.file + ".jar"));
+			JavaHelper.copyLibraries (project.templatePaths, "Mac" + (is64 ? "64" : ""), executableDirectory);
+			
 		} else if (targetType == "nodejs") {
 			
 			ProcessHelper.runCommand ("", "haxe", [ hxml ]);
@@ -142,7 +158,7 @@ class MacPlatform extends PlatformTarget {
 			
 		}
 		
-		if (PlatformHelper.hostPlatform != Platform.WINDOWS && targetType != "nodejs") {
+		if (PlatformHelper.hostPlatform != Platform.WINDOWS && targetType != "nodejs" && targetType != "java") {
 			
 			ProcessHelper.runCommand ("", "chmod", [ "755", executablePath ]);
 			
@@ -224,6 +240,10 @@ class MacPlatform extends PlatformTarget {
 		if (targetType == "nodejs") {
 			
 			NodeJSHelper.run (project, executableDirectory + "/ApplicationMain.js", arguments);
+			
+		} else if (targetType == "java") {
+			
+			ProcessHelper.runCommand (executableDirectory, "java", [ "-jar", project.app.file + ".jar" ].concat (arguments));
 			
 		} else if (project.target == PlatformHelper.hostPlatform) {
 			

@@ -252,6 +252,7 @@ class Image {
 			
 			case CANVAS:
 				
+				ImageCanvasUtil.convertToCanvas (this);
 				ImageCanvasUtil.copyPixels (this, sourceImage, sourceRect, destPoint, alphaImage, alphaPoint, mergeAlpha);
 			
 			case DATA:
@@ -291,11 +292,13 @@ class Image {
 			
 			case "png":
 				
-				#if (sys && (!disable_cffi || !format))
+				#if java
+				
+				#elseif (sys && (!disable_cffi || !format))
 				
 				return lime_image_encode (buffer, 0, quality);
 				
-				#else
+				#elseif !js
 				
 				try {
 					
@@ -330,7 +333,9 @@ class Image {
 			
 			case "jpg", "jpeg":
 				
-				#if (sys && (!disable_cffi || !format))
+				#if java
+				
+				#elseif (sys && (!disable_cffi || !format))
 				
 				return lime_image_encode (buffer, 1, quality);
 				
@@ -868,11 +873,11 @@ class Image {
 		// (issue #1019768)
 		if (image.complete) { }
 		
-		#elseif (cpp || neko || nodejs)
+		#elseif (cpp || neko || nodejs || java)
 		
 		var buffer = null;
 		
-		#if (sys && (!disable_cffi || !format))
+		#if (sys && (!disable_cffi || !format) && !java)
 		
 		var data = lime_image_load (path);
 		if (data != null) {
