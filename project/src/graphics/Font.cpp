@@ -624,7 +624,9 @@ namespace lime {
 		
 		glyphList.sort (CompareGlyphHeight);
 		
-		image->Resize (128, 128, 1);
+		// TODO: use 1bpp bitmap instead
+		int bpp = 4;
+		image->Resize (128, 128, bpp);
 		int x = 0, y = 0, maxRows = 0;
 		unsigned char *bytes = image->data->Bytes ();
 		
@@ -672,7 +674,8 @@ namespace lime {
 					
 				}
 				
-				image->Resize (image->width, image->height, 1);
+				image->Resize (image->width, image->height, bpp);
+				bytes = image->data->Bytes();
 				rectsIndex = 0;
 				it = glyphList.begin ();
 				it--;
