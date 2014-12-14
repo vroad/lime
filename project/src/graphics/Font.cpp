@@ -283,7 +283,7 @@ namespace lime {
 			
 		} else if (error) {
 			
-			printf ("Failed to load font face %s\n", fontFace);
+			//printf ("Failed to load font face %s\n", fontFace);
 			return;
 			
 		}
