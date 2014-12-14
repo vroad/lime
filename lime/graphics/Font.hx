@@ -198,7 +198,12 @@ class Font {
 				
 			}
 			
-			return new ImageBuffer (new UInt8Array (data.image.data), data.image.width, data.image.height, data.image.bpp);
+			#if nodejs
+			var u8a:UInt8Array = data.image.data.byteView;
+			#else
+			var u8a:UInt8Array = new UInt8Array (data.image.data);
+			#end
+			return new ImageBuffer (u8a, data.image.width, data.image.height, data.image.bpp);
 			
 		}
 		
@@ -265,7 +270,7 @@ class Font {
 			
 		}
 		
-		#if (flash || js)
+		#if (flash || html5)
 		
 		//this.glyphs = glyphs;
 		
