@@ -210,6 +210,11 @@ namespace lime {
 		if (resource->path) {
 			
 			file = lime::fopen (resource->path, "rb");
+			if (!file)
+			{
+				jpeg_destroy_decompress(&cinfo);
+				return false;
+			}
 			jpeg_stdio_src (&cinfo, file);
 			
 		} else {
