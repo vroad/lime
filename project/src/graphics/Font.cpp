@@ -261,6 +261,7 @@ namespace lime {
 	
 	Font::Font (const char *fontFace) {
 		
+		face = 0;
 		int error;
 		FT_Library library;
 		
@@ -269,6 +270,7 @@ namespace lime {
 		if (error) {
 			
 			printf ("Could not initialize FreeType\n");
+			return;
 			
 		}
 		
@@ -277,10 +279,12 @@ namespace lime {
 		if (error == FT_Err_Unknown_File_Format) {
 			
 			printf ("Invalid font type\n");
+			return;
 			
 		} else if (error) {
 			
 			printf ("Failed to load font face %s\n", fontFace);
+			return;
 			
 		}
 		

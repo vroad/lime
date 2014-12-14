@@ -159,6 +159,11 @@ namespace lime {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = new Font (val_string (fontFace));
+		if (font->face == 0)
+		{
+			delete font;
+			return alloc_null();
+		}
 		value v = alloc_float ((intptr_t)font);
 		val_gc (v, lime_font_destroy);
 		return v;
