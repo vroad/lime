@@ -924,31 +924,35 @@ class CommandLineTools {
 			var versionFile = PathHelper.combine (project.app.path, ".build");
 			var version = 1;
 			
-			PathHelper.mkdir (project.app.path);
-			
-			if (FileSystem.exists (versionFile)) {
+			try {
 				
-				var previousVersion = Std.parseInt (File.getBytes (versionFile).toString ());
-				
-				if (previousVersion != null) {
+				if (FileSystem.exists (versionFile)) {
 					
-					version = previousVersion;
+					var previousVersion = Std.parseInt (File.getBytes (versionFile).toString ());
 					
-					if (increment) {
+					if (previousVersion != null) {
 						
-						version ++;
+						version = previousVersion;
+						
+						if (increment) {
+							
+							version ++;
+							
+						}
 						
 					}
 					
 				}
 				
-			}
+			} catch (e:Dynamic) {}
 			
 			project.meta.buildNumber = Std.string (version);
 			
 			if (increment) {
 				
 				try {
+					
+					PathHelper.mkdir (project.app.path);
 					
 					var output = File.write (versionFile, false);
 					output.writeString (Std.string (version));
@@ -1028,7 +1032,7 @@ class CommandLineTools {
 			
 		}
 		
-		var json = Json.parse (File.getContent (PathHelper.getHaxelib (haxelib) + "/haxelib.json"));
+		var json = Json.parse (File.getContent (PathHelper.getHaxelib (haxelib, true) + "/haxelib.json"));
 		return json.version;
 		
 	}
@@ -1141,7 +1145,21 @@ class CommandLineTools {
 				
 				if (define == define.toUpperCase ()) {
 					
-					Sys.putEnv (define, config.defines.get (define));
+					switch (define) {
+						
+						case "ANT_HOME", "JAVA_HOME":
+							
+							if (FileSystem.exists (config.defines.get (define))) {
+								
+								Sys.putEnv (define, config.defines.get (define));
+								
+							}
+						
+						default:
+							
+							Sys.putEnv (define, config.defines.get (define));
+						
+					}
 					
 				}
 				

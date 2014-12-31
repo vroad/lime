@@ -111,7 +111,15 @@ class CPPHelper {
 				
 			}
 			
-			ProcessHelper.runCommand (path, "haxelib", args);
+			Sys.putEnv ("HXCPP_EXIT_ON_ERROR", "");
+			
+			var code = ProcessHelper.runCommand (path, "haxelib", args);
+			
+			if (code != 0) {
+				
+				Sys.exit (code);
+				
+			}
 			
 		}
 		
@@ -288,6 +296,8 @@ class CPPHelper {
 			Sys.putEnv ("HXCPP_COMPILE_THREADS", Std.string (threads));
 			
 		}
+		
+		Sys.putEnv ("HXCPP_EXIT_ON_ERROR", "");
 		
 		ProcessHelper.runCommand (path, "haxelib", args);
 		

@@ -24,6 +24,8 @@
 #include <graphics/RenderEvent.h>
 #include <system/System.h>
 #include <ui/KeyEvent.h>
+#include <ui/Mouse.h>
+#include <ui/MouseCursor.h>
 #include <ui/MouseEvent.h>
 #include <ui/TouchEvent.h>
 #include <ui/Window.h>
@@ -334,6 +336,30 @@ namespace lime {
 	}
 	
 	
+	value lime_mouse_hide () {
+		
+		Mouse::Hide ();
+		return alloc_null ();
+		
+	}
+	
+	
+	value lime_mouse_set_cursor (value cursor) {
+		
+		Mouse::SetCursor ((MouseCursor)val_int (cursor));
+		return alloc_null ();
+		
+	}
+	
+	
+	value lime_mouse_show () {
+		
+		Mouse::Show ();
+		return alloc_null ();
+		
+	}
+	
+	
 	value lime_neko_execute (value module) {
 		
 		#ifdef LIME_NEKO
@@ -467,6 +493,16 @@ namespace lime {
 	}
 	
 	
+	value lime_window_set_icon (value window, value buffer) {
+		
+		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		ImageBuffer imageBuffer = ImageBuffer (buffer);
+		targetWindow->SetIcon (&imageBuffer);
+		return alloc_null ();
+		
+	}
+	
+	
 	DEFINE_PRIM (lime_application_create, 1);
 	DEFINE_PRIM (lime_application_exec, 1);
 	DEFINE_PRIM (lime_application_init, 1);
@@ -485,6 +521,9 @@ namespace lime {
 	DEFINE_PRIM (lime_key_event_manager_register, 2);
 	DEFINE_PRIM (lime_lzma_encode, 1);
 	DEFINE_PRIM (lime_lzma_decode, 1);
+	DEFINE_PRIM (lime_mouse_hide, 0);
+	DEFINE_PRIM (lime_mouse_set_cursor, 1);
+	DEFINE_PRIM (lime_mouse_show, 0);
 	DEFINE_PRIM (lime_mouse_event_manager_register, 2);
 	DEFINE_PRIM (lime_neko_execute, 1);
 	DEFINE_PRIM (lime_renderer_create, 1);
@@ -499,6 +538,7 @@ namespace lime {
 	DEFINE_PRIM (lime_window_event_manager_register, 2);
 	DEFINE_PRIM (lime_window_move, 3);
 	DEFINE_PRIM (lime_window_resize, 3);
+	DEFINE_PRIM (lime_window_set_icon, 2);
 	
 	
 }

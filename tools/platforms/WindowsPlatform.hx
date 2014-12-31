@@ -12,6 +12,7 @@ import helpers.NodeJSHelper;
 import helpers.PathHelper;
 import helpers.PlatformHelper;
 import helpers.ProcessHelper;
+import project.Asset;
 import project.AssetType;
 import project.Haxelib;
 import project.HXProject;
@@ -25,7 +26,6 @@ class WindowsPlatform extends PlatformTarget {
 	
 	private var applicationDirectory:String;
 	private var executablePath:String;
-	private var targetDirectory:String;
 	private var targetType:String;
 	
 	
@@ -92,6 +92,8 @@ class WindowsPlatform extends PlatformTarget {
 			}
 			
 		}
+		
+		IconHelper.createIcon (project.icons, 32, 32, PathHelper.combine (applicationDirectory, "icon.png"));
 		
 		if (targetType == "neko") {
 			

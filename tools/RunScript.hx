@@ -45,11 +45,17 @@ class RunScript {
 			
 			if (!FileSystem.exists (source)) {
 				
-				var args = [ "tools/tools.n", "rebuild", "lime", "-nocffi" ];
+				var args = [ "tools/tools.n", "rebuild", "lime", "-release", "-nocffi" ];
 				
 				if (LogHelper.verbose) {
 					
 					args.push ("-verbose");
+					
+				}
+				
+				if (!LogHelper.enableColor) {
+					
+					args.push ("-nocolor");
 					
 				}
 				
@@ -59,7 +65,7 @@ class RunScript {
 						
 						if (PlatformHelper.hostPlatform == WINDOWS) {
 							
-							ProcessHelper.runCommand ("", "neko", args.concat ([ "windows", toolsDirectory ]));
+							ProcessHelper.runCommand (limeDirectory, "neko", args.concat ([ "windows", toolsDirectory ]));
 							
 						}
 					
@@ -67,7 +73,7 @@ class RunScript {
 						
 						if (PlatformHelper.hostPlatform == MAC) {
 							
-							ProcessHelper.runCommand ("", "neko", args.concat ([ "mac", toolsDirectory ]));
+							ProcessHelper.runCommand (limeDirectory, "neko", args.concat ([ "mac", toolsDirectory ]));
 							
 						}
 					
@@ -75,7 +81,7 @@ class RunScript {
 						
 						if (PlatformHelper.hostPlatform == LINUX && PlatformHelper.hostArchitecture == X86) {
 							
-							ProcessHelper.runCommand ("", "neko", args.concat ([ "linux", "-32", toolsDirectory ]));
+							ProcessHelper.runCommand (limeDirectory, "neko", args.concat ([ "linux", "-32", toolsDirectory ]));
 							
 						}
 					
@@ -83,7 +89,7 @@ class RunScript {
 						
 						if (PlatformHelper.hostPlatform == LINUX && PlatformHelper.hostArchitecture == X64) {
 							
-							ProcessHelper.runCommand ("", "neko", args.concat ([ "linux", "-64", toolsDirectory ]));
+							ProcessHelper.runCommand (limeDirectory, "neko", args.concat ([ "linux", "-64", toolsDirectory ]));
 							
 						}
 					
@@ -95,7 +101,7 @@ class RunScript {
 				
 				if (LogHelper.verbose) {
 					
-					LogHelper.warn ("", "Warning: Source path \"" + source + "\" does not exist");
+					LogHelper.warn ("", "Source path \"" + source + "\" does not exist");
 					
 				}
 				
