@@ -41,10 +41,11 @@ namespace lime {
 		height = val_int (val_field (imageBuffer, id_height));
 		bpp = val_int (val_field (imageBuffer, id_bitsPerPixel));
 		value data_value = val_field (imageBuffer, id_data);
-		if (val_is_buffer (data_value))
-			data = new ByteArray (data_value);
+		value buffer_value = val_field (data_value, id_buffer);
+		if (val_is_buffer (buffer_value))
+			data = new ByteArray (buffer_value);
 		else
-			data = new ByteArray (val_field (data_value, id_buffer));
+			data = new ByteArray (data_value);
 		
 	}
 	
