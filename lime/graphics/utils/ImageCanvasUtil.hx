@@ -158,15 +158,11 @@ class ImageCanvasUtil {
 			
 			// TODO: Better solution?
 			
-			if (image.type == CANVAS) {
-				
-				buffer.data = cast buffer.__srcImageData.data;
-				
-			} else {
-				
-				buffer.data = new UInt8Array (buffer.__srcImageData.data);
-				
-			}
+			#if (js && html5 && !dom)
+			buffer.data = cast buffer.__srcImageData.data;
+			#else
+			buffer.data = new UInt8Array (buffer.__srcImageData.data);
+			#end
 			
 		}
 		
@@ -236,6 +232,18 @@ class ImageCanvasUtil {
 		createImageData (image);
 		
 		return ImageDataUtil.getPixels (image, rect);
+		
+	}
+	
+	
+	public static function merge (image:Image, sourceImage:Image, sourceRect:Rectangle, destPoint:Vector2, redMultiplier:Int, greenMultiplier:Int, blueMultiplier:Int, alphaMultiplier:Int):Void {
+		
+		convertToCanvas (sourceImage);
+		createImageData (sourceImage);
+		convertToCanvas (image);
+		createImageData (image);
+		
+		ImageDataUtil.merge (image, sourceImage, sourceRect, destPoint, redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier);
 		
 	}
 	

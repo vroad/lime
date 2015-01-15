@@ -209,6 +209,31 @@ class IOSPlatform extends PlatformTarget {
 		context.CPP_BUILD_LIBRARY = project.config.getString ("cpp.buildLibrary", "hxcpp");
 		context.IOS_LINKER_FLAGS = ["-stdlib=libc++"].concat (project.config.getArrayString ("ios.linker-flags"));
 		
+		var compilerFlags = "";
+		
+		for (key in project.haxedefs.keys ()) {
+			
+			switch (key) {
+				
+				case "no-compilation":
+				default:
+					
+					var value = project.haxedefs.get (key);
+					
+					if (value == null || value == "") {
+						
+						value = "1";
+						
+					}
+					
+					compilerFlags += " -D" + StringTools.replace (key, "-", "_") + "=\"" + value + "\"";
+				
+			}
+			
+		}
+		
+		context.CPP_BUILD_LIBRARY_FLAGS = compilerFlags;
+		
 		switch (project.window.orientation) {
 			
 			case PORTRAIT:
@@ -335,14 +360,31 @@ class IOSPlatform extends PlatformTarget {
 		PathHelper.mkdir (projectDirectory + "/haxe");
 		PathHelper.mkdir (projectDirectory + "/haxe/lime/installer");
 		
-		var iconNames = [ "Icon.png", "Icon@2x.png", "Icon-60.png", "Icon-60@2x.png", "Icon-72.png", "Icon-72@2x.png", "Icon-76.png", "Icon-76@2x.png" ];
-		var iconSizes = [ 57, 114, 60, 120, 72, 144, 76, 152 ];
-		
+		var iconSizes:Array<IconSize> = [
+			{ name : "Icon-Small.png", size : 29 },
+			{ name : "Icon-Small-40.png", size : 40 },
+			{ name : "Icon-Small-50.png", size : 50 },
+			{ name : "Icon.png", size : 57 },
+			{ name : "Icon-Small@2x.png", size : 58 },
+			{ name : "Icon-72.png", size : 72 },
+			{ name : "Icon-76.png", size : 76 },
+			{ name : "Icon-Small-40@2x.png", size : 80 },
+			{ name : "Icon-Small-50@2x.png", size : 100 },
+			{ name : "Icon@2x.png", size : 114 },
+			{ name : "Icon-60@2x.png", size : 120 },
+			{ name : "Icon-72@2x.png", size : 144 },
+			{ name : "Icon-76@2x.png", size : 152 },
+			{ name : "Icon-60@3x.png", size : 180 },
+		];
+
 		context.HAS_ICON = true;
 		
-		for (i in 0...iconNames.length) {
+		var iconPath = PathHelper.combine (projectDirectory, "Images.xcassets/AppIcon.appiconset");
+		PathHelper.mkdir (iconPath);
+		
+		for (iconSize in iconSizes) {
 			
-			if (!IconHelper.createIcon (project.icons, iconSizes[i], iconSizes[i], PathHelper.combine (projectDirectory, iconNames[i]))) {
+			if (!IconHelper.createIcon (project.icons, iconSize.size, iconSize.size, PathHelper.combine (iconPath, iconSize.name))) {
 				
 				context.HAS_ICON = false;
 				
@@ -350,21 +392,31 @@ class IOSPlatform extends PlatformTarget {
 			
 		}
 		
-		var splashScreenNames = [ "Default.png", "Default@2x.png", "Default-568h@2x.png", "Default-Portrait.png", "Default-Landscape.png", "Default-Portrait@2x.png", "Default-Landscape@2x.png" ];
-		var splashScreenWidth = [ 320, 640, 640, 768, 1024, 1536, 2048 ];
-		var splashScreenHeight = [ 480, 960, 1136, 1024, 768, 2048, 1536 ];
+		var splashSizes:Array<SplashSize> = [
+			{ name: "Default.png", w: 320, h: 480 }, // iPhone, portrait
+			{ name: "Default@2x.png", w: 640, h: 960  }, // iPhone Retina, portrait
+			{ name: "Default-568h@2x.png", w: 640, h: 1136 }, // iPhone 5, portrait
+			{ name: "Default-Portrait.png", w: 768, h: 1024 }, // iPad, portrait
+			{ name: "Default-Landscape.png", w: 1024, h: 768  }, // iPad, landscape
+			{ name: "Default-Portrait@2x.png", w: 1536, h: 2048 }, // iPad Retina, portrait
+			{ name: "Default-Landscape@2x.png", w: 2048, h: 1536 },	// iPad Retina, landscape
+			{ name: "Default-667h@2x.png", w: 750, h: 1334 }, // iPhone 6, portrait
+			{ name: "Default-736h@3x.png", w: 1242,	h: 2208 }, // iPhone 6 Plus, portrait
+			{ name: "Default-736h-Landscape@3x.png", w: 2208, h: 1242 }, // iPhone 6 Plus, landscape
+		];
+
+		var splashScreenPath = PathHelper.combine (projectDirectory, "Images.xcassets/LaunchImage.launchimage");
+		PathHelper.mkdir (splashScreenPath);
 		
-		for (i in 0...splashScreenNames.length) {
+		for (size in splashSizes) {
 			
-			var width = splashScreenWidth[i];
-			var height = splashScreenHeight[i];
 			var match = false;
 			
 			for (splashScreen in project.splashScreens) {
 				
-				if (splashScreen.width == width && splashScreen.height == height && Path.extension (splashScreen.path) == "png") {
+				if (splashScreen.width == size.w && splashScreen.height == size.h && Path.extension (splashScreen.path) == "png") {
 					
-					FileHelper.copyFile (splashScreen.path, PathHelper.combine (projectDirectory, splashScreenNames[i]));
+					FileHelper.copyFile (splashScreen.path, PathHelper.combine (splashScreenPath, size.name));
 					match = true;
 					
 				}
@@ -373,16 +425,16 @@ class IOSPlatform extends PlatformTarget {
 			
 			if (!match) {
 				
-				var splashScreenPath = PathHelper.combine (projectDirectory, splashScreenNames[i]);
+				var imagePath = PathHelper.combine (splashScreenPath, size.name);
 				
-				if (!FileSystem.exists (splashScreenPath)) {
+				if (!FileSystem.exists (imagePath)) {
 					
-					LogHelper.info ("", " - \x1b[1mGenerating image:\x1b[0m " + PathHelper.combine (projectDirectory, splashScreenNames[i]));
+					LogHelper.info ("", " - \x1b[1mGenerating image:\x1b[0m " + imagePath);
 					
-					var image = new Image (null, 0, 0, width, height, (0xFF << 24) | (project.window.background & 0xFFFFFF));
+					var image = new Image (null, 0, 0, size.w, size.h, (0xFF << 24) | (project.window.background & 0xFFFFFF));
 					var bytes = image.encode ("png");
 					
-					File.saveBytes (splashScreenPath, bytes);
+					File.saveBytes (imagePath, bytes);
 					
 				}
 				
@@ -395,6 +447,7 @@ class IOSPlatform extends PlatformTarget {
 		FileHelper.recursiveCopyTemplate (project.templatePaths, "iphone/PROJ/haxe", projectDirectory + "/haxe", context);
 		FileHelper.recursiveCopyTemplate (project.templatePaths, "haxe", projectDirectory + "/haxe", context);
 		FileHelper.recursiveCopyTemplate (project.templatePaths, "iphone/PROJ/Classes", projectDirectory + "/Classes", context);
+		FileHelper.recursiveCopyTemplate (project.templatePaths, "iphone/PROJ/Images.xcassets", projectDirectory + "/Images.xcassets", context);
 		FileHelper.copyFileTemplate (project.templatePaths, "iphone/PROJ/PROJ-Entitlements.plist", projectDirectory + "/" + project.app.file + "-Entitlements.plist", context);
 		FileHelper.copyFileTemplate (project.templatePaths, "iphone/PROJ/PROJ-Info.plist", projectDirectory + "/" + project.app.file + "-Info.plist", context);
 		FileHelper.copyFileTemplate (project.templatePaths, "iphone/PROJ/PROJ-Prefix.pch", projectDirectory + "/" + project.app.file + "-Prefix.pch", context);
@@ -483,7 +536,8 @@ class IOSPlatform extends PlatformTarget {
 			
 			if (asset.type != AssetType.TEMPLATE) {
 				
-				var targetPath = projectDirectory + "/assets/" + asset.resourceName;
+				var targetPath = PathHelper.combine (projectDirectory + "/assets/", asset.resourceName);
+				
 				//var sourceAssetPath:String = projectDirectory + "haxe/" + asset.sourcePath;
 				
 				PathHelper.mkdir (Path.directory (targetPath));
@@ -494,8 +548,10 @@ class IOSPlatform extends PlatformTarget {
 				
 			} else {
 				
-				PathHelper.mkdir (Path.directory (projectDirectory + "/" + asset.targetPath));
-				FileHelper.copyAsset (asset, projectDirectory + "/" + asset.targetPath, context);
+				var targetPath = PathHelper.combine (projectDirectory, asset.targetPath);
+				
+				PathHelper.mkdir (Path.directory (targetPath));
+				FileHelper.copyAsset (asset, targetPath, context);
 				
 			}
 			
@@ -535,5 +591,22 @@ class IOSPlatform extends PlatformTarget {
 	@ignore public override function trace ():Void {}
 	@ignore public override function uninstall ():Void {}
 	
+	
+}
+
+
+private typedef IconSize = {
+	
+	name:String,
+	size:Int,
+	
+}
+
+
+private typedef SplashSize = {
+	
+	name:String,
+	w:Int,
+	h:Int,
 	
 }
