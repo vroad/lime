@@ -21,7 +21,7 @@ class PNG {
 		
 		#if java
 		
-		#elseif (sys && (!disable_cffi || !format))
+		#elseif (sys && !html5 && (!disable_cffi || !format))
 			
 			return lime_image_encode (image.buffer, 0, 0);
 			
