@@ -82,34 +82,40 @@ class AndroidHelper {
 	
 	public static function getDeviceSDKVersion (deviceID:String):Int {
 		
-		var tempFile = PathHelper.getTemporaryFile ();
+		var devices = listDevices ();
 		
-		var args = [ "wait-for-device", "shell", "getprop", "ro.build.version.sdk", ">", tempFile ];
-		
-		if (deviceID != null && deviceID != "") {
+		if (devices.length > 0) {
 			
-			args.unshift (deviceID);
-			args.unshift ("-s");
+			var tempFile = PathHelper.getTemporaryFile ();
 			
-			connect (deviceID);
+			var args = [ "wait-for-device", "shell", "getprop", "ro.build.version.sdk", ">", tempFile ];
 			
-		}
-		
-		if (PlatformHelper.hostPlatform == Platform.MAC) {
+			if (deviceID != null && deviceID != "") {
+				
+				args.unshift (deviceID);
+				args.unshift ("-s");
+				
+				//connect (deviceID);
+				
+			}
 			
-			ProcessHelper.runCommand (adbPath, "perl", [ "-e", 'alarm shift @ARGV; exec @ARGV', "3", adbName ].concat (args));
+			if (PlatformHelper.hostPlatform == Platform.MAC) {
+				
+				ProcessHelper.runCommand (adbPath, "perl", [ "-e", 'alarm shift @ARGV; exec @ARGV', "3", adbName ].concat (args), true, true);
+				
+			} else {
+				
+				ProcessHelper.runCommand (adbPath, adbName, args, true, true);
+				
+			}
 			
-		} else {
-			
-			ProcessHelper.runCommand (adbPath, adbName, args);
-			
-		}
-		
-		if (FileSystem.exists (tempFile)) {
-			
-			var output = File.getContent (tempFile);
-			FileSystem.deleteFile (tempFile);
-			return Std.parseInt (output);
+			if (FileSystem.exists (tempFile)) {
+				
+				var output = File.getContent (tempFile);
+				FileSystem.deleteFile (tempFile);
+				return Std.parseInt (output);
+				
+			}
 			
 		}
 		
@@ -276,7 +282,26 @@ class AndroidHelper {
 	public static function listDevices ():Array <String> {
 		
 		var devices = new Array <String> ();
-		var output = ProcessHelper.runProcess (adbPath, adbName, [ "devices" ]);
+		var output = "";
+		
+		if (PlatformHelper.hostPlatform == Platform.MAC) {
+			
+			var tempFile = PathHelper.getTemporaryFile ();
+			
+			ProcessHelper.runCommand (adbPath, adbName, [ "devices", ">", tempFile ], true, true);
+			
+			if (FileSystem.exists (tempFile)) {
+				
+				output = File.getContent (tempFile);
+				FileSystem.deleteFile (tempFile);
+				
+			}
+			
+		} else {
+			
+			ProcessHelper.runCommand (adbPath, adbName, [ "devices" ], true, true);
+			
+		}
 		
 		if (output != null && output != "") {
 			

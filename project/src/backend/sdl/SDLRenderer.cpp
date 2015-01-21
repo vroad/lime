@@ -28,7 +28,11 @@ namespace lime {
 	
 	SDLRenderer::~SDLRenderer () {
 		
-		
+		if (sdlRenderer) {
+			
+			SDL_DestroyRenderer (sdlRenderer);
+			
+		}
 		
 	}
 	
