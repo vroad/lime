@@ -234,7 +234,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 		// TODO: Complete Lime Font API
 		
 		#if openfl
-		#if (flash || js)
+		#if (flash || html5)
 		
 		return cast (Type.createInstance (className.get (id), []), openfl.text.Font);
 		
