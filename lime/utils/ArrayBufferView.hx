@@ -5,7 +5,6 @@ typedef ArrayBufferView = js.html.ArrayBufferView;
 typedef ArrayBufferView = nodejs.ArrayBufferView;
 #else
 
-
 import lime.utils.ByteArray;
 import lime.utils.IMemoryRange;
 
@@ -78,7 +77,7 @@ import haxe.io.BytesData;
 		
 		#if flash
 		buffer.endian = flash.utils.Endian.LITTLE_ENDIAN;
-		#else
+		#elseif (cpp || neko)
 		buffer.bigEndian = false;
 		#end
 		

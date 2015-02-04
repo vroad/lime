@@ -65,7 +65,7 @@ class AndroidHelper {
 	
 	private static function connect (deviceID:String):Void {
 		
-		if (deviceID != null && deviceID != "") {
+		if (deviceID != null && deviceID != "" && deviceID.indexOf ("emulator") == -1) {
 			
 			if (deviceID.indexOf (":") > 0) {
 				
@@ -227,6 +227,8 @@ class AndroidHelper {
 				
 			}
 			
+			ProcessHelper.runCommand (adbPath, adbName, [ "-s", deviceID, "shell", "input", "keyevent", "82" ]);
+			
 		}
 		
 		var args = [ "install", "-r" ];
@@ -284,7 +286,7 @@ class AndroidHelper {
 		var devices = new Array <String> ();
 		var output = "";
 		
-		if (PlatformHelper.hostPlatform == Platform.MAC) {
+		if (PlatformHelper.hostPlatform != Platform.WINDOWS) {
 			
 			var tempFile = PathHelper.getTemporaryFile ();
 			
@@ -299,7 +301,7 @@ class AndroidHelper {
 			
 		} else {
 			
-			ProcessHelper.runCommand (adbPath, adbName, [ "devices" ], true, true);
+			output = ProcessHelper.runProcess (adbPath, adbName, [ "devices" ], true, true);
 			
 		}
 		

@@ -259,9 +259,8 @@ namespace lime {
 	}
 	
 	
-	Font::Font (const char *fontFace) {
+	Font *Font::FromFile (const char *fontFace) {
 		
-		face = 0;
 		int error;
 		FT_Library library;
 		
@@ -270,24 +269,37 @@ namespace lime {
 		if (error) {
 			
 			printf ("Could not initialize FreeType\n");
-			return;
+			return 0;
 			
+		} else {
+		
+			FT_Face face;
+			error = FT_New_Face (library, fontFace, 0, &face);
+			
+			if (error == FT_Err_Unknown_File_Format) {
+
+				printf ("Invalid font type\n");
+
+			} else if (error) {
+
+				printf ("Failed to load font face %s\n", fontFace);
+
+			} else {
+
+				return new Font(face);
+
+			}
+
 		}
 		
-		error = FT_New_Face (library, fontFace, 0, &face);
-		
-		if (error == FT_Err_Unknown_File_Format) {
-			
-			printf ("Invalid font type\n");
-			return;
-			
-		} else if (error) {
-			
-			//printf ("Failed to load font face %s\n", fontFace);
-			return;
-			
-		}
-		
+		return 0;
+
+	}
+
+	Font::Font (FT_Face face) {
+
+		this->face = face;
+
 		/* Set charmap
 		 *
 		 * See http://www.microsoft.com/typography/otspec/name.htm for a list of
@@ -532,8 +544,11 @@ namespace lime {
 		
 	}
 	
-	
-	bool Font::InsertCodepoint (unsigned long codepoint) {
+	bool Font::InsertCodepointFromIndex (unsigned long codepoint) {
+		return InsertCodepoint(codepoint, false);
+	}
+
+	bool Font::InsertCodepoint (unsigned long codepoint, bool b) {
 		
 		GlyphInfo info;
 		info.codepoint = codepoint;
@@ -547,8 +562,12 @@ namespace lime {
 		// if (codepoint < (*first).codepoint ||
 		// 	(codepoint == (*first).codepoint && mSize != (*first).size)) {
 			
-			info.index = FT_Get_Char_Index (face, codepoint);
 			
+			if (b) {
+				info.index = FT_Get_Char_Index (face, codepoint);
+			} else {
+				info.index = codepoint;	
+			}
 			if (FT_Load_Glyph (face, info.index, FT_LOAD_DEFAULT) != 0) return false;
 			info.height = face->glyph->metrics.height;
 			

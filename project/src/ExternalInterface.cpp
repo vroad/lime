@@ -160,15 +160,18 @@ namespace lime {
 	value lime_font_load (value fontFace) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = new Font (val_string (fontFace));
-		if (font->face == 0)
-		{
-			delete font;
-			return alloc_null();
+		Font *font = Font::FromFile (val_string (fontFace));
+		if (font) {
+
+			value v = alloc_float ((intptr_t)font);
+			val_gc (v, lime_font_destroy);
+			return v;
+
+		} else {
+
+			return alloc_null ();
+
 		}
-		value v = alloc_float ((intptr_t)font);
-		val_gc (v, lime_font_destroy);
-		return v;
 		#else
 		return alloc_null ();
 		#endif
@@ -458,6 +461,16 @@ namespace lime {
 	}
 	
 	
+	value lime_window_close (value window) {
+		
+		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		targetWindow->Close ();
+		delete targetWindow;
+		return alloc_null ();
+		
+	}
+	
+	
 	value lime_window_create (value application, value width, value height, value flags, value title) {
 		
 		Window* window = CreateWindow ((Application*)(intptr_t)val_float (application), val_int (width), val_int (height), val_int (flags), val_string (title));
@@ -534,6 +547,7 @@ namespace lime {
 	DEFINE_PRIM (lime_text_from_string, 4);
 	DEFINE_PRIM (lime_touch_event_manager_register, 2);
 	DEFINE_PRIM (lime_update_event_manager_register, 2);
+	DEFINE_PRIM (lime_window_close, 1);
 	DEFINE_PRIM (lime_window_create, 5);
 	DEFINE_PRIM (lime_window_event_manager_register, 2);
 	DEFINE_PRIM (lime_window_move, 3);

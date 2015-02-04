@@ -9,14 +9,7 @@ import js.html.TouchEvent;
 import js.Browser;
 import lime.app.Application;
 import lime.graphics.Image;
-import lime.ui.KeyEventManager;
-import lime.ui.MouseEventManager;
-import lime.ui.TouchEventManager;
 import lime.ui.Window;
-
-@:access(lime.ui.KeyEventManager)
-@:access(lime.ui.MouseEventManager)
-@:access(lime.ui.TouchEventManager)
 
 
 class HTML5Window {
@@ -37,6 +30,19 @@ class HTML5Window {
 	public function new (parent:Window) {
 		
 		this.parent = parent;
+		
+		if (parent.config != null && Reflect.hasField (parent.config, "element")) {
+			
+			element = parent.config.element;
+			
+		}
+		
+	}
+	
+	
+	public function close ():Void {
+		
+		
 		
 	}
 	
@@ -153,54 +159,6 @@ class HTML5Window {
 			
 		}
 		
-		#if stats
-		stats = untyped __js__("new Stats ()");
-		stats.domElement.style.position = "absolute";
-		stats.domElement.style.top = "0px";
-		Browser.document.body.appendChild (stats.domElement);
-		#end
-		
-		Browser.window.addEventListener ("focus", handleEvent, false);
-		Browser.window.addEventListener ("blur", handleEvent, false);
-		Browser.window.addEventListener ("resize", handleEvent, false);
-		Browser.window.addEventListener ("beforeunload", handleEvent, false);
-		
-	}
-	
-	
-	private function handleEvent (event:js.html.Event):Void {
-		
-		switch (event.type) {
-			
-			case "focus":
-				
-				Window.onWindowFocusIn.dispatch ();
-				Window.onWindowActivate.dispatch ();
-			
-			case "blur":
-				
-				Window.onWindowFocusOut.dispatch ();
-				Window.onWindowDeactivate.dispatch ();
-			
-			case "resize":
-				
-				var cacheWidth = parent.width;
-				var cacheHeight = parent.height;
-				
-				handleResize ();
-				
-				if (parent.width != cacheWidth || parent.height != cacheHeight) {
-					
-					Window.onWindowResize.dispatch (parent.width, parent.height);
-					
-				}
-			
-			case "beforeunload":
-				
-				Window.onWindowClose.dispatch ();
-			
-		}
-		
 	}
 	
 	
@@ -246,15 +204,15 @@ class HTML5Window {
 				
 				case "mousedown":
 					
-					MouseEventManager.onMouseDown.dispatch (x, y, event.button);
+					parent.onMouseDown.dispatch (x, y, event.button);
 				
 				case "mouseup":
 					
-					MouseEventManager.onMouseUp.dispatch (x, y, event.button);
+					parent.onMouseUp.dispatch (x, y, event.button);
 				
 				case "mousemove":
 					
-					MouseEventManager.onMouseMove.dispatch (x, y, event.button);
+					parent.onMouseMove.dispatch (x, y, event.button);
 				
 				default:
 				
@@ -262,7 +220,7 @@ class HTML5Window {
 			
 		} else {
 			
-			MouseEventManager.onMouseWheel.dispatch (untyped event.deltaX, untyped event.deltaY);
+			parent.onMouseWheel.dispatch (untyped event.deltaX, untyped event.deltaY);
 			
 		}
 		
@@ -379,15 +337,15 @@ class HTML5Window {
 			
 			case "touchstart":
 				
-				TouchEventManager.onTouchStart.dispatch (x, y, id);
+				parent.onTouchStart.dispatch (x, y, id);
 			
 			case "touchmove":
 				
-				TouchEventManager.onTouchMove.dispatch (x, y, id);
+				parent.onTouchMove.dispatch (x, y, id);
 			
 			case "touchend":
 				
-				TouchEventManager.onTouchEnd.dispatch (x, y, id);
+				parent.onTouchEnd.dispatch (x, y, id);
 			
 			default:
 			

@@ -3,7 +3,7 @@ License
 
 The MIT License (MIT)
 
-Copyright (c) 2013-2015 OpenFL contributors
+Copyright (c) 2013-2015 Joshua Granick and other Lime contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,17 +25,88 @@ THE SOFTWARE.
 
 -------
 
-Portions of other MIT-license projects are also used, including content that is
+This product bundles libcurl 7.37.1, which is available under an
+"MIT/X derivate" license. For details, see [project/lib/curl/](project/lib).
 
-    Copyright (c) 2007-2015 NME contributors
-    Copyright (c) 2014-2015 snow contributors
+This product bundles freetype 2.5.3, which is available under an
+"FTL" (BSD-style) license. For details, see [project/lib/freetype/](project/lib).
+
+This product bundles harfbuzz 0.9.32, which is available under an
+"MIT" license. For details, see [project/lib/harfbuzz/](project/lib).
+
+This product bundles libjpeg 6b, which is available under a
+"libjpeg" (BSD-style) license. For details, see [project/lib/jpeg/](project/lib).
+
+This product bundles libogg 1.3.0, which is available under a
+"BSD" license. For details, see [project/lib/ogg/](project/lib).
+
+This product bundles OpenAL-Soft 1.15.1, which is available under an
+"LGPLv3" license. For details, see [project/lib/openal/](project/lib). It also bundles
+an OpenAL-Soft derivative for Android under [project/lib/openal-android/](project/lib).
+
+_OpenAL-Soft is only included in dynamically-linked builds, it is excluded
+from Lime static builds in order to preserve Lime's permissive nature._
+
+This product bundles libpng 1.6.12, which is available under a
+"zlib" (BSD-style) license. For details, see [project/lib/png/](project/lib).
+
+This product bundles SDL 2.0.4+9174, which is available under a
+"zlib" (BSD-style) license. For details, see [project/lib/sdl/](project/lib).
+
+This product bundles libvorbis 1.3.3, which is available under a
+"BSD" license. For details, see [project/lib/vorbis/](project/lib).
+
+This product bundles zlib 1.2.8, which is available under a
+"zlib" (BSD-style) license. For details, see [project/lib/zlib/](project/lib).
 
 -------
 
-Native dependencies include unrestrictive licenses, such as the Zlib, MIT, or BSD
-license. The full text of each license is included in each sub-repository. The 
-notable exception is OpenAL Soft, which is LGPL-licensed.
+Modifications and source-repository versions of Haxe core files are included in the
+[haxe/](haxe/) folder, which are available under an "MIT" license. For details, see
+https://github.com/haxefoundation/haxe
 
-When Lime is compiled to a shared binary, the LGPL "copy-left" clause will apply
-to Lime's C++ source-code, but not to other aspects of a project. When Lime
-is statically linked to project code, OpenAL Soft is not included.
+The following files were developed in collaboration with the NME project,
+which is available under an "MIT" license. For details, see
+https://github.com/haxenme/nme
+
+    legacy/
+    lime/utils/
+    project/include/utils/ByteArray.h
+    project/include/utils/QuickVec.h
+    project/src/graphics/format/
+    project/src/graphics/opengl/
+    project/src/utils/ByteArray.cpp
+    tools/utils/JavaExternGenerator.hx
+
+The following files were developed in collaboration with Sven Bergström
+and the snow project, which is available under an "MIT" license. For
+details, see https://github.com/underscorediscovery/snow
+
+    project/src/audio/openal/OpenALBindings.cpp
+
+-------
+
+_The following are not included in Lime applications, but are used by
+the Lime command-line tools. Their licensing does not affect products
+created with Lime._
+
+This product bundles Closure Compiler v20141215, which is available under an
+"Apache 2.0 License" license. For details, see https://github.com/google/closure-compiler.
+
+This product bundles ios-deploy 1.0.3, which is available under an
+"GPLv3" license. For details, see https://github.com/openfl/ios-deploy.
+
+This product bundles ios-sim 1.8.2, which is available under an
+"MIT" license. For details, see https://github.com/openfl/ios-sim.
+
+This product bundles node.js 0.10.26, which is available under an
+"MIT" license. For details, see https://github.com/joyent/node.
+
+This product bundles http-server 0.7.4, which is available under an
+"MIT" license. For details, see https://github.com/nodeapps/http-server.
+
+This product bundles webify 0.1.1.0, which is available under an
+"MIT" license. For details, see https://github.com/ananthakumaran/webify.
+
+This product bundles YUI Compressor 2.4.7, which is available under an
+"MIT" license. For details, see https://github.com/yui/yuicompressor.

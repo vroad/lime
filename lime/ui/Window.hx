@@ -11,30 +11,61 @@ import lime.graphics.Renderer;
 class Window {
 	
 	
-	public static var onWindowActivate = new Event<Void->Void> ();
-	public static var onWindowClose = new Event<Void->Void> ();
-	public static var onWindowDeactivate = new Event<Void->Void> ();
-	public static var onWindowFocusIn = new Event<Void->Void> ();
-	public static var onWindowFocusOut = new Event<Void->Void> ();
-	public static var onWindowMove = new Event<Float->Float->Void> ();
-	public static var onWindowResize = new Event<Int->Int->Void> ();
-	
 	public var currentRenderer:Renderer;
 	public var config:Config;
 	public var fullscreen:Bool;
 	public var height:Int;
+	public var onKeyDown = new Event<Int->Int->Void> ();
+	public var onKeyUp = new Event<Int->Int->Void> ();
+	public var onMouseDown = new Event<Float->Float->Int->Void> ();
+	public var onMouseMove = new Event<Float->Float->Int->Void> ();
+	public var onMouseUp = new Event<Float->Float->Int->Void> ();
+	public var onMouseWheel = new Event<Float->Float->Void> ();
+	public var onTouchEnd = new Event<Float->Float->Int->Void> ();
+	public var onTouchMove = new Event<Float->Float->Int->Void> ();
+	public var onTouchStart = new Event<Float->Float->Int->Void> ();
+	public var onWindowActivate = new Event<Void->Void> ();
+	public var onWindowClose = new Event<Void->Void> ();
+	public var onWindowDeactivate = new Event<Void->Void> ();
+	public var onWindowFocusIn = new Event<Void->Void> ();
+	public var onWindowFocusOut = new Event<Void->Void> ();
+	public var onWindowMove = new Event<Float->Float->Void> ();
+	public var onWindowResize = new Event<Int->Int->Void> ();
 	public var width:Int;
 	public var x:Int;
 	public var y:Int;
 	
-	@:noCompletion public var backend:WindowBackend;
+	@:noCompletion private var backend:WindowBackend;
 	
 	
-	public function new (config:Config) {
+	public function new (config:Config = null) {
 		
 		this.config = config;
 		
+		width = 0;
+		height = 0;
+		fullscreen = false;
+		x = 0;
+		y = 0;
+		
+		if (config != null) {
+			
+			// TODO: Switch to the tool's Config type?
+			
+			if (Reflect.hasField (config, "width")) width = config.width;
+			if (Reflect.hasField (config, "height")) height = config.height;
+			if (Reflect.hasField (config, "fullscreen")) fullscreen = config.fullscreen;
+			
+		}
+		
 		backend = new WindowBackend (this);
+		
+	}
+	
+	
+	public function close ():Void {
+		
+		backend.close ();
 		
 	}
 	

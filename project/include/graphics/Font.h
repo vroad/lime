@@ -23,25 +23,19 @@ namespace lime {
 	class Image;
 	
 	
-	#ifdef LIME_FREETYPE
 	typedef struct {
 		
 		unsigned long codepoint;
 		size_t size;
+	#ifdef LIME_FREETYPE
 		FT_UInt index;
 		FT_Pos height;
-		
-	} GlyphInfo;
 	#else
-	typedef struct {
-		
-		unsigned long codepoint;
-		size_t size;
 		int index;
 		int height;
+	#endif
 		
 	} GlyphInfo;
-	#endif
 	
 	
 	class Font {
@@ -49,7 +43,7 @@ namespace lime {
 		
 		public:
 			
-			Font (const char *fontFace);
+			static Font *FromFile (const char *fontFace);
 			
 			value Decompose (int em);
 			value GetFamilyName ();
@@ -57,16 +51,18 @@ namespace lime {
 			void LoadRange (unsigned long start, unsigned long end);
 			value RenderToImage (ImageBuffer *image);
 			void SetSize (size_t size);
-			
+			bool InsertCodepointFromIndex (unsigned long codepoint);
+
 			#ifdef LIME_FREETYPE
+			Font (FT_Face face);
 			FT_Face face;
 			#else
 			void* face;
 			#endif
 			
 		private:
-			
-			bool InsertCodepoint (unsigned long codepoint);
+
+			bool InsertCodepoint (unsigned long codepoint, bool b = true);
 			
 			std::list<GlyphInfo> glyphList;
 			size_t mSize;
