@@ -127,29 +127,28 @@
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/configs/linux/" if="linux"/>
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/configs/windows/" if="windows"/>
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/configs/mac/" if="mac"/>
+			<compilerflag value="-DHAVE_LIBC" />
 			<compilerflag value="-DLIME_SDL" />
 			
 			<file name="src/backend/sdl/SDLApplication.cpp" />
 			<file name="src/backend/sdl/SDLWindow.cpp" />
 			<file name="src/backend/sdl/SDLRenderer.cpp" />
 			<file name="src/backend/sdl/SDLMouse.cpp" />
+			<file name="src/backend/sdl/SDLSystem.cpp" />
+			<file name="src/backend/sdl/SDLJNI.cpp" />
 			
 		</section>
-		
-		<file name="src/system/ios/System.mm" if="ios" />
 		
 		<file name="src/app/UpdateEvent.cpp" />
 		<file name="src/audio/format/WAV.cpp" />
 		<file name="src/audio/AudioBuffer.cpp" />
 		<file name="src/graphics/ImageBuffer.cpp" />
 		<file name="src/graphics/RenderEvent.cpp" />
-		<file name="src/system/System.cpp" />
 		<file name="src/ui/KeyEvent.cpp" />
 		<file name="src/ui/MouseEvent.cpp" />
 		<file name="src/ui/TouchEvent.cpp" />
 		<file name="src/ui/WindowEvent.cpp" />
 		<file name="src/utils/ByteArray.cpp" />
-		<file name="src/utils/FileIO.cpp" />
 		
 	</files>
 	

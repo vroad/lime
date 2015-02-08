@@ -30,6 +30,7 @@
 #include <ui/TouchEvent.h>
 #include <ui/Window.h>
 #include <ui/WindowEvent.h>
+#include <utils/JNI.h>
 #include <vm/NekoVM.h>
 
 
@@ -295,6 +296,17 @@ namespace lime {
 	}
 	
 	
+	value lime_jni_getenv () {
+		
+		#ifdef ANDROID
+		return alloc_float ((intptr_t)JNI::GetEnv ());
+		#else
+		return alloc_null ();
+		#endif
+		
+	}
+	
+	
 	value lime_key_event_manager_register (value callback, value eventObject) {
 		
 		KeyEvent::callback = new AutoGCRoot (callback);
@@ -398,9 +410,9 @@ namespace lime {
 	}
 	
 	
-	value lime_system_get_timestamp () {
+	value lime_system_gettimer () {
 		
-		return alloc_float (System::GetTimestamp ());
+		return alloc_float (System::GetTimer ());
 		
 	}
 	
@@ -531,6 +543,7 @@ namespace lime {
 	DEFINE_PRIM (lime_font_outline_decompose, 2);
 	DEFINE_PRIM (lime_image_encode, 3);
 	DEFINE_PRIM (lime_image_load, 1);
+	DEFINE_PRIM (lime_jni_getenv, 0);
 	DEFINE_PRIM (lime_key_event_manager_register, 2);
 	DEFINE_PRIM (lime_lzma_encode, 1);
 	DEFINE_PRIM (lime_lzma_decode, 1);
@@ -542,7 +555,7 @@ namespace lime {
 	DEFINE_PRIM (lime_renderer_create, 1);
 	DEFINE_PRIM (lime_renderer_flip, 1);
 	DEFINE_PRIM (lime_render_event_manager_register, 2);
-	DEFINE_PRIM (lime_system_get_timestamp, 0);
+	DEFINE_PRIM (lime_system_gettimer, 0);
 	DEFINE_PRIM (lime_text_create, 3);
 	DEFINE_PRIM (lime_text_from_string, 4);
 	DEFINE_PRIM (lime_touch_event_manager_register, 2);

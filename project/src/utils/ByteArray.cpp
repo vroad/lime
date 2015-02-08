@@ -1,8 +1,6 @@
-
 #include <hx/CFFI.h>
-
+#include <system/System.h>
 #include <utils/ByteArray.h>
-#include <utils/FileIO.h>
 #include <string>
 
 
@@ -145,7 +143,7 @@ namespace lime {
     
     ByteArray ByteArray::FromFile(const OSChar *inFilename)
 {
-   FILE *file = lime::fopen (inFilename, "rb");
+   FILE_HANDLE *file = lime::fopen (inFilename, "rb");
    if (!file)
    {
       #ifdef ANDROID
@@ -170,7 +168,7 @@ value lime_byte_array_overwrite_file(value inFilename, value inBytes) {
 
         // file is created if it doesn't exist,
    // if it exists, it is truncated to zero
-   FILE *file = lime::fopen (val_os_string(inFilename), "wb");
+   FILE_HANDLE *file = lime::fopen (val_os_string(inFilename), "wb");
    if (!file)
    {
       #ifdef ANDROID

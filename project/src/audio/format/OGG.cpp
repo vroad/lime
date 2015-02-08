@@ -1,5 +1,5 @@
 #include <audio/format/OGG.h>
-#include <utils/FileIO.h>
+#include <system/System.h>
 #include <vorbis/vorbisfile.h>
 
 
@@ -110,28 +110,28 @@ namespace lime {
 		
 		if (resource->path) {
 			
-			FILE *file;
+			FILE_HANDLE *file;
 			
-			#ifdef ANDROID
-			FileInfo info = AndroidGetAssetFD (resource->path);
-			file = lime::fdopen (info.fd, "rb");
-			lime::fseek (file, info.offset, 0);
-			#else
+			//#ifdef ANDROID
+			//FileInfo info = AndroidGetAssetFD (resource->path);
+			//file = lime::fdopen (info.fd, "rb");
+			//lime::fseek (file, info.offset, 0);
+			//#else
 			file = lime::fopen (resource->path, "rb");
-			#endif
+			//#endif
 			
-			if (!file) {
+			if (!file || !file->isFile ()) {
 				
 				//LOG_SOUND("FAILED to read audio file, file pointer as null?\n");
 				return false;
 				
 			}
 			
-			#ifdef ANDROID
-			ov_open (file, &oggFile, NULL, info.length);
-			#else
-			ov_open (file, &oggFile, NULL, 0);
-			#endif
+			//#ifdef ANDROID
+			//ov_open (file, &oggFile, NULL, info.length);
+			//#else
+			ov_open (file->getFile (), &oggFile, NULL, file->getLength ());
+			//#endif
 			
 		} else {
 			
