@@ -415,7 +415,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 	
 	public override function loadAudioBuffer (id:String, handler:AudioBuffer -> Void):Void {
 		
-		#if (flash || js)
+		#if (flash || html5)
 		
 		//if (path.exists (id)) {
 			
@@ -567,7 +567,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 	
 	/*public override function loadMusic (id:String, handler:Dynamic -> Void):Void {
 		
-		#if (flash || js)
+		#if (flash || html5)
 		
 		//if (path.exists (id)) {
 			
