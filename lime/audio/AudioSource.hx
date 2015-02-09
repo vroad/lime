@@ -159,7 +159,7 @@ class AudioSource {
 		
 		#if html5
 		
-			return 0;
+		return 1;
 		
 		#elseif flash
 			
@@ -178,7 +178,7 @@ class AudioSource {
 		
 		#if html5
 		
-			return 0;
+		return 1;
 		
 		#elseif flash
 			
@@ -201,7 +201,7 @@ class AudioSource {
 		
 		#if html5
 		
-			return 0;
+		return 0;
 		
 		#elseif flash
 			
@@ -220,7 +220,7 @@ class AudioSource {
 		
 		#if html5
 		
-			return 0;
+		return 0;
 		
 		#elseif flash
 			
