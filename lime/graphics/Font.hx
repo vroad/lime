@@ -1,6 +1,7 @@
 package lime.graphics;
 
 
+import haxe.io.Bytes;
 import lime.graphics.Image;
 import lime.utils.ByteArray;
 import lime.utils.UInt8Array;
@@ -18,25 +19,24 @@ class Font {
 
 
 	public var fontName (default, null):String;
-	public var image:Image;
-	public var glyphs:Map<Int, Map<Int, GlyphRect>>;
-
+	
 	@:noCompletion private var __fontPath:String;
 	@:noCompletion private var __handle:Dynamic;
-
-
-	public function new (fontName:String = null) {
+	public var glyphs:Map<Int, Map<Int, GlyphRect>>;
+	private var fontData:NativeFontData;
+	
+	private static var fontNames:Map<String, Font> = new Map();
+	
+	private function new (fontName:String = null) {
 
 		this.fontName = fontName;
 		this.glyphs = new Map<Int, Map<Int, GlyphRect>>();
 
 	}
-
-
-	public function createImage ():ImageBuffer {
-
-		glyphs = new Map<Int, Map<Int, GlyphRect>>();
-
+	
+	
+	public function createImage (size:Int, text:String):Array<GlyphRect> {
+		
 		#if (js && html5)
 
 		/*
@@ -170,41 +170,39 @@ class Font {
 		return new ImageBuffer (bd, bd.width, bd.height);*/
 
 		#elseif (cpp || neko || nodejs)
-
+		
 		if (__handle==null)	throw "Uninitialized font handle.";
-		var data = lime_font_create_image (__handle);
-
+		var data = lime_font_create_image (__handle, size, text);
+		
 		if (data == null) {
 
 			return null;
 
 		} else {
-
-			var glyphRects:Map<Int, GlyphRect>;
-
-			for (glyph in cast (data.glyphs, Array<Dynamic>)) {
-
-				if (glyphs.exists (glyph.size)) {
-
-					glyphRects = glyphs.get (glyph.size);
-
-				} else {
-
-					glyphRects = new Map<Int, GlyphRect>();
-					glyphs.set (glyph.size, glyphRects);
-
-				}
-
-				glyphRects.set (glyph.codepoint, new GlyphRect (glyph.x, glyph.y, glyph.width, glyph.height, glyph.offset.x, glyph.offset.y));
-
+			
+			var glyphRects:Map<Int, GlyphRect> = glyphs.get (size);
+			
+			if (glyphRects == null) {
+				
+				glyphRects = new Map<Int, GlyphRect>();
+				glyphs.set (size, glyphRects);
+				
 			}
 			
-			#if nodejs
-			var u8a:UInt8Array = data.image.data.byteView;
-			#else
-			var u8a:UInt8Array = new UInt8Array (data.image.data);
-			#end
-			return new ImageBuffer (u8a, data.image.width, data.image.height, data.image.bpp);
+			var createdGlyphs:Array<GlyphRect> = [];
+			
+			var glyphs:Array<Dynamic> = data.glyphs;
+			
+			for (i in 0 ... glyphs.length)
+			{
+				
+				var gr:GlyphRect = cast glyphs[i];
+				glyphRects.set (StringTools.fastCodeAt(text, i), gr);
+				createdGlyphs.push(gr);
+				
+			}
+			
+			return createdGlyphs;
 			
 		}
 
@@ -218,10 +216,9 @@ class Font {
 	public function decompose ():NativeFontData {
 
 		#if (cpp || neko || nodejs)
-
-		if (__handle==null)	throw "Uninitialized font handle.";
-		return lime_font_outline_decompose (__handle, 1024 * 20);
-
+		
+		return lime_font_outline_decompose (__handle, 1024 * 1024 * 20);
+		
 		#else
 
 		return null;
@@ -229,8 +226,25 @@ class Font {
 		#end
 
 	}
-
-
+	
+	public function getFontData():NativeFontData {
+		
+		#if (cpp || neko || nodejs)
+		
+		if (fontData == null)
+			return fontData = lime_font_get_face_info (__handle);
+		else
+			return fontData;
+		
+		#else
+		
+		return null;
+		
+		#end
+		
+	}
+	
+	
 	public static function fromBytes (bytes:ByteArray):Font {
 
 		var font = new Font ();
@@ -247,6 +261,12 @@ class Font {
 		return font;
 
 	}
+	
+	public static function fromName (name:String):Font {
+		
+		return fontNames[name];
+		
+	}
 
 
 	public function loadRange (size:Int, start:Int, end:Int) {
@@ -256,10 +276,10 @@ class Font {
 		// this.glyphs = glyphs;
 
 		#elseif (cpp || neko || nodejs)
-
+		
 		if (__handle==null)	throw "Uninitialized font handle.";
-		lime_font_load_range (__handle, size, start, end);
-
+		//lime_font_load_range (__handle, size, start, end);
+		
 		#end
 
 	}
@@ -278,10 +298,10 @@ class Font {
 		//this.glyphs = glyphs;
 
 		#elseif (cpp || neko || nodejs)
-
+		
 		if (__handle==null)	throw "Uninitialized font handle.";
-		lime_font_load_glyphs (__handle, size, glyphs);
-
+		//lime_font_load_glyphs (__handle, size, glyphs);
+		
 		#end
 
 	}
@@ -298,6 +318,7 @@ class Font {
 		if (__handle != null) {
 
 			fontName = lime_font_get_family_name (__handle);
+			fontNames[fontName] = this;
 
 		}
 
@@ -309,38 +330,31 @@ class Font {
 	#if (cpp || neko || nodejs)
 	private static var lime_font_get_family_name = System.load ("lime", "lime_font_get_family_name", 1);
 	private static var lime_font_load = System.load ("lime", "lime_font_load", 1);
-	private static var lime_font_load_glyphs = System.load ("lime", "lime_font_load_glyphs", 3);
-	private static var lime_font_load_range = System.load ("lime", "lime_font_load_range", 4);
-	private static var lime_font_create_image = System.load ("lime", "lime_font_create_image", 1);
+	//private static var lime_font_load_glyphs = System.load ("lime", "lime_font_load_glyphs", 3);
+	//private static var lime_font_load_range = System.load ("lime", "lime_font_load_range", 4);
+	private static var lime_font_create_image = System.load ("lime", "lime_font_create_image", 3);
 	private static var lime_font_outline_decompose = System.load ("lime", "lime_font_outline_decompose", 2);
+	private static var lime_font_get_face_info = System.load ("lime", "lime_font_get_face_info", 1);
 	#end
 
 
 }
 
 
-class GlyphRect {
-
-
-	public var x:Float;
-	public var y:Float;
-	public var width:Float;
-	public var height:Float;
+typedef GlyphRect = {
+	
+	
+	public var width:Int;
+	public var height:Int;
 	public var xOffset:Int;
 	public var yOffset:Int;
-
-
-	public function new (x:Float, y:Float, width:Float, height:Float, xOffset:Int=0, yOffset:Int=0) {
-
-		this.x = x;
-		this.y = y;
-		this.xOffset = xOffset;
-		this.yOffset = yOffset;
-		this.width = width;
-		this.height = height;
-
-	}
-
+	public var bitmap:ByteArray;
+	
+	public var advance:Int;
+	public var min_x:Int;
+	public var max_x:Int;
+	public var min_y:Int;
+	public var max_y:Int;
 
 }
 

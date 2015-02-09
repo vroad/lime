@@ -3,7 +3,6 @@
 
 
 #include <hx/CFFI.h>
-#include <list>
 #include <graphics/ImageBuffer.h>
 
 #ifdef LIME_FREETYPE
@@ -44,14 +43,15 @@ namespace lime {
 		public:
 			
 			static Font *FromFile (const char *fontFace);
+			~Font();
 			
 			value Decompose (int em);
+			value GetFaceInfo ();
 			value GetFamilyName ();
-			void LoadGlyphs (const char *glyphs);
-			void LoadRange (unsigned long start, unsigned long end);
-			value RenderToImage (ImageBuffer *image);
+			value GetGlyphInfo (const char *glyphs);
+			value RenderToImage (size_t size, const char *glyphs);
+			value GetKernings (value glyphs);
 			void SetSize (size_t size);
-			bool InsertCodepointFromIndex (unsigned long codepoint);
 
 			#ifdef LIME_FREETYPE
 			Font (FT_Face face);
@@ -61,10 +61,7 @@ namespace lime {
 			#endif
 			
 		private:
-
-			bool InsertCodepoint (unsigned long codepoint, bool b = true);
 			
-			std::list<GlyphInfo> glyphList;
 			size_t mSize;
 		
 	};

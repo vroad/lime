@@ -121,14 +121,12 @@ namespace lime {
 	}
 	
 	
-	value lime_font_create_image (value fontHandle) {
+	value lime_font_create_image (value fontHandle, value size, value glyphs) {
 		
 		#ifdef LIME_FREETYPE
-		ImageBuffer image;
 		Font *font = (Font*)(intptr_t)val_float (fontHandle);
 		value data = alloc_empty_object ();
-		alloc_field (data, val_id ("glyphs"), font->RenderToImage (&image));
-		alloc_field (data, val_id ("image"), image.Value ());
+		alloc_field (data, val_id ("glyphs"), font->RenderToImage (val_int(size), val_string(glyphs)));
 		return data;
 		#else
 		return alloc_null ();
@@ -185,7 +183,7 @@ namespace lime {
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)(intptr_t)val_float (fontHandle);
 		font->SetSize (val_int (size));
-		font->LoadGlyphs (val_string (glyphs));
+		//font->LoadGlyphs (val_string (glyphs));
 		#endif
 		
 		return alloc_null ();
@@ -198,7 +196,7 @@ namespace lime {
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)(intptr_t)val_float (fontHandle);
 		font->SetSize (val_int (size));
-		font->LoadRange (val_int (start), val_int (end));
+		//font->LoadRange (val_int (start), val_int (end));
 		#endif
 		
 		return alloc_null ();
@@ -211,6 +209,18 @@ namespace lime {
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)(intptr_t)val_float (fontHandle);
 		return font->Decompose (val_int (size));
+		#else
+		return alloc_null ();
+		#endif
+		
+	}
+
+
+	value lime_font_get_face_info (value fontHandle) {
+		
+		#ifdef LIME_FREETYPE
+		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		return font->GetFaceInfo ();
 		#else
 		return alloc_null ();
 		#endif
@@ -535,12 +545,13 @@ namespace lime {
 	DEFINE_PRIM (lime_application_quit, 1);
 	DEFINE_PRIM (lime_application_update, 1);
 	DEFINE_PRIM (lime_audio_load, 1);
-	DEFINE_PRIM (lime_font_create_image, 1);
+	DEFINE_PRIM (lime_font_create_image, 3);
 	DEFINE_PRIM (lime_font_get_family_name, 1);
 	DEFINE_PRIM (lime_font_load, 1);
 	DEFINE_PRIM (lime_font_load_glyphs, 3);
 	DEFINE_PRIM (lime_font_load_range, 4);
 	DEFINE_PRIM (lime_font_outline_decompose, 2);
+	DEFINE_PRIM (lime_font_get_face_info, 1);
 	DEFINE_PRIM (lime_image_encode, 3);
 	DEFINE_PRIM (lime_image_load, 1);
 	DEFINE_PRIM (lime_jni_getenv, 0);

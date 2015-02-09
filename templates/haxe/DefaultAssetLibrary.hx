@@ -248,7 +248,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 			
 		} else {
 			
-			return new openfl.text.Font (path.get (id));
+			return openfl.text.Font.fromFile (path.get (id));
 			
 		}
 		

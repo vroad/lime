@@ -235,15 +235,14 @@ namespace {
 namespace lime {
 	
 	
-	static int id_codepoint;
 	static int id_height;
-	static int id_offset;
-	static int id_size;
 	static int id_width;
-	static int id_x;
-	static int id_y;
+	static int id_xOffset;
+	static int id_yOffset;
+	static int id_bitmap;
 	static bool init = false;
-	
+	static FT_Library library;
+	static int libRefCount = 0;
 	
 	bool CompareGlyphHeight (const GlyphInfo &a, const GlyphInfo &b) {
 		
@@ -262,9 +261,13 @@ namespace lime {
 	Font *Font::FromFile (const char *fontFace) {
 		
 		int error;
-		FT_Library library;
 		
-		error = FT_Init_FreeType (&library);
+		if (libRefCount < 1)
+			error = FT_Init_FreeType (&library);
+		else
+			error = 0;
+
+		libRefCount++;
 		
 		if (error) {
 			
@@ -322,6 +325,16 @@ namespace lime {
 			
 		}
 		
+	}
+
+	Font::~Font() {
+
+		FT_Done_Face(face);
+
+		libRefCount--;
+		if (libRefCount < 1)
+			FT_Done_FreeType (library);
+
 	}
 	
 	
@@ -537,74 +550,42 @@ namespace lime {
 		
 	}
 	
+
+	value Font::GetFaceInfo () {
+
+		wchar_t* family_name = get_familyname_from_sfnt_name (face);
+		value ret = alloc_empty_object ();
+		alloc_field (ret, val_id ("has_kerning"), alloc_bool (FT_HAS_KERNING (face)));
+		alloc_field (ret, val_id ("is_fixed_width"), alloc_bool (FT_IS_FIXED_WIDTH (face)));
+		alloc_field (ret, val_id ("has_glyph_names"), alloc_bool (FT_HAS_GLYPH_NAMES (face)));
+		alloc_field (ret, val_id ("is_italic"), alloc_bool (face->style_flags & FT_STYLE_FLAG_ITALIC));
+		alloc_field (ret, val_id ("is_bold"), alloc_bool (face->style_flags & FT_STYLE_FLAG_BOLD));
+		alloc_field (ret, val_id ("num_glyphs"), alloc_int(0));
+		alloc_field (ret, val_id ("family_name"), family_name == NULL ? alloc_string (face->family_name) : alloc_wstring (family_name));
+		alloc_field (ret, val_id ("style_name"), alloc_string (face->style_name));
+		alloc_field (ret, val_id ("em_size"), alloc_int (face->units_per_EM));
+		alloc_field (ret, val_id ("ascend"), alloc_int (face->ascender));
+		alloc_field (ret, val_id ("descend"), alloc_int (face->descender));
+		alloc_field (ret, val_id ("height"), alloc_int (face->height));
+		
+		delete family_name;
+		
+		// 'glyphs' field
+		value neko_glyphs = alloc_null();
+		alloc_field (ret, val_id ("glyphs"), neko_glyphs);
+		
+		// 'kerning' field
+		alloc_field (ret, val_id ("kerning"), alloc_null ());
+		
+		return ret;
+		
+	}
 	
 	value Font::GetFamilyName () {
 		
 		return alloc_wstring (get_familyname_from_sfnt_name (face));
 		
 	}
-	
-	bool Font::InsertCodepointFromIndex (unsigned long codepoint) {
-		return InsertCodepoint(codepoint, false);
-	}
-
-	bool Font::InsertCodepoint (unsigned long codepoint, bool b) {
-		
-		GlyphInfo info;
-		info.codepoint = codepoint;
-		info.size = mSize;
-		
-		// search for duplicates, if any
-		std::list<GlyphInfo>::iterator first = glyphList.begin ();
-		first = std::lower_bound (first, glyphList.end (), info, CompareGlyphCodepoint);
-		
-		// skip duplicates unless they are different sizes
-		// if (codepoint < (*first).codepoint ||
-		// 	(codepoint == (*first).codepoint && mSize != (*first).size)) {
-			
-			
-			if (b) {
-				info.index = FT_Get_Char_Index (face, codepoint);
-			} else {
-				info.index = codepoint;	
-			}
-			if (FT_Load_Glyph (face, info.index, FT_LOAD_DEFAULT) != 0) return false;
-			info.height = face->glyph->metrics.height;
-			
-			glyphList.insert (first, info);
-			
-			return true;
-			
-		// }
-		
-		return false;
-		
-	}
-	
-	
-	void Font::LoadGlyphs (const char *glyphs) {
-		
-		char *g = (char*)glyphs;
-		
-		while (*g != 0) {
-			
-			InsertCodepoint (readNextChar (g));
-			
-		}
-		
-	}
-	
-	
-	void Font::LoadRange (unsigned long start, unsigned long end) {
-		
-		for (unsigned long codepoint = start; codepoint < end; codepoint++) {
-			
-			InsertCodepoint (codepoint);
-			
-		}
-		
-	}
-	
 	
 	void Font::SetSize (size_t size) {
 		
@@ -626,137 +607,77 @@ namespace lime {
 	}
 	
 	
-	value Font::RenderToImage (ImageBuffer *image) {
+	value Font::RenderToImage (size_t size, const char *glyphs) {
 		
 		if (!init) {
 			
 			id_width = val_id ("width");
 			id_height = val_id ("height");
-			id_x = val_id ("x");
-			id_y = val_id ("y");
-			id_offset = val_id ("offset");
-			id_size = val_id ("size");
-			id_codepoint = val_id ("codepoint");
+			id_xOffset = val_id ("xOffset");
+			id_yOffset = val_id ("yOffset");
+			id_bitmap = val_id ("bitmap");
 			init = true;
 			
 		}
 		
-		glyphList.sort (CompareGlyphHeight);
+		if (mSize != size)
+			SetSize(size);
+
+		char *g = (char*)glyphs;
+		size_t glyphCount = 0;
+		while (*g != 0) {
+			readNextChar(g);
+			glyphCount++;
+		}
 		
-		// TODO: use 1bpp bitmap instead
-		int bpp = 4;
-		image->Resize (128, 128, bpp);
-		int x = 0, y = 0, maxRows = 0;
-		unsigned char *bytes = image->data->Bytes ();
-		
-		value rects = alloc_array (glyphList.size ());
+		value rects = alloc_array (glyphCount);
 		int rectsIndex = 0;
-		
-		size_t hdpi = 72;
-		size_t vdpi = 72;
-		size_t hres = 100;
-		FT_Matrix matrix = {
-			(int)((1.0/hres) * 0x10000L),
-			(int)((0.0) * 0x10000L),
-			(int)((0.0) * 0x10000L),
-			(int)((1.0) * 0x10000L)
-		};
-		
-		for (std::list<GlyphInfo>::iterator it = glyphList.begin (); it != glyphList.end (); it++) {
+
+		g = (char*)glyphs;
+		while (*g != 0) {
 			
-			// recalculate the character size for each glyph since it will vary
-			FT_Set_Char_Size (face, 0, (int)((*it).size*64), (int)(hdpi * hres), vdpi);
-			FT_Set_Transform (face, &matrix, NULL);
+			FT_ULong charCode = readNextChar(g);
+			FT_UInt index = FT_Get_Char_Index (face, charCode);
 			
-			FT_Load_Glyph (face, (*it).index, FT_LOAD_DEFAULT);
+			FT_Load_Glyph (face, index, FT_LOAD_DEFAULT);
 			
 			if (FT_Render_Glyph (face->glyph, FT_RENDER_MODE_NORMAL) != 0) continue;
 			
 			FT_Bitmap bitmap = face->glyph->bitmap;
 			
-			if (x + bitmap.width > image->width) {
-				
-				y += maxRows + 1;
-				x = maxRows = 0;
-				
-			}
-			
-			if (y + bitmap.rows > image->height) {
-				
-				if (image->width < image->height) {
-					
-					image->width *= 2;
-					
-				} else {
-					
-					image->height *= 2;
-					
-				}
-				
-				image->Resize (image->width, image->height, bpp);
-				bytes = image->data->Bytes();
-				rectsIndex = 0;
-				it = glyphList.begin ();
-				it--;
-				x = y = maxRows = 0;
-				continue;
-				
-			}
-			
-			if (image->bpp == 1) {
-				
-				image->Blit (bitmap.buffer, x, y, bitmap.width, bitmap.rows);
-				
-			} else {
-				
-				for (int row = 0; row < bitmap.rows; row++) {
-					
-					unsigned char *out = &bytes[((row + y) * image->width + x) * image->bpp];
-					const unsigned char *line = &bitmap.buffer[row * bitmap.width]; // scanline
-					const unsigned char *const end = line + bitmap.width;
-					
-					while (line != end) {
-						
-						*out++ = 0xFF;
-						*out++ = 0xFF;
-						*out++ = 0xFF;
-						*out++ = *line;
-						
-						line++;
-						
-					}
-					
-				}
-				
-			}
-			
 			value v = alloc_empty_object ();
-			alloc_field (v, id_x, alloc_int (x));
-			alloc_field (v, id_y, alloc_int (y));
+			size_t buf_len = bitmap.width * bitmap.rows;
+			if (buf_len != 0)
+			{
+				ByteArray ba(buf_len);
+				memcpy(ba.Bytes(), bitmap.buffer, buf_len);
+				alloc_field(v, id_bitmap, ba.mValue);
+			}
+			else
+				alloc_field(v, id_bitmap, alloc_null());
 			alloc_field (v, id_width, alloc_int (bitmap.width));
 			alloc_field (v, id_height, alloc_int (bitmap.rows));
 			
-			value offset = alloc_empty_object ();
-			alloc_field (offset, id_x, alloc_int (face->glyph->bitmap_left));
-			alloc_field (offset, id_y, alloc_int (face->glyph->bitmap_top));
-			alloc_field (v, id_offset, offset);
+			alloc_field (v, id_xOffset, alloc_int (face->glyph->bitmap_left));
+			alloc_field (v, id_yOffset, alloc_int (face->glyph->bitmap_top));
+
+			alloc_field (v, val_id ("advance"), alloc_int (face->glyph->metrics.horiAdvance));
+			alloc_field (v, val_id ("min_x"), alloc_int (face->glyph->metrics.horiBearingX));
+			alloc_field (v, val_id ("max_x"), alloc_int (face->glyph->metrics.horiBearingX + face->glyph->metrics.width));
+			alloc_field (v, val_id ("min_y"), alloc_int (face->glyph->metrics.horiBearingY - face->glyph->metrics.height));
+			alloc_field (v, val_id ("max_y"), alloc_int (face->glyph->metrics.horiBearingY));
 			
-			alloc_field (v, id_codepoint, alloc_int ((*it).index));
-			alloc_field (v, id_size, alloc_int ((*it).size));
 			val_array_set_i (rects, rectsIndex++, v);
-			
-			x += bitmap.width + 1;
-			
-			if (bitmap.rows > maxRows) {
-				
-				maxRows = bitmap.rows;
-				
-			}
-			
+
 		}
 		
 		return rects;
 		
+	}
+
+	value Font::GetKernings(value glyphs)
+	{
+		return alloc_null();
 	}
 	
 	
