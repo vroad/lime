@@ -1,7 +1,7 @@
 package lime.utils;
 #if html5
 typedef UInt32Array = js.html.Uint32Array;
-#elseif
+#elseif nodejs
 typedef UInt32Array = nodejs.Uint32Array;
 #else
 
