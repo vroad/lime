@@ -1,9 +1,8 @@
 package lime.utils;
-#if html5
+#if (js && !display)
 typedef ArrayBufferView = js.html.ArrayBufferView;
-#elseif nodejs
-typedef ArrayBufferView = nodejs.ArrayBufferView;
 #else
+
 
 import lime.utils.ByteArray;
 import lime.utils.IMemoryRange;
