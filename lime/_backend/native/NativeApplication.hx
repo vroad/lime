@@ -67,11 +67,11 @@ class NativeApplication {
 		lime_update_event_manager_register (handleUpdateEvent, updateEventInfo);
 		lime_window_event_manager_register (handleWindowEvent, windowEventInfo);
 		
-		lime_application_init (handle);
-		
 		// TODO: add parent.init
 		
 		#if nodejs
+		
+		lime_application_init (handle);
 		
 		var eventLoop = function () {
 			
@@ -94,12 +94,7 @@ class NativeApplication {
 		
 		#elseif (cpp || neko)
 		
-		while (lime_application_update (handle)) {}
-		
-		var result = lime_application_quit (handle);
-		__cleanup ();
-		
-		return result;
+		return lime_application_exec (handle);
 		
 		#else
 		
@@ -291,6 +286,7 @@ class NativeApplication {
 	
 	
 	private static var lime_application_create = System.load ("lime", "lime_application_create", 1);
+	private static var lime_application_exec = System.load ("lime", "lime_application_exec", 1);
 	private static var lime_application_init = System.load ("lime", "lime_application_init", 1);
 	private static var lime_application_update = System.load ("lime", "lime_application_update", 1);
 	private static var lime_application_quit = System.load ("lime", "lime_application_quit", 1);
