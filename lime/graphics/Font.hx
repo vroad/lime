@@ -12,8 +12,9 @@ import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
 #end
 
+#if 0
 @:autoBuild(lime.Assets.embedFont())
-
+#end
 
 class Font {
 
