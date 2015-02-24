@@ -8,6 +8,7 @@ import lime.app.Config;
 import lime.audio.AudioManager;
 import lime.graphics.Renderer;
 import lime.ui.KeyCode;
+import lime.ui.KeyModifier;
 import lime.ui.Window;
 
 @:access(lime._backend.html5.HTML5Window)
@@ -159,7 +160,7 @@ class HTML5Application {
 			}
 			
 			var keyCode = cast convertKeyCode (event.keyCode != null ? event.keyCode : event.which);
-			var modifier = 0;
+			var modifier = (event.shiftKey ? (KeyModifier.SHIFT) : 0) | (event.ctrlKey ? (KeyModifier.CTRL) : 0) | (event.altKey ? (KeyModifier.ALT) : 0) | (event.metaKey ? (KeyModifier.META) : 0);
 			
 			if (event.type == "keydown") {
 				

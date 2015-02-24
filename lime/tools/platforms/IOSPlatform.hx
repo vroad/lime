@@ -7,6 +7,7 @@ import haxe.Template;
 import lime.tools.helpers.ArrayHelper;
 import lime.tools.helpers.AssetHelper;
 import lime.tools.helpers.CPPHelper;
+import lime.tools.helpers.DeploymentHelper;
 import lime.tools.helpers.FileHelper;
 import lime.tools.helpers.IconHelper;
 import lime.tools.helpers.IOSHelper;
@@ -43,12 +44,20 @@ class IOSPlatform extends PlatformTarget {
 	
 	public override function build ():Void {
 		
-		IOSHelper.build (project, targetDirectory);
-		
-		if (!project.targetFlags.exists ("simulator")) {
+		if (project.targetFlags.exists ("xcode") && PlatformHelper.hostPlatform == Platform.MAC) {
 			
-			var entitlements = targetDirectory + "/" + project.app.file + "/" + project.app.file + "-Entitlements.plist";
-			IOSHelper.sign (project, targetDirectory + "/bin", entitlements);
+			ProcessHelper.runCommand ("", "open", [ targetDirectory + "/" + project.app.file + ".xcodeproj" ] );
+			
+		} else {
+			
+			IOSHelper.build (project, targetDirectory);
+			
+			if (!project.targetFlags.exists ("simulator")) {
+				
+				var entitlements = targetDirectory + "/" + project.app.file + "/" + project.app.file + "-Entitlements.plist";
+				IOSHelper.sign (project, targetDirectory + "/bin", entitlements);
+				
+			}
 			
 		}
 		
@@ -62,6 +71,13 @@ class IOSPlatform extends PlatformTarget {
 			PathHelper.removeDirectory (targetDirectory);
 			
 		}
+		
+	}
+	
+	
+	public override function deploy ():Void {
+		
+		DeploymentHelper.deploy (project, targetFlags, targetDirectory, "iOS");
 		
 	}
 	
@@ -208,31 +224,6 @@ class IOSPlatform extends PlatformTarget {
 		context.IOS_COMPILER = project.config.getString ("ios.compiler", "clang");
 		context.CPP_BUILD_LIBRARY = project.config.getString ("cpp.buildLibrary", "hxcpp");
 		context.IOS_LINKER_FLAGS = ["-stdlib=libc++"].concat (project.config.getArrayString ("ios.linker-flags"));
-		
-		var compilerFlags = "";
-		
-		for (key in project.haxedefs.keys ()) {
-			
-			switch (key) {
-				
-				case "no-compilation":
-				default:
-					
-					var value = project.haxedefs.get (key);
-					
-					if (value == null || value == "") {
-						
-						value = "1";
-						
-					}
-					
-					compilerFlags += " -D" + StringTools.replace (key, "-", "_") + "=\"" + value + "\"";
-				
-			}
-			
-		}
-		
-		context.CPP_BUILD_LIBRARY_FLAGS = compilerFlags;
 		
 		switch (project.window.orientation) {
 			
@@ -555,12 +546,6 @@ class IOSPlatform extends PlatformTarget {
 				FileHelper.copyAsset (asset, targetPath, context);
 				
 			}
-			
-		}
-		
-		if (project.command == "update" && PlatformHelper.hostPlatform == Platform.MAC) {
-			
-			ProcessHelper.runCommand ("", "open", [ targetDirectory + "/" + project.app.file + ".xcodeproj" ] );
 			
 		}
 		

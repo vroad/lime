@@ -261,6 +261,14 @@ class PathHelper {
 						
 						LogHelper.error ("haxelib \"" + haxelib.name + "\" does not have an \"ndll/" + directoryName + "\" directory");
 						
+					} else if (output.indexOf ("haxelib install ") > -1) {
+						
+						var start = output.indexOf ("haxelib install ") + 16;
+						var end = output.lastIndexOf ("'");
+						var dependencyName = output.substring (start, end);
+						
+						LogHelper.error ("Could not find haxelib \"" + dependencyName + "\" (dependency of \"" + haxelib.name + "\"), does it need to be installed?");
+						
 					} else {
 						
 						if (haxelib.version != "") {
@@ -511,7 +519,7 @@ class PathHelper {
 			
 		} else if (isAbsolute (targetDirectory)) {
 			
-			return FileSystem.fullPath (path);
+			return combine (Sys.getCwd (), path);
 			
 		} else {
 			

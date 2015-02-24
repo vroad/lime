@@ -40,7 +40,7 @@ class PlatformTarget {
 		}
 		
 		//if (!Reflect.hasField (metaFields.clean, "ignore") && (command == "clean" || targetFlags.exists ("clean"))) {
-		if (!Reflect.hasField (metaFields.clean, "ignore") && (command == "clean" || (project.targetFlags.exists ("clean") && command != "rebuild"))) {
+		if (!Reflect.hasField (metaFields.clean, "ignore") && (command == "clean" || (project.targetFlags.exists ("clean") && (command == "update" || command == "build" || command == "test")))) {
 			
 			LogHelper.info ("", LogHelper.accentColor + "Running command: CLEAN" + LogHelper.resetColor);
 			clean ();
@@ -75,6 +75,13 @@ class PlatformTarget {
 			
 			LogHelper.info ("", "\n" + LogHelper.accentColor + "Running command: BUILD" + LogHelper.resetColor);
 			build ();
+			
+		}
+		
+		if (!Reflect.hasField (metaFields.deploy, "deploy") && (command == "deploy")) {
+			
+			LogHelper.info ("", "\n" + LogHelper.accentColor + "Running command: DEPLOY" + LogHelper.resetColor);
+			deploy ();
 			
 		}
 		
@@ -115,6 +122,7 @@ class PlatformTarget {
 	
 	@ignore public function build ():Void {}
 	@ignore public function clean ():Void {}
+	@ignore public function deploy ():Void {}
 	@ignore public function display ():Void {}
 	@ignore public function install ():Void {}
 	@ignore public function rebuild ():Void {}

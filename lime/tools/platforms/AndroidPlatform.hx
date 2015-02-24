@@ -7,6 +7,7 @@ import lime.tools.helpers.AndroidHelper;
 import lime.tools.helpers.ArrayHelper;
 import lime.tools.helpers.AssetHelper;
 import lime.tools.helpers.CPPHelper;
+import lime.tools.helpers.DeploymentHelper;
 import lime.tools.helpers.FileHelper;
 import lime.tools.helpers.IconHelper;
 import lime.tools.helpers.LogHelper;
@@ -163,6 +164,13 @@ class AndroidPlatform extends PlatformTarget {
 	}
 	
 	
+	public override function deploy ():Void {
+		
+		DeploymentHelper.deploy (project, targetFlags, targetDirectory, "Android");
+		
+	}
+	
+	
 	public override function display ():Void {
 		
 		var hxml = PathHelper.findTemplate (project.templatePaths, "android/hxml/" + (project.debug ? "debug" : "release") + ".hxml");
@@ -284,7 +292,7 @@ class AndroidPlatform extends PlatformTarget {
 		var context = project.templateContext;
 		
 		context.CPP_DIR = targetDirectory + "/obj";
-		context.ANDROID_INSTALL_LOCATION = project.config.getString ("android.install-location", "preferExternal");
+		context.ANDROID_INSTALL_LOCATION = project.config.getString ("android.install-location", "auto");
 		context.ANDROID_MINIMUM_SDK_VERSION = project.config.getInt ("android.minimum-sdk-version", 9);
 		context.ANDROID_TARGET_SDK_VERSION = project.config.getInt ("android.target-sdk-version", 16);
 		context.ANDROID_EXTENSIONS = project.config.getArrayString ("android.extension");
