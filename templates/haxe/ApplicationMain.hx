@@ -22,7 +22,7 @@ class ApplicationMain {
 		preloader.onComplete = start;
 		preloader.create (config);
 		
-		#if html5
+		#if (js && html5)
 		var urls = [];
 		var types = [];
 		
