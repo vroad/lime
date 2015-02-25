@@ -83,7 +83,7 @@ class Image {
 					
 					case DOM (_), CANVAS (_): CANVAS;
 					case FLASH (_): FLASH;
-					default: #if html5 CANVAS; #else DATA; #end
+					default: DATA;
 					
 				}
 				
