@@ -95,6 +95,7 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 				Std.is (bytes, UInt32Array) ||
 				Std.is (bytes, Int8Array) ||
 				Std.is (bytes, Int16Array) ||
+				Std.is (bytes, Int32Array) ||
 				Std.is (bytes, Float32Array))
 				return untyped bytes.byteLength;
 			
