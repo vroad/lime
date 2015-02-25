@@ -948,8 +948,7 @@ class Image {
 	
 	
 	private function __fromImageBuffer (buffer:ImageBuffer):Void {
-		if (buffer.bitsPerPixel != 4)
-			throw "Non-32bit images are not supported yet";
+		
 		this.buffer = buffer;
 		
 		if (buffer != null) {
