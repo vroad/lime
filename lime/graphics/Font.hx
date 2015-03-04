@@ -249,7 +249,7 @@ class Font {
 	public static function fromBytes (bytes:ByteArray):Font {
 
 		var font = new Font ();
-		// TODO font.__fromBytes (bytes);
+		font.__fromBytes (bytes);
 		return font;
 
 	}
@@ -326,11 +326,28 @@ class Font {
 		#end
 
 	}
+	
+	@:noCompletion private function __fromBytes (data:ByteArray):Void {
+
+		#if (cpp || neko || nodejs)
+
+		__handle = lime_font_load (data);
+
+		if (__handle != null) {
+
+			fontName = lime_font_get_family_name (__handle);
+			fontNames[fontName] = this;
+
+		}
+
+		#end
+
+	}
 
 
 	#if (cpp || neko || nodejs)
 	private static var lime_font_get_family_name = System.load ("lime", "lime_font_get_family_name", 1);
-	private static var lime_font_load = System.load ("lime", "lime_font_load", 1);
+	private static var lime_font_load:Dynamic->Dynamic = System.load ("lime", "lime_font_load", 1);
 	//private static var lime_font_load_glyphs = System.load ("lime", "lime_font_load_glyphs", 3);
 	//private static var lime_font_load_range = System.load ("lime", "lime_font_load_range", 4);
 	private static var lime_font_create_image = System.load ("lime", "lime_font_create_image", 3);

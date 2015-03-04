@@ -258,7 +258,7 @@ namespace lime {
 	}
 	
 	
-	Font *Font::FromFile (const char *fontFace) {
+	Font *Font::FromFile (Resource *resource) {
 		
 		int error;
 		
@@ -275,9 +275,23 @@ namespace lime {
 			return 0;
 			
 		} else {
-		
+
 			FT_Face face;
-			error = FT_New_Face (library, fontFace, 0, &face);
+			FT_Byte *data;
+
+			if (resource->path) {
+				
+				error = FT_New_Face (library, resource->path, 0, &face);
+				data = 0;
+				
+			} else {
+				
+				data = new FT_Byte[resource->data->Size ()];
+				int dataSize = resource->data->Size ();
+				memcpy (data, resource->data->Bytes (), dataSize);
+				error = FT_New_Memory_Face (library, data, dataSize, 0, &face);
+				
+			}
 			
 			if (error == FT_Err_Unknown_File_Format) {
 
@@ -285,11 +299,14 @@ namespace lime {
 
 			} else if (error) {
 
-				printf ("Failed to load font face %s\n", fontFace);
+				if (resource->path)
+					printf ("Failed to load font face %s\n", resource->path);
+				else
+					printf ("Failed to load font face from memory\n");
 
 			} else {
 
-				return new Font(face);
+				return new Font(face, data);
 
 			}
 
@@ -299,9 +316,10 @@ namespace lime {
 
 	}
 
-	Font::Font (FT_Face face) {
+	Font::Font (FT_Face face, FT_Byte *data) {
 
 		this->face = face;
+		this->data = data;
 
 		/* Set charmap
 		 *
@@ -330,6 +348,8 @@ namespace lime {
 	Font::~Font() {
 
 		FT_Done_Face(face);
+		if (this->data)
+			delete this->data;
 
 		libRefCount--;
 		if (libRefCount < 1)

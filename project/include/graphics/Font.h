@@ -4,6 +4,7 @@
 
 #include <hx/CFFI.h>
 #include <graphics/ImageBuffer.h>
+#include <utils/Resource.h>
 
 #ifdef LIME_FREETYPE
 #include <ft2build.h>
@@ -42,7 +43,7 @@ namespace lime {
 		
 		public:
 			
-			static Font *FromFile (const char *fontFace);
+			static Font *FromFile (Resource *resource);
 			~Font();
 			
 			value Decompose (int em);
@@ -54,10 +55,12 @@ namespace lime {
 			void SetSize (size_t size);
 
 			#ifdef LIME_FREETYPE
-			Font (FT_Face face);
+			Font (FT_Face face, FT_Byte *data);
 			FT_Face face;
+			FT_Byte *data;
 			#else
-			void* face;
+			void *face;
+			void *data;
 			#endif
 			
 		private:

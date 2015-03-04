@@ -159,7 +159,21 @@ namespace lime {
 	value lime_font_load (value fontFace) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = Font::FromFile (val_string (fontFace));
+
+		Resource resource;
+		
+		if (val_is_string (fontFace)) {
+			
+			resource = Resource (val_string (fontFace));
+			
+		} else {
+			
+			ByteArray bytes (fontFace);
+			resource = Resource (&bytes);
+			
+		}
+
+		Font *font = Font::FromFile (&resource);
 		if (font) {
 
 			value v = alloc_float ((intptr_t)font);
