@@ -422,7 +422,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 	
 	public override function loadAudioBuffer (id:String, handler:AudioBuffer -> Void):Void {
 		
-		#if (flash || html5)
+		#if (flash)
 		if (path.exists (id)) {
 			
 			var soundLoader = new Sound ();
