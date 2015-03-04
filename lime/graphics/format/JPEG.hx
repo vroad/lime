@@ -13,7 +13,7 @@ class JPEG {
 		
 		#if java
 		
-		#elseif (sys && !html5 && (!disable_cffi || !format))
+		#elseif (sys && (!disable_cffi || !format))
 			
 			return lime_image_encode (image.buffer, 1, quality);
 			
