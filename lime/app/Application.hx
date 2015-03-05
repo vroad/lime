@@ -1,8 +1,8 @@
 package lime.app;
 
 
-import lime.graphics.RenderContext;
 import lime.graphics.Renderer;
+import lime.graphics.RenderContext;
 import lime.ui.KeyCode;
 import lime.ui.KeyModifier;
 import lime.ui.Window;
@@ -20,6 +20,7 @@ class Application extends Module {
 	public static var current (default, null):Application;
 	
 	public var config (default, null):Config;
+	public var modules (default, null):Array<IModule>;
 	
 	/**
 	 * Update events are dispatched each frame (usually just before rendering)
@@ -32,6 +33,7 @@ class Application extends Module {
 	public var windows (default, null):Array<Window>;
 	
 	@:noCompletion private var backend:ApplicationBackend;
+	@:noCompletion private var initialized:Bool;
 	
 	
 	public function new () {
@@ -44,11 +46,29 @@ class Application extends Module {
 			
 		}
 		
+		modules = new Array ();
 		renderers = new Array ();
 		windows = new Array ();
 		backend = new ApplicationBackend (this);
 		
 		onUpdate.add (update);
+		
+	}
+	
+	
+	/**
+	 * Adds a new module to the Application
+	 * @param	module	A module to add
+	 */
+	public function addModule (module:IModule):Void {
+		
+		modules.push (module);
+		
+		if (initialized && renderer != null) {
+			
+			module.init (renderer.context);
+			
+		}
 		
 	}
 	
@@ -128,155 +148,231 @@ class Application extends Module {
 	}
 	
 	
-	/**
-	 * The init() method is called once before the first render()
-	 * call. This can be used to do initial set-up for the current
-	 * render context
-	 * @param	context The current render context
-	 */
-	public function init (context:RenderContext):Void { }
+	public override function init (context:RenderContext):Void {
+		
+		for (module in modules) {
+			
+			module.init (context);
+			
+		}
+		
+		initialized = true;
+		
+	}
+	
+	
+	public override function onKeyDown (keyCode:KeyCode, modifier:KeyModifier):Void {
+		
+		for (module in modules) {
+			
+			module.onKeyDown (keyCode, modifier);
+			
+		}
+		
+	}
+	
+	
+	public override function onKeyUp (keyCode:KeyCode, modifier:KeyModifier):Void {
+		
+		for (module in modules) {
+			
+			module.onKeyUp (keyCode, modifier);
+			
+		}
+		
+	}
+	
+	
+	public override function onMouseDown (x:Float, y:Float, button:Int):Void {
+		
+		for (module in modules) {
+			
+			module.onMouseDown (x, y, button);
+			
+		}
+		
+	}
+	
+	
+	public override function onMouseMove (x:Float, y:Float, button:Int):Void {
+		
+		for (module in modules) {
+			
+			module.onMouseMove (x, y, button);
+			
+		}
+		
+	}
+	
+	
+	public override function onMouseUp (x:Float, y:Float, button:Int):Void {
+		
+		for (module in modules) {
+			
+			module.onMouseUp (x, y, button);
+			
+		}
+		
+	}
+	
+	
+	public override function onMouseWheel (deltaX:Float, deltaY:Float):Void {
+		
+		for (module in modules) {
+			
+			module.onMouseWheel (deltaX, deltaY);
+			
+		}
+		
+	}
+	
+	
+	public override function onRenderContextLost ():Void {
+		
+		for (module in modules) {
+			
+			module.onRenderContextLost ();
+			
+		}
+		
+	}
+	
+	
+	public override function onRenderContextRestored (context:RenderContext):Void {
+		
+		for (module in modules) {
+			
+			module.onRenderContextRestored (context);
+			
+		}
+		
+	}
+	
+	
+	public override function onTouchEnd (x:Float, y:Float, id:Int):Void {
+		
+		for (module in modules) {
+			
+			module.onTouchEnd (x, y, id);
+			
+		}
+		
+	}
+	
+	
+	public override function onTouchMove (x:Float, y:Float, id:Int):Void {
+		
+		for (module in modules) {
+			
+			module.onTouchMove (x, y, id);
+			
+		}
+		
+	}
+	
+	
+	public override function onTouchStart (x:Float, y:Float, id:Int):Void {
+		
+		for (module in modules) {
+			
+			module.onTouchStart (x, y, id);
+			
+		}
+		
+	}
+	
+	
+	public override function onWindowActivate ():Void {
+		
+		for (module in modules) {
+			
+			module.onWindowActivate ();
+			
+		}
+		
+	}
+	
+	
+	public override function onWindowClose ():Void {
+		
+		for (module in modules) {
+			
+			module.onWindowClose ();
+			
+		}
+		
+	}
+	
+	
+	public override function onWindowDeactivate ():Void {
+		
+		for (module in modules) {
+			
+			module.onWindowDeactivate ();
+			
+		}
+		
+	}
+	
+	
+	public override function onWindowFocusIn ():Void {
+		
+		for (module in modules) {
+			
+			module.onWindowFocusIn ();
+			
+		}
+		
+	}
+	
+	
+	public override function onWindowFocusOut ():Void {
+		
+		for (module in modules) {
+			
+			module.onWindowFocusOut ();
+			
+		}
+		
+	}
+	
+	
+	public override function onWindowMove (x:Float, y:Float):Void {
+		
+		for (module in modules) {
+			
+			module.onWindowMove (x, y);
+			
+		}
+		
+	}
+	
+	
+	public override function onWindowResize (width:Int, height:Int):Void {
+		
+		for (module in modules) {
+			
+			module.onWindowResize (width, height);
+			
+		}
+		
+	}
 	
 	
 	/**
-	 * Called when a key down event is fired
-	 * @param	keyCode	The code of the key that was pressed
-	 * @param	modifier	The modifier of the key that was pressed
+	 * Removes a module from the Application
+	 * @param	module	A module to remove
 	 */
-	public function onKeyDown (keyCode:KeyCode, modifier:KeyModifier):Void { }
-	
-	
-	/**
-	 * Called when a key up event is fired
-	 * @param	keyCode	The code of the key that was released
-	 * @param	modifier	The modifier of the key that was released
-	 */
-	public function onKeyUp (keyCode:KeyCode, modifier:KeyModifier):Void { }
-	
-	
-	/**
-	 * Called when a mouse down event is fired
-	 * @param	x	The current x coordinate of the mouse
-	 * @param	y	The current y coordinate of the mouse
-	 * @param	button	The ID of the mouse button that was pressed
-	 */
-	public function onMouseDown (x:Float, y:Float, button:Int):Void { }
-	
-	
-	/**
-	 * Called when a mouse move event is fired
-	 * @param	x	The current x coordinate of the mouse
-	 * @param	y	The current y coordinate of the mouse
-	 * @param	button	The ID of the mouse button that was pressed
-	 */
-	public function onMouseMove (x:Float, y:Float, button:Int):Void { }
-	
-	
-	/**
-	 * Called when a mouse up event is fired
-	 * @param	x	The current x coordinate of the mouse
-	 * @param	y	The current y coordinate of the mouse
-	 * @param	button	The ID of the button that was released
-	 */
-	public function onMouseUp (x:Float, y:Float, button:Int):Void { }
-	
-	
-	/**
-	 * Called when a mouse wheel event is fired
-	 * @param	deltaX	The amount of horizontal scrolling (if applicable)
-	 * @param	deltaY	The amount of vertical scrolling (if applicable)
-	 */
-	public function onMouseWheel (deltaX:Float, deltaY:Float):Void { }
-	
-	
-	/**
-	 * Called when a render context is lost
-	 */
-	public function onRenderContextLost ():Void { }
-	
-	
-	/**
-	 * Called when a render context is restored
-	 * @param	context	The current render context
-	 */
-	public function onRenderContextRestored (context:RenderContext):Void { }
-	
-	
-	/**
-	 * Called when a touch end event is fired
-	 * @param	x	The current x coordinate of the touch point
-	 * @param	y	The current y coordinate of the touch point
-	 * @param	id	The ID of the touch point
-	 */
-	public function onTouchEnd (x:Float, y:Float, id:Int):Void { }
-	
-	
-	/**
-	 * Called when a touch move event is fired
-	 * @param	x	The current x coordinate of the touch point
-	 * @param	y	The current y coordinate of the touch point
-	 * @param	id	The ID of the touch point
-	 */
-	public function onTouchMove (x:Float, y:Float, id:Int):Void { }
-	
-	
-	/**
-	 * Called when a touch start event is fired
-	 * @param	x	The current x coordinate of the touch point
-	 * @param	y	The current y coordinate of the touch point
-	 * @param	id	The ID of the touch point
-	 */
-	public function onTouchStart (x:Float, y:Float, id:Int):Void { }
-	
-	
-	/**
-	 * Called when a window activate event is fired
-	 */
-	public function onWindowActivate ():Void { }
-	
-	
-	/**
-	 * Called when a window close event is fired
-	 */
-	public function onWindowClose ():Void { }
-	
-	
-	/**
-	 * Called when a window deactivate event is fired
-	 */
-	public function onWindowDeactivate ():Void { }
-	
-	
-	/**
-	 * Called when a window focus in event is fired
-	 */
-	public function onWindowFocusIn ():Void { }
-	
-	
-	/**
-	 * Called when a window focus out event is fired
-	 */
-	public function onWindowFocusOut ():Void { }
-	
-	
-	/**
-	 * Called when a window move event is fired
-	 * @param	x	The x position of the window
-	 * @param	y	The y position of the window
-	 */
-	public function onWindowMove (x:Float, y:Float):Void { }
-	
-	
-	/**
-	 * Called when a window resize event is fired
-	 * @param	width	The width of the window
-	 * @param	height	The height of the window
-	 */
-	public function onWindowResize (width:Int, height:Int):Void {}
+	public function removeModule (module:IModule):Void {
+		
+		modules.remove (module);
+		
+	}
 	
 	
 	/**
 	 * Removes a Renderer from the Application
-	 * @param	renderer	A Renderer object to add
+	 * @param	renderer	A Renderer object to remove
 	 */
 	public function removeRenderer (renderer:Renderer):Void {
 		
@@ -291,7 +387,7 @@ class Application extends Module {
 	
 	/**
 	 * Removes a Window from the Application
-	 * @param	window	A Window object to add
+	 * @param	window	A Window object to remove
 	 */
 	public function removeWindow (window:Window):Void {
 		
@@ -305,18 +401,26 @@ class Application extends Module {
 	}
 	
 	
-	/**
-	 * Called when a render event is fired
-	 * @param	context	The current render context
-	 */
-	public function render (context:RenderContext):Void { }
+	public override function render (context:RenderContext):Void {
+		
+		for (module in modules) {
+			
+			module.render (context);
+			
+		}
+		
+	}
 	
 	
-	/**
-	 * Called when an update event is fired
-	 * @param	deltaTime	The amount of time in milliseconds that has elapsed since the last update
-	 */
-	public function update (deltaTime:Int):Void { }
+	public override function update (deltaTime:Int):Void {
+		
+		for (module in modules) {
+			
+			module.update (deltaTime);
+			
+		}
+		
+	}
 	
 	
 	
