@@ -1,9 +1,24 @@
 #include <text/Font.h>
+#include <graphics/ImageBuffer.h>
+#include <system/System.h>
+
 #include <algorithm>
 #include <vector>
 
+#ifdef LIME_FREETYPE
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_BITMAP_H
+#include FT_SFNT_NAMES_H
+#include FT_TRUETYPE_IDS_H
+#include FT_GLYPH_H
+#include FT_OUTLINE_H
+#endif
+
+
 // from http://stackoverflow.com/questions/2948308/how-do-i-read-utf-8-characters-via-a-pointer
 #define IS_IN_RANGE(c, f, l)	 (((c) >= (f)) && ((c) <= (l)))
+
 
 unsigned long readNextChar (char*& p)
 {
@@ -257,10 +272,10 @@ namespace lime {
 	}
 	
 	
-	Font *Font::FromFile (Resource *resource) {
-		
+	Font::Font (Resource *resource, int faceIndex) {
+
 		int error;
-		
+	
 		if (libRefCount < 1)
 			error = FT_Init_FreeType (&library);
 		else
@@ -268,132 +283,79 @@ namespace lime {
 
 		libRefCount++;
 		
-		if (error) {
+		if (resource) {
 			
-			printf ("Could not initialize FreeType\n");
-			return 0;
-			
-		} else {
-
-			FT_Face face;
-			FT_Byte *data;
-
-			if (resource->path) {
+			if (error) {
 				
-				error = FT_New_Face (library, resource->path, 0, &face);
-				data = 0;
+				printf ("Could not initialize FreeType\n");
 				
 			} else {
 				
-				data = new FT_Byte[resource->data->Size ()];
-				int dataSize = resource->data->Size ();
-				memcpy (data, resource->data->Bytes (), dataSize);
-				error = FT_New_Memory_Face (library, data, dataSize, 0, &face);
+				FT_Face face;
+				FILE_HANDLE *file = NULL;
 				
-			}
-			
-			if (error == FT_Err_Unknown_File_Format) {
-
-				printf ("Invalid font type\n");
-
-			} else if (error) {
-
-				if (resource->path)
-					printf ("Failed to load font face %s\n", resource->path);
-				else
-					printf ("Failed to load font face from memory\n");
-
-			} else {
-
-				return new Font(face, data);
-
-			}
-
-		}
-		
-		return 0;
-
-	}
-
-	Font::Font (FT_Face face, FT_Byte *data) {
-
-		this->face = face;
-		this->data = data;
-
-		/* Set charmap
-		 *
-		 * See http://www.microsoft.com/typography/otspec/name.htm for a list of
-		 * some possible platform-encoding pairs.  We're interested in 0-3 aka 3-1
-		 * - UCS-2.  Otherwise, fail. If a font has some unicode map, but lacks
-		 * UCS-2 - it is a broken or irrelevant font. What exactly Freetype will
-		 * select on face load (it promises most wide unicode, and if that will be
-		 * slower that UCS-2 - left as an excercise to check.
-		 */
-		for (int i = 0; i < face->num_charmaps; i++) {
-			
-			FT_UShort pid = face->charmaps[i]->platform_id;
-			FT_UShort eid = face->charmaps[i]->encoding_id;
-			
-			if (((pid == 0) && (eid == 3)) || ((pid == 3) && (eid == 1))) {
-				
-				FT_Set_Charmap (face, face->charmaps[i]);
-				
-			}
-			
-		}
-		
-	}
-
-	Font::~Font() {
-
-		FT_Done_Face(face);
-		if (this->data)
-			delete this->data;
-
-		libRefCount--;
-		if (libRefCount < 1)
-			FT_Done_FreeType (library);
-
-	}
-	
-	
-	wchar_t *get_familyname_from_sfnt_name (FT_Face face) {
-		
-		wchar_t *family_name = NULL;
-		FT_SfntName sfnt_name;
-		FT_UInt num_sfnt_names, sfnt_name_index;
-		int len, i;
-		
-		if (FT_IS_SFNT (face)) {
-			
-			num_sfnt_names = FT_Get_Sfnt_Name_Count (face);
-			sfnt_name_index = 0;
-			
-			while (sfnt_name_index < num_sfnt_names) {
-				
-				if (!FT_Get_Sfnt_Name (face, sfnt_name_index++, (FT_SfntName *)&sfnt_name) && sfnt_name.name_id == TT_NAME_ID_FULL_NAME) {
+				if (resource->path) {
 					
-					if (sfnt_name.platform_id == TT_PLATFORM_MACINTOSH) {
+					file = lime::fopen (resource->path, "rb");
+					
+					if (file->isFile ()) {
 						
-						len = sfnt_name.string_len;
-						family_name = new wchar_t[len + 1];
-						mbstowcs (&family_name[0], &reinterpret_cast<const char*>(sfnt_name.string)[0], len);
-						family_name[len] = L'\0';
-						return family_name;
+						error = FT_New_Face (library, resource->path, faceIndex, &face);
 						
-					} else if ((sfnt_name.platform_id == TT_PLATFORM_MICROSOFT) && (sfnt_name.encoding_id == TT_MS_ID_UNICODE_CS)) {
+					} else {
 						
-						len = sfnt_name.string_len / 2;
-						family_name = (wchar_t*)malloc ((len + 1) * sizeof (wchar_t));
+						ByteArray data = ByteArray (resource->path);
+						unsigned char *buffer = (unsigned char*)malloc (data.Size ());
+						memcpy (buffer, data.Bytes (), data.Size ());
+						error = FT_New_Memory_Face (library, buffer, data.Size (), faceIndex, &face);
 						
-						for (i = 0; i < len; i++) {
+					}
+					
+				} else {
+					
+					unsigned char *buffer = (unsigned char*)malloc (resource->data->Size ());
+					memcpy (buffer, resource->data->Bytes (), resource->data->Size ());
+					error = FT_New_Memory_Face (library, buffer, resource->data->Size (), faceIndex, &face);
+					
+				}
+				
+				if (file) {
+					
+					lime::fclose (file);
+					
+				}
+				
+				if (error == FT_Err_Unknown_File_Format) {
+					
+					printf ("Invalid font type\n");
+					
+				} else if (error) {
+					
+					printf ("Failed to load font face %s\n", resource->path);
+					
+				} else {
+					
+					this->face = face;
+					
+					/* Set charmap
+					 *
+					 * See http://www.microsoft.com/typography/otspec/name.htm for a list of
+					 * some possible platform-encoding pairs.  We're interested in 0-3 aka 3-1
+					 * - UCS-2.  Otherwise, fail. If a font has some unicode map, but lacks
+					 * UCS-2 - it is a broken or irrelevant font. What exactly Freetype will
+					 * select on face load (it promises most wide unicode, and if that will be
+					 * slower that UCS-2 - left as an excercise to check.
+					 */
+					for (int i = 0; i < ((FT_Face)face)->num_charmaps; i++) {
+						
+						FT_UShort pid = ((FT_Face)face)->charmaps[i]->platform_id;
+						FT_UShort eid = ((FT_Face)face)->charmaps[i]->encoding_id;
+						
+						if (((pid == 0) && (eid == 3)) || ((pid == 3) && (eid == 1))) {
 							
-							family_name[i] = ((wchar_t)sfnt_name.string[i * 2 + 1]) | (((wchar_t)sfnt_name.string[i * 2]) << 8);
+							FT_Set_Charmap ((FT_Face)face, ((FT_Face)face)->charmaps[i]);
 							
 						}
-						
-						family_name[len] = L'\0';
-						return family_name;
 						
 					}
 					
@@ -403,7 +365,16 @@ namespace lime {
 			
 		}
 		
-		return NULL;
+	}
+	
+	
+	Font::~Font () {
+		
+		if (face) {
+			
+			//FT_Done_Face ((FT_Face)face);
+			
+		}
 		
 	}
 	
@@ -412,6 +383,7 @@ namespace lime {
 		
 		int result, i, j;
 		
+		FT_Face face = (FT_Face)this->face;
 		FT_Set_Char_Size (face, em, em, 72, 72);
 		
 		std::vector<glyph*> glyphs;
@@ -490,7 +462,7 @@ namespace lime {
 		}
 		
 		int num_glyphs = glyphs.size ();
-		wchar_t* family_name = get_familyname_from_sfnt_name (face);
+		wchar_t* family_name = GetFamilyName();
 		
 		value ret = alloc_empty_object ();
 		alloc_field (ret, val_id ("has_kerning"), alloc_bool (FT_HAS_KERNING (face)));
@@ -568,12 +540,13 @@ namespace lime {
 		return ret;
 		
 	}
-	
+
 
 	value Font::GetFaceInfo () {
 
-		wchar_t* family_name = get_familyname_from_sfnt_name (face);
+		wchar_t* family_name = GetFamilyName();
 		value ret = alloc_empty_object ();
+		FT_Face face = (FT_Face)this->face;
 		alloc_field (ret, val_id ("has_kerning"), alloc_bool (FT_HAS_KERNING (face)));
 		alloc_field (ret, val_id ("is_fixed_width"), alloc_bool (FT_IS_FIXED_WIDTH (face)));
 		alloc_field (ret, val_id ("has_glyph_names"), alloc_bool (FT_HAS_GLYPH_NAMES (face)));
@@ -600,11 +573,61 @@ namespace lime {
 		
 	}
 	
-	value Font::GetFamilyName () {
+	wchar_t *Font::GetFamilyName () {
 		
-		return alloc_wstring (get_familyname_from_sfnt_name (face));
+		#ifdef LIME_FREETYPE
+		
+		wchar_t *family_name = NULL;
+		FT_SfntName sfnt_name;
+		FT_UInt num_sfnt_names, sfnt_name_index;
+		int len, i;
+		
+		if (FT_IS_SFNT (((FT_Face)face))) {
+			
+			num_sfnt_names = FT_Get_Sfnt_Name_Count ((FT_Face)face);
+			sfnt_name_index = 0;
+			
+			while (sfnt_name_index < num_sfnt_names) {
+				
+				if (!FT_Get_Sfnt_Name ((FT_Face)face, sfnt_name_index++, (FT_SfntName *)&sfnt_name) && sfnt_name.name_id == TT_NAME_ID_FULL_NAME) {
+					
+					if (sfnt_name.platform_id == TT_PLATFORM_MACINTOSH) {
+						
+						len = sfnt_name.string_len;
+						family_name = new wchar_t[len + 1];
+						mbstowcs (&family_name[0], &reinterpret_cast<const char*>(sfnt_name.string)[0], len);
+						family_name[len] = L'\0';
+						return family_name;
+						
+					} else if ((sfnt_name.platform_id == TT_PLATFORM_MICROSOFT) && (sfnt_name.encoding_id == TT_MS_ID_UNICODE_CS)) {
+						
+						len = sfnt_name.string_len / 2;
+						family_name = (wchar_t*)malloc ((len + 1) * sizeof (wchar_t));
+						
+						for (i = 0; i < len; i++) {
+							
+							family_name[i] = ((wchar_t)sfnt_name.string[i * 2 + 1]) | (((wchar_t)sfnt_name.string[i * 2]) << 8);
+							
+						}
+						
+						family_name[len] = L'\0';
+						return family_name;
+						
+					}
+					
+				}
+				
+			}
+			
+		}
+		
+		#endif
+		
+		return NULL;
 		
 	}
+	
+	
 	
 	void Font::SetSize (size_t size) {
 		
@@ -618,8 +641,8 @@ namespace lime {
 			(int)((1.0) * 0x10000L)
 		};
 		
-		FT_Set_Char_Size (face, 0, (int)(size*64), (int)(hdpi * hres), vdpi);
-		FT_Set_Transform (face, &matrix, NULL);
+		FT_Set_Char_Size ((FT_Face)face, 0, (int)(size*64), (int)(hdpi * hres), vdpi);
+		FT_Set_Transform ((FT_Face)face, &matrix, NULL);
 		
 		mSize = size;
 		
@@ -653,6 +676,7 @@ namespace lime {
 		int rectsIndex = 0;
 
 		g = (char*)glyphs;
+		FT_Face face = (FT_Face)this->face;
 		while (*g != 0) {
 			
 			FT_ULong charCode = readNextChar(g);

@@ -15,14 +15,12 @@
 #include <audio/AudioBuffer.h>
 #include <graphics/format/JPEG.h>
 #include <graphics/format/PNG.h>
-#include <text/Font.h>
-#ifdef LIME_HARFBUZZ
-#include <text/TextLayout.h>
-#endif
 #include <graphics/ImageBuffer.h>
 #include <graphics/Renderer.h>
 #include <graphics/RenderEvent.h>
 #include <system/System.h>
+#include <text/Font.h>
+#include <text/TextLayout.h>
 #include <ui/KeyEvent.h>
 #include <ui/Mouse.h>
 #include <ui/MouseCursor.h>
@@ -135,9 +133,9 @@ namespace lime {
 	}
 	
 	
-	void lime_font_destroy (value fontHandle) {
+	void lime_font_destroy (value handle) {
 		
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		Font *font = (Font*)(intptr_t)val_float (handle);
 		delete font;
 		font = 0;
 		
@@ -148,7 +146,7 @@ namespace lime {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)(intptr_t)val_float (fontHandle);
-		return font->GetFamilyName ();
+		return alloc_wstring (font->GetFamilyName ());
 		#else
 		return alloc_null ();
 		#endif
@@ -156,38 +154,35 @@ namespace lime {
 	}
 	
 	
-	value lime_font_load (value fontFace) {
+	value lime_font_load (value data) {
 		
 		#ifdef LIME_FREETYPE
 
 		Resource resource;
 		
-		if (val_is_string (fontFace)) {
+		if (val_is_string (data)) {
 			
-			resource = Resource (val_string (fontFace));
+			resource = Resource (val_string (data));
 			
 		} else {
 			
-			ByteArray bytes (fontFace);
+			ByteArray bytes (data);
 			resource = Resource (&bytes);
 			
 		}
-
-		Font *font = Font::FromFile (&resource);
+		
+		Font *font = new Font (&resource, 0);
+		
 		if (font) {
-
+			
 			value v = alloc_float ((intptr_t)font);
 			val_gc (v, lime_font_destroy);
 			return v;
-
-		} else {
-
-			return alloc_null ();
-
+			
 		}
-		#else
-		return alloc_null ();
 		#endif
+		
+		return alloc_null ();
 		
 	}
 	
@@ -441,10 +436,10 @@ namespace lime {
 	}
 	
 	
-	void lime_text_destroy (value textHandle) {
+	void lime_text_layout_destroy (value textHandle) {
 		
 		#ifdef LIME_HARFBUZZ
-		Text *text = (Text*)(intptr_t)val_float (textHandle);
+		TextLayout *text = (TextLayout*)(intptr_t)val_float (textHandle);
 		delete text;
 		text = 0;
 		#endif
@@ -452,28 +447,36 @@ namespace lime {
 	}
 	
 	
-	value lime_text_create (value direction, value script, value language) {
+	value lime_text_layout_create (value direction, value script, value language) {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
-		Text *text = new Text (val_int (direction), val_string (script), val_string (language));
+		
+		TextLayout *text = new TextLayout (val_int (direction), val_string (script), val_string (language));
 		value v = alloc_float ((intptr_t)text);
-		val_gc (v, lime_text_destroy);
+		val_gc (v, lime_text_layout_destroy);
 		return v;
+		
 		#else
+		
 		return alloc_null ();
+		
 		#endif
 		
 	}
 	
 	
-	value lime_text_from_string (value textHandle, value fontHandle, value size, value textString) {
+	value lime_text_layout_layout (value textHandle, value fontHandle, value size, value textString) {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
-		Text *text = (Text*)(intptr_t)val_float (textHandle);
+		
+		TextLayout *text = (TextLayout*)(intptr_t)val_float (textHandle);
 		Font *font = (Font*)(intptr_t)val_float (fontHandle);
-		return text->FromString(font, val_int (size), val_string (textString));
+		return text->Layout (font, val_int (size), val_string (textString));
+		
 		#else
+		
 		return alloc_null ();
+		
 		#endif
 		
 	}
@@ -581,8 +584,8 @@ namespace lime {
 	DEFINE_PRIM (lime_renderer_flip, 1);
 	DEFINE_PRIM (lime_render_event_manager_register, 2);
 	DEFINE_PRIM (lime_system_gettimer, 0);
-	DEFINE_PRIM (lime_text_create, 3);
-	DEFINE_PRIM (lime_text_from_string, 4);
+	DEFINE_PRIM (lime_text_layout_create, 3);
+	DEFINE_PRIM (lime_text_layout_layout, 4);
 	DEFINE_PRIM (lime_touch_event_manager_register, 2);
 	DEFINE_PRIM (lime_update_event_manager_register, 2);
 	DEFINE_PRIM (lime_window_close, 1);

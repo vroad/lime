@@ -1,38 +1,34 @@
-#ifndef LIME_GRAPHICS_TEXT_H
-#define LIME_GRAPHICS_TEXT_H
+#ifndef LIME_TEXT_TEXT_LAYOUT_H
+#define LIME_TEXT_TEXT_LAYOUT_H
 
 
+#include <text/Font.h>
 #include <hx/CFFI.h>
-#include <hb.h>
 
 
 namespace lime {
-
-
-	class Font;
-
-
-	class Text {
-
-
+	
+	
+	class TextLayout {
+		
+		
 		public:
-
-			Text (hb_tag_t direction, const char *script, const char *language);
-			~Text ();
-
-			value FromString (Font *font, size_t size, const char *text);
-
+			
+			TextLayout (int direction, const char *script, const char *language);
+			~TextLayout ();
+			
+			value Layout (Font *font, size_t size, const char *text);
+			
 		private:
-
-			hb_buffer_t *mBuffer;
-			hb_direction_t mDirection;
-			hb_script_t mScript;
-			hb_language_t mLanguage;
-
-
+			
+			void *mBuffer;
+			long mDirection;
+			long mScript;
+			long mLanguage;
+			
 	};
-
-
+	
+	
 }
 
 
