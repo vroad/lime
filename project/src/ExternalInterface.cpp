@@ -15,9 +15,9 @@
 #include <audio/AudioBuffer.h>
 #include <graphics/format/JPEG.h>
 #include <graphics/format/PNG.h>
-#include <graphics/Font.h>
+#include <text/Font.h>
 #ifdef LIME_HARFBUZZ
-#include <graphics/Text.h>
+#include <text/TextLayout.h>
 #endif
 #include <graphics/ImageBuffer.h>
 #include <graphics/Renderer.h>

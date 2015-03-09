@@ -3,7 +3,6 @@
 
 
 #include <hx/CFFI.h>
-#include <graphics/ImageBuffer.h>
 #include <utils/Resource.h>
 
 #ifdef LIME_FREETYPE

@@ -6,7 +6,7 @@ import haxe.Unserializer;
 import lime.app.Preloader;
 import lime.audio.openal.AL;
 import lime.audio.AudioBuffer;
-import lime.graphics.Font;
+import lime.text.Font;
 import lime.graphics.Image;
 import lime.utils.ByteArray;
 import lime.utils.UInt8Array;

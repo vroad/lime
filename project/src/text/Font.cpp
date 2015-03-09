@@ -1,5 +1,4 @@
-#include <graphics/Font.h>
-#include <graphics/ImageBuffer.h>
+#include <text/Font.h>
 #include <algorithm>
 #include <vector>
 

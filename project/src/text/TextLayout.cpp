@@ -1,5 +1,5 @@
-#include <graphics/Font.h>
-#include <graphics/Text.h>
+#include <text/Font.h>
+#include <text/TextLayout.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <hb-ft.h>

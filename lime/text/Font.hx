@@ -1,4 +1,4 @@
-package lime.graphics;
+package lime.text;
 
 
 import haxe.io.Bytes;
