@@ -6,8 +6,8 @@ import haxe.Unserializer;
 import lime.app.Preloader;
 import lime.audio.openal.AL;
 import lime.audio.AudioBuffer;
-import lime.text.Font;
 import lime.graphics.Image;
+import lime.text.Font;
 import lime.utils.ByteArray;
 import lime.utils.UInt8Array;
 import lime.Assets;
@@ -654,14 +654,14 @@ class DefaultAssetLibrary extends AssetLibrary {
 #elseif html5
 
 #if openfl
-::foreach assets::::if (type == "font")::@:keep #if display private #end class __ASSET__::flatName:: extends openfl.text.Font { public function new () { super (); fontName = "::fontName::"; } } ::end::
+::foreach assets::::if (type == "font")::@:keep #if display private #end class __ASSET__::flatName:: extends openfl.text.Font { public function new () { super (); name = "::name::"; } } ::end::
 ::end::
 #end
 
 #else
 
 #if openfl
-::if (assets != null)::::foreach assets::::if (type == "font")::@:keep class __ASSET__::flatName:: extends openfl.text.Font { public function new () { super (); __fontPath = "::targetPath::"; fontName = "::fontName::"; }}
+::if (assets != null)::::foreach assets::::if (type == "font")::@:keep class __ASSET__::flatName:: extends openfl.text.Font { public function new () { super (); __fontPath = "::targetPath::"; name = "::name::"; }}
 ::end::::end::::end::
 #end
 

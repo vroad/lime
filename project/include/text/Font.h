@@ -3,15 +3,13 @@
 
 
 #include <graphics/ImageBuffer.h>
+#include <text/GlyphSet.h>
 #include <utils/Resource.h>
 #include <hx/CFFI.h>
 #include <list>
 
 
 namespace lime {
-	
-	
-	class Image;
 	
 	
 	typedef struct {
@@ -34,9 +32,16 @@ namespace lime {
 			~Font ();
 			
 			value Decompose (int em);
+			int GetAscender ();
+			int GetDescender ();
 			value GetFaceInfo ();
 			wchar_t *GetFamilyName ();
-			value GetGlyphInfo (const char *glyphs);
+			value GetGlyphMetrics (GlyphSet *glyphSet);
+			int GetHeight ();
+			int GetNumGlyphs ();
+			int GetUnderlinePosition ();
+			int GetUnderlineThickness ();
+			int GetUnitsPerEM ();
 			value RenderToImage (size_t size, const char *glyphs);
 			value GetKernings (value glyphs);
 			void SetSize (size_t size);

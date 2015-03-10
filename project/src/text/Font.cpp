@@ -131,116 +131,136 @@ namespace {
 	
 	
 	enum {
+		
 		PT_MOVE = 1,
 		PT_LINE = 2,
 		PT_CURVE = 3
+		
 	};
-
+	
+	
 	struct point {
-		int				x, y;
-		unsigned char  type;
-
-		point() { }
-		point(int x, int y, unsigned char type) : x(x), y(y), type(type) { }
+		
+		int x, y;
+		unsigned char type;
+		
+		point () { }
+		point (int x, int y, unsigned char type) : x (x), y (y), type (type) { }
+		
 	};
 	
 	
 	struct glyph {
 		
-		FT_ULong					 char_code;
-		FT_Vector					advance;
-		FT_Glyph_Metrics		  metrics;
-		int							index, x, y;
-		std::vector<int>		  pts;
+		FT_ULong char_code;
+		FT_Vector advance;
+		FT_Glyph_Metrics metrics;
+		int index, x, y;
+		std::vector<int> pts;
 		
-		glyph(): x(0), y(0) { }
+		glyph () : x (0), y (0) { }
 		
 	};
 	
 	
 	struct kerning {
-		int							l_glyph, r_glyph;
-		int							x, y;
-
-		kerning() { }
-		kerning(int l, int r, int x, int y): l_glyph(l), r_glyph(r), x(x), y(y) { }
+		
+		int l_glyph, r_glyph;
+		int x, y;
+		
+		kerning () { }
+		kerning (int l, int r, int x, int y) : l_glyph (l), r_glyph (r), x (x), y (y) { }
+		
 	};
 	
 	
 	struct glyph_sort_predicate {
-		bool operator()(const glyph* g1, const glyph* g2) const {
-			return g1->char_code <  g2->char_code;
+		
+		bool operator () (const glyph* g1, const glyph* g2) const {
+			
+			return g1->char_code < g2->char_code;
+			
 		}
+		
 	};
 	
 	
 	typedef const FT_Vector *FVecPtr;
 	
 	
-	int outline_move_to(FVecPtr to, void *user) {
-		glyph		 *g = static_cast<glyph*>(user);
-
-		g->pts.push_back(PT_MOVE);
-		g->pts.push_back(to->x);
-		g->pts.push_back(to->y);
-
-		g->x = to->x;
-		g->y = to->y;
+	int outline_move_to (FVecPtr to, void *user) {
 		
-		return 0;
-	}
-
-	int outline_line_to(FVecPtr to, void *user) {
-		glyph		 *g = static_cast<glyph*>(user);
-
-		g->pts.push_back(PT_LINE);
-		g->pts.push_back(to->x - g->x);
-		g->pts.push_back(to->y - g->y);
+		glyph *g = static_cast<glyph*> (user);
+		
+		g->pts.push_back (PT_MOVE);
+		g->pts.push_back (to->x);
+		g->pts.push_back (to->y);
 		
 		g->x = to->x;
 		g->y = to->y;
 		
 		return 0;
-	}
-
-	int outline_conic_to(FVecPtr ctl, FVecPtr to, void *user) {
-		glyph		 *g = static_cast<glyph*>(user);
-
-		g->pts.push_back(PT_CURVE);
-		g->pts.push_back(ctl->x - g->x);
-		g->pts.push_back(ctl->y - g->y);
-		g->pts.push_back(to->x - ctl->x);
-		g->pts.push_back(to->y - ctl->y);
 		
-		g->x = to->x;
-		g->y = to->y;
-		
-		return 0;
 	}
 	
-	int outline_cubic_to(FVecPtr ctl1, FVecPtr ctl2, FVecPtr to, void *user) {
+	
+	int outline_line_to (FVecPtr to, void *user) {
+		
+		glyph *g = static_cast<glyph*> (user);
+		
+		g->pts.push_back (PT_LINE);
+		g->pts.push_back (to->x - g->x);
+		g->pts.push_back (to->y - g->y);
+		
+		g->x = to->x;
+		g->y = to->y;
+		
+		return 0;
+		
+	}
+	
+	
+	int outline_conic_to (FVecPtr ctl, FVecPtr to, void *user) {
+		
+		glyph *g = static_cast<glyph*> (user);
+		
+		g->pts.push_back (PT_CURVE);
+		g->pts.push_back (ctl->x - g->x);
+		g->pts.push_back (ctl->y - g->y);
+		g->pts.push_back (to->x - ctl->x);
+		g->pts.push_back (to->y - ctl->y);
+		
+		g->x = to->x;
+		g->y = to->y;
+		
+		return 0;
+		
+	}
+	
+	
+	int outline_cubic_to (FVecPtr ctl1, FVecPtr ctl2, FVecPtr to, void *user) {
 		
 		// Cubic curves are not supported, we need to approximate to a quadratic
 		// TODO: divide into multiple curves
 		
-		glyph		 *g = static_cast<glyph*>(user);
+		glyph *g = static_cast<glyph*> (user);
 		
 		FT_Vector ctl;
 		ctl.x = (-0.25 * g->x) + (0.75 * ctl1->x) + (0.75 * ctl2->x) + (-0.25 * to->x);
 		ctl.y = (-0.25 * g->y) + (0.75 * ctl1->y) + (0.75 * ctl2->y) + (-0.25 * to->y);
 		
-		g->pts.push_back(PT_CURVE);
-		g->pts.push_back(ctl.x - g->x);
-		g->pts.push_back(ctl.y - g->y);
-		g->pts.push_back(to->x - ctl.x);
-		g->pts.push_back(to->y - ctl.y);
+		g->pts.push_back (PT_CURVE);
+		g->pts.push_back (ctl.x - g->x);
+		g->pts.push_back (ctl.y - g->y);
+		g->pts.push_back (to->x - ctl.x);
+		g->pts.push_back (to->y - ctl.y);
 		
 		g->x = to->x;
 		g->y = to->y;
 		
 		return 0;
+		
 	}
-
 	
 	
 }
@@ -250,9 +270,18 @@ namespace lime {
 	
 	
 	static int id_height;
+	static int id_horizontalAdvance;
+	static int id_horizontalBearingX;
+	static int id_horizontalBearingY;
+	static int id_index;
+	static int id_offset;
+	static int id_size;
+	static int id_verticalAdvance;
+	static int id_verticalBearingX;
+	static int id_verticalBearingY;
 	static int id_width;
-	static int id_xOffset;
-	static int id_yOffset;
+	static int id_x;
+	static int id_y;
 	static int id_bitmap;
 	static bool init = false;
 	static FT_Library library;
@@ -271,6 +300,33 @@ namespace lime {
 		
 	}
 	
+	
+	static void initialize () {
+		
+		if (!init) {
+			
+			id_width = val_id ("width");
+			id_height = val_id ("height");
+			id_x = val_id ("x");
+			id_y = val_id ("y");
+			id_offset = val_id ("offset");
+			id_size = val_id ("size");
+			
+			id_horizontalAdvance = val_id ("horizontalAdvance");
+			id_horizontalBearingX = val_id ("horizontalBearingX");
+			id_horizontalBearingY = val_id ("horizontalBearingY");
+			id_index = val_id ("index");
+			id_verticalAdvance = val_id ("verticalAdvance");
+			id_verticalBearingX = val_id ("verticalBearingX");
+			id_verticalBearingY = val_id ("verticalBearingY");
+
+			id_bitmap = val_id ("bitmap");
+			
+			init = true;
+			
+		}
+		
+	}
 	
 	Font::Font (Resource *resource, int faceIndex) {
 
@@ -573,6 +629,20 @@ namespace lime {
 		
 	}
 	
+	int Font::GetAscender () {
+		
+		return ((FT_Face)face)->ascender;
+		
+	}
+	
+	
+	int Font::GetDescender () {
+		
+		return ((FT_Face)face)->descender;
+		
+	}
+	
+	
 	wchar_t *Font::GetFamilyName () {
 		
 		#ifdef LIME_FREETYPE
@@ -628,6 +698,121 @@ namespace lime {
 	}
 	
 	
+	void GetGlyphMetrics_Push (FT_Face face, FT_UInt glyphIndex, value glyphList) {
+		
+		if (FT_Load_Glyph (face, glyphIndex, FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_DEFAULT) == 0) {
+			
+			value metrics = alloc_empty_object ();
+			
+			alloc_field (metrics, id_height, alloc_int (((FT_Face)face)->glyph->metrics.height));
+			alloc_field (metrics, id_horizontalBearingX, alloc_int (((FT_Face)face)->glyph->metrics.horiBearingX));
+			alloc_field (metrics, id_horizontalBearingY, alloc_int (((FT_Face)face)->glyph->metrics.horiBearingY));
+			alloc_field (metrics, id_horizontalAdvance, alloc_int (((FT_Face)face)->glyph->metrics.horiAdvance));
+			alloc_field (metrics, id_index, alloc_int (glyphIndex));
+			alloc_field (metrics, id_verticalBearingX, alloc_int (((FT_Face)face)->glyph->metrics.vertBearingX));
+			alloc_field (metrics, id_verticalBearingY, alloc_int (((FT_Face)face)->glyph->metrics.vertBearingY));
+			alloc_field (metrics, id_verticalAdvance, alloc_int (((FT_Face)face)->glyph->metrics.vertAdvance));
+			
+			val_array_push (glyphList, metrics);
+			
+		}
+		
+	}
+	
+	
+	value Font::GetGlyphMetrics (GlyphSet *glyphSet) {
+		
+		initialize ();
+		
+		value glyphList = alloc_array (0);
+		
+		if (!glyphSet->glyphs.empty ()) {
+			
+			for (unsigned int i = 0; i < glyphSet->glyphs.length (); i++) {
+				
+				GetGlyphMetrics_Push ((FT_Face)face, FT_Get_Char_Index ((FT_Face)face, glyphSet->glyphs[i]), glyphList);
+				
+			}
+			
+		}
+		
+		GlyphRange range;
+		
+		for (int i = 0; i < glyphSet->ranges.size (); i++) {
+			
+			range = glyphSet->ranges[i];
+			
+			if (range.start == 0 && range.end == -1) {
+				
+				FT_UInt glyphIndex;
+				FT_ULong charCode = FT_Get_First_Char ((FT_Face)face, &glyphIndex);
+				
+				while (glyphIndex != 0) {
+					
+					GetGlyphMetrics_Push ((FT_Face)face, glyphIndex, glyphList);
+					charCode = FT_Get_Next_Char ((FT_Face)face, charCode, &glyphIndex);
+					
+				}
+				
+			} else {
+				
+				unsigned long end = range.end;
+				
+				if (end < 0) {
+					
+					end = ((FT_Face)face)->num_glyphs - 1;
+					
+				}
+				
+				for (unsigned long i = range.start; i <= end; i++) {
+					
+					GetGlyphMetrics_Push ((FT_Face)face, i, glyphList);
+					
+				}
+				
+			}
+			
+		}
+		
+		return glyphList;
+		
+	}
+	
+	
+	int Font::GetHeight () {
+		
+		return ((FT_Face)face)->height;
+		
+	}
+	
+	
+	int Font::GetNumGlyphs () {
+		
+		return ((FT_Face)face)->num_glyphs;
+		
+	}
+	
+	
+	int Font::GetUnderlinePosition () {
+		
+		return ((FT_Face)face)->underline_position;
+		
+	}
+	
+	
+	int Font::GetUnderlineThickness () {
+		
+		return ((FT_Face)face)->underline_thickness;
+		
+	}
+	
+	
+	int Font::GetUnitsPerEM () {
+		
+		return ((FT_Face)face)->units_per_EM;
+		
+	}
+	
 	
 	void Font::SetSize (size_t size) {
 		
@@ -651,16 +836,7 @@ namespace lime {
 	
 	value Font::RenderToImage (size_t size, const char *glyphs) {
 		
-		if (!init) {
-			
-			id_width = val_id ("width");
-			id_height = val_id ("height");
-			id_xOffset = val_id ("xOffset");
-			id_yOffset = val_id ("yOffset");
-			id_bitmap = val_id ("bitmap");
-			init = true;
-			
-		}
+		initialize ();
 		
 		if (mSize != size)
 			SetSize(size);
@@ -701,8 +877,8 @@ namespace lime {
 			alloc_field (v, id_width, alloc_int (bitmap.width));
 			alloc_field (v, id_height, alloc_int (bitmap.rows));
 			
-			alloc_field (v, id_xOffset, alloc_int (face->glyph->bitmap_left));
-			alloc_field (v, id_yOffset, alloc_int (face->glyph->bitmap_top));
+			alloc_field (v, id_x, alloc_int (face->glyph->bitmap_left));
+			alloc_field (v, id_y, alloc_int (face->glyph->bitmap_top));
 
 			alloc_field (v, val_id ("advance"), alloc_int (face->glyph->metrics.horiAdvance));
 			alloc_field (v, val_id ("min_x"), alloc_int (face->glyph->metrics.horiBearingX));

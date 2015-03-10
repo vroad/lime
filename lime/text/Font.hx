@@ -18,7 +18,17 @@ import js.html.CanvasRenderingContext2D;
 class Font {
 
 
-	public var fontName (default, null):String;
+	public var ascender (get, null):Int;
+	public var descender (get, null):Int;
+	public var height (get, null):Int;
+	public var name (default, null):String;
+	public var numGlyphs (get, null):Int;
+	public var underlinePosition (get, null):Int;
+	public var underlineThickness (get, null):Int;
+	public var unitsPerEM (get, null):Int;
+	
+	
+	
 	
 	@:noCompletion private var __fontPath:String;
 	@:noCompletion private var __handle:Dynamic;
@@ -27,9 +37,9 @@ class Font {
 	
 	private static var fontNames:Map<String, Font> = new Map();
 	
-	private function new (fontName:String = null) {
+	private function new (name:String = null) {
 
-		this.fontName = fontName;
+		this.name = name;
 		this.glyphs = new Map<Int, Map<Int, GlyphRect>>();
 
 	}
@@ -267,8 +277,19 @@ class Font {
 		return fontNames[name];
 		
 	}
-
-
+	
+	
+	public function getGlyphMetrics (glyphs:GlyphSet):Array<GlyphMetrics> {
+		
+		#if (cpp || neko || nodejs)
+		return lime_font_get_glyph_metrics (__handle, glyphs);
+		#else
+		return null;
+		#end
+		
+	}
+	
+	
 	public function loadRange (size:Int, start:Int, end:Int) {
 
 		#if (flash || js)
@@ -317,8 +338,8 @@ class Font {
 
 		if (__handle != null) {
 
-			fontName = lime_font_get_family_name (__handle);
-			fontNames[fontName] = this;
+			name = lime_font_get_family_name (__handle);
+			fontNames[name] = this;
 
 		}
 
@@ -334,18 +355,117 @@ class Font {
 
 		if (__handle != null) {
 
-			fontName = lime_font_get_family_name (__handle);
-			fontNames[fontName] = this;
+			name = lime_font_get_family_name (__handle);
+			fontNames[name] = this;
 
 		}
 
 		#end
 
 	}
-
-
+	
+	
+	
+	
+	// Get & Set Methods
+	
+	
+	
+	
+	private function get_ascender ():Int {
+		
+		#if (cpp || neko || nodejs)
+		return lime_font_get_ascender (__handle);
+		#else
+		return 0;
+		#end
+		
+	}
+	
+	
+	private function get_descender ():Int {
+		
+		#if (cpp || neko || nodejs)
+		return lime_font_get_descender (__handle);
+		#else
+		return 0;
+		#end
+		
+	}
+	
+	
+	private function get_height ():Int {
+		
+		#if (cpp || neko || nodejs)
+		return lime_font_get_height (__handle);
+		#else
+		return 0;
+		#end
+		
+	}
+	
+	
+	private function get_numGlyphs ():Int {
+		
+		#if (cpp || neko || nodejs)
+		return lime_font_get_num_glyphs (__handle);
+		#else
+		return 0;
+		#end
+		
+	}
+	
+	
+	private function get_underlinePosition ():Int {
+		
+		#if (cpp || neko || nodejs)
+		return lime_font_get_underline_position (__handle);
+		#else
+		return 0;
+		#end
+		
+	}
+	
+	
+	private function get_underlineThickness ():Int {
+		
+		#if (cpp || neko || nodejs)
+		return lime_font_get_underline_thickness (__handle);
+		#else
+		return 0;
+		#end
+		
+	}
+	
+	
+	private function get_unitsPerEM ():Int {
+		
+		#if (cpp || neko || nodejs)
+		return lime_font_get_units_per_em (__handle);
+		#else
+		return 0;
+		#end
+		
+	}
+	
+	
+	
+	
+	// Native Methods
+	
+	
+	
+	
 	#if (cpp || neko || nodejs)
+	private static var lime_font_get_ascender = System.load ("lime", "lime_font_get_ascender", 1);
+	private static var lime_font_get_descender = System.load ("lime", "lime_font_get_descender", 1);
 	private static var lime_font_get_family_name = System.load ("lime", "lime_font_get_family_name", 1);
+	private static var lime_font_get_glyph_metrics = System.load ("lime", "lime_font_get_glyph_metrics", 2);
+	private static var lime_font_get_height = System.load ("lime", "lime_font_get_height", 1);
+	private static var lime_font_get_num_glyphs = System.load ("lime", "lime_font_get_num_glyphs", 1);
+	private static var lime_font_get_underline_position = System.load ("lime", "lime_font_get_underline_position", 1);
+	private static var lime_font_get_underline_thickness = System.load ("lime", "lime_font_get_underline_thickness", 1);
+	private static var lime_font_get_units_per_em = System.load ("lime", "lime_font_get_units_per_em", 1);
 	private static var lime_font_load:Dynamic->Dynamic = System.load ("lime", "lime_font_load", 1);
 	//private static var lime_font_load_glyphs = System.load ("lime", "lime_font_load_glyphs", 3);
 	//private static var lime_font_load_range = System.load ("lime", "lime_font_load_range", 4);
@@ -363,8 +483,8 @@ typedef GlyphRect = {
 	
 	public var width:Int;
 	public var height:Int;
-	public var xOffset:Int;
-	public var yOffset:Int;
+	public var x:Int;
+	public var y:Int;
 	public var bitmap:ByteArray;
 	
 	public var advance:Int;
