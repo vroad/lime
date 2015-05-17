@@ -438,6 +438,7 @@ namespace lime {
 		#ifdef IPHONE
 		SDL_iPhoneSetAnimationCallback (window->sdlWindow, 1, UpdateFrame, NULL);
 		#endif
+		windows.push_back (window);
 		
 	}
 	
@@ -529,15 +530,30 @@ namespace lime {
 		
 		#else
 			
-			if (currentUpdate >= nextUpdate) {
-				
-				SDL_RemoveTimer (timerID);
+			bool isVsyncEnabled = false;
+			for (int i = 0; i < windows.size(); ++i)
+				if (windows[i]->flags & WINDOW_FLAG_VSYNC) {
+					
+					isVsyncEnabled = true;
+					break;
+					
+				}
+			
+			if (isVsyncEnabled)
 				OnTimer (0, 0);
+			else {
 				
-			} else if (!timerActive) {
-				
-				timerActive = true;
-				timerID = SDL_AddTimer (nextUpdate - currentUpdate, OnTimer, 0);
+				if (currentUpdate >= nextUpdate) {
+					
+					SDL_RemoveTimer (timerID);
+					OnTimer (0, 0);
+					
+				} else if (!timerActive) {
+					
+					timerActive = true;
+					timerID = SDL_AddTimer (nextUpdate - currentUpdate, OnTimer, 0);
+					
+				}
 				
 			}
 			

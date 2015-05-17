@@ -23,6 +23,16 @@ namespace lime {
 			SDL_Renderer* sdlRenderer;
 			SDL_Texture* sdlTexture;
 			SDL_Window* sdlWindow;
+			
+		private:
+			
+			#ifdef HX_WINDOWS
+			void SetDwmFlushEnabled (bool enabled);
+			
+			bool isDwmFlushEnabled;
+			bool isVsyncForced;
+			#endif
+			int originalFlags;
 		
 	};
 	

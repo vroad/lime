@@ -13,7 +13,7 @@
 #include <ui/TouchEvent.h>
 #include <ui/WindowEvent.h>
 #include "SDLWindow.h"
-
+#include <vector>
 
 namespace lime {
 	
@@ -61,6 +61,7 @@ namespace lime {
 			TouchEvent touchEvent;
 			UpdateEvent updateEvent;
 			WindowEvent windowEvent;
+			std::vector<SDLWindow*> windows;
 		
 	};
 	

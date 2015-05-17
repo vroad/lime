@@ -204,10 +204,12 @@ namespace lime {
 		if (fullscreen) {
 			
 			SDL_SetWindowFullscreen (sdlWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+			flags |= WINDOW_FLAG_FULLSCREEN;
 			
 		} else {
 			
 			SDL_SetWindowFullscreen (sdlWindow, 0);
+			flags &= ~WINDOW_FLAG_FULLSCREEN;
 			
 		}
 		
