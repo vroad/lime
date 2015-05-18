@@ -336,7 +336,7 @@ class Font {
 	
 	private inline function getUInt8ArrayFromByteArray(ba:ByteArray)
 	{
-		#if nodejs
+		#if js
 		return ba.byteView;
 		#else
 		return new UInt8Array(ba);
