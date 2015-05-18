@@ -153,8 +153,8 @@ class PlatformSetup {
 		
 		if (extension != "zip") {
 			
-			var arguments = "xvzf";			
-						
+			var arguments = "xvzf";
+			
 			if (extension == "bz2" || extension == "tbz2") {
 				
 				arguments = "xvjf";
@@ -178,7 +178,7 @@ class PlatformSetup {
 				}
 				
 				ProcessHelper.runCommand ("", "tar", [ arguments, sourceZIP ], false);
-				ProcessHelper.runCommand ("", "cp", [ "-R", ignoreRootFolder + "/*", targetPath ], false);
+				ProcessHelper.runCommand ("", "cp", [ "-R", ignoreRootFolder + "/.", targetPath ], false);
 				Sys.command ("rm", [ "-r", ignoreRootFolder ]);
 				
 			} else {
@@ -668,7 +668,7 @@ class PlatformSetup {
 				defaultInstallPath = "/opt/air-sdk";
 				
 			}
-
+			
 			downloadFile (downloadPath);
 			
 			var path = unescapePath (CLIHelper.param ("Output directory [" + defaultInstallPath + "]"));
@@ -1687,8 +1687,8 @@ class PlatformSetup {
 				
 			}
 			
-			File.copy (PathHelper.getHaxelib (new Haxelib ("lime")) + "\\templates\\\\bin\\lime.exe", haxePath + "\\lime.exe");
-			File.copy (PathHelper.getHaxelib (new Haxelib ("lime")) + "\\templates\\\\bin\\lime.sh", haxePath + "\\lime");
+			try { File.copy (PathHelper.getHaxelib (new Haxelib ("lime")) + "\\templates\\\\bin\\lime.exe", haxePath + "\\lime.exe"); } catch (e:Dynamic) {}
+			try { File.copy (PathHelper.getHaxelib (new Haxelib ("lime")) + "\\templates\\\\bin\\lime.sh", haxePath + "\\lime"); } catch (e:Dynamic) {}
 			
 		} else {
 			
@@ -1847,10 +1847,10 @@ class PlatformSetup {
 				
 			}
 			
-			File.copy (PathHelper.getHaxelib (new Haxelib ("lime")) + "\\templates\\\\bin\\lime.exe", haxePath + "\\lime.exe");
-			File.copy (PathHelper.getHaxelib (new Haxelib ("lime")) + "\\templates\\\\bin\\lime.sh", haxePath + "\\lime");
-			File.copy (PathHelper.getHaxelib (new Haxelib ("openfl")) + "\\templates\\\\bin\\openfl.exe", haxePath + "\\openfl.exe");
-			File.copy (PathHelper.getHaxelib (new Haxelib ("openfl")) + "\\templates\\\\bin\\openfl.sh", haxePath + "\\openfl");
+			try { File.copy (PathHelper.getHaxelib (new Haxelib ("lime")) + "\\templates\\\\bin\\lime.exe", haxePath + "\\lime.exe"); } catch (e:Dynamic) {}
+			try { File.copy (PathHelper.getHaxelib (new Haxelib ("lime")) + "\\templates\\\\bin\\lime.sh", haxePath + "\\lime"); } catch (e:Dynamic) {}
+			try { File.copy (PathHelper.getHaxelib (new Haxelib ("openfl")) + "\\templates\\\\bin\\openfl.exe", haxePath + "\\openfl.exe"); } catch (e:Dynamic) {}
+			try { File.copy (PathHelper.getHaxelib (new Haxelib ("openfl")) + "\\templates\\\\bin\\openfl.sh", haxePath + "\\openfl"); } catch (e:Dynamic) {}
 			
 		} else {
 			

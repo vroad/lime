@@ -4,7 +4,7 @@ package lime._backend.html5;
 import js.html.CanvasElement;
 import js.html.DivElement;
 #if (haxe_ver >= "3.2")
-import js.html.HTMLElement;
+import js.html.Element;
 #else
 import js.html.HtmlElement;
 #end
@@ -21,11 +21,12 @@ class HTML5Window {
 	
 	public var canvas:CanvasElement;
 	public var div:DivElement;
-	public var element:#if (haxe_ver >= "3.2") HTMLElement #else HtmlElement #end;
+	public var element:#if (haxe_ver >= "3.2") Element #else HtmlElement #end;
 	#if stats
 	public var stats:Dynamic;
 	#end
 	
+	private var enableTextEvents:Bool;
 	private var parent:Window;
 	private var setHeight:Int;
 	private var setWidth:Int;
@@ -140,7 +141,7 @@ class HTML5Window {
 				
 			}
 			
-			var events = [ "mousedown", "mousemove", "mouseup", "wheel" ];
+			var events = [ "mousedown", "mouseenter", "mouseleave", "mousemove", "mouseup", "wheel" ];
 			
 			for (event in events) {
 				
@@ -162,6 +163,13 @@ class HTML5Window {
 			element.addEventListener ("touchend", handleTouchEvent, true);
 			
 		}
+		
+	}
+	
+	
+	public function getEnableTextEvents ():Bool {
+		
+		return enableTextEvents;
 		
 	}
 	
@@ -210,13 +218,21 @@ class HTML5Window {
 					
 					parent.onMouseDown.dispatch (x, y, event.button);
 				
+				case "mouseenter":
+					
+					parent.onWindowEnter.dispatch ();
+				
+				case "mouseleave":
+					
+					parent.onWindowLeave.dispatch ();
+				
 				case "mouseup":
 					
 					parent.onMouseUp.dispatch (x, y, event.button);
 				
 				case "mousemove":
 					
-					parent.onMouseMove.dispatch (x, y, event.button);
+					parent.onMouseMove.dispatch (x, y);
 				
 				default:
 				
@@ -224,7 +240,7 @@ class HTML5Window {
 			
 		} else {
 			
-			parent.onMouseWheel.dispatch (untyped event.deltaX, untyped event.deltaY);
+			parent.onMouseWheel.dispatch (untyped event.deltaX, - untyped event.deltaY);
 			
 		}
 		
@@ -372,9 +388,30 @@ class HTML5Window {
 	}
 	
 	
+	public function setEnableTextEvents (value:Bool):Bool {
+		
+		return enableTextEvents = value;
+		
+	}
+	
+	
+	public function setFullscreen (value:Bool):Bool {
+		
+		return false;
+		
+	}
+	
+	
 	public function setIcon (image:Image):Void {
 		
 		
+		
+	}
+	
+	
+	public function setMinimized (value:Bool):Bool {
+		
+		return false;
 		
 	}
 	

@@ -1,3 +1,131 @@
+2.4.1 (05/13/2015)
+------------------
+
+* Improve handling of custom error types in HTML5 target
+* Guard icon helpers if PNG encoding fails
+* Fixed Emscripten rebuild
+* Fixed issue on the build server
+
+
+2.4.0 (05/12/2015)
+------------------
+
+* Added Cairo render context and bindings
+* Added support for software windows, using Cairo not OpenGL
+* Added text input/edit events
+* Added onEnter/onLeave events for Window mouse focus
+* Added Image getColorBoundsRect
+* Added build support for ANGLE
+* Removed prevent default for HTML5 arrow and space keys
+* Improved Image copyPixels with merge alpha
+* Fixed static build support
+* Fixed a case where fonts might not be embedded
+* Fixed occasional crash with OpenAL on Neko
+
+
+2.3.3 (04/21/2015)
+------------------
+
+* Added audioSource.loops, audioSource.offset, audioSource.length
+* Renamed audioSource.timeOffset to audioSource.currentTime
+* Fixed onComplete for AudioSource instances
+* Fixed support for embedded bytes on HTML5
+* Fixed support for hardware anti-aliasing on SDL2 targets
+* Fixed some loose file handles in the format decoders
+* Fixed a possible crash in copyPixels
+* Improved accuracy of URLLoader progress
+
+
+2.3.2 (04/15/2015)
+------------------
+
+* Improved performance of pixel-based operations in Image
+* Added support for RGBA (default) and ARGB color order
+* Added --port=123 to change the webserver port on HTML5 builds 
+* Added support for Unicode Windows system paths
+* Added larger icon sizes requested by Windows 10
+* Improved functionality of BMP.encode
+* Fixed compilation on Android without Sound.java
+* Fixed support for -Doptional-cffi
+* Fixed haxe.Timer (legacy)
+
+
+2.3.1 (04/08/2015)
+------------------
+
+* Renamed Lime legacy to "lime-legacy" to support hybrid builds
+* Added -Dhybrid for using Lime 2 and Lime legacy in the same project
+* Improved support for standalone Neko builds on Linux
+* Fixed loading of OGG sounds on Android
+* Fixed Emscripten support for newer HXCPP
+* Fixed a crash using gl.texSubImage2D on Neko
+* Fixed missing System.fontsDirectory on Linux
+* Fixed crash on NULL system directories
+* Fixed crash when font or JPEG file paths are not found
+* Added softKeyboardRect support for iOS (legacy)
+
+
+2.3.0 (03/26/2015)
+------------------
+
+* Added initial Lime 2 support for iOS
+* Added Mouse.lock and Mouse.warp on native platforms
+* Added window.onMouseMoveRelative for use with mouse locking
+* Added System.exit
+* Added Lime 2 support for haxe.Timer
+* Changed window.onMouseMove to dispatch only (x, y)
+* Improved window width/height reporting after creation
+* Updated ios-deploy, fixed the run command for iOS
+* Fixed the ByteArray size returned from Image.getPixels
+* Fixed Flash builds for Mac and Haxe 3.2
+* Fixed js.Boot for new changes in Haxe 3.2
+* Fixed an issue in the Gamepad API
+* Fixed the ZipHelper for Haxe 3.2
+* Fixed the -Dstats define for HTML5 builds
+
+
+2.2.2 (03/25/2015)
+------------------
+
+* Restored support for OpenFL 2.2
+* Added System.fontsDirectory
+* Improved Font.fromFile when the file is not available
+* Improved HTTP server to allow access from other devices
+* Improved System.getTimer to work without haxe.Timer
+* Fixed a crash when using GL.bufferData with zero-length data
+
+
+2.2.1 (03/21/2015)
+------------------
+
+* Fixed -rebuild for 32-bit Mac/Linux with newer HXCPP
+* Fixed ImageBuffer with newer HXCPP
+* Compile fix
+
+
+2.2.0 (03/20/2015)
+------------------
+
+* Added formal support for fonts
+* Added formal support for complex text layout
+* Added Gamepad input support
+* Added Haxe 3.2 support
+* Added support for Window fullscreen
+* Added support for Window minimized
+* Added System directories (user, documents, etc)
+* Added the foundation for iOS support
+* Improved support for node.js
+* Improved support for Lime modules
+* Added support for embedded images and sounds
+* Changed Module init() to occur sooner
+* Implemented Assets.getBytes for Flash BitmapData
+* Fixed Assets.isLocal for Flash sound assets
+* Fixed Image and ImageBuffer clone()
+* Fixed support for HXCPP 3.2.x
+* Fixed -rebuild when using the Lime 2 desktop NDLL
+* Fixed "lime rebuild" when in the Lime directory
+
+
 2.1.3 (03/02/2015)
 ------------------
 

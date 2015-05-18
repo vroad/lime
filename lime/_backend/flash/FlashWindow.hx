@@ -12,6 +12,7 @@ import lime.ui.Window;
 class FlashWindow {
 	
 	
+	private var enableTextEvents:Bool;
 	private var parent:Window;
 	
 	
@@ -37,6 +38,13 @@ class FlashWindow {
 	}
 	
 	
+	public function getEnableTextEvents ():Bool {
+		
+		return enableTextEvents;
+		
+	}
+	
+	
 	public function move (x:Int, y:Int):Void {
 		
 		
@@ -51,9 +59,30 @@ class FlashWindow {
 	}
 	
 	
+	public function setEnableTextEvents (value:Bool):Bool {
+		
+		return enableTextEvents = value;
+		
+	}
+	
+	
+	public function setFullscreen (value:Bool):Bool {
+		
+		return value;
+		
+	}
+	
+	
 	public function setIcon (image:Image):Void {
 		
 		
+		
+	}
+	
+	
+	public function setMinimized (value:Bool):Bool {
+		
+		return false;
 		
 	}
 	

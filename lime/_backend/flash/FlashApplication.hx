@@ -25,13 +25,15 @@ class FlashApplication {
 	
 	
 	private var cacheTime:Int;
-	private var initialized:Bool;
+	private var mouseLeft:Bool;
 	private var parent:Application;
 	
 	
 	public function new (parent:Application):Void {
 		
 		this.parent = parent;
+		
+		Lib.current.stage.frameRate = 60;
 		
 		AudioManager.init ();
 		
@@ -106,10 +108,12 @@ class FlashApplication {
 		
 		if (config != null) {
 			
+			setFrameRate (config.fps);
 			var window = new Window (config);
 			var renderer = new Renderer (window);
 			parent.addWindow (window);
 			parent.addRenderer (renderer);
+			parent.init (renderer.context);
 			
 		}
 		
@@ -138,6 +142,7 @@ class FlashApplication {
 		Lib.current.stage.addEventListener (Event.DEACTIVATE, handleWindowEvent);
 		Lib.current.stage.addEventListener (FocusEvent.FOCUS_IN, handleWindowEvent);
 		Lib.current.stage.addEventListener (FocusEvent.FOCUS_OUT, handleWindowEvent);
+		Lib.current.stage.addEventListener (Event.MOUSE_LEAVE, handleWindowEvent);
 		Lib.current.stage.addEventListener (Event.RESIZE, handleWindowEvent);
 		
 		cacheTime = Lib.getTimer ();
@@ -146,6 +151,13 @@ class FlashApplication {
 		Lib.current.stage.addEventListener (Event.ENTER_FRAME, handleUpdateEvent);
 		
 		return 0;
+		
+	}
+	
+	
+	public function getFrameRate ():Float {
+		
+		return Lib.current.stage.frameRate;
 		
 	}
 	
@@ -160,6 +172,12 @@ class FlashApplication {
 			if (event.type == KeyboardEvent.KEY_DOWN) {
 				
 				parent.window.onKeyDown.dispatch (keyCode, modifier);
+				
+				if (parent.window.enableTextEvents) {
+					
+					parent.window.onTextInput.dispatch (String.fromCharCode (event.charCode));
+					
+				}
 				
 			} else {
 				
@@ -178,8 +196,8 @@ class FlashApplication {
 			
 			var button = switch (event.type) {
 				
-				case "middleMouseDown", "middleMouseMove", "middleMouseUp": 1;
-				case "rightMouseDown", "rightMouseMove", "rightMouseUp": 2;
+				case "middleMouseDown", "middleMouseUp": 1;
+				case "rightMouseDown", "rightMouseUp": 2;
 				default: 0;
 				
 			}
@@ -190,9 +208,16 @@ class FlashApplication {
 					
 					parent.window.onMouseDown.dispatch (event.stageX, event.stageY, button);
 				
-				case "mouseMove", "middleMouseMove", "rightMouseMove":
+				case "mouseMove":
 					
-					parent.window.onMouseMove.dispatch (event.stageX, event.stageY, button);
+					if (mouseLeft) {
+						
+						mouseLeft = false;
+						parent.window.onWindowEnter.dispatch ();
+						
+					}
+					
+					parent.window.onMouseMove.dispatch (event.stageX, event.stageY);
 				
 				case "mouseUp", "middleMouseUp", "rightMouseUp":
 					
@@ -250,13 +275,6 @@ class FlashApplication {
 		
 		if (parent.renderer != null) {
 			
-			if (!initialized) {
-				
-				initialized = true;
-				parent.init (parent.renderer.context);
-				
-			}
-			
 			parent.renderer.onRender.dispatch (parent.renderer.context);
 			parent.renderer.flip ();
 			
@@ -287,6 +305,11 @@ class FlashApplication {
 					
 					parent.window.onWindowFocusOut.dispatch ();
 				
+				case Event.MOUSE_LEAVE:
+					
+					mouseLeft = true;
+					parent.window.onWindowLeave.dispatch ();
+				
 				default:
 					
 					parent.window.width = Lib.current.stage.stageWidth;
@@ -297,6 +320,13 @@ class FlashApplication {
 			}
 			
 		}
+		
+	}
+	
+	
+	public function setFrameRate (value:Float):Float {
+		
+		return Lib.current.stage.frameRate = value;
 		
 	}
 	

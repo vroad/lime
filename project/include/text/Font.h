@@ -3,10 +3,13 @@
 
 
 #include <graphics/ImageBuffer.h>
-#include <text/GlyphSet.h>
+#include <system/System.h>
 #include <utils/Resource.h>
 #include <hx/CFFI.h>
-#include <list>
+
+#ifdef HX_WINDOWS
+#undef GetGlyphIndices
+#endif
 
 
 namespace lime {
@@ -22,6 +25,18 @@ namespace lime {
 	} GlyphInfo;
 	
 	
+	typedef struct {
+		
+		uint32_t index;
+		uint32_t width;
+		uint32_t height;
+		uint32_t x;
+		uint32_t y;
+		unsigned char data;
+		
+	} GlyphImage;
+	
+	
 	class Font {
 		
 		
@@ -34,22 +49,22 @@ namespace lime {
 			value Decompose (int em);
 			int GetAscender ();
 			int GetDescender ();
-			value GetFaceInfo ();
 			wchar_t *GetFamilyName ();
-			value GetGlyphMetrics (GlyphSet *glyphSet);
+			int GetGlyphIndex (char* character);
+			value GetGlyphIndices (char* characters);
+			value GetGlyphMetrics (int index);
 			int GetHeight ();
 			int GetNumGlyphs ();
 			int GetUnderlinePosition ();
 			int GetUnderlineThickness ();
 			int GetUnitsPerEM ();
-			value RenderToImage (size_t size, const char *glyphs);
-			value GetKernings (value glyphs);
+			int RenderGlyph (int index, ByteArray *bytes, int offset = 0);
+			int RenderGlyphs (value indices, ByteArray *bytes);
 			void SetSize (size_t size);
 			
 			void* face;
 			
 		private:
-			
 			
 			size_t mSize;
 		

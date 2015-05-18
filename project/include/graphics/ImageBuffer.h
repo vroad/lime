@@ -3,6 +3,7 @@
 
 
 #include <hx/CFFI.h>
+#include <graphics/PixelFormat.h>
 #include <utils/ByteArray.h>
 
 
@@ -24,8 +25,10 @@ namespace lime {
 			
 			int bpp;
 			ByteArray *data;
+			PixelFormat format;
 			int height;
 			int width;
+			bool transparent;
 		
 		private:
 			

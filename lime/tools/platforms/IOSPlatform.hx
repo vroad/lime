@@ -340,6 +340,8 @@ class IOSPlatform extends PlatformTarget {
 	
 	public override function run ():Void {
 		
+		if (project.targetFlags.exists ("xcode")) return;
+		
 		IOSHelper.launch (project, targetDirectory);
 		
 	}
@@ -449,7 +451,10 @@ class IOSPlatform extends PlatformTarget {
 		
 		context.HAS_LAUNCH_IMAGE = true;
 		
-		FileHelper.recursiveCopyTemplate (project.templatePaths, "iphone/Resources", projectDirectory + "/Resources", context, true, false);
+		PathHelper.mkdir (projectDirectory + "/resources");
+		PathHelper.mkdir (projectDirectory + "/haxe/build");
+		
+		FileHelper.recursiveCopyTemplate (project.templatePaths, "iphone/resources", projectDirectory + "/resources", context, true, false);
 		FileHelper.recursiveCopyTemplate (project.templatePaths, "iphone/PROJ/haxe", projectDirectory + "/haxe", context);
 		FileHelper.recursiveCopyTemplate (project.templatePaths, "haxe", projectDirectory + "/haxe", context);
 		FileHelper.recursiveCopyTemplate (project.templatePaths, "iphone/PROJ/Classes", projectDirectory + "/Classes", context);
@@ -495,8 +500,8 @@ class IOSPlatform extends PlatformTarget {
 					
 					if (!FileSystem.exists (releaseLib)) {
 						
-						releaseLib = PathHelper.getLibraryPath (ndll, "IPhone", "lib", ".iphoneos.a");
-						debugLib = PathHelper.getLibraryPath (ndll, "IPhone", "lib", ".iphoneos.a", true);
+						releaseLib = PathHelper.getLibraryPath (ndll, "iPhone", "lib", ".iphoneos.a");
+						debugLib = PathHelper.getLibraryPath (ndll, "iPhone", "lib", ".iphoneos.a", true);
 						
 					}
 					
@@ -560,6 +565,12 @@ class IOSPlatform extends PlatformTarget {
 				FileHelper.copyAsset (asset, targetPath, context);
 				
 			}
+			
+		}
+		
+		if (project.targetFlags.exists ("xcode") && PlatformHelper.hostPlatform == Platform.MAC && command == "update") {
+			
+			ProcessHelper.runCommand ("", "open", [ targetDirectory + "/" + project.app.file + ".xcodeproj" ] );
 			
 		}
 		

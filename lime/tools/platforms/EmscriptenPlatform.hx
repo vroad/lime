@@ -4,6 +4,7 @@ package lime.tools.platforms;
 //import openfl.utils.ByteArray;
 //import openfl.utils.CompressionAlgorithm;
 import haxe.io.Path;
+import haxe.Json;
 import haxe.Template;
 import lime.tools.helpers.AssetHelper;
 import lime.tools.helpers.CPPHelper;
@@ -14,6 +15,7 @@ import lime.tools.helpers.LogHelper;
 import lime.tools.helpers.PathHelper;
 import lime.tools.helpers.ProcessHelper;
 import lime.project.AssetType;
+import lime.project.Haxelib;
 import lime.project.HXProject;
 import lime.project.PlatformTarget;
 import sys.io.File;
@@ -52,8 +54,8 @@ class EmscriptenPlatform extends PlatformTarget {
 		
 		var hxml = targetDirectory + "/haxe/" + type + ".hxml";
 		
-		ProcessHelper.runCommand ("", "haxe", [ hxml, "-D", "emscripten", "-D", "webgl" ] );
-		CPPHelper.compile (project, targetDirectory + "/obj", [ "-Demscripten", "-Dwebgl" ]);
+		ProcessHelper.runCommand ("", "haxe", [ hxml, "-D", "emscripten", "-D", "webgl", "-D", "static_link" ] );
+		CPPHelper.compile (project, targetDirectory + "/obj", [ "-Demscripten", "-Dwebgl", "-Dstatic_link" ]);
 		
 		if (project.environment.exists ("EMSCRIPTEN_SDK")) {
 			
@@ -72,7 +74,16 @@ class EmscriptenPlatform extends PlatformTarget {
 			
 		}
 		
-		args = args.concat ([ "ApplicationMain" + (project.debug ? "-debug" : "") + ".a", "-o", "ApplicationMain.o" ]);
+		var json = Json.parse (File.getContent (PathHelper.getHaxelib (new Haxelib ("hxcpp"), true) + "/haxelib.json"));
+		var prefix = "";
+		
+		if (Std.parseFloat (json.version) > 3.1) {
+			
+			prefix = "lib";
+			
+		}
+		
+		args = args.concat ([ prefix + "ApplicationMain" + (project.debug ? "-debug" : "") + ".a", "-o", "ApplicationMain.o" ]);
 		ProcessHelper.runCommand (targetDirectory + "/obj", "emcc", args, true, false, true);
 		
 		args = [ "ApplicationMain.o", "-s", "ASM_JS=1", "-s", "NO_EXIT_RUNTIME=1", "-s", "USE_SDL=2" ];
@@ -215,7 +226,7 @@ class EmscriptenPlatform extends PlatformTarget {
 	
 	public override function rebuild ():Void {
 		
-		CPPHelper.rebuild (project, [[ "-Demscripten" ]]);
+		CPPHelper.rebuild (project, [[ "-Demscripten", "-Dstatic_link" ]]);
 		
 	}
 	

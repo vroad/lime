@@ -2,6 +2,9 @@ package lime.app;
 
 
 import lime.graphics.RenderContext;
+import lime.ui.Gamepad;
+import lime.ui.GamepadAxis;
+import lime.ui.GamepadButton;
 import lime.ui.KeyCode;
 import lime.ui.KeyModifier;
 
@@ -23,6 +26,13 @@ class Module implements IModule {
 	 * @param	context The current render context
 	 */
 	public function init (context:RenderContext):Void { }
+	
+	
+	public function onGamepadAxisMove (gamepad:Gamepad, axis:GamepadAxis, value:Float):Void { }
+	public function onGamepadButtonDown (gamepad:Gamepad, button:GamepadButton):Void { }
+	public function onGamepadButtonUp (gamepad:Gamepad, button:GamepadButton):Void { }
+	public function onGamepadConnect (gamepad:Gamepad):Void { }
+	public function onGamepadDisconnect (gamepad:Gamepad):Void { }
 	
 	
 	/**
@@ -56,7 +66,16 @@ class Module implements IModule {
 	 * @param	y	The current y coordinate of the mouse
 	 * @param	button	The ID of the mouse button that was pressed
 	 */
-	public function onMouseMove (x:Float, y:Float, button:Int):Void { }
+	public function onMouseMove (x:Float, y:Float):Void { }
+	
+	
+	/**
+	 * Called when a mouse move relative event is fired
+	 * @param	x	The x movement of the mouse
+	 * @param	y	The y movement of the mouse
+	 * @param	button	The ID of the mouse button that was pressed
+	 */
+	public function onMouseMoveRelative (x:Float, y:Float):Void { }
 	
 	
 	/**
@@ -87,6 +106,22 @@ class Module implements IModule {
 	 * @param	context	The current render context
 	 */
 	public function onRenderContextRestored (context:RenderContext):Void { }
+	
+	
+	/**
+	 * Called when a text edit event is fired
+	 * @param	text	The current replacement text
+	 * @param	start	The starting index for the edit
+	 * @param	length	The length of the edit
+	 */
+	public function onTextEdit (text:String, start:Int, length:Int):Void { }
+	
+	
+	/**
+	 * Called when a text input event is fired
+	 * @param	text	The current input text
+	 */
+	public function onTextInput (text:String):Void { }
 	
 	
 	/**
@@ -135,6 +170,12 @@ class Module implements IModule {
 	
 	
 	/**
+	 * Called when a window enter event is fired
+	 */
+	public function onWindowEnter ():Void { }
+	
+	
+	/**
 	 * Called when a window focus in event is fired
 	 */
 	public function onWindowFocusIn ():Void { }
@@ -144,6 +185,24 @@ class Module implements IModule {
 	 * Called when a window focus out event is fired
 	 */
 	public function onWindowFocusOut ():Void { }
+	
+	
+	/**
+	 * Called when a window fullscreen event is fired
+	 */
+	public function onWindowFullscreen ():Void { }
+	
+	
+	/**
+	 * Called when a mouse leave event is fired
+	 */
+	public function onWindowLeave ():Void { }
+	
+	
+	/**
+	 * Called when a window minimize event is fired
+	 */
+	public function onWindowMinimize ():Void { }
 	
 	
 	/**
@@ -160,6 +219,9 @@ class Module implements IModule {
 	 * @param	height	The height of the window
 	 */
 	public function onWindowResize (width:Int, height:Int):Void { }
+	
+	
+	public function onWindowRestore ():Void { }
 	
 	
 	/**

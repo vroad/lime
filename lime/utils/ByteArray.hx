@@ -106,8 +106,15 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 		var slen = function (bytes:ByteArray){ return bytes == null ? 0 : bytes.length; }
 		#end
 		
+		#if !lime_legacy
 		var init = System.load ("lime", "lime_byte_array_init", 4);
-		init (factory, slen, resize, bytes);
+		if (init != null) init (factory, slen, resize, bytes);
+		#end
+		
+		#if (lime_hybrid || lime_legacy)
+		var init = System.load ("lime-legacy", "lime_legacy_byte_array_init", 4);
+		if (init != null) init (factory, slen, resize, bytes);
+		#end
 		
 	}
 	#end
@@ -995,6 +1002,15 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	#end
 	
 	
+	#if (cpp || neko || nodejs)
+	public function __getNativePointer ():Dynamic {
+		
+		return lime_byte_array_get_native_pointer (this);
+		
+	}
+	#end
+	
+	
 	#if js
 	private function __getUTFBytesCount (value:String):Int {
 		
@@ -1147,12 +1163,11 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	
 	
 	
-	#if !disable_cffi
+	private static var lime_byte_array_get_native_pointer = System.load ("lime", "lime_byte_array_get_native_pointer", 1);
 	private static var lime_byte_array_overwrite_file = System.load ("lime", "lime_byte_array_overwrite_file", 2);
 	private static var lime_byte_array_read_file = System.load ("lime", "lime_byte_array_read_file", 1);
 	private static var lime_lzma_decode = System.load ("lime", "lime_lzma_decode", 1);
 	private static var lime_lzma_encode = System.load ("lime", "lime_lzma_encode", 1);
-	#end
 	
 	
 }

@@ -1,6 +1,7 @@
 package lime._backend.native;
 
 
+import haxe.Timer;
 import lime.app.Application;
 import lime.app.Config;
 import lime.audio.AudioManager;
@@ -9,31 +10,38 @@ import lime.graphics.GLRenderContext;
 import lime.graphics.RenderContext;
 import lime.graphics.Renderer;
 import lime.system.System;
+import lime.ui.Gamepad;
 import lime.ui.Window;
 
+@:access(haxe.Timer)
 @:access(lime.app.Application)
 @:access(lime.graphics.Renderer)
+@:access(lime.ui.Gamepad)
+@:access(lime.ui.Window)
 
 
 class NativeApplication {
 	
 	
+	private var gamepadEventInfo = new GamepadEventInfo ();
 	private var keyEventInfo = new KeyEventInfo ();
 	private var mouseEventInfo = new MouseEventInfo ();
 	private var renderEventInfo = new RenderEventInfo (RENDER);
+	private var textEventInfo = new TextEventInfo ();
 	private var touchEventInfo = new TouchEventInfo ();
 	private var updateEventInfo = new UpdateEventInfo ();
 	private var windowEventInfo = new WindowEventInfo ();
 	
 	public var handle:Dynamic;
 	
-	private var initialized:Bool;
+	private var frameRate:Float;
 	private var parent:Application;
 	
 	
 	public function new (parent:Application):Void {
 		
 		this.parent = parent;
+		frameRate = 60;
 		
 		AudioManager.init ();
 		
@@ -48,10 +56,12 @@ class NativeApplication {
 		
 		if (config != null) {
 			
+			setFrameRate (config.fps);
 			var window = new Window (config);
 			var renderer = new Renderer (window);
 			parent.addWindow (window);
 			parent.addRenderer (renderer);
+			parent.init (renderer.context);
 			
 		}
 		
@@ -60,14 +70,14 @@ class NativeApplication {
 	
 	public function exec ():Int {
 		
+		lime_gamepad_event_manager_register (handleGamepadEvent, gamepadEventInfo);
 		lime_key_event_manager_register (handleKeyEvent, keyEventInfo);
 		lime_mouse_event_manager_register (handleMouseEvent, mouseEventInfo);
 		lime_render_event_manager_register (handleRenderEvent, renderEventInfo);
+		lime_text_event_manager_register (handleTextEvent, textEventInfo);
 		lime_touch_event_manager_register (handleTouchEvent, touchEventInfo);
 		lime_update_event_manager_register (handleUpdateEvent, updateEventInfo);
 		lime_window_event_manager_register (handleWindowEvent, windowEventInfo);
-		
-		// TODO: add parent.init
 		
 		#if nodejs
 		
@@ -81,7 +91,7 @@ class NativeApplication {
 				
 				var result = lime_application_quit (handle);
 				__cleanup ();
-				Sys.exit(result);
+				Sys.exit (result);
 				
 			}
 			
@@ -101,6 +111,51 @@ class NativeApplication {
 		return 0;
 		
 		#end
+		
+	}
+	
+	
+	public function getFrameRate ():Float {
+		
+		return frameRate;
+		
+	}
+	
+	
+	private function handleGamepadEvent ():Void {
+		
+		if (parent.window != null) {
+			
+			switch (gamepadEventInfo.type) {
+				
+				case AXIS_MOVE:
+					
+					parent.window.onGamepadAxisMove.dispatch (Gamepad.devices.get (gamepadEventInfo.id), gamepadEventInfo.axis, gamepadEventInfo.value);
+				
+				case BUTTON_DOWN:
+					
+					parent.window.onGamepadButtonDown.dispatch (Gamepad.devices.get (gamepadEventInfo.id), gamepadEventInfo.button);
+				
+				case BUTTON_UP:
+					
+					parent.window.onGamepadButtonUp.dispatch (Gamepad.devices.get (gamepadEventInfo.id), gamepadEventInfo.button);
+				
+				case CONNECT:
+					
+					var gamepad = new Gamepad (gamepadEventInfo.id);
+					Gamepad.devices.set (gamepadEventInfo.id, gamepad);
+					parent.window.onGamepadConnect.dispatch (gamepad);
+				
+				case DISCONNECT:
+					
+					var gamepad = Gamepad.devices.get (gamepadEventInfo.id);
+					if (gamepad != null) gamepad.connected = false;
+					Gamepad.devices.remove (gamepadEventInfo.id);
+					parent.window.onGamepadDisconnect.dispatch (gamepad);
+				
+			}
+			
+		}
 		
 	}
 	
@@ -142,7 +197,8 @@ class NativeApplication {
 				
 				case MOUSE_MOVE:
 					
-					parent.window.onMouseMove.dispatch (mouseEventInfo.x, mouseEventInfo.y, mouseEventInfo.button);
+					parent.window.onMouseMove.dispatch (mouseEventInfo.x, mouseEventInfo.y);
+					parent.window.onMouseMoveRelative.dispatch (mouseEventInfo.movementX, mouseEventInfo.movementY);
 				
 				case MOUSE_WHEEL:
 					
@@ -165,13 +221,7 @@ class NativeApplication {
 				
 				case RENDER:
 					
-					if (!initialized) {
-						
-						initialized = true;
-						parent.init (parent.renderer.context);
-						
-					}
-					
+					parent.renderer.render ();
 					parent.renderer.onRender.dispatch (parent.renderer.context);
 					parent.renderer.flip ();
 					
@@ -185,12 +235,35 @@ class NativeApplication {
 					#if lime_console
 					parent.renderer.context = CONSOLE (new ConsoleRenderContext ());
 					#else
-					parent.renderer.context = OPENGL (new GLRenderContext ());
+					if (parent.config.hardware) {
+						
+						parent.renderer.context = OPENGL (new GLRenderContext ());
+						
+					}
 					#end
 					
 					parent.renderer.onRenderContextRestored.dispatch (parent.renderer.context);
 				
 			}
+			
+		}
+		
+	}
+	
+	
+	private function handleTextEvent ():Void {
+		
+		switch (textEventInfo.type) {
+			
+			case TEXT_INPUT:
+				
+				parent.window.onTextInput.dispatch (textEventInfo.text);
+			
+			case TEXT_EDIT:
+				
+				parent.window.onTextEdit.dispatch (textEventInfo.text, textEventInfo.start, textEventInfo.length);
+			
+			default:
 			
 		}
 		
@@ -226,6 +299,7 @@ class NativeApplication {
 	
 	private function handleUpdateEvent ():Void {
 		
+		updateTimer ();
 		parent.onUpdate.dispatch (updateEventInfo.deltaTime);
 		
 	}
@@ -249,6 +323,10 @@ class NativeApplication {
 					
 					parent.window.onWindowDeactivate.dispatch ();
 				
+				case WINDOW_ENTER:
+					
+					parent.window.onWindowEnter.dispatch ();
+				
 				case WINDOW_FOCUS_IN:
 					
 					parent.window.onWindowFocusIn.dispatch ();
@@ -257,19 +335,80 @@ class NativeApplication {
 					
 					parent.window.onWindowFocusOut.dispatch ();
 				
+				case WINDOW_LEAVE:
+					
+					parent.window.onWindowLeave.dispatch ();
+				
+				case WINDOW_MINIMIZE:
+					
+					parent.window.__minimized = true;
+					parent.window.onWindowMinimize.dispatch ();
+				
 				case WINDOW_MOVE:
 					
-					parent.window.x = windowEventInfo.x;
-					parent.window.y = windowEventInfo.y;
-					
+					parent.window.__x = windowEventInfo.x;
+					parent.window.__y = windowEventInfo.y;
 					parent.window.onWindowMove.dispatch (windowEventInfo.x, windowEventInfo.y);
 				
 				case WINDOW_RESIZE:
 					
-					parent.window.width = windowEventInfo.width;
-					parent.window.height = windowEventInfo.height;
-					
+					parent.window.__width = windowEventInfo.width;
+					parent.window.__height = windowEventInfo.height;
 					parent.window.onWindowResize.dispatch (windowEventInfo.width, windowEventInfo.height);
+				
+				case WINDOW_RESTORE:
+					
+					parent.window.__fullscreen = false;
+					parent.window.__minimized = false;
+					parent.window.onWindowRestore.dispatch ();
+				
+			}
+			
+		}
+		
+	}
+	
+	
+	public function setFrameRate (value:Float):Float {
+		
+		lime_application_set_frame_rate (handle, value);
+		return frameRate = value;
+		
+	}
+	
+	
+	private function updateTimer ():Void {
+		
+		if (Timer.sRunningTimers.length > 0) {
+			
+			var currentTime = System.getTimer ();
+			var foundNull = false;
+			var timer;
+			
+			for (i in 0...Timer.sRunningTimers.length) {
+				
+				timer = Timer.sRunningTimers[i];
+				
+				if (timer != null) {
+					
+					if (currentTime >= timer.mFireAt) {
+						
+						timer.mFireAt += timer.mTime;
+						timer.run ();
+						
+					}
+					
+				} else {
+					
+					foundNull = true;
+					
+				}
+				
+			}
+			
+			if (foundNull) {
+				
+				Timer.sRunningTimers = Timer.sRunningTimers.filter (function (val) { return val != null; });
 				
 			}
 			
@@ -288,16 +427,60 @@ class NativeApplication {
 	private static var lime_application_create = System.load ("lime", "lime_application_create", 1);
 	private static var lime_application_exec = System.load ("lime", "lime_application_exec", 1);
 	private static var lime_application_init = System.load ("lime", "lime_application_init", 1);
+	private static var lime_application_set_frame_rate = System.load ("lime", "lime_application_set_frame_rate", 2);
 	private static var lime_application_update = System.load ("lime", "lime_application_update", 1);
 	private static var lime_application_quit = System.load ("lime", "lime_application_quit", 1);
-	private static var lime_application_get_ticks = System.load ("lime", "lime_application_get_ticks", 0);
+	private static var lime_gamepad_event_manager_register = System.load ("lime", "lime_gamepad_event_manager_register", 2);
 	private static var lime_key_event_manager_register = System.load ("lime", "lime_key_event_manager_register", 2);
 	private static var lime_mouse_event_manager_register = System.load ("lime", "lime_mouse_event_manager_register", 2);
 	private static var lime_render_event_manager_register = System.load ("lime", "lime_render_event_manager_register", 2);
+	private static var lime_text_event_manager_register = System.load ("lime", "lime_text_event_manager_register", 2);
 	private static var lime_touch_event_manager_register = System.load ("lime", "lime_touch_event_manager_register", 2);
 	private static var lime_update_event_manager_register = System.load ("lime", "lime_update_event_manager_register", 2);
 	private static var lime_window_event_manager_register = System.load ("lime", "lime_window_event_manager_register", 2);
 	
+	
+}
+
+
+private class GamepadEventInfo {
+	
+	
+	public var axis:Int;
+	public var button:Int;
+	public var id:Int;
+	public var type:GamepadEventType;
+	public var value:Float;
+	
+	
+	public function new (type:GamepadEventType = null, id:Int = 0, button:Int = 0, axis:Int = 0, value:Float = 0) {
+		
+		this.type = type;
+		this.id = id;
+		this.button = button;
+		this.axis = axis;
+		this.value = value;
+		
+	}
+	
+	
+	public function clone ():GamepadEventInfo {
+		
+		return new GamepadEventInfo (type, id, button, axis, value);
+		
+	}
+	
+	
+}
+
+
+@:enum private abstract GamepadEventType(Int) {
+	
+	var AXIS_MOVE = 0;
+	var BUTTON_DOWN = 1;
+	var BUTTON_UP = 2;
+	var CONNECT = 3;
+	var DISCONNECT = 4;
 	
 }
 
@@ -341,25 +524,29 @@ private class MouseEventInfo {
 	
 	
 	public var button:Int;
+	public var movementX:Float;
+	public var movementY:Float;
 	public var type:MouseEventType;
 	public var x:Float;
 	public var y:Float;
 	
 	
 	
-	public function new (type:MouseEventType = null, x:Float = 0, y:Float = 0, button:Int = 0) {
+	public function new (type:MouseEventType = null, x:Float = 0, y:Float = 0, button:Int = 0, movementX:Float = 0, movementY:Float = 0) {
 		
 		this.type = type;
 		this.x = x;
 		this.y = y;
 		this.button = button;
+		this.movementX = movementX;
+		this.movementY = movementY;
 		
 	}
 	
 	
 	public function clone ():MouseEventInfo {
 		
-		return new MouseEventInfo (type, x, y, button);
+		return new MouseEventInfo (type, x, y, button, movementX, movementY);
 		
 	}
 	
@@ -407,6 +594,44 @@ private class RenderEventInfo {
 	var RENDER = 0;
 	var RENDER_CONTEXT_LOST = 1;
 	var RENDER_CONTEXT_RESTORED = 2;
+	
+}
+
+
+private class TextEventInfo {
+	
+	
+	public var id:Int;
+	public var length:Int;
+	public var start:Int;
+	public var text:String;
+	public var type:TextEventType;
+	
+	
+	public function new (type:TextEventType = null, text:String = "", start:Int = 0, length:Int = 0) {
+		
+		this.type = type;
+		this.text = text;
+		this.start = start;
+		this.length = length;
+		
+	}
+	
+	
+	public function clone ():TextEventInfo {
+		
+		return new TextEventInfo (type, text, start, length);
+		
+	}
+	
+	
+}
+
+
+@:enum private abstract TextEventType(Int) {
+	
+	var TEXT_INPUT = 0;
+	var TEXT_EDIT = 1;
 	
 }
 
@@ -517,9 +742,13 @@ private class WindowEventInfo {
 	var WINDOW_ACTIVATE = 0;
 	var WINDOW_CLOSE = 1;
 	var WINDOW_DEACTIVATE = 2;
-	var WINDOW_FOCUS_IN = 3;
-	var WINDOW_FOCUS_OUT = 4;
-	var WINDOW_MOVE = 5;
-	var WINDOW_RESIZE = 6;
+	var WINDOW_ENTER = 3;
+	var WINDOW_FOCUS_IN = 4;
+	var WINDOW_FOCUS_OUT = 5;
+	var WINDOW_LEAVE = 6;
+	var WINDOW_MINIMIZE = 7;
+	var WINDOW_MOVE = 8;
+	var WINDOW_RESIZE = 9;
+	var WINDOW_RESTORE = 10;
 	
 }

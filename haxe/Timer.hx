@@ -1,5 +1,5 @@
 package haxe;
-#if (macro || (!neko && !cpp))
+#if (macro || (!neko && !cpp && !nodejs))
 
 
 // Original haxe.Timer class
@@ -41,7 +41,7 @@ package haxe;
 	the child class.
 **/
 class Timer {
-	#if (flash || js || java)
+	#if (flash || js || java || python)
 
 	#if (flash || js)
 		private var id : Null<Int>;
@@ -62,12 +62,9 @@ class Timer {
 		The accuracy of this may be platform-dependent.
 	**/
 	public function new( time_ms : Int ){
-		#if flash9
+		#if flash
 			var me = this;
 			id = untyped __global__["flash.utils.setInterval"](function() { me.run(); },time_ms);
-		#elseif flash
-			var me = this;
-			id = untyped _global["setInterval"](function() { me.run(); },time_ms);
 		#elseif js
 			var me = this;
 			id = untyped setInterval(function() me.run(),time_ms);
@@ -89,10 +86,8 @@ class Timer {
 		#if (flash || js)
 			if( id == null )
 				return;
-			#if flash9
+			#if flash
 				untyped __global__["flash.utils.clearInterval"](id);
-			#elseif flash
-				untyped _global["clearInterval"](id);
 			#elseif js
 				untyped clearInterval(id);
 			#end
@@ -190,7 +185,7 @@ private class TimerTask extends java.util.TimerTask {
 		this.timer = timer;
 	}
 
-	@:overload public function run():Void {
+	@:overload override public function run():Void {
 		timer.run();
 	}
 }
@@ -243,7 +238,11 @@ class Timer {
 	
 	private static function getMS ():Float {
 		
-		return stamp () * 1000.0;
+		#if lime_legacy
+		return lime_time_stamp () * 1000.0;
+		#else
+		return System.getTimer ();
+		#end
 		
 	}
 	
@@ -298,7 +297,6 @@ class Timer {
 	}
 	
 	
-	#if lime_legacy
 	@:noCompletion private function __check (inTime:Float) {
 		
 		if (inTime >= mFireAt) {
@@ -340,9 +338,10 @@ class Timer {
 	}
 	
 	
+	#if (lime_legacy || lime_hybrid)
 	@:noCompletion public static function __nextWake (limit:Float):Float {
 		
-		var now = lime_time_stamp () * 1000.0;
+		var now = getMS ();
 		var sleep;
 		
 		for (timer in sRunningTimers) {
@@ -380,7 +379,7 @@ class Timer {
 	
 	
 	#if lime_legacy
-	static var lime_time_stamp = flash.Lib.load ("lime", "lime_time_stamp", 0);
+	static var lime_time_stamp:Void->Float = flash.Lib.load ("lime-legacy", "lime_legacy_time_stamp", 0);
 	#end
 	
 	

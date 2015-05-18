@@ -136,7 +136,15 @@ class CommandLineTools {
 				
 				if (words.length < 2) {
 					
-					words.unshift ("lime");
+					if (targetFlags.exists ("openfl")) {
+						
+						words.unshift ("openfl");
+						
+					} else {
+						
+						words.unshift ("lime");
+						
+					}
 					
 				}
 				
@@ -168,7 +176,7 @@ class CommandLineTools {
 							
 						} else {
 							
-							path = PathHelper.combine (words[0], "project");
+							path = PathHelper.combine (words[0], "project/Build.xml");
 							
 						}
 						
@@ -251,6 +259,10 @@ class CommandLineTools {
 							
 							project = new HXProject ();
 							project.config.set ("project.rebuild.path", PathHelper.combine (PathHelper.getHaxelib (haxelib), "project"));
+							
+						} else {
+							
+							project.config.set ("project.rebuild.path", PathHelper.combine (PathHelper.getHaxelib (haxelib), project.config.get ("project.rebuild.path")));
 							
 						}
 						
@@ -357,7 +369,7 @@ class CommandLineTools {
 		
 		for (arg in args) {
 			
-			if (arg == "-nocffi") {
+			if (arg == "-nocffi" || arg == "-rebuild") {
 				
 				System.disableCFFI = true;
 				
@@ -801,6 +813,12 @@ class CommandLineTools {
 		if (showHint) {
 			
 			LogHelper.println ("Use \x1b[3m" + commandName + " setup\x1b[0m to configure platforms or \x1b[3m" + commandName + " help\x1b[0m for more commands");
+			
+			if (targetFlags.exists ("openfl")) {
+				
+				LogHelper.println ("\x1b[37mUse \x1b[3m-Dv2\x1b[0m\x1b[37m or \x1b[3m-Dlegacy\x1b[0m\x1b[37m with your commands to use OpenFL 2.x legacy mode\x1b[0m");
+				
+			}
 			
 		}
 		
@@ -1272,8 +1290,6 @@ class CommandLineTools {
 		}
 		
 		for (key in projectDefines.keys ()) {
-			
-			Sys.println (key);
 			
 			var components = key.split ("-");
 			var field = components.shift ().toLowerCase ();

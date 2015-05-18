@@ -3,6 +3,9 @@ package lime.app;
 
 import lime.graphics.Renderer;
 import lime.graphics.RenderContext;
+import lime.ui.Gamepad;
+import lime.ui.GamepadAxis;
+import lime.ui.GamepadButton;
 import lime.ui.KeyCode;
 import lime.ui.KeyModifier;
 import lime.ui.Window;
@@ -20,6 +23,7 @@ class Application extends Module {
 	public static var current (default, null):Application;
 	
 	public var config (default, null):Config;
+	public var frameRate (get, set):Float;
 	public var modules (default, null):Array<IModule>;
 	
 	/**
@@ -98,22 +102,35 @@ class Application extends Module {
 		
 		windows.push (window);
 		
+		window.onGamepadAxisMove.add (onGamepadAxisMove);
+		window.onGamepadButtonDown.add (onGamepadButtonDown);
+		window.onGamepadButtonUp.add (onGamepadButtonUp);
+		window.onGamepadConnect.add (onGamepadConnect);
+		window.onGamepadDisconnect.add (onGamepadDisconnect);
 		window.onKeyDown.add (onKeyDown);
 		window.onKeyUp.add (onKeyUp);
 		window.onMouseDown.add (onMouseDown);
 		window.onMouseMove.add (onMouseMove);
+		window.onMouseMoveRelative.add (onMouseMoveRelative);
 		window.onMouseUp.add (onMouseUp);
 		window.onMouseWheel.add (onMouseWheel);
+		window.onTextEdit.add (onTextEdit);
+		window.onTextInput.add (onTextInput);
 		window.onTouchStart.add (onTouchStart);
 		window.onTouchMove.add (onTouchMove);
 		window.onTouchEnd.add (onTouchEnd);
 		window.onWindowActivate.add (onWindowActivate);
 		window.onWindowClose.add (onWindowClose);
 		window.onWindowDeactivate.add (onWindowDeactivate);
+		window.onWindowEnter.add (onWindowEnter);
 		window.onWindowFocusIn.add (onWindowFocusIn);
 		window.onWindowFocusOut.add (onWindowFocusOut);
+		window.onWindowFullscreen.add (onWindowFullscreen);
+		window.onWindowLeave.add (onWindowLeave);
+		window.onWindowMinimize.add (onWindowMinimize);
 		window.onWindowMove.add (onWindowMove);
 		window.onWindowResize.add (onWindowResize);
+		window.onWindowRestore.add (onWindowRestore);
 		
 		window.create (this);
 		
@@ -161,6 +178,61 @@ class Application extends Module {
 	}
 	
 	
+	public override function onGamepadAxisMove (gamepad:Gamepad, axis:GamepadAxis, value:Float):Void {
+		
+		for (module in modules) {
+			
+			module.onGamepadAxisMove (gamepad, axis, value);
+			
+		}
+		
+	}
+	
+	
+	public override function onGamepadButtonDown (gamepad:Gamepad, button:GamepadButton):Void {
+		
+		for (module in modules) {
+			
+			module.onGamepadButtonDown (gamepad, button);
+			
+		}
+		
+	}
+	
+	
+	public override function onGamepadButtonUp (gamepad:Gamepad, button:GamepadButton):Void {
+		
+		for (module in modules) {
+			
+			module.onGamepadButtonUp (gamepad, button);
+			
+		}
+		
+	}
+	
+	
+	public override function onGamepadConnect (gamepad:Gamepad):Void {
+		
+		for (module in modules) {
+			
+			module.onGamepadConnect (gamepad);
+			
+		}
+		
+	}
+	
+	
+	public override function onGamepadDisconnect (gamepad:Gamepad):Void {
+		
+		for (module in modules) {
+			
+			module.onGamepadDisconnect (gamepad);
+			
+		}
+		
+	}
+	
+	
 	public override function onKeyDown (keyCode:KeyCode, modifier:KeyModifier):Void {
 		
 		for (module in modules) {
@@ -194,11 +266,22 @@ class Application extends Module {
 	}
 	
 	
-	public override function onMouseMove (x:Float, y:Float, button:Int):Void {
+	public override function onMouseMove (x:Float, y:Float):Void {
 		
 		for (module in modules) {
 			
-			module.onMouseMove (x, y, button);
+			module.onMouseMove (x, y);
+			
+		}
+		
+	}
+	
+	
+	public override function onMouseMoveRelative (x:Float, y:Float):Void {
+		
+		for (module in modules) {
+			
+			module.onMouseMoveRelative (x, y);
 			
 		}
 		
@@ -243,6 +326,28 @@ class Application extends Module {
 		for (module in modules) {
 			
 			module.onRenderContextRestored (context);
+			
+		}
+		
+	}
+	
+	
+	public override function onTextEdit (text:String, start:Int, length:Int):Void {
+		
+		for (module in modules) {
+			
+			module.onTextEdit (text, start, length);
+			
+		}
+		
+	}
+	
+	
+	public override function onTextInput (text:String):Void {
+		
+		for (module in modules) {
+			
+			module.onTextInput (text);
 			
 		}
 		
@@ -315,6 +420,17 @@ class Application extends Module {
 	}
 	
 	
+	public override function onWindowEnter ():Void {
+		
+		for (module in modules) {
+			
+			module.onWindowEnter ();
+			
+		}
+		
+	}
+	
+	
 	public override function onWindowFocusIn ():Void {
 		
 		for (module in modules) {
@@ -337,6 +453,39 @@ class Application extends Module {
 	}
 	
 	
+	public override function onWindowFullscreen ():Void {
+		
+		for (module in modules) {
+			
+			module.onWindowFullscreen ();
+			
+		}
+		
+	}
+	
+	
+	public override function onWindowLeave ():Void {
+		
+		for (module in modules) {
+			
+			module.onWindowLeave ();
+			
+		}
+		
+	}
+	
+	
+	public override function onWindowMinimize ():Void {
+		
+		for (module in modules) {
+			
+			module.onWindowMinimize ();
+			
+		}
+		
+	}
+	
+	
 	public override function onWindowMove (x:Float, y:Float):Void {
 		
 		for (module in modules) {
@@ -353,6 +502,17 @@ class Application extends Module {
 		for (module in modules) {
 			
 			module.onWindowResize (width, height);
+			
+		}
+		
+	}
+	
+	
+	public override function onWindowRestore ():Void {
+		
+		for (module in modules) {
+			
+			module.onWindowRestore ();
 			
 		}
 		
@@ -428,6 +588,20 @@ class Application extends Module {
 	// Get & Set Methods
 	
 	
+	
+	
+	@:noCompletion private inline function get_frameRate ():Float {
+		
+		return backend.getFrameRate ();
+		
+	}
+	
+	
+	@:noCompletion private inline function set_frameRate (value:Float):Float {
+		
+		return backend.setFrameRate (value);
+		
+	}
 	
 	
 	@:noCompletion private inline function get_renderer ():Renderer {

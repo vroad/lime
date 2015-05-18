@@ -1,15 +1,23 @@
 package lime.text;
 
 
-typedef GlyphMetrics = {
+import lime.math.Vector2;
+
+
+class GlyphMetrics {
 	
-	var height:Int;
-	var horizontalAdvance:Int;
-	var horizontalBearingX:Int;
-	var horizontalBearingY:Int;
-	var index:Int;
-	var verticalAdvance:Int;
-	var verticalBearingX:Int;
-	var verticalBearingY:Int;
+	
+	public var advance:Vector2;
+	public var height:Int;
+	public var horizontalBearing:Vector2;
+	public var verticalBearing:Vector2;
+	
+	
+	public function new () {
+		
+		
+		
+	}
+	
 	
 }

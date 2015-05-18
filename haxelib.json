@@ -4,8 +4,7 @@
 	"license": "MIT",
 	"tags": [],
 	"description": "A flexible lightweight layer for Haxe cross-platform developers",
-	"version": "2.1.3",
-	"releasenote": "Added 'lime.ui.KeyModifier', many other improvements",
-	"contributors": [ "singmajesty" ],
-	"dependencies": {}
+	"version": "2.4.1",
+	"releasenote": "Minor fixes",
+	"contributors": [ "singmajesty" ]
 }

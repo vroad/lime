@@ -336,6 +336,7 @@ class URLLoader {
 		CURLEasy.setopt(__curl, SSL_VERIFYPEER, false);
 		CURLEasy.setopt(__curl, SSL_VERIFYHOST, false);
 		CURLEasy.setopt(__curl, USERAGENT, "libcurl-agent/1.0");
+		CURLEasy.setopt(__curl, CONNECTTIMEOUT, 30);
 
 		var result = CURLEasy.perform(__curl);
 
@@ -374,9 +375,11 @@ class URLLoader {
 
 	private function progressFunction (dltotal:Float, dlnow:Float, uptotal:Float, upnow:Float):Int {
 		
-		if(upnow>bytesLoaded || dlnow>bytesTotal) {
+		if(upnow>bytesLoaded || dlnow>bytesLoaded || uptotal>bytesTotal || dltotal>bytesTotal) {
 			if(upnow > bytesLoaded) bytesLoaded = Std.int(upnow);
-			if(dlnow > bytesTotal) bytesTotal = Std.int(dlnow);
+			if(dlnow > bytesLoaded) bytesLoaded = Std.int(dlnow);
+			if(uptotal > bytesTotal) bytesTotal = Std.int(uptotal);
+			if(dltotal > bytesTotal) bytesTotal = Std.int(dltotal);
 			onProgress.dispatch(this, bytesLoaded, bytesTotal);
 		}
 		return 0;

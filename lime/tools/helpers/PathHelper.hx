@@ -524,6 +524,7 @@ class PathHelper {
 		} else {
 			
 			targetDirectory = StringTools.replace (targetDirectory, "\\", "/");
+			
 			var splitTarget = targetDirectory.split ("/");
 			var directories = 0;
 			
@@ -531,7 +532,7 @@ class PathHelper {
 				
 				switch (splitTarget.shift ()) {
 					
-					case ".":
+					case ".", "":
 						
 						// ignore
 					
@@ -720,6 +721,12 @@ class PathHelper {
 		} else if (trailingSlash && !StringTools.endsWith (path, "/")) {
 			
 			path += "/";
+			
+		}
+		
+		if (PlatformHelper.hostPlatform == Platform.WINDOWS && path.charAt (1) == ":") {
+			
+			path = path.charAt (0).toUpperCase () + ":" + path.substr (2);
 			
 		}
 		

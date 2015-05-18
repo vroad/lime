@@ -17,11 +17,22 @@ namespace lime {
 			~SDLRenderer ();
 			
 			virtual void Flip ();
+			virtual value Lock ();
+			virtual void Unlock ();
 			
 			SDL_Renderer* sdlRenderer;
+			SDL_Texture* sdlTexture;
 			SDL_Window* sdlWindow;
-
-			static SDL_RendererInfo sdlRendererInfo;
+			
+		private:
+			
+			#ifdef HX_WINDOWS
+			void SetDwmFlushEnabled (bool enabled);
+			
+			bool isDwmFlushEnabled;
+			bool isVsyncForced;
+			#endif
+			int originalFlags;
 		
 	};
 	
