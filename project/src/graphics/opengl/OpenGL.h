@@ -60,7 +60,9 @@
 #include <gl/GL.h>
 typedef ptrdiff_t GLsizeiptrARB;
 #define NEED_EXTENSIONS
+#ifdef NATIVE_TOOLKIT_SDL_ANGLE
 #define DYNAMIC_OGL
+#endif
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
 
