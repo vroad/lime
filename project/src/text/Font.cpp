@@ -486,7 +486,7 @@ namespace lime {
 		
 		while (glyph_index != 0) {
 			
-			if (FT_Load_Glyph ((FT_Face)face, glyph_index, FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_DEFAULT) == 0) {
+			if (FT_Load_Glyph ((FT_Face)face, glyph_index, FT_LOAD_NO_BITMAP | FT_LOAD_DEFAULT) == 0) {
 				
 				glyph *g = new glyph;
 				result = FT_Outline_Decompose (&((FT_Face)face)->glyph->outline, &ofn, g);
@@ -725,7 +725,7 @@ namespace lime {
 		
 		initialize ();
 		
-		if (FT_Load_Glyph ((FT_Face)face, index, FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_DEFAULT) == 0) {
+		if (FT_Load_Glyph ((FT_Face)face, index, FT_LOAD_NO_BITMAP | FT_LOAD_DEFAULT) == 0) {
 			
 			value metrics = alloc_empty_object ();
 			
