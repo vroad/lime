@@ -13,6 +13,7 @@
 #include <audio/format/OGG.h>
 #include <audio/format/WAV.h>
 #include <audio/AudioBuffer.h>
+#include <audio/AudioStream.h>
 #include <graphics/format/JPEG.h>
 #include <graphics/format/PNG.h>
 #include <graphics/utils/ImageDataUtil.h>
@@ -35,7 +36,9 @@
 #include <ui/WindowEvent.h>
 #include <utils/JNI.h>
 #include <vm/NekoVM.h>
-
+#ifdef LIME_OGG
+#include <vorbis/vorbisfile.h>
+#endif
 
 namespace lime {
 	
@@ -91,7 +94,7 @@ namespace lime {
 	}
 	
 	
-	value lime_audio_load (value data) {
+	value lime_audio_load (value data, value stream) {
 		
 		AudioBuffer audioBuffer;
 		Resource resource;
@@ -114,12 +117,40 @@ namespace lime {
 		}
 		
 		#ifdef LIME_OGG
-		if (OGG::Decode (&resource, &audioBuffer)) {
+		OggVorbis_File *oggFile = new OggVorbis_File ();
+		if (OGG::Decode (&resource, &audioBuffer, oggFile, val_bool (stream))) {
 			
 			return audioBuffer.Value ();
 			
+		} else {
+			
+			delete oggFile;
+			
 		}
 		#endif
+		
+		return alloc_null ();
+		
+	}
+	
+	
+	value lime_audio_stream_decode (value handle, value sizeInBytes, value bufferCount) {
+		
+		AudioStream *stream = (AudioStream*)(intptr_t)val_float (handle);
+		
+		#ifdef LIME_OGG
+		if (stream->format == OggFormat)
+			return OGG::DecodeStream ((OggVorbis_File*)stream->handle, val_int (sizeInBytes), val_int (bufferCount));
+		#endif 
+		
+		return alloc_null ();
+	}
+	
+	
+	value lime_audio_stream_destroy (value handle) {
+		
+		AudioStream *stream = (AudioStream*)(intptr_t)val_float (handle);
+		delete stream;
 		
 		return alloc_null ();
 		
@@ -1003,7 +1034,9 @@ namespace lime {
 	DEFINE_PRIM (lime_application_quit, 1);
 	DEFINE_PRIM (lime_application_set_frame_rate, 2);
 	DEFINE_PRIM (lime_application_update, 1);
-	DEFINE_PRIM (lime_audio_load, 1);
+	DEFINE_PRIM (lime_audio_load, 2);
+	DEFINE_PRIM (lime_audio_stream_decode, 3);
+	DEFINE_PRIM (lime_audio_stream_destroy, 1);
 	DEFINE_PRIM (lime_font_get_ascender, 1);
 	DEFINE_PRIM (lime_font_get_descender, 1);
 	DEFINE_PRIM (lime_font_get_family_name, 1);

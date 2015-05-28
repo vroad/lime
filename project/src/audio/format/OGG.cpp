@@ -1,7 +1,16 @@
 #include <audio/format/OGG.h>
+#include <audio/AudioStream.h>
 #include <system/System.h>
 #include <vorbis/vorbisfile.h>
 
+// 0 for Little-Endian, 1 for Big-Endian
+#ifdef HXCPP_BIG_ENDIAN
+#define BUFFER_READ_TYPE 1
+#else
+#define BUFFER_READ_TYPE 0
+#endif
+
+#define READ_MAX 4096
 
 namespace lime {
 	
@@ -104,9 +113,7 @@ namespace lime {
 	};
 	
 	
-	bool OGG::Decode (Resource *resource, AudioBuffer *audioBuffer) {
-		
-		OggVorbis_File oggFile;
+	bool OGG::Decode (Resource *resource, AudioBuffer *audioBuffer, OggVorbis_File *oggFile, bool stream) {
 		
 		if (resource->path) {
 			
@@ -120,7 +127,7 @@ namespace lime {
 			
 			if (file->isFile ()) {
 				
-				if (ov_open (file->getFile (), &oggFile, NULL, file->getLength ()) != 0) {
+				if (ov_open (file->getFile (), oggFile, NULL, file->getLength ()) != 0) {
 					
 					lime::fclose (file);
 					return false;
@@ -130,12 +137,13 @@ namespace lime {
 			} else {
 				
 				lime::fclose (file);
-				ByteArray data = ByteArray (resource->path);
+				audioBuffer->sourceData = new ByteArray (resource->path);
 				
-				OAL_OggMemoryFile fakeFile = { data.Bytes (), data.Size (), 0 };
+				OAL_OggMemoryFile fakeFile = { audioBuffer->sourceData->Bytes (), audioBuffer->sourceData->Size (), 0 };
 				
-				if (ov_open_callbacks (&fakeFile, &oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
+				if (ov_open_callbacks (&fakeFile, oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
 					
+					delete audioBuffer->sourceData;
 					return false;
 					
 				}
@@ -145,34 +153,27 @@ namespace lime {
 		} else {
 			
 			OAL_OggMemoryFile fakeFile = { resource->data->Bytes (), resource->data->Size (), 0 };
+			audioBuffer->sourceData = new ByteArray (*resource->data);
 			
-			if (ov_open_callbacks (&fakeFile, &oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
+			if (ov_open_callbacks (&fakeFile, oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
 				
+				delete audioBuffer->sourceData;
 				return false;
 				
 			}
 			
 		}
 		
-		// 0 for Little-Endian, 1 for Big-Endian
-		#ifdef HXCPP_BIG_ENDIAN
-		#define BUFFER_READ_TYPE 1
-		#else
-		#define BUFFER_READ_TYPE 0
-		#endif
-		
 		int bitStream;
 		long bytes = 1;
 		int totalBytes = 0;
 		
-		#define BUFFER_SIZE 32768
-		
-		vorbis_info *pInfo = ov_info (&oggFile, -1);            
+		vorbis_info *pInfo = ov_info (oggFile, -1);            
 		
 		if (pInfo == NULL) {
 			
 			//LOG_SOUND("FAILED TO READ OGG SOUND INFO, IS THIS EVEN AN OGG FILE?\n");
-			ov_clear (&oggFile);
+			ov_clear (oggFile);
 			return false;
 			
 		}
@@ -180,34 +181,77 @@ namespace lime {
 		audioBuffer->channels = pInfo->channels;
 		audioBuffer->sampleRate = pInfo->rate;
 		
-		//default to 16? todo 
 		audioBuffer->bitsPerSample = 16;
 		
-		// Seem to need four times the read PCM total
-		audioBuffer->data->Resize (ov_pcm_total (&oggFile, -1) * 4);
+		int dataLength = ov_pcm_total (oggFile, -1) * audioBuffer->channels * audioBuffer->bitsPerSample / 8;
+		audioBuffer->data->Resize (dataLength);
 		
-		while (bytes > 0) {
+		if (!stream) {
 			
-			if (audioBuffer->data->Size () < totalBytes + BUFFER_SIZE) {
+			while (bytes > 0) {
 				
-				audioBuffer->data->Resize (totalBytes + BUFFER_SIZE);
+				bytes = ov_read (oggFile, (char *)audioBuffer->data->Bytes () + totalBytes, READ_MAX, BUFFER_READ_TYPE, 2, 1, &bitStream);
+				totalBytes += bytes;
 				
 			}
 			
-			bytes = ov_read (&oggFile, (char *)audioBuffer->data->Bytes () + totalBytes, BUFFER_SIZE, BUFFER_READ_TYPE, 2, 1, &bitStream);
-			totalBytes += bytes;
+		}
+		
+		if (dataLength != totalBytes) {
+			
+			audioBuffer->data->Resize (totalBytes);
 			
 		}
 		
-		audioBuffer->data->Resize (totalBytes);
-		ov_clear (&oggFile);
-		
-		#undef BUFFER_SIZE
-		#undef BUFFER_READ_TYPE
+		if (!stream) {
+			
+			ov_clear (oggFile);
+			delete audioBuffer->sourceData;
+			audioBuffer->sourceData = NULL;
+			
+		}
+		else {
+			
+			audioBuffer->handle = new AudioStream (OggFormat, oggFile);
+			
+		}
 		
 		return true;
 		
 	}
 	
+	value OGG::DecodeStream (OggVorbis_File *oggFile, int sizeInBytes, int bufferCount) {
+		
+		int bitStream;
+		value result = alloc_array (bufferCount);
+		
+		for (int i = 0; i < bufferCount; ++i) {
+			
+			ByteArray data (sizeInBytes);
+			int remainBytes = sizeInBytes;
+			int totalBytes = 0;
+			
+			int bytes;
+			do {
+				
+				size_t readBufferSize = READ_MAX < remainBytes ? READ_MAX : remainBytes;
+				bytes = ov_read (oggFile, ((char *)data.Bytes ()) + totalBytes, readBufferSize, BUFFER_READ_TYPE, 2, 1, &bitStream);
+				remainBytes -= bytes;
+				totalBytes += bytes;
+				
+			} while (bytes > 0 && remainBytes > 0);
+			
+			if (totalBytes != sizeInBytes) {
+				
+				data.Resize (totalBytes);
+				
+			}
+			
+			val_array_set_i (result, i, data.mValue);
+			
+		}
+
+		return result;
+	}
 	
 }
