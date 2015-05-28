@@ -18,8 +18,11 @@ class AudioBuffer {
 	
 	public var bitsPerSample:Int;
 	public var channels:Int;
+	public var handle:Dynamic;
+	public var sourceData:ByteArray;
 	public var data:ByteArray;
 	public var id:UInt;
+	public var stream(get, never):Bool;
 	public var sampleRate:Int;
 	
 	#if (js && html5)
@@ -28,6 +31,7 @@ class AudioBuffer {
 	public var src:Sound;
 	#else
 	public var src:Dynamic;
+	public static var buffers:Array<AudioBuffer> = [];
 	#end
 	
 	
@@ -40,24 +44,43 @@ class AudioBuffer {
 	
 	public function dispose ():Void {
 		
-		// TODO
+		#if (cpp || neko || nodejs)
+		
+		if (handle != null ) {
+			
+			lime_audio_stream_destroy (handle);
+			handle = null;	
+			
+		}
+		
+		#end
 		
 	}
 	
 	
-	public static function fromBytes (bytes:ByteArray):AudioBuffer {
+	@:noCompletion private function get_stream():Bool {
+		
+		return handle != null || sourceData != null;
+		
+	}
+	
+	
+	public static function fromBytes (bytes:ByteArray, stream:Bool = false):AudioBuffer {
 		
 		#if (cpp || neko || nodejs)
 			
-			var data = lime_audio_load (bytes);
+			var data = lime_audio_load (bytes, stream);
 			
 			if (data != null) {
 				
 				var audioBuffer = new AudioBuffer ();
 				audioBuffer.bitsPerSample = data.bitsPerSample;
 				audioBuffer.channels = data.channels;
+				audioBuffer.handle = data.handle;
+				audioBuffer.sourceData = data.sourceData;
 				audioBuffer.data = data.data;
 				audioBuffer.sampleRate = data.sampleRate;
+				buffers.push (audioBuffer);
 				return audioBuffer;
 				
 			}
@@ -69,19 +92,22 @@ class AudioBuffer {
 	}
 	
 	
-	public static function fromFile (path:String):AudioBuffer {
+	public static function fromFile (path:String, stream:Bool = false):AudioBuffer {
 		
 		#if (cpp || neko || nodejs)
 			
-			var data = lime_audio_load (path);
+			var data = lime_audio_load (path, stream);
 			
 			if (data != null) {
 				
 				var audioBuffer = new AudioBuffer ();
 				audioBuffer.bitsPerSample = data.bitsPerSample;
 				audioBuffer.channels = data.channels;
+				audioBuffer.handle = data.handle;
+				audioBuffer.sourceData = data.sourceData;
 				audioBuffer.data = data.data;
 				audioBuffer.sampleRate = data.sampleRate;
+				buffers.push (audioBuffer);
 				return audioBuffer;
 				
 			}
@@ -101,7 +127,8 @@ class AudioBuffer {
 	
 	
 	#if (cpp || neko || nodejs)
-	private static var lime_audio_load:Dynamic = System.load ("lime", "lime_audio_load", 1);
+	private static var lime_audio_load:Dynamic = System.load ("lime", "lime_audio_load", 2);
+	private static var lime_audio_stream_destroy:Dynamic = System.load ("lime", "lime_audio_stream_destroy", 1);
 	#end
 	
 	

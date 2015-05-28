@@ -70,7 +70,11 @@ class AudioManager {
 				
 				case OPENAL (alc, al):
 					
+					#if (cpp || neko || nodejs)
+					
 					alc.processContext (alc.getCurrentContext ());
+					
+					#end
 				
 				default:
 				
@@ -89,6 +93,14 @@ class AudioManager {
 				
 				case OPENAL (alc, al):
 					
+					#if (cpp || neko || nodejs)
+					
+					for (buffer in AudioBuffer.buffers) {
+						
+						buffer.dispose ();
+						
+					}
+					
 					var currentContext = alc.getCurrentContext ();
 					
 					if (currentContext != null) {
@@ -99,6 +111,8 @@ class AudioManager {
 						alc.closeDevice (device);
 						
 					}
+					
+					#end
 				
 				default:
 				
@@ -117,7 +131,11 @@ class AudioManager {
 				
 				case OPENAL (alc, al):
 					
+					#if (cpp || neko || nodejs)
+					
 					alc.suspendContext (alc.getCurrentContext ());
+					
+					#end
 				
 				default:
 				

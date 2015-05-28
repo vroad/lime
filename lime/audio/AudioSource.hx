@@ -4,6 +4,8 @@ package lime.audio;
 import haxe.Timer;
 import lime.app.Event;
 import lime.audio.openal.AL;
+import lime.system.System;
+import lime.utils.ByteArray;
 
 #if flash
 import flash.media.SoundChannel;
@@ -33,6 +35,11 @@ class AudioSource {
 	
 	#if (cpp || neko || nodejs)
 	private var timer:Timer;
+	private var queueTimer:Timer;
+	private var format:Int;
+
+	inline private static var initialBufferCount = 2;
+	private var streamBuffers:Array<Int>;
 	#end
 	
 	
@@ -64,12 +71,22 @@ class AudioSource {
 		switch (AudioManager.context) {
 			
 			case OPENAL (alc, al):
+						
+				#if (cpp || neko || nodejs)
 				
 				if (id != 0) {
 					
 					al.deleteSource (id);
 					
 				}
+				
+				if (streamBuffers != null) {
+					
+					AL.deleteBuffers (streamBuffers);
+					
+				}
+				
+				#end
 			
 			default:
 				
@@ -84,11 +101,11 @@ class AudioSource {
 			
 			case OPENAL (alc, al):
 				
+				#if (cpp || neko || nodejs)
+				
 				if (buffer.id == 0) {
 					
-					buffer.id = al.genBuffer ();
-					
-					var format = 0;
+					format = 0;
 					
 					if (buffer.channels == 1) {
 						
@@ -116,12 +133,23 @@ class AudioSource {
 						
 					}
 					
-					al.bufferData (buffer.id, format, buffer.data, buffer.data.length, buffer.sampleRate);
+					if (!buffer.stream) {
+						
+						buffer.id = al.genBuffer ();
+						al.bufferData (buffer.id, format, buffer.data, buffer.data.length, buffer.sampleRate);
+						
+					}
 					
 				}
 				
 				id = al.genSource ();
-				al.sourcei (id, al.BUFFER, buffer.id);
+				if (!buffer.stream) {
+					
+					al.sourcei (id, al.BUFFER, buffer.id);
+					
+				}
+				
+				#end
 			
 			default:
 			
@@ -150,6 +178,20 @@ class AudioSource {
 			
 			var time = currentTime;
 			
+			if (queueTimer != null) {
+				
+				queueTimer.stop ();
+				
+			}
+			
+			if (buffer.stream) {
+				
+				queueTimer = new Timer (300);
+				queueTimer.run = queueTimer_onRun;
+				queueTimer_onRun ();
+				
+			}
+			
 			AL.sourcePlay (id);
 			
 			currentTime = time;
@@ -160,8 +202,12 @@ class AudioSource {
 				
 			}
 			
-			timer = new Timer (length - currentTime);
-			timer.run = timer_onRun;
+			if (!buffer.stream) {
+				
+				timer = new Timer (length - currentTime);
+				timer.run = timer_onRun;
+				
+			}
 			
 		#end
 		
@@ -229,7 +275,7 @@ class AudioSource {
 	
 	private function timer_onRun () {
 		
-		#if (!flash && !html5)
+		#if (cpp || neko || nodejs)
 		
 		playing = false;
 		
@@ -253,6 +299,86 @@ class AudioSource {
 		
 	}
 	
+	
+	private function queueTimer_onRun () {
+		
+		#if (cpp || neko || nodejs)
+		
+		var shouldStop:Bool = false;
+		if (playing) {
+			
+			var bufferCount:Int;
+			
+			if (streamBuffers == null) {
+				
+				bufferCount = initialBufferCount;
+				streamBuffers = AL.genBuffers (bufferCount);
+				
+			} else {
+				
+				bufferCount = AL.getSourcei ( id, AL.BUFFERS_PROCESSED );
+				if (bufferCount == 0) {
+					
+					return;
+					
+				}
+				streamBuffers = AL.sourceUnqueueBuffers (id, bufferCount);
+				
+			}
+			
+			var data:Array<ByteArray> = lime_audio_stream_decode (buffer.handle, 65536, bufferCount);
+			
+			if (data == null) {
+				
+				shouldStop = true;
+				
+			} else {
+				
+				if (data.length != 0) {
+					
+					for (i in 0 ... data.length) {
+						
+						var ba:ByteArray = data[i];
+						AL.bufferData (streamBuffers[i], format, ba, ba.length, buffer.sampleRate);
+						
+					}
+					
+					AL.sourceQueueBuffers (id, data.length, streamBuffers);
+					
+					var state = AL.getSourcei (id, AL.SOURCE_STATE);
+					if (state != AL.PLAYING)
+						AL.sourcePlay (id);
+					
+				} else {
+					
+					shouldStop = true;
+					
+				}
+				
+			}
+		} else  {
+			
+			shouldStop = true;
+			
+		}
+		
+		if (shouldStop) {
+			
+			if (streamBuffers != null) {
+				
+				AL.deleteBuffers (streamBuffers);
+				streamBuffers = null;
+				
+			}
+			
+			queueTimer.stop ();
+			stop ();
+			
+		}
+		
+		#end
+		
+	}
 	
 	
 	
@@ -385,5 +511,7 @@ class AudioSource {
 		
 	}
 	
-	
+	#if (cpp || neko || nodejs)
+	private static var lime_audio_stream_decode:Dynamic = System.load ("lime", "lime_audio_stream_decode", 3);
+	#end
 }
