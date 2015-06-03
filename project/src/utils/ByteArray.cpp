@@ -3,14 +3,23 @@
 #include <utils/ByteArray.h>
 #include <string>
 
+#ifdef LIME_TLS
+#ifdef HX_WINDOWS
+#define THREAD_LOCAL __declspec(thread)
+#else
+#define THREAD_LOCAL thread_local
+#endif
+#else
+#define THREAD_LOCAL
+#endif
 
 namespace lime {
 	
 	
-	AutoGCRoot *gByteArrayCreate = 0;
-	AutoGCRoot *gByteArrayLen = 0;
-	AutoGCRoot *gByteArrayResize = 0;
-	AutoGCRoot *gByteArrayBytes = 0;
+	THREAD_LOCAL AutoGCRoot *gByteArrayCreate = 0;
+	THREAD_LOCAL AutoGCRoot *gByteArrayLen = 0;
+	THREAD_LOCAL AutoGCRoot *gByteArrayResize = 0;
+	THREAD_LOCAL AutoGCRoot *gByteArrayBytes = 0;
 	
 	
 	ByteArray::ByteArray (int inSize) {
