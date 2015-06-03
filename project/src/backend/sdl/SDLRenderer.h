@@ -33,6 +33,9 @@ namespace lime {
 			bool isVsyncForced;
 			#endif
 			int originalFlags;
+			
+			int width;
+			int height;
 		
 	};
 	
