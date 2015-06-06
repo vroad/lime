@@ -89,13 +89,14 @@ class NativeApplication {
 			
 			if (!active) {
 				
-				var result = lime_application_quit (handle);
+				untyped process.exitCode = lime_application_quit (handle);
 				__cleanup ();
-				Sys.exit (result);
+				
+			} else {
+				
+				untyped setImmediate (eventLoop);
 				
 			}
-			
-			untyped setImmediate (eventLoop);
 			
 		}
 		
