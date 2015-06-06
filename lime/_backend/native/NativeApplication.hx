@@ -420,6 +420,7 @@ class NativeApplication {
 	
 	private function __cleanup ():Void {
 		
+		Application.current.atExit ();
 		AudioManager.shutdown ();
 		
 	}

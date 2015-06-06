@@ -178,6 +178,17 @@ class Application extends Module {
 	}
 	
 	
+	public override function atExit ():Void {
+		
+		for (module in modules) {
+			
+			module.atExit ();
+			
+		}
+		
+	}
+	
+	
 	public override function onGamepadAxisMove (gamepad:Gamepad, axis:GamepadAxis, value:Float):Void {
 		
 		for (module in modules) {

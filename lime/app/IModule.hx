@@ -22,6 +22,12 @@ interface IModule {
 	
 	
 	/**
+	 * Called before the app exits
+	 */
+	public function atExit ():Void;
+	
+	
+	/**
 	 * Called when a gamepad axis move event is fired
 	 * @param	gamepad	The current gamepad
 	 * @param	axis	The axis that was moved
