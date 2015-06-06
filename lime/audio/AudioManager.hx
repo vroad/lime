@@ -95,12 +95,6 @@ class AudioManager {
 					
 					#if (cpp || neko || nodejs)
 					
-					for (buffer in AudioBuffer.buffers) {
-						
-						buffer.dispose ();
-						
-					}
-					
 					var currentContext = alc.getCurrentContext ();
 					
 					if (currentContext != null) {

@@ -13,6 +13,8 @@ namespace lime {
 		
 		
 		public:
+
+			virtual ~Renderer() {};
 			
 			virtual void Flip () = 0;
 			virtual value Lock () = 0;

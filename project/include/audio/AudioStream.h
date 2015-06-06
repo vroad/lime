@@ -9,6 +9,12 @@ namespace lime {
 		
 		
 		public:
+
+			~AudioStream() {
+				
+				delete handle;
+				
+			}
 			
 			AudioStream(AudioFormat format, void *handle)
 				: format(format), handle(handle) {}

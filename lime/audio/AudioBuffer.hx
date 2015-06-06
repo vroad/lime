@@ -31,29 +31,12 @@ class AudioBuffer {
 	public var src:Sound;
 	#else
 	public var src:Dynamic;
-	public static var buffers:Array<AudioBuffer> = [];
 	#end
 	
 	
 	public function new () {
 		
 		id = 0;
-		
-	}
-	
-	
-	public function dispose ():Void {
-		
-		#if (cpp || neko || nodejs)
-		
-		if (handle != null ) {
-			
-			lime_audio_stream_destroy (handle);
-			handle = null;	
-			
-		}
-		
-		#end
 		
 	}
 	
@@ -80,7 +63,6 @@ class AudioBuffer {
 				audioBuffer.sourceData = data.sourceData;
 				audioBuffer.data = data.data;
 				audioBuffer.sampleRate = data.sampleRate;
-				buffers.push (audioBuffer);
 				return audioBuffer;
 				
 			}
@@ -107,7 +89,6 @@ class AudioBuffer {
 				audioBuffer.sourceData = data.sourceData;
 				audioBuffer.data = data.data;
 				audioBuffer.sampleRate = data.sampleRate;
-				buffers.push (audioBuffer);
 				return audioBuffer;
 				
 			}
@@ -128,7 +109,6 @@ class AudioBuffer {
 	
 	#if (cpp || neko || nodejs)
 	private static var lime_audio_load:Dynamic = System.load ("lime", "lime_audio_load", 2);
-	private static var lime_audio_stream_destroy:Dynamic = System.load ("lime", "lime_audio_stream_destroy", 1);
 	#end
 	
 	

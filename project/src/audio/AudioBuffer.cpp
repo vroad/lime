@@ -1,5 +1,5 @@
 #include <audio/AudioBuffer.h>
-
+#include <utils/NativePointer.h>
 
 namespace lime {
 	
@@ -12,7 +12,7 @@ namespace lime {
 	static int id_sampleRate;
 	static bool init = false;
 	
-	
+
 	AudioBuffer::AudioBuffer () {
 		
 		bitsPerSample = 0;
@@ -47,10 +47,22 @@ namespace lime {
 			
 		}
 		
+		value handleValue;
+		if (handle != NULL) {
+			
+			NativePointer<AudioStream> ptr (handle);
+			handleValue = ptr.mValue;
+			
+		} else {
+			
+			handleValue = alloc_null ();
+			
+		}
+		
 		mValue = alloc_empty_object ();
 		alloc_field (mValue, id_bitsPerSample, alloc_int (bitsPerSample));
 		alloc_field (mValue, id_channels, alloc_int (channels));
-		alloc_field (mValue, id_handle, handle != NULL ? alloc_float ((intptr_t)handle) : alloc_null ());
+		alloc_field (mValue, id_handle, handleValue);
 		alloc_field (mValue, id_sourceData, sourceData != NULL ? sourceData->mValue : alloc_null ());
 		alloc_field (mValue, id_data, data->mValue);
 		alloc_field (mValue, id_sampleRate, alloc_int (sampleRate));

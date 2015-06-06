@@ -17,6 +17,8 @@ namespace lime {
 		
 		
 		public:
+
+			virtual ~Window() {};
 			
 			virtual void Close () = 0;
 			virtual bool GetEnableTextEvents () = 0;

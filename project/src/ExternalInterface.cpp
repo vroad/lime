@@ -34,6 +34,7 @@
 #include <ui/TouchEvent.h>
 #include <ui/Window.h>
 #include <ui/WindowEvent.h>
+#include <utils/NativePointer.h>
 #include <utils/JNI.h>
 #include <vm/NekoVM.h>
 #ifdef LIME_OGG
@@ -42,19 +43,21 @@
 
 namespace lime {
 	
-	
+
 	value lime_application_create (value callback) {
 		
 		Application* app = CreateApplication ();
 		Application::callback = new AutoGCRoot (callback);
-		return alloc_float ((intptr_t)app);
+		NativePointer<Application> ptr (app);
+		return ptr.mValue;
 		
 	}
 	
 	
 	value lime_application_exec (value application) {
 		
-		Application* app = (Application*)(intptr_t)val_float (application);
+		NativePointer<Application> ptr (application);
+		Application* app = ptr.mPointer;
 		return alloc_int (app->Exec ());
 		
 	}
@@ -62,7 +65,8 @@ namespace lime {
 	
 	value lime_application_init (value application) {
 		
-		Application* app = (Application*)(intptr_t)val_float (application);
+		NativePointer<Application> ptr (application);
+		Application* app = ptr.mPointer;
 		app->Init ();
 		return alloc_null ();
 		
@@ -71,7 +75,8 @@ namespace lime {
 	
 	value lime_application_quit (value application) {
 		
-		Application* app = (Application*)(intptr_t)val_float (application);
+		NativePointer<Application> ptr (application);
+		Application* app = ptr.mPointer;
 		return alloc_int (app->Quit ());
 		
 	}
@@ -79,7 +84,8 @@ namespace lime {
 	
 	value lime_application_set_frame_rate (value application, value frameRate) {
 		
-		Application* app = (Application*)(intptr_t)val_float (application);
+		NativePointer<Application> ptr (application);
+		Application* app = ptr.mPointer;
 		app->SetFrameRate (val_number (frameRate));
 		return alloc_null ();
 		
@@ -88,7 +94,8 @@ namespace lime {
 	
 	value lime_application_update (value application) {
 		
-		Application* app = (Application*)(intptr_t)val_float (application);
+		NativePointer<Application> ptr (application);
+		Application* app = ptr.mPointer;
 		return alloc_bool (app->Update ());
 		
 	}
@@ -136,7 +143,8 @@ namespace lime {
 	
 	value lime_audio_stream_decode (value handle, value sizeInBytes, value bufferCount) {
 		
-		AudioStream *stream = (AudioStream*)(intptr_t)val_float (handle);
+		NativePointer<AudioStream> ptr (handle);
+		AudioStream *stream = ptr.mPointer;
 		
 		#ifdef LIME_OGG
 		if (stream->format == OggFormat)
@@ -147,29 +155,11 @@ namespace lime {
 	}
 	
 	
-	value lime_audio_stream_destroy (value handle) {
-		
-		AudioStream *stream = (AudioStream*)(intptr_t)val_float (handle);
-		delete stream;
-		
-		return alloc_null ();
-		
-	}
-	
-	
-	void lime_font_destroy (value handle) {
-		
-		Font *font = (Font*)(intptr_t)val_float (handle);
-		delete font;
-		font = 0;
-		
-	}
-	
-	
 	value lime_font_get_ascender (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		return alloc_int (font->GetAscender ());
 		#else
 		return alloc_null ();
@@ -181,7 +171,8 @@ namespace lime {
 	value lime_font_get_descender (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		return alloc_int (font->GetDescender ());
 		#else
 		return alloc_null ();
@@ -193,7 +184,8 @@ namespace lime {
 	value lime_font_get_family_name (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		return alloc_wstring (font->GetFamilyName ());
 		#else
 		return alloc_null ();
@@ -205,7 +197,8 @@ namespace lime {
 	value lime_font_get_glyph_index (value fontHandle, value character) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		return alloc_int (font->GetGlyphIndex ((char*)val_string (character)));
 		#else
 		return alloc_int (-1);
@@ -217,7 +210,8 @@ namespace lime {
 	value lime_font_get_glyph_indices (value fontHandle, value characters) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		return font->GetGlyphIndices ((char*)val_string (characters));
 		#else
 		return alloc_null ();
@@ -229,7 +223,8 @@ namespace lime {
 	value lime_font_get_glyph_metrics (value fontHandle, value index) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		return font->GetGlyphMetrics (val_int (index));
 		#else
 		return alloc_null ();
@@ -241,7 +236,8 @@ namespace lime {
 	value lime_font_get_height (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		return alloc_int (font->GetHeight ());
 		#else
 		return alloc_null ();
@@ -253,7 +249,8 @@ namespace lime {
 	value lime_font_get_num_glyphs (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		return alloc_int (font->GetNumGlyphs ());
 		#else
 		return alloc_null ();
@@ -265,7 +262,8 @@ namespace lime {
 	value lime_font_get_underline_position (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		return alloc_int (font->GetUnderlinePosition ());
 		#else
 		return alloc_null ();
@@ -277,7 +275,8 @@ namespace lime {
 	value lime_font_get_underline_thickness (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		return alloc_int (font->GetUnderlineThickness ());
 		#else
 		return alloc_null ();
@@ -289,7 +288,8 @@ namespace lime {
 	value lime_font_get_units_per_em (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		return alloc_int (font->GetUnitsPerEM ());
 		#else
 		return alloc_null ();
@@ -320,9 +320,8 @@ namespace lime {
 			
 			if (font->face) {
 				
-				value v = alloc_float ((intptr_t)font);
-				val_gc (v, lime_font_destroy);
-				return v;
+				NativePointer<Font> ptr (font);
+				return ptr.mValue;
 				
 			} else {
 				
@@ -341,7 +340,8 @@ namespace lime {
 	value lime_font_outline_decompose (value fontHandle, value size) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		return font->Decompose (val_int (size));
 		#else
 		return alloc_null ();
@@ -353,7 +353,8 @@ namespace lime {
 	value lime_font_render_glyph (value fontHandle, value index, value data) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		ByteArray bytes = ByteArray (data);
 		return font->RenderGlyph (val_int (index), &bytes);
 		#else
@@ -366,7 +367,8 @@ namespace lime {
 	value lime_font_render_glyphs (value fontHandle, value indices, value data) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		ByteArray bytes = ByteArray (data);
 		return font->RenderGlyphs (indices, &bytes);
 		#else
@@ -379,7 +381,8 @@ namespace lime {
 	value lime_font_set_size (value fontHandle, value fontSize) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<Font> ptr (fontHandle);
+		Font *font = ptr.mPointer;
 		font->SetSize (val_int (fontSize));
 		#endif
 		
@@ -745,15 +748,18 @@ namespace lime {
 	
 	value lime_renderer_create (value window) {
 		
-		Renderer* renderer = CreateRenderer ((Window*)(intptr_t)val_float (window));
-		return alloc_float ((intptr_t)renderer);
+		NativePointer<Window> windowPtr (window);
+		Renderer* renderer = CreateRenderer (windowPtr.mPointer);
+		NativePointer<Renderer> ptr (renderer);
+		return ptr.mValue;
 		
 	}
 	
 	
 	value lime_renderer_flip (value renderer) {
 		
-		((Renderer*)(intptr_t)val_float (renderer))->Flip ();
+		NativePointer<Renderer> ptr (renderer);
+		ptr.mPointer->Flip ();
 		return alloc_null (); 
 		
 	}
@@ -761,14 +767,16 @@ namespace lime {
 	
 	value lime_renderer_lock (value renderer) {
 		
-		return ((Renderer*)(intptr_t)val_float (renderer))->Lock ();
+		NativePointer<Renderer> ptr (renderer);
+		return ptr.mPointer->Lock ();
 		
 	}
 	
 	
 	value lime_renderer_unlock (value renderer) {
 		
-		((Renderer*)(intptr_t)val_float (renderer))->Unlock ();
+		NativePointer<Renderer> ptr (renderer);
+		ptr.mPointer->Unlock ();
 		return alloc_null ();
 		
 	}
@@ -813,25 +821,13 @@ namespace lime {
 	}
 	
 	
-	void lime_text_layout_destroy (value textHandle) {
-		
-		#ifdef LIME_HARFBUZZ
-		TextLayout *text = (TextLayout*)(intptr_t)val_float (textHandle);
-		delete text;
-		text = 0;
-		#endif
-		
-	}
-	
-	
 	value lime_text_layout_create (value direction, value script, value language) {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
 		
 		TextLayout *text = new TextLayout (val_int (direction), val_string (script), val_string (language));
-		value v = alloc_float ((intptr_t)text);
-		val_gc (v, lime_text_layout_destroy);
-		return v;
+		NativePointer<TextLayout> ptr (text);
+		return ptr.mValue;
 		
 		#else
 		
@@ -846,8 +842,10 @@ namespace lime {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
 		
-		TextLayout *text = (TextLayout*)(intptr_t)val_float (textHandle);
-		Font *font = (Font*)(intptr_t)val_float (fontHandle);
+		NativePointer<TextLayout> textPtr (textHandle);
+		TextLayout *text = textPtr.mPointer;
+		NativePointer<Font> fontPtr (fontHandle);
+		Font *font = fontPtr.mPointer;
 		ByteArray bytes = ByteArray (data);
 		text->Position (font, val_int (size), val_string (textString), &bytes);
 		
@@ -861,7 +859,8 @@ namespace lime {
 	value lime_text_layout_set_direction (value textHandle, value direction) {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
-		TextLayout *text = (TextLayout*)(intptr_t)val_float (textHandle);
+		NativePointer<TextLayout> textPtr (textHandle);
+		TextLayout *text = textPtr.mPointer;
 		text->SetDirection (val_int (direction));
 		#endif
 		return alloc_null ();
@@ -872,7 +871,8 @@ namespace lime {
 	value lime_text_layout_set_language (value textHandle, value direction) {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
-		TextLayout *text = (TextLayout*)(intptr_t)val_float (textHandle);
+		NativePointer<TextLayout> textPtr (textHandle);
+		TextLayout *text = textPtr.mPointer;
 		text->SetLanguage (val_string (direction));
 		#endif
 		return alloc_null ();
@@ -883,7 +883,8 @@ namespace lime {
 	value lime_text_layout_set_script (value textHandle, value direction) {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
-		TextLayout *text = (TextLayout*)(intptr_t)val_float (textHandle);
+		NativePointer<TextLayout> textPtr (textHandle);
+		TextLayout *text = textPtr.mPointer;
 		text->SetScript (val_string (direction));
 		#endif
 		return alloc_null ();
@@ -911,17 +912,20 @@ namespace lime {
 	
 	value lime_window_close (value window) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		NativePointer<Window> ptr (window);
+		Window* targetWindow = ptr.mPointer;
 		targetWindow->Close ();
 		return alloc_null ();
 		
 	}
 	
-	
+
 	value lime_window_create (value application, value width, value height, value flags, value title) {
 		
-		Window* window = CreateWindow ((Application*)(intptr_t)val_float (application), val_int (width), val_int (height), val_int (flags), val_string (title));
-		return alloc_float ((intptr_t)window);
+		NativePointer<Application> appPtr (application);
+		Window* window = CreateWindow (appPtr.mPointer, val_int (width), val_int (height), val_int (flags), val_string (title));
+		NativePointer<Window> ptr (window);
+		return ptr.mValue;
 		
 	}
 	
@@ -937,7 +941,8 @@ namespace lime {
 	
 	value lime_window_get_enable_text_events (value window) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		NativePointer<Window> ptr (window);
+		Window* targetWindow = ptr.mPointer;
 		return alloc_bool (targetWindow->GetEnableTextEvents ());
 		
 	}
@@ -945,7 +950,8 @@ namespace lime {
 	
 	value lime_window_get_height (value window) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		NativePointer<Window> ptr (window);
+		Window* targetWindow = ptr.mPointer;
 		return alloc_int (targetWindow->GetHeight ());
 		
 	}
@@ -953,7 +959,8 @@ namespace lime {
 	
 	value lime_window_get_width (value window) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		NativePointer<Window> ptr (window);
+		Window* targetWindow = ptr.mPointer;
 		return alloc_int (targetWindow->GetWidth ());
 		
 	}
@@ -961,7 +968,8 @@ namespace lime {
 	
 	value lime_window_get_x (value window) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		NativePointer<Window> ptr (window);
+		Window* targetWindow = ptr.mPointer;
 		return alloc_int (targetWindow->GetX ());
 		
 	}
@@ -969,7 +977,8 @@ namespace lime {
 	
 	value lime_window_get_y (value window) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		NativePointer<Window> ptr (window);
+		Window* targetWindow = ptr.mPointer;
 		return alloc_int (targetWindow->GetY ());
 		
 	}
@@ -977,7 +986,8 @@ namespace lime {
 	
 	value lime_window_move (value window, value x, value y) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		NativePointer<Window> ptr (window);
+		Window* targetWindow = ptr.mPointer;
 		targetWindow->Move (val_int (x), val_int (y));
 		return alloc_null ();
 		
@@ -986,7 +996,8 @@ namespace lime {
 	
 	value lime_window_resize (value window, value width, value height) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		NativePointer<Window> ptr (window);
+		Window* targetWindow = ptr.mPointer;
 		targetWindow->Resize (val_int (width), val_int (height));
 		return alloc_null ();
 		
@@ -995,7 +1006,8 @@ namespace lime {
 	
 	value lime_window_set_enable_text_events (value window, value enabled) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		NativePointer<Window> ptr (window);
+		Window* targetWindow = ptr.mPointer;
 		targetWindow->SetEnableTextEvents (val_bool (enabled));
 		return alloc_null ();
 		
@@ -1004,7 +1016,8 @@ namespace lime {
 	
 	value lime_window_set_fullscreen (value window, value fullscreen) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		NativePointer<Window> ptr (window);
+		Window* targetWindow = ptr.mPointer;
 		return alloc_bool (targetWindow->SetFullscreen (val_bool (fullscreen)));
 		
 	}
@@ -1012,7 +1025,8 @@ namespace lime {
 	
 	value lime_window_set_icon (value window, value buffer) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		NativePointer<Window> ptr (window);
+		Window* targetWindow = ptr.mPointer;
 		ImageBuffer imageBuffer = ImageBuffer (buffer);
 		targetWindow->SetIcon (&imageBuffer);
 		return alloc_null ();
@@ -1022,7 +1036,8 @@ namespace lime {
 	
 	value lime_window_set_minimized (value window, value fullscreen) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		NativePointer<Window> ptr (window);
+		Window* targetWindow = ptr.mPointer;
 		return alloc_bool (targetWindow->SetMinimized (val_bool (fullscreen)));
 		
 	}
@@ -1036,7 +1051,6 @@ namespace lime {
 	DEFINE_PRIM (lime_application_update, 1);
 	DEFINE_PRIM (lime_audio_load, 2);
 	DEFINE_PRIM (lime_audio_stream_decode, 3);
-	DEFINE_PRIM (lime_audio_stream_destroy, 1);
 	DEFINE_PRIM (lime_font_get_ascender, 1);
 	DEFINE_PRIM (lime_font_get_descender, 1);
 	DEFINE_PRIM (lime_font_get_family_name, 1);
