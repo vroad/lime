@@ -1,20 +1,46 @@
 #include <graphics/ImageBuffer.h>
-
+#include <utils/ThreadLocalStorage.h>
 
 namespace lime {
 	
+	struct ImageBufferId {
+
+		ImageBufferId () {
+
+			init = false;
+
+		}
+
+		int bitsPerPixel;
+		int bpp;
+		int buffer;
+		int data;
+		int format;
+		int height;
+		int width;
+		int transparent;
+		bool init;
+
+	};
 	
-	static int id_bitsPerPixel;
-	static int id_bpp;
-	static int id_buffer;
-	static int id_data;
-	static int id_format;
-	static int id_height;
-	static int id_width;
-	static int id_transparent;
-	static bool init = false;
-	
-	
+	static ThreadLocalStorage<ImageBufferId> stringId;
+
+	static void initializeId (ImageBufferId &id) {
+
+		id.bpp = val_id ("bpp");
+		id.bitsPerPixel = val_id ("bitsPerPixel");
+		id.transparent = val_id ("transparent");
+		id.buffer = val_id ("buffer");
+		id.width = val_id ("width");
+		id.height = val_id ("height");
+		id.data = val_id ("data");
+		id.format = val_id ("format");
+		id.init = true;
+
+	}
+
+
+
 	ImageBuffer::ImageBuffer () {
 		
 		width = 0;
@@ -29,27 +55,21 @@ namespace lime {
 	
 	ImageBuffer::ImageBuffer (value imageBuffer) {
 		
-		if (!init) {
+		ImageBufferId id = stringId.Get ();
+		if (id.init == false) {
 			
-			id_bpp = val_id ("bpp");
-			id_bitsPerPixel = val_id ("bitsPerPixel");
-			id_transparent = val_id ("transparent");
-			id_buffer = val_id ("buffer");
-			id_width = val_id ("width");
-			id_height = val_id ("height");
-			id_data = val_id ("data");
-			id_format = val_id ("format");
-			init = true;
+			initializeId (id);
+			stringId.Set (id);
 			
 		}
 		
-		width = val_int (val_field (imageBuffer, id_width));
-		height = val_int (val_field (imageBuffer, id_height));
-		bpp = val_int (val_field (imageBuffer, id_bitsPerPixel));
-		format = (PixelFormat)val_int (val_field (imageBuffer, id_format));
-		transparent = val_bool (val_field (imageBuffer, id_transparent));
-		value data_value = val_field (imageBuffer, id_data);
-		value buffer_value = val_field (data_value, id_buffer);
+		width = val_int (val_field (imageBuffer, id.width));
+		height = val_int (val_field (imageBuffer, id.height));
+		bpp = val_int (val_field (imageBuffer, id.bitsPerPixel));
+		format = (PixelFormat)val_int (val_field (imageBuffer, id.format));
+		transparent = val_bool (val_field (imageBuffer, id.transparent));
+		value data_value = val_field (imageBuffer, id.data);
+		value buffer_value = val_field (data_value, id.buffer);
 		
 		//if (val_is_buffer (buffer_value))
 			data = new ByteArray (buffer_value);
@@ -98,27 +118,21 @@ namespace lime {
 	
 	value ImageBuffer::Value () {
 		
-		if (!init) {
+		ImageBufferId id = stringId.Get ();
+		if (id.init == false) {
 			
-			id_bpp = val_id ("bpp");
-			id_bitsPerPixel = val_id ("bitsPerPixel");
-			id_transparent = val_id ("transparent");
-			id_buffer = val_id ("buffer");
-			id_width = val_id ("width");
-			id_height = val_id ("height");
-			id_data = val_id ("data");
-			id_format = val_id ("format");
-			init = true;
-			
+			initializeId (id);
+			stringId.Set (id);
+
 		}
 		
 		mValue = alloc_empty_object ();
-		alloc_field (mValue, id_width, alloc_int (width));
-		alloc_field (mValue, id_height, alloc_int (height));
-		alloc_field (mValue, id_bpp, alloc_int (bpp));
-		alloc_field (mValue, id_transparent, alloc_bool (transparent));
-		alloc_field (mValue, id_data, data->mValue);
-		alloc_field (mValue, id_format, alloc_int (format));
+		alloc_field (mValue, id.width, alloc_int (width));
+		alloc_field (mValue, id.height, alloc_int (height));
+		alloc_field (mValue, id.bpp, alloc_int (bpp));
+		alloc_field (mValue, id.transparent, alloc_bool (transparent));
+		alloc_field (mValue, id.data, data->mValue);
+		alloc_field (mValue, id.format, alloc_int (format));
 		return mValue;
 		
 	}

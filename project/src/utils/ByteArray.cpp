@@ -1,30 +1,82 @@
 #include <hx/CFFI.h>
 #include <system/System.h>
 #include <utils/ByteArray.h>
-#include <string>
-
-#ifdef LIME_TLS
-#ifdef HX_WINDOWS
-#define THREAD_LOCAL __declspec(thread)
-#else
-#define THREAD_LOCAL thread_local
-#endif
-#else
-#define THREAD_LOCAL
-#endif
+#include <utils/ThreadLocalStorage.h>
 
 namespace lime {
 	
-	
-	THREAD_LOCAL AutoGCRoot *gByteArrayCreate = 0;
-	THREAD_LOCAL AutoGCRoot *gByteArrayLen = 0;
-	THREAD_LOCAL AutoGCRoot *gByteArrayResize = 0;
-	THREAD_LOCAL AutoGCRoot *gByteArrayBytes = 0;
-	
+	struct ByteArrayFunc {
+
+		ByteArrayFunc (value inFactory, value inLen, value inResize, value inBytes) {
+
+			byteArrayCreate = new AutoGCRoot (inFactory);
+			byteArrayLen = new AutoGCRoot (inLen);
+			byteArrayResize = new AutoGCRoot (inResize);
+			byteArrayBytes = new AutoGCRoot (inBytes);
+
+		}
+
+		~ByteArrayFunc () {
+
+			delete byteArrayCreate;
+			delete byteArrayLen;
+			delete byteArrayResize;
+			delete byteArrayBytes;
+
+		}
+
+		AutoGCRoot *byteArrayCreate;
+		AutoGCRoot *byteArrayLen;
+		AutoGCRoot *byteArrayResize;
+		AutoGCRoot *byteArrayBytes;
+
+	};
+
+	static ThreadLocalStorage<ByteArrayFunc*> gFuncStorage;
+
+	ByteArrayFunc *getByteArrayFunc () {
+
+		ByteArrayFunc *func = gFuncStorage.Get ();
+		if (func == NULL) {
+
+			val_throw (alloc_string ("ByteArray is not initialized for this thread"));
+
+		}
+		return func;
+
+	}
+
+	value createByteArray (int inSize) {
+
+		ByteArrayFunc *func = getByteArrayFunc ();
+		return val_call1 (func->byteArrayCreate->get (), alloc_int (inSize));
+
+	}
+
+	value getByteArrayLength (value value) {
+
+		ByteArrayFunc *func = getByteArrayFunc ();
+		return val_call1 (func->byteArrayLen->get (), value);
+
+	}
+
+	void resizeByteArray (value value, int inSize) {
+
+		ByteArrayFunc *func = getByteArrayFunc ();
+		val_call2 (func->byteArrayResize->get (), value, alloc_int (inSize));
+
+	}
+
+	value getByteArrayBytes (value value) {
+
+		ByteArrayFunc *func = getByteArrayFunc ();
+		return val_call1 (func->byteArrayBytes->get (), value);
+
+	}
 	
 	ByteArray::ByteArray (int inSize) {
 		
-		mValue = val_call1 (gByteArrayCreate->get (), alloc_int (inSize));
+		mValue = createByteArray (inSize);
 		
 	}
 	
@@ -38,7 +90,7 @@ namespace lime {
 	
 	ByteArray::ByteArray (const QuickVec<uint8> &inData) {
 		
-		mValue = val_call1 (gByteArrayCreate->get (), alloc_int (inData.size ()));
+		mValue = createByteArray (inData.size ());
 		uint8 *bytes = Bytes ();
 		if (bytes)
 			memcpy (bytes, &inData[0], inData.size ());
@@ -77,7 +129,7 @@ namespace lime {
 		int len = lime::ftell (file);
 		lime::fseek (file, 0, SEEK_SET);
 		
-		mValue = val_call1 (gByteArrayCreate->get (), alloc_int (len));
+		mValue = createByteArray (len);
 		
 		int status = lime::fread (Bytes (), len, 1, file);
 		lime::fclose (file);
@@ -88,23 +140,23 @@ namespace lime {
 	void ByteArray::Resize (int inSize) {
 		
 		if (mValue == 0)
-			mValue = val_call1 (gByteArrayCreate->get (), alloc_int (inSize));
+			mValue = createByteArray (inSize);
 		else
-			val_call2 (gByteArrayResize->get (), mValue, alloc_int (inSize));
+			resizeByteArray (mValue, inSize);
 		
 	}
 	
 	
 	int ByteArray::Size () const {
 		
-		return val_int (val_call1 (gByteArrayLen->get (), mValue));
+		return val_int (getByteArrayLength (mValue));
 		
 	}
 	
 	
 	const unsigned char *ByteArray::Bytes () const {
 		
-		value bytes = val_call1 (gByteArrayBytes->get (), mValue);
+		value bytes = getByteArrayBytes (mValue);
 		
 		if (val_is_string (bytes))
 			return (unsigned char *)val_string (bytes);
@@ -114,6 +166,7 @@ namespace lime {
 		if (buf == 0) {
 			
 			val_throw (alloc_string ("Bad ByteArray"));
+			
 		}
 		
 		return (unsigned char *)buffer_data (buf);
@@ -123,7 +176,7 @@ namespace lime {
 	
 	unsigned char *ByteArray::Bytes () {
 		
-		value bytes = val_call1 (gByteArrayBytes->get (),mValue);
+		value bytes = getByteArrayBytes (mValue);
 		
 		if (val_is_string (bytes))
 			return (unsigned char *)val_string (bytes);
@@ -164,10 +217,7 @@ namespace lime {
 	
 	value lime_byte_array_init (value inFactory, value inLen, value inResize, value inBytes) {
 		
-		gByteArrayCreate = new AutoGCRoot (inFactory);
-		gByteArrayLen = new AutoGCRoot (inLen);
-		gByteArrayResize = new AutoGCRoot (inResize);
-		gByteArrayBytes = new AutoGCRoot (inBytes);
+		gFuncStorage.Set( new ByteArrayFunc (inFactory, inLen, inResize, inBytes));
 		
 		return alloc_null ();
 		

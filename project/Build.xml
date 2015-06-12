@@ -23,8 +23,6 @@
 	<set name="LIME_SDL" value="1" />
 	<set name="LIME_VORBIS" value="1" />
 	<set name="LIME_ZLIB" value="1" />
-
-	<set name="LIME_TLS" value="1" />
 	
 	<set name="OUTPUT_DIR" value="../ndll" unless="OUTPUT_DIR" />
 	<set name="NATIVE_TOOLKIT_PATH" value="lib" unless="NATIVE_TOOLKIT_PATH" />
@@ -173,13 +171,6 @@
 			<file name="src/backend/sdl/SDLSystem.cpp" />
 			<file name="src/backend/sdl/SDLJNI.cpp" />
 			
-		</section>
-
-		<section if="LIME_TLS">
-
-			<compilerflag value="-DLIME_TLS" />
-			<!-- <compilerflag value="-DHXCPP_NO_WINXP_COMPAT" if="windows" /> -->
-
 		</section>
 		
 		<section if="LIME_ZLIB">
