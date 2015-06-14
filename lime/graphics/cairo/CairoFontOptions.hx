@@ -103,7 +103,7 @@ class CairoFontOptions
 		return value;
 	}
 	
-	#if (cpp || neko || nodejs)
+	#if lime_cairo
 	private static var lime_cairo_font_options_create = System.load ("lime", "lime_cairo_font_options_create", 0);
 	private static var lime_cairo_font_options_get_antialias = System.load ("lime", "lime_cairo_font_options_get_antialias", 1);
 	private static var lime_cairo_font_options_get_subpixel_order = System.load ("lime", "lime_cairo_font_options_get_subpixel_order", 1);
