@@ -2,8 +2,7 @@
 -cp extern
 -cp .
 -main ImportAll
--cp C:\HaxeToolkit\haxe\lib\nodejs\git
--cp C:\HaxeToolkit\haxe\lib\nodejs\git\hxclasses
+-lib nodejs
 -js lime.js
 -D nodejs=2.2.7
 -D lime-openal
