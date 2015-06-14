@@ -12,6 +12,12 @@ class ApplicationMain {
 	
 	
 	public static function create ():Void {
+
+		#if (tools && !display)
+			
+		lime.Assets.registerLibrary ("default", new DefaultAssetLibrary ());
+			
+		#end
 		
 		#if !munit
 		app = new ::APP_MAIN:: ();

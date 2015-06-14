@@ -1,5 +1,8 @@
 package;
 
+#if codegen
+import haxe.Timer;
+#end
 
 import lime.app.Application;
 import lime.app.Config;
@@ -73,7 +76,7 @@ import lime.net.URLRequest;
 import lime.net.URLRequestHeader;
 import lime.net.URLRequestMethod;
 import lime.net.URLVariables;
-#if (windows || mac || linux || neko)
+#if ((windows || mac || linux || neko) && !codegen)
 import lime.project.ApplicationData;
 import lime.project.Architecture;
 import lime.project.Asset;
@@ -102,7 +105,7 @@ import lime.text.Font;
 import lime.text.TextDirection;
 import lime.text.TextLayout;
 import lime.text.TextScript;
-#if (windows || mac || linux || neko)
+#if ((windows || mac || linux || neko) && !codegen)
 import lime.tools.helpers.AIRHelper;
 import lime.tools.helpers.AndroidHelper;
 import lime.tools.helpers.AntHelper;
@@ -164,3 +167,116 @@ import lime.utils.UInt32Array;
 import lime.utils.UInt8Array;
 //import lime.vm.NekoVM;
 import lime.Assets;
+
+#if codegen
+class ImportAll
+{
+	public static function main()
+	{
+		untyped
+		{
+			exports.haxe_Timer = haxe_Timer;
+			exports.lime_app_Application = lime_app_Application;
+			//exports.lime_app_Config = lime_app_Config;
+			exports.lime_app_Event = lime_app_Event;
+			exports.lime_app_Module = lime_app_Module;
+			exports.lime_app_Preloader = lime_app_Preloader;
+			exports.lime_audio_openal_AL = lime_audio_openal_AL;
+			exports.lime_audio_openal_ALC = lime_audio_openal_ALC;
+			//exports.lime_audio_openal_ALContext = lime_audio_openal_ALContext;
+			//exports.lime_audio_openal_ALDevice = lime_audio_openal_ALDevice;
+			exports.lime_audio_ALAudioContext = lime_audio_ALAudioContext;
+			exports.lime_audio_ALCAudioContext = lime_audio_ALCAudioContext;
+			exports.lime_audio_AudioBuffer = lime_audio_AudioBuffer;
+			exports.lime_audio_AudioContext = lime_audio_AudioContext;
+			exports.lime_audio_AudioManager = lime_audio_AudioManager;
+			exports.lime_audio_AudioSource = lime_audio_AudioSource;
+			exports.lime_audio_FlashAudioContext = lime_audio_FlashAudioContext;
+			exports.lime_audio_HTML5AudioContext = lime_audio_HTML5AudioContext;
+			exports.lime_audio_WebAudioContext = lime_audio_WebAudioContext;
+			exports.lime_graphics_format_BMP = lime_graphics_format_BMP;
+			exports.lime_graphics_format_JPEG = lime_graphics_format_JPEG;
+			exports.lime_graphics_format_PNG = lime_graphics_format_PNG;
+			//exports.lime_graphics_opengl_GL = lime_graphics_opengl_GL;
+			//exports.lime_graphics_opengl_GLActiveInfo = lime_graphics_opengl_GLActiveInfo;
+			exports.lime_graphics_opengl_GLBuffer = lime_graphics_opengl_GLBuffer;
+			//exports.lime_graphics_opengl_GLContextAttributes = lime_graphics_opengl_GLContextAttributes;
+			exports.lime_graphics_opengl_GLFramebuffer = lime_graphics_opengl_GLFramebuffer;
+			exports.lime_graphics_opengl_GLObject = lime_graphics_opengl_GLObject;
+			exports.lime_graphics_opengl_GLProgram = lime_graphics_opengl_GLProgram;
+			exports.lime_graphics_opengl_GLRenderbuffer = lime_graphics_opengl_GLRenderbuffer;
+			exports.lime_graphics_opengl_GLShader = lime_graphics_opengl_GLShader;
+			//exports.lime_graphics_opengl_GLShaderPrecisionFormat = lime_graphics_opengl_GLShaderPrecisionFormat;
+			exports.lime_graphics_opengl_GLTexture = lime_graphics_opengl_GLTexture;
+			//exports.lime_graphics_opengl_GLUniformLocation = lime_graphics_opengl_GLUniformLocation;
+			exports.lime_graphics_utils_ImageCanvasUtil = lime_graphics_utils_ImageCanvasUtil;
+			exports.lime_graphics_utils_ImageDataUtil = lime_graphics_utils_ImageDataUtil;
+			exports.lime_graphics_CanvasRenderContext = lime_graphics_CanvasRenderContext;
+			exports.lime_graphics_DOMRenderContext = lime_graphics_DOMRenderContext;
+			exports.lime_graphics_FlashRenderContext = lime_graphics_FlashRenderContext;
+			exports.lime_graphics_GLRenderContext = lime_graphics_GLRenderContext;
+			exports.lime_graphics_Image = lime_graphics_Image;
+			exports.lime_graphics_ImageBuffer = lime_graphics_ImageBuffer;
+			exports.lime_graphics_ImageType = lime_graphics_ImageType;
+			exports.lime_graphics_RenderContext = lime_graphics_RenderContext;
+			exports.lime_graphics_Renderer = lime_graphics_Renderer;
+			//exports.lime_graphics_TextFormat = lime_graphics_TextFormat;
+			//exports.lime_math_ColorMatrix = lime_math_ColorMatrix;
+			exports.lime_math_Matrix3 = lime_math_Matrix3;
+			//exports.lime_math_Matrix4 = lime_math_Matrix4;
+			exports.lime_math_Rectangle = lime_math_Rectangle;
+			exports.lime_math_Vector2 = lime_math_Vector2;
+			//exports.lime_math_Vector4 = lime_math_Vector4;
+			//exports.lime_net_curl_CURL = lime_net_curl_CURL;
+			//exports.lime_net_curl_CURLCode = lime_net_curl_CURLCode;
+			exports.lime_net_curl_CURLEasy = lime_net_curl_CURLEasy;
+			//exports.lime_net_curl_CURLInfo = lime_net_curl_CURLInfo;
+			//exports.lime_net_curl_CURLOption = lime_net_curl_CURLOption;
+			//exports.lime_net_curl_CURLVersion = lime_net_curl_CURLVersion;
+			exports.lime_net_oauth_OAuthClient = lime_net_oauth_OAuthClient;
+			exports.lime_net_oauth_OAuthConsumer = lime_net_oauth_OAuthConsumer;
+			exports.lime_net_oauth_OAuthRequest = lime_net_oauth_OAuthRequest;
+			//exports.lime_net_oauth_OAuthSignatureMethod = lime_net_oauth_OAuthSignatureMethod;
+			//exports.lime_net_oauth_OAuthToken = lime_net_oauth_OAuthToken;
+			//exports.lime_net_oauth_OAuthVersion = lime_net_oauth_OAuthVersion;
+			//exports.lime_net_NetConnection = lime_net_NetConnection;
+			//exports.lime_net_NetConnectionManager = lime_net_NetConnectionManager;
+			exports.lime_net_URIParser = lime_net_URIParser;
+			exports.lime_net_URLLoader = lime_net_URLLoader;
+			exports.lime_net_URLLoaderDataFormat = lime_net_URLLoaderDataFormat;
+			exports.lime_net_URLRequest = lime_net_URLRequest;
+			exports.lime_net_URLRequestHeader = lime_net_URLRequestHeader;
+			//exports.lime_net_URLRequestMethod = lime_net_URLRequestMethod;
+			exports.lime_net_URLVariables = lime_net_URLVariables;
+
+			exports.lime_system_System = lime_system_System;
+			exports.lime_text_Font = lime_text_Font;
+			//exports.lime_text_TextDirection = lime_text_TextDirection;
+			exports.lime_text_TextLayout = lime_text_TextLayout;
+			//exports.lime_text_TextScript = lime_text_TextScript;
+
+			//exports.lime_ui_KeyCode = lime_ui_KeyCode;
+			exports.lime_ui_Mouse = lime_ui_Mouse;
+			exports.lime_ui_MouseCursor = lime_ui_MouseCursor;
+			exports.lime_ui_Window = lime_ui_Window;
+			//exports.lime_utils_ArrayBuffer = lime_utils_ArrayBuffer;
+			//exports.lime_utils_ArrayBufferView = lime_utils_ArrayBufferView;
+			exports.lime_utils_ByteArray = lime_utils_ByteArray;
+			//exports.lime_utils_Float32Array = lime_utils_Float32Array;
+			exports.lime_utils_GLUtils = lime_utils_GLUtils;
+			exports.lime_utils_IDataInput = lime_utils_IDataInput;
+			exports.lime_utils_IMemoryRange = lime_utils_IMemoryRange;
+			//exports.lime_utils_Int16Array = lime_utils_Int16Array;
+			//exports.lime_utils_Int32Array = lime_utils_Int32Array;
+			//exports.lime_utils_Int8Array = lime_utils_Int8Array;
+			//exports.lime_utils_UInt16Array = lime_utils_UInt16Array;
+			//exports.lime_utils_UInt32Array = lime_utils_UInt32Array;
+			//exports.lime_utils_UInt8Array = lime_utils_UInt8Array;
+			//exports.lime_vm_NekoVM = lime_vm_NekoVM;
+			exports.lime_Assets = lime_Assets;
+
+			exports.lime_AssetLibrary = lime_AssetLibrary;
+		}
+	}
+}
+#end

@@ -1,6 +1,8 @@
 package lime.ui;
 
-
+#if lime_shared
+@:jsRequire("lime", "lime_ui_MouseCursor") extern
+#end
 enum MouseCursor {
 	
 	ARROW;

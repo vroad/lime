@@ -24,6 +24,9 @@
 /**
     Hash methods for Hmac calculation.
 */
+#if lime_shared
+@:jsRequire("lime", "haxe_crypto_HashMethod") extern
+#end
 enum HashMethod {
 	MD5;
 	SHA1;

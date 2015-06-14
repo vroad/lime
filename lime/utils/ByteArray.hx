@@ -305,7 +305,7 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	}
 	
 	
-	public inline function readBoolean ():Bool {
+	public #if !codegen inline #end function readBoolean ():Bool {
 		
 		#if js
 		return (this.readByte () != 0);
@@ -316,7 +316,7 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	}
 	
 	
-	public inline function readByte ():Int {
+	public #if !codegen inline #end function readByte ():Int {
 		
 		#if js
 		var data:Dynamic = data;
@@ -436,7 +436,7 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	}
 	
 	
-	public inline function readMultiByte (length:Int, charSet:String):String {
+	public #if !codegen inline #end function readMultiByte (length:Int, charSet:String):String {
 		
 		return readUTFBytes (length);
 		
@@ -459,7 +459,7 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	}
 	
 	
-	public inline function readUnsignedByte ():Int {
+	public #if !codegen inline #end function readUnsignedByte ():Int {
 		
 		#if js
 		var data:Dynamic = data;
@@ -726,7 +726,7 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	}
 	
 	
-	public inline function writeBoolean (value:Bool):Void {
+	public #if !codegen inline #end function writeBoolean (value:Bool):Void {
 		
 		this.writeByte (value ? 1 : 0);
 		
@@ -976,7 +976,7 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	}
 	
 	
-	@:keep public inline function __get (pos:Int):Int {
+	@:keep public #if !codegen inline #end function __get (pos:Int):Int {
 		
 		#if js
 		return data.getInt8 (pos);
@@ -1082,7 +1082,7 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	#end
 	
 	
-	@:keep public inline function __set (pos:Int, v:Int):Void {
+	@:keep public #if !codegen inline #end function __set (pos:Int, v:Int):Void {
 		
 		#if js
 		data.setUint8 (pos, v);

@@ -11,7 +11,9 @@ import lime.graphics.Image;
 import lime.text.Font;
 import lime.utils.ByteArray;
 import lime.utils.UInt8Array;
+import lime.AssetLibrary;
 import lime.Assets;
+import lime.AssetType;
 
 #if sys
 import sys.FileSystem;
@@ -95,7 +97,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 				lastModified = FileSystem.stat (path).mtime.getTime ();
 				
 				timer = new Timer (2000);
-				timer.run = function () {
+				untyped timer.run = function () {
 					
 					var modified = FileSystem.stat (path).mtime.getTime ();
 					
