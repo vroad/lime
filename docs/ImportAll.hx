@@ -1,6 +1,8 @@
 package;
 
 #if codegen
+import haxe.crypto.HashMethod;
+import haxe.crypto.Sha256;
 import haxe.Timer;
 #end
 
@@ -175,6 +177,9 @@ class ImportAll
 	{
 		untyped
 		{
+			exports.haxe_crypto_HashMethod = haxe_crypto_HashMethod;
+			exports.haxe_crypto_Hmac = haxe_crypto_Hmac;
+			exports.haxe_crypto_Sha256 = haxe_crypto_Sha256;
 			exports.haxe_Timer = haxe_Timer;
 			exports.lime_app_Application = lime_app_Application;
 			//exports.lime_app_Config = lime_app_Config;
