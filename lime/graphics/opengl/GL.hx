@@ -385,7 +385,7 @@ class GL {
 		
 		return view != null ? {
 			
-			byteView: view,
+			b: view,
 			length: view.byteLength
 			
 		} : null;

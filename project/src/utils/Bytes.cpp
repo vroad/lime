@@ -1,32 +1,52 @@
 #include <system/System.h>
 #include <utils/Bytes.h>
-
+#include <utils/ThreadLocalStorage.h>
 
 namespace lime {
 	
+	struct BytesId {
+
+		BytesId () {
+
+			init = false;
+
+		}
+
+		int b;
+		int length;
+		bool init;
+
+	};
 	
-	static int id_b;
-	static int id_length;
-	static bool init = false;
+	static ThreadLocalStorage<BytesId> stringId;
+	static bool useBufferInitialized = false;
 	static bool useBuffer = false;
 	
-	
 	inline void initialize () {
+
+		BytesId id = stringId.Get ();
 		
-		if (!init) {
+		if (!id.init) {
 			
-			id_b = val_id ("b");
-			id_length = val_id ("length");
+			id.b = val_id ("b");
+			id.length = val_id ("length");
 			
 			buffer b = alloc_buffer_len (1);
 			
-			if (buffer_data (b)) {
+			if (!useBufferInitialized) {
+
+				if (buffer_data (b)) {
 				
-				useBuffer = true;
+					useBuffer = true;
 				
+				}
+
+				useBufferInitialized = true;
+
 			}
 			
-			init = true;
+			id.init = true;
+			stringId.Set (id);
 			
 		}
 		
@@ -149,8 +169,10 @@ namespace lime {
 				_value = alloc_empty_object ();
 				
 			}
+
+			BytesId id = stringId.Get ();
 			
-			if (val_is_null (val_field (_value, id_b))) {
+			if (val_is_null (val_field (_value, id.b))) {
 				
 				value dataValue;
 				
@@ -167,28 +189,29 @@ namespace lime {
 					
 				}
 				
-				alloc_field (_value, id_b, dataValue);
+				alloc_field (_value, id.b, dataValue);
 				
 			} else {
+
+				int copySize = size < _length ? size : _length;
 				
 				if (useBuffer) {
 					
-					buffer b = val_to_buffer (val_field (_value, id_b));
-					buffer_set_size (b, size);
+					buffer b = alloc_buffer_len (size);
 					_data = (unsigned char*)buffer_data (b);
+					alloc_field (_value, id.b, buffer_val (b));
 					
 				} else {
 					
 					value s = alloc_raw_string (size);
-					memcpy ((char *)val_string (s), val_string (val_field (_value, id_b)), size);
-					alloc_field (_value, id_b, s);
+					alloc_field (_value, id.b, s);
 					_data = (unsigned char*)val_string (s);
 					
 				}
 				
 			}
 			
-			alloc_field (_value, id_length, alloc_int (size));
+			alloc_field (_value, id.length, alloc_int (size));
 			
 		}
 		
@@ -206,13 +229,15 @@ namespace lime {
 			_value = 0;
 			
 		} else {
+
+			BytesId id = stringId.Get ();
 			
 			_value = bytes;
-			_length = val_int (val_field (bytes, id_length));
+			_length = val_int (val_field (bytes, id.length));
 			
 			if (_length > 0) {
 				
-				value b = val_field (bytes, id_b);
+				value b = val_field (bytes, id.b);
 				
 				if (val_is_string (b)) {
 					

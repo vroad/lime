@@ -1,6 +1,7 @@
 package lime.text;
 
 
+import haxe.io.Bytes;
 import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
 import lime.math.Vector2;
@@ -34,6 +35,22 @@ class Font {
 	public var unitsPerEM (get, null):Int;
 	
 	@:noCompletion private var __fontPath:String;
+	
+	
+	@:noCompletion private static function getBytes(ba:ByteArray):Dynamic {
+		
+		#if nodejs
+		return {
+			
+			b: ba.byteView,
+			length: ba.byteView.byteLength
+			
+		};
+		#else
+		return ba;
+		#end
+		
+	}
 	
 	
 	public function new (name:String = null) {
@@ -144,9 +161,9 @@ class Font {
 		
 		lime_font_set_size (src, fontSize);
 		
-		var bytes = new ByteArray ();
+		var bytes = new ByteArray (16);
 		bytes.endian = "littleEndian";
-		var data:ByteArray = lime_font_render_glyph (src, glyph, bytes);
+		var data:Bytes = lime_font_render_glyph (src, glyph, getBytes(bytes));
 		
 		if (data != null) {
 			
@@ -155,7 +172,7 @@ class Font {
 			var x = bytes.readInt ();
 			var y = bytes.readInt ();
 			
-			var buffer = new ImageBuffer (getUInt8ArrayFromByteArray (data), width, height, 1);
+			var buffer = new ImageBuffer (getUInt8ArrayFromBytes (data), width, height, 1);
 			var image = new Image (buffer, 0, 0, width, height);
 			image.x = x;
 			image.y = y;
@@ -177,10 +194,10 @@ class Font {
 		
 		lime_font_set_size (src, fontSize);
 		
-		var bytes = new ByteArray ();
+		var bytes = new ByteArray (glyphList.length * 16);
 		bytes.endian = "littleEndian";
 		
-		var rawImages:Array<ByteArray> = lime_font_render_glyphs (src, glyphList, bytes);
+		var rawImages:Array<Bytes> = lime_font_render_glyphs (src, glyphList, getBytes(bytes));
 		
 		if (rawImages != null) {
 			
@@ -192,12 +209,12 @@ class Font {
 				var x = bytes.readInt ();
 				var y = bytes.readInt ();
 				
-				var rawImage:ByteArray = rawImages[i];
+				var rawImage:Bytes = rawImages[i];
                 var buffer, image = null;
                 if (rawImage != null)
                 {
                     
-				    buffer = new ImageBuffer (getUInt8ArrayFromByteArray (rawImage), width, height, 1);
+				    buffer = new ImageBuffer (getUInt8ArrayFromBytes (rawImage), width, height, 1);
 				    image = new Image (buffer, 0, 0, width, height);
 				    image.x = x;
 				    image.y = y;
@@ -337,12 +354,12 @@ class Font {
 		
 	}
 	
-	private inline function getUInt8ArrayFromByteArray(ba:ByteArray)
+	private inline function getUInt8ArrayFromBytes(bytes:Dynamic):UInt8Array
 	{
 		#if js
-		return ba.byteView;
+		return bytes.b;
 		#else
-		return new UInt8Array(ba);
+		return new UInt8Array (@:privateAccess new Bytes (bytes.length, bytes.b));
 		#end
 	}
 	

@@ -948,7 +948,12 @@ class Image {
 			
 			if (data != null) {
 				
-				__fromImageBuffer (new ImageBuffer (new UInt8Array (@:privateAccess new Bytes (data.data.length, data.data.b)), data.width, data.height, data.bitsPerPixel));
+				#if nodejs
+				var u8a = data.data.b;
+				#else
+				var u8a = new UInt8Array (@:privateAccess new Bytes (data.data.length, data.data.b)), data.width, data.height, data.bitsPerPixel)
+				#end
+				__fromImageBuffer (new ImageBuffer (u8a, data.width, data.height, data.bitsPerPixel));
 				
 				if (onload != null) {
 					
@@ -1015,7 +1020,11 @@ class Image {
 				
 				if (data != null) {
 					
+					#if nodejs
+					var u8a = data.data.b;
+					#else
 					var u8a = new UInt8Array (@:privateAccess new Bytes (data.data.length, data.data.b));
+					#end
 					buffer = new ImageBuffer (u8a, data.width, data.height, data.bitsPerPixel);
 					
 				}

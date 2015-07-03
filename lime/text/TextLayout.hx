@@ -1,6 +1,6 @@
 package lime.text;
 
-
+import haxe.io.Bytes;
 import lime.math.Vector2;
 import lime.system.System;
 import lime.utils.ByteArray;
@@ -22,7 +22,7 @@ class TextLayout {
 	
 	private var __dirty:Bool;
 	
-	@:noCompletion private var __buffer:ByteArray;
+	@:noCompletion private var __bytes:Dynamic;
 	@:noCompletion private var __direction:TextDirection;
 	@:noCompletion private var __handle:Dynamic;
 	@:noCompletion private var __language:String;
@@ -55,14 +55,10 @@ class TextLayout {
 		
 		if (__handle != null && text != null && text != "" && font != null && font.src != null) {
 			
-			if (__buffer == null) {
-				
-				__buffer = new ByteArray (1);
-				__buffer.endian = "littleEndian";
-				
-			}
+			__bytes = lime_text_layout_position (__handle, font.src, size, text, __bytes);
 			
-			var data = lime_text_layout_position (__handle, font.src, size, text, __buffer);
+			var __buffer = ByteArray.fromBytes (@:privateAccess new Bytes (__bytes.length, #if nodejs __bytes.b.buffer #else __bytes.b #end));
+			__buffer.endian = "littleEndian";
 			
 			if (__buffer.length > 4) {
 				
