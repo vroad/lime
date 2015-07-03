@@ -137,9 +137,9 @@ namespace lime {
 			} else {
 				
 				lime::fclose (file);
-				audioBuffer->sourceData = new ByteArray (resource->path);
+				audioBuffer->sourceData = new Bytes (resource->path);
 				
-				OAL_OggMemoryFile fakeFile = { audioBuffer->sourceData->Bytes (), audioBuffer->sourceData->Size (), 0 };
+				OAL_OggMemoryFile fakeFile = { audioBuffer->sourceData->Data (), audioBuffer->sourceData->Length (), 0 };
 				
 				if (ov_open_callbacks (&fakeFile, oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
 					
@@ -152,8 +152,8 @@ namespace lime {
 			
 		} else {
 			
-			OAL_OggMemoryFile fakeFile = { resource->data->Bytes (), resource->data->Size (), 0 };
-			audioBuffer->sourceData = new ByteArray (*resource->data);
+			OAL_OggMemoryFile fakeFile = { resource->data->Data (), resource->data->Length (), 0 };
+			audioBuffer->sourceData = new Bytes (*resource->data);
 			
 			if (ov_open_callbacks (&fakeFile, oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
 				
@@ -190,7 +190,7 @@ namespace lime {
 			
 			while (bytes > 0) {
 				
-				bytes = ov_read (oggFile, (char *)audioBuffer->data->Bytes () + totalBytes, READ_MAX, BUFFER_READ_TYPE, 2, 1, &bitStream);
+				bytes = ov_read (oggFile, (char *)audioBuffer->data->Data () + totalBytes, READ_MAX, BUFFER_READ_TYPE, 2, 1, &bitStream);
 				totalBytes += bytes;
 				
 			}
@@ -227,7 +227,7 @@ namespace lime {
 		
 		for (int i = 0; i < bufferCount; ++i) {
 			
-			ByteArray data (sizeInBytes);
+			Bytes data (sizeInBytes);
 			int remainBytes = sizeInBytes;
 			int totalBytes = 0;
 			
@@ -235,7 +235,7 @@ namespace lime {
 			do {
 				
 				size_t readBufferSize = READ_MAX < remainBytes ? READ_MAX : remainBytes;
-				bytes = ov_read (oggFile, ((char *)data.Bytes ()) + totalBytes, readBufferSize, BUFFER_READ_TYPE, 2, 1, &bitStream);
+				bytes = ov_read (oggFile, ((char *)data.Data ()) + totalBytes, readBufferSize, BUFFER_READ_TYPE, 2, 1, &bitStream);
 				remainBytes -= bytes;
 				totalBytes += bytes;
 				
@@ -247,7 +247,7 @@ namespace lime {
 				
 			}
 			
-			val_array_set_i (result, i, data.mValue);
+			val_array_set_i (result, i, data.Value ());
 			
 		}
 

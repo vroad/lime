@@ -3,7 +3,7 @@
 
 
 #include <hx/CFFI.h>
-#include <utils/ByteArray.h>
+#include <utils/Bytes.h>
 #include <audio/AudioStream.h>
 
 #ifdef ANDROID
@@ -44,8 +44,8 @@ namespace lime {
 			int channels;
 			int sampleRate;
 			AudioStream *handle;
-			ByteArray *sourceData;
-			ByteArray *data;
+			Bytes *sourceData;
+			Bytes *data;
 			
 		private:
 			

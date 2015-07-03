@@ -389,20 +389,20 @@ namespace lime {
 						
 					} else {
 						
-						ByteArray data = ByteArray (resource->path);
-						unsigned char *buffer = (unsigned char*)malloc (data.Size ());
-						memcpy (buffer, data.Bytes (), data.Size ());
+						Bytes data = Bytes (resource->path);
+						unsigned char *buffer = (unsigned char*)malloc (data.Length ());
+						memcpy (buffer, data.Data (), data.Length ());
 						lime::fclose (file);
 						file = 0;
-						error = FT_New_Memory_Face (library, buffer, data.Size (), faceIndex, &face);
+						error = FT_New_Memory_Face (library, buffer, data.Length (), faceIndex, &face);
 						
 					}
 					
 				} else {
 					
-					unsigned char *buffer = (unsigned char*)malloc (resource->data->Size ());
-					memcpy (buffer, resource->data->Bytes (), resource->data->Size ());
-					error = FT_New_Memory_Face (library, buffer, resource->data->Size (), faceIndex, &face);
+					unsigned char *buffer = (unsigned char*)malloc (resource->data->Length ());
+					memcpy (buffer, resource->data->Data (), resource->data->Length ());
+					error = FT_New_Memory_Face (library, buffer, resource->data->Length (), faceIndex, &face);
 					
 				}
 				
@@ -781,9 +781,9 @@ namespace lime {
 	}
 	
 	
-	value Font::RenderGlyph (int index, ByteArray *imageData, int offset) {
+	value Font::RenderGlyph (int index, Bytes *imageData, int offset) {
 		
-		GlyphImage *data = (GlyphImage*)(imageData->Bytes () + offset);
+		GlyphImage *data = (GlyphImage*)(imageData->Data () + offset);
 		
 		if (FT_Load_Glyph ((FT_Face)face, index, FT_LOAD_RENDER) != 0)
 		{
@@ -811,18 +811,18 @@ namespace lime {
 			int width = bitmap.width;
 			int height = bitmap.rows;
 			int pitch = bitmap.pitch;
-			ByteArray image (bitmap.width * bitmap.rows);
-			unsigned char* position = image.Bytes();
-			memcpy (position, bitmap.buffer, image.Size());
+			Bytes image (bitmap.width * bitmap.rows);
+			unsigned char* position = image.Data ();
+			memcpy (position, bitmap.buffer, image.Length ());
 			
-			return image.mValue;
+			return image.Value ();
 			
 		}
 		
 	}
 	
 	
-	value Font::RenderGlyphs (value indices, ByteArray *imageData) {
+	value Font::RenderGlyphs (value indices, Bytes *imageData) {
 		
 		int offset = 0;
 		int totalOffset = 4;
@@ -830,7 +830,7 @@ namespace lime {
 		
 		int numIndices = val_array_size (indices);
 		int imageDataSize = (4 * 4) * numIndices;
-		if (imageDataSize > imageData->Size ())
+		if (imageDataSize > imageData->Length ())
 			imageData->Resize (imageDataSize);
 		
 		value images = alloc_array (numIndices);
