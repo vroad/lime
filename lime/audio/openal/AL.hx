@@ -71,13 +71,25 @@ class AL {
 	public static inline var EXPONENT_DISTANCE:Int = 0xD005;
 	public static inline var EXPONENT_DISTANCE_CLAMPED:Int = 0xD006;
 	
+	#if nodejs
+	@:noCompletion private static function createBytes(ba:ByteArray):Dynamic {
+		
+		return ba != null ? {
+			
+			b: ba.byteView,
+			length: ba.byteView.byteLength
+			
+		} : null;
+		
+	}
+	#end
 	
 	public static function bufferData (buffer:Int, format:Int, data:ByteArray, size:Int, freq:Int):Void {
 		
 		#if ((cpp || neko) && lime_openal)
 		lime_al_buffer_data (buffer, format, data.getByteBuffer (), size, freq);
 		#elseif (nodejs && lime_openal)
-		lime_al_buffer_data (buffer, format, data, size, freq);
+		lime_al_buffer_data (buffer, format, createBytes (data), size, freq);
 		#end
 		
 	}

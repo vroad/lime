@@ -62,7 +62,11 @@ class AudioBuffer {
 				audioBuffer.channels = data.channels;
 				audioBuffer.handle = data.handle;
 				audioBuffer.sourceData = data.sourceData;
+				#if nodejs
+				audioBuffer.data = ByteArray.fromBytes(@:privateAccess new Bytes(data.data.length, data.data.b.buffer));
+				#else
 				audioBuffer.data = ByteArray.fromBytes (@:privateAccess new Bytes (data.data.length, data.data.b));
+				#end
 				audioBuffer.sampleRate = data.sampleRate;
 				return audioBuffer;
 				
@@ -88,7 +92,11 @@ class AudioBuffer {
 				audioBuffer.channels = data.channels;
 				audioBuffer.handle = data.handle;
 				audioBuffer.sourceData = data.sourceData;
+				#if nodejs
+				audioBuffer.data = ByteArray.fromBytes(@:privateAccess new Bytes(data.data.length, data.data.b.buffer));
+				#else
 				audioBuffer.data = ByteArray.fromBytes (@:privateAccess new Bytes (data.data.length, data.data.b));
+				#end
 				audioBuffer.sampleRate = data.sampleRate;
 				return audioBuffer;
 				
