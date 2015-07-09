@@ -722,7 +722,9 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	
 	public function writeFile (path:String):Void {
 		
-		#if sys
+		#if nodejs
+		File.saveBytes (path, @:privateAccess new Bytes (length, cast byteView));
+		#elseif sys
 		File.saveBytes (path, this);
 		#end
 		
