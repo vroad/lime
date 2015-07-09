@@ -951,7 +951,7 @@ class Image {
 				#if nodejs
 				var u8a = data.data.b;
 				#else
-				var u8a = new UInt8Array (@:privateAccess new Bytes (data.data.length, data.data.b)), data.width, data.height, data.bitsPerPixel)
+				var u8a = new UInt8Array (@:privateAccess new Bytes (data.data.length, data.data.b));
 				#end
 				__fromImageBuffer (new ImageBuffer (u8a, data.width, data.height, data.bitsPerPixel));
 				
