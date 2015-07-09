@@ -105,7 +105,9 @@ class NativeApplication {
 		
 		#elseif (cpp || neko)
 		
-		return lime_application_exec (handle);
+		var result = lime_application_exec (handle);
+		__cleanup ();
+		return result;
 		
 		#else
 		

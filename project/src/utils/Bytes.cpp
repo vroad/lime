@@ -103,8 +103,8 @@ namespace lime {
 		}
 		
 		lime::fseek (file, 0, SEEK_END);
-		
 		int size = lime::ftell (file);
+		lime::fseek (file, 0, SEEK_SET);
 		
 		if (size > 0) {
 			
@@ -114,7 +114,6 @@ namespace lime {
 		}
 		
 		lime::fclose (file);
-		delete file;
 		
 	}
 	
