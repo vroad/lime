@@ -168,7 +168,7 @@ namespace lime {
 		long bytes = 1;
 		int totalBytes = 0;
 		
-		vorbis_info *pInfo = ov_info (oggFile, -1);            
+		vorbis_info *pInfo = ov_info (oggFile, -1);
 		
 		if (pInfo == NULL) {
 			
