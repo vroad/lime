@@ -17,11 +17,13 @@ class GLUtils {
 		
 		if (GL.getShaderParameter (shader, GL.COMPILE_STATUS) == 0) {
 			
+			var log = GL.getShaderInfoLog (shader);
+			
 			switch (type) {
 				
-				case GL.VERTEX_SHADER: throw "Error compiling vertex shader";
-				case GL.FRAGMENT_SHADER: throw "Error compiling fragment shader";
-				default: throw "Error compiling unknown shader type";
+				case GL.VERTEX_SHADER: throw "Error compiling vertex shader\n" + log;
+				case GL.FRAGMENT_SHADER: throw "Error compiling fragment shader\n" + log;
+				default: throw "Error compiling unknown shader type\n" + log;
 				
 			}
 			
