@@ -181,7 +181,12 @@ namespace lime {
 				
 				_value = alloc_empty_object ();
 				_root = alloc_root ();
-				*_root = _value;
+				
+				if (_root) {
+					
+					*_root = _value;
+					
+				}	
 				
 			}
 
@@ -258,7 +263,13 @@ namespace lime {
 			
 			_value = bytes;
 			_root = alloc_root ();
-			*_root = _value;
+			
+			if (_root) {
+				
+				*_root = _value;
+				
+			}
+			
 			_length = val_int (val_field (bytes, id.length));
 			
 			if (_length > 0) {
