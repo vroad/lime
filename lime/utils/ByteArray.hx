@@ -330,6 +330,9 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 		
 		#if html5
 		return null;
+		#elseif nodejs
+		var bytes = lime_bytes_read_file (path);
+		return ByteArray.fromBytes (bytes);
 		#else
 		return ByteArray.fromBytes (File.getBytes (path));
 		#end
@@ -723,7 +726,8 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	public function writeFile (path:String):Void {
 		
 		#if nodejs
-		File.saveBytes (path, @:privateAccess new Bytes (length, cast byteView));
+		var bytes = BytesUtil.getBytesFromByteArray (this);
+		lime_bytes_overwrite_file (path, bytes);
 		#elseif sys
 		File.saveBytes (path, this);
 		#end
@@ -1095,6 +1099,10 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	
 	
 	private static var lime_bytes_get_data_pointer = System.load ("lime", "lime_bytes_get_data_pointer", 1);
+	#if nodejs
+	private static var lime_bytes_overwrite_file = System.load ("lime", "lime_bytes_overwrite_file", 2);
+	private static var lime_bytes_read_file = System.load ("lime", "lime_bytes_read_file", 1);
+	#end
 	
 }
 

@@ -340,4 +340,45 @@ namespace lime {
 	}
 	
 	
+	value lime_bytes_overwrite_file (value inFilename, value inBytes) {
+		
+		// file is created if it doesn't exist,
+		// if it exists, it is truncated to zero
+		FILE_HANDLE *file = lime::fopen (val_string (inFilename), "wb");
+		
+		if (!file) {
+			
+			#ifdef ANDROID
+			// [todo]
+			#endif
+			return alloc_null();
+			
+		}
+		
+		Bytes bytes (inBytes);
+		
+		// The function fwrite() writes nitems objects, each size bytes long, to the
+		// stream pointed to by stream, obtaining them from the location given by
+		// ptr.
+		// fwrite(const void *restrict ptr, size_t size, size_t nitems, FILE *restrict stream);
+		lime::fwrite (bytes.Data (), 1, bytes.Length (), file);
+		
+		lime::fclose (file);
+		return alloc_null ();
+		
+	}
+	
+	
+	value lime_bytes_read_file (value inFilename) {
+		
+		Bytes result = Bytes (val_string (inFilename));
+		
+		return result.Value ();
+		
+	}
+	
+	DEFINE_PRIM (lime_bytes_overwrite_file, 2);
+	DEFINE_PRIM (lime_bytes_read_file, 1);
+	
+	
 }
