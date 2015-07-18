@@ -1042,8 +1042,6 @@ HRESULT EVRCustomPresenter::RenegotiateMediaType()
         return MF_E_INVALIDREQUEST;
     }
 
-
-
     // Loop through all of the mixer's proposed output types.
     DWORD iTypeIndex = 0;
     while (!bFoundMediaType && (hr != MF_E_NO_MORE_TYPES))
@@ -1053,8 +1051,6 @@ HRESULT EVRCustomPresenter::RenegotiateMediaType()
 
         // Step 1. Get the next media type supported by mixer.
         hr = m_pMixer->GetOutputAvailableType(0, iTypeIndex++, &pMixerType);
-
-        
         if (FAILED(hr))
         {
             break;
@@ -1094,9 +1090,6 @@ HRESULT EVRCustomPresenter::RenegotiateMediaType()
         if (SUCCEEDED(hr))
         {
             hr = m_pMixer->SetOutputType(0, pOptimalType, 0);
-
-            
-            
 
             assert(SUCCEEDED(hr)); // This should succeed unless the MFT lied in the previous call.
 
@@ -1423,7 +1416,6 @@ HRESULT EVRCustomPresenter::CreateOptimalVideoType(IMFMediaType* pProposedType, 
 
     // Clone the proposed type.
     CHECK_HR(hr = mtOptimal.CopyFrom(pProposedType));
-    
 
     // Modify the new type.
 
@@ -1442,14 +1434,12 @@ HRESULT EVRCustomPresenter::CreateOptimalVideoType(IMFMediaType* pProposedType, 
         CHECK_HR(hr = CalculateOutputRectangle(pProposedType, &rcOutput));
     }
 
-    // Set the extended color information: Use BT.709
-    
+    // Set the extended color information: Use BT.709 
     CHECK_HR(hr = mtOptimal.SetYUVMatrix(MFVideoTransferMatrix_BT709));
     CHECK_HR(hr = mtOptimal.SetTransferFunction(MFVideoTransFunc_709));
     CHECK_HR(hr = mtOptimal.SetVideoPrimaries(MFVideoPrimaries_BT709));
     CHECK_HR(hr = mtOptimal.SetVideoNominalRange(MFNominalRange_16_235));
     CHECK_HR(hr = mtOptimal.SetVideoLighting(MFVideoLighting_dim));
-
 
     // Set the target rect dimensions. 
     CHECK_HR(hr = mtOptimal.SetFrameDimensions(rcOutput.right, rcOutput.bottom));
@@ -1466,9 +1456,6 @@ HRESULT EVRCustomPresenter::CreateOptimalVideoType(IMFMediaType* pProposedType, 
     // frame dimentions.
     CHECK_HR(hr = mtOptimal.SetPanScanAperture(displayArea));
     CHECK_HR(hr = mtOptimal.SetMinDisplayAperture(displayArea));
-
-    
-    
 
     // Return the pointer to the caller.
     *ppOptimalType = mtOptimal.Detach();
@@ -2419,7 +2406,8 @@ HRESULT SetMixerSourceRect(IMFTransform *pMixer, const MFVideoNormalizedRect& nr
 
     CHECK_HR(hr = pMixer->GetAttributes(&pAttributes));
 
-    CHECK_HR(hr = pAttributes->SetBlob(VIDEO_ZOOM_RECT, (const UINT8*)&nrcSource, sizeof(nrcSource))); 
+    CHECK_HR(hr = pAttributes->SetBlob(VIDEO_ZOOM_RECT, (const UINT8*)&nrcSource, sizeof(nrcSource)));
+
 done:
     SAFE_RELEASE(pAttributes);
     return hr;

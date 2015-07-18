@@ -108,7 +108,6 @@ WMFVideo::WMFVideo(HWND hVideo, HWND hEvent) :
     _previousTopoID(0),
     _isLooping(false)
 {
-
 }
 
 WMFVideo::~WMFVideo()
@@ -128,9 +127,6 @@ WMFVideo::~WMFVideo()
     // Shutdown. To handle that case, call Shutdown in the destructor. 
 
     Shutdown();
-    //SAFE_RELEASE(m_pEVRPresenter);
-
-
 }
 
 // IUnknown methods
@@ -341,23 +337,16 @@ HRESULT WMFVideo::OpenURLInternal(const WCHAR *sURL)
     // 3. Create the topology.
     // 4. Queue the topology [asynchronous]
     // 5. Start playback [asynchronous - does not happen in this method.]
-    
+
     IMFTopology *pTopology = NULL;
     IMFPresentationDescriptor* pSourcePD = NULL;
 
-    
-
-    
-    
     // Create the media session.
     HRESULT hr = CreateSession();
     if (FAILED(hr))
     {
         goto done;
     }
-    
-
-
 
     // Create the media source.
     hr = CreateMediaSource(sURL, &m_pSource);
@@ -671,13 +660,10 @@ done:
 HRESULT WMFVideo::Shutdown()
 {
     // Close the session
-
-
     HRESULT hr = CloseSession();
 
-
     // Shutdown the Media Foundation platform
-   
+    MFShutdown();
 
     if (m_hCloseEvent)
     {
@@ -828,7 +814,6 @@ HRESULT WMFVideo::CloseSession()
     //  media session fires.
 
     HRESULT hr = S_OK;
-    
 
     if (m_pVideoDisplay != NULL ) SafeRelease(&m_pVideoDisplay);
     if (m_pVolumeControl != NULL) SafeRelease(&m_pVolumeControl);
@@ -891,7 +876,6 @@ HRESULT WMFVideo::StartPlayback()
         // an error code, and we will update our state then.
         m_state = Started;
     }
-    
     PropVariantClear(&varStart);
     return hr;
 }
@@ -909,9 +893,6 @@ HRESULT WMFVideo::PlayInternal()
     }
     return StartPlayback();
 }
-
-
-
 
 
 //  Create a media source from a URL.
@@ -950,7 +931,6 @@ HRESULT CreateMediaSource(PCWSTR sURL, IMFMediaSource **ppSource)
 
     // Get the IMFMediaSource interface from the media source.
     hr = pSource->QueryInterface(IID_PPV_ARGS(ppSource));
-    
 
 done:
     SafeRelease(&pSourceResolver);
@@ -1260,13 +1240,6 @@ HRESULT AddBranchToPartialTopology(
 
         // Connect the source node to the output node.
         hr = pSourceNode->ConnectOutput(0, pOutputNode, 0);
-
-
-        
-
-
-
-
     }
     // else: If not selected, don't add the branch. 
 
@@ -1275,7 +1248,6 @@ done:
     SafeRelease(&pSinkActivate);
     SafeRelease(&pSourceNode);
     SafeRelease(&pOutputNode);
-    
     return hr;
 }
 
@@ -1307,7 +1279,6 @@ HRESULT CreatePlaybackTopology(
         goto done;
     }
 
-    
     // For each stream, create the topology nodes and add them to the topology.
     for (DWORD i = 0; i < cSourceStreams; i++)
     {
@@ -1316,14 +1287,7 @@ HRESULT CreatePlaybackTopology(
         {
             goto done;
         }
-
-    
-
-
-
-
     }
-    
 
     // Return the IMFTopology pointer to the caller.
     *ppTopology = pTopology;

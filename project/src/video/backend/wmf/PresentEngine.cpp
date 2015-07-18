@@ -19,12 +19,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "EVRPresenter.h"
-#ifdef NATIVE_TOOLKIT_SDL_ANGLE
-#include "../../../graphics/opengl/OpenGL.h"
 #include <vector>
-#else
-#error
-#endif
 
 HRESULT FindAdapter(IDirect3D9 *pD3D9, HMONITOR hMonitor, UINT *puAdapterID);
 
@@ -39,7 +34,9 @@ D3DPresentEngine::D3DPresentEngine(HRESULT& hr) :
     m_pD3D9(NULL),
     m_pDevice(NULL),
     m_pDeviceManager(NULL),
+    #if 0
     m_pSurfaceRepaint(NULL),
+    #endif
     #ifdef NATIVE_TOOLKIT_SDL_ANGLE
     egl_display(NULL),
     egl_surface(NULL),
@@ -84,7 +81,9 @@ D3DPresentEngine::~D3DPresentEngine()
     }
     #endif
     SAFE_RELEASE(m_pDevice);
+    #if 0
     SAFE_RELEASE(m_pSurfaceRepaint);
+    #endif
     SAFE_RELEASE(m_pDeviceManager);
     SAFE_RELEASE(m_pD3D9);
 }
@@ -372,7 +371,7 @@ HRESULT D3DPresentEngine::SetDestinationRect(const RECT& rcDest)
 
 HRESULT D3DPresentEngine::SetSampleFormat(IMFMediaType *pFormat)
 {
-    return GetSwapChainPresentParameters(pFormat, &_w, &_h, &_format);
+    return GetTextureParameters(pFormat, &_w, &_h, &_format);
 }
 
 //-----------------------------------------------------------------------------
@@ -399,9 +398,7 @@ HRESULT D3DPresentEngine::CreateVideoSamples(
     }
 
     HRESULT hr = S_OK;
-    UINT width = _w, height = _h;
-    D3DFORMAT d3dFormat = _format;
-    
+
     IMFSample *pVideoSample = NULL;            // Sampl
     
     AutoLock lock(m_ObjectLock);
@@ -446,7 +443,9 @@ void D3DPresentEngine::ReleaseResources()
     // Let the derived class release any resources it created.
     OnReleaseResources();
 
+    #if 0
     SAFE_RELEASE(m_pSurfaceRepaint);
+    #endif
 }
 
 
@@ -538,65 +537,7 @@ done:
 
     return hr;
 #else
-    IMFMediaBuffer* pBuffer = NULL;
-    IDirect3DSurface9* pSurface = NULL;
-    IDirect3DSwapChain9* pSwapChain = NULL;
-
-    if (pSample)
-    {
-        // Get the buffer from the sample.
-        CHECK_HR(hr = pSample->GetBufferByIndex(0, &pBuffer));
-
-        // Get the surface from the buffer.
-        CHECK_HR(hr = MFGetService(pBuffer, MR_BUFFER_SERVICE, __uuidof(IDirect3DSurface9), (void**)&pSurface));
-    }
-    else if (m_pSurfaceRepaint)
-    {
-        // Redraw from the last surface.
-        pSurface = m_pSurfaceRepaint;
-        pSurface->AddRef();
-    }
-
-    if (pSurface)
-    {
-        // Get the swap chain from the surface.
-        CHECK_HR(hr = pSurface->GetContainer(__uuidof(IDirect3DSwapChain9), (LPVOID*)&pSwapChain));
-
-        // Present the swap chain.
-        CHECK_HR(hr = PresentSwapChain(pSwapChain, pSurface));
-
-        // Store this pointer in case we need to repaint the surface.
-        CopyComPointer(m_pSurfaceRepaint, pSurface);
-    }
-    else
-    {
-        // No surface. All we can do is paint a black rectangle.
-        PaintFrameWithGDI();
-    }
-
-done:
-    SAFE_RELEASE(pSwapChain);
-    SAFE_RELEASE(pSurface);
-    SAFE_RELEASE(pBuffer);
-
-    if (FAILED(hr))
-    {
-        if (hr == D3DERR_DEVICELOST || hr == D3DERR_DEVICENOTRESET || hr == D3DERR_DEVICEHUNG)
-        {
-            // We failed because the device was lost. Fill the destination rectangle.
-            PaintFrameWithGDI();
-
-            // Ignore. We need to reset or re-create the device, but this method
-            // is probably being called from the scheduler thread, which is not the
-            // same thread that created the device. The Reset(Ex) method must be
-            // called from the thread that created the device.
-
-            // The presenter will detect the state when it calls CheckDeviceState() 
-            // on the next sample.
-            hr = S_OK;
-        }
-    }
-    return hr;
+#error
 #endif
 }
 
@@ -702,21 +643,17 @@ HRESULT D3DPresentEngine::CreateD3DDevice()
         uAdapterID,
         D3DDEVTYPE_HAL,
         pp.hDeviceWindow,
-        vp | D3DCREATE_NOWINDOWCHANGES | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE ,
+        vp | D3DCREATE_NOWINDOWCHANGES | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE,
         &pp, 
         NULL,
         &pDevice
         ));
-
-    
 
     // Get the adapter display mode.
     CHECK_HR(hr = m_pD3D9->GetAdapterDisplayMode(uAdapterID, &m_DisplayMode));
 
     // Reset the D3DDeviceManager with the new device 
     CHECK_HR(hr = m_pDeviceManager->ResetDevice(pDevice, m_DeviceResetToken));
-
-    
 
     SAFE_RELEASE(m_pDevice);
 
@@ -767,54 +704,11 @@ done:
 
 
 
-//-----------------------------------------------------------------------------
-// PresentSwapChain
-//
-// Presents a swap chain that contains a video frame.
-//
-// pSwapChain: Pointer to the swap chain.
-// pSurface: Pointer to the swap chain's back buffer surface.
-
-//
-// Note: This method simply calls IDirect3DSwapChain9::Present, but a derived 
-// class could do something fancier.
-//-----------------------------------------------------------------------------
-
-HRESULT D3DPresentEngine::PresentSwapChain(IDirect3DSwapChain9* pSwapChain, IDirect3DSurface9* pSurface)
-{
-    HRESULT hr = S_OK;
-
-    #if 0
-    //pSwapChain->GetFrontBufferData(d3d_shared_surface);
-    IDirect3DSurface9 *surface;
-    pSwapChain->GetBackBuffer(0,D3DBACKBUFFER_TYPE_MONO,&surface);
-    if (m_pDevice->StretchRect(surface,NULL,d3d_shared_surface,NULL,D3DTEXF_NONE) != D3D_OK)
-    {
-        printf("ofxWMFVideoPlayer: Error while copying texture to gl context \n");
-    }
-    SAFE_RELEASE(surface);
-
-    if (m_hwnd == NULL)
-    {
-        return MF_E_INVALIDREQUEST;
-    }
-    
-    hr = pSwapChain->Present(NULL, &m_rcDestRect, m_hwnd, NULL, 0);
-
-    
-
-    LOG_MSG_IF_FAILED(L"D3DPresentEngine::PresentSwapChain, IDirect3DSwapChain9::Present failed.", hr);
-    #endif
-
-    return hr;
-}
-
-//-----------------------------------------------------------------------------
 // PaintFrameWithGDI
 // 
 // Fills the destination rectangle with black.
 //-----------------------------------------------------------------------------
-
+#if 0
 void D3DPresentEngine::PaintFrameWithGDI()
 {
     HDC hdc = GetDC(m_hwnd);
@@ -832,25 +726,20 @@ void D3DPresentEngine::PaintFrameWithGDI()
         ReleaseDC(m_hwnd, hdc);
     }
 }
-
+#endif
 
 //-----------------------------------------------------------------------------
-// GetSwapChainPresentParameters
+// GetTextureParameters
 //
 // Given a media type that describes the video format, fills in the
 // D3DPRESENT_PARAMETERS for creating a swap chain.
 //-----------------------------------------------------------------------------
 
-HRESULT D3DPresentEngine::GetSwapChainPresentParameters(IMFMediaType *pType, UINT *pWidth, UINT *pHeight, D3DFORMAT *pD3DFormat)
+HRESULT D3DPresentEngine::GetTextureParameters(IMFMediaType *pType, UINT *pWidth, UINT *pHeight, D3DFORMAT *pD3DFormat)
 {
     // Caller holds the object lock.
 
-    HRESULT hr = S_OK; 
-
-    #if 0
-    UINT32 width = 0, height = 0;
-    DWORD d3dFormat = 0;
-    #endif
+    HRESULT hr = S_OK;
 
     // Helper object for reading the proposed type.
     VideoType videoType(pType);
@@ -860,33 +749,9 @@ HRESULT D3DPresentEngine::GetSwapChainPresentParameters(IMFMediaType *pType, UIN
         return MF_E_INVALIDREQUEST;
     }
 
-    #if 0
-    ZeroMemory(pPP, sizeof(D3DPRESENT_PARAMETERS));
-    #endif
-
     // Get some information about the video format.
     CHECK_HR(hr = videoType.GetFrameDimensions(pWidth, pHeight));
     CHECK_HR(hr = videoType.GetFourCC((DWORD*)pD3DFormat));
-
-    #if 0
-    ZeroMemory(pPP, sizeof(D3DPRESENT_PARAMETERS));
-    pPP->BackBufferWidth = width;
-    pPP->BackBufferHeight = height;
-    pPP->Windowed = TRUE;
-    pPP->SwapEffect = D3DSWAPEFFECT_COPY;
-    pPP->BackBufferFormat = (D3DFORMAT)d3dFormat;
-    pPP->hDeviceWindow = m_hwnd;
-    pPP->Flags = D3DPRESENTFLAG_VIDEO;
-    pPP->PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
-
-    D3DDEVICE_CREATION_PARAMETERS params;
-    CHECK_HR(hr = m_pDevice->GetCreationParameters(&params));
-    
-    if (params.DeviceType != D3DDEVTYPE_HAL)
-    {
-        pPP->Flags |= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
-    }
-    #endif
 
 done:
     return S_OK;

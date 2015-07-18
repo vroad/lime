@@ -18,7 +18,6 @@
 #include <shobjidl.h> 
 #include <shlwapi.h>
 #include <assert.h>
-#include <tchar.h>
 #include <strsafe.h>
 
 // Media Foundation headers

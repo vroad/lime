@@ -19,13 +19,10 @@
 
 #pragma once
 
-#if 0
-//#include "glu.h"
-#include "GL/glew.h"
-#include "GL/wglew.h"
-//#include "GLFW/glfw3.h"
+#ifdef NATIVE_TOOLKIT_SDL_ANGLE
+#include "../../../graphics/opengl/OpenGL.h"
 #else
-#include "EGLSurfaceContainer.h"
+#error
 #endif
 
 //-----------------------------------------------------------------------------
@@ -43,9 +40,6 @@
 const DWORD PRESENTER_BUFFER_COUNT = 3;
 
 
-#pragma comment (lib,"Evr.lib")
-#pragma comment(lib,"D3d9.lib")
-#pragma comment(lib,"Dxva2.lib")
 
 class D3DPresentEngine : public SchedulerCallback
 {
@@ -89,7 +83,7 @@ public:
 
 protected:
     HRESULT InitializeD3D();
-    HRESULT GetSwapChainPresentParameters(IMFMediaType *pType, UINT *pWidth, UINT *pHeight, D3DFORMAT *pD3DFormat);
+    HRESULT GetTextureParameters(IMFMediaType *pType, UINT *pWidth, UINT *pHeight, D3DFORMAT *pD3DFormat);
     HRESULT CreateD3DDevice();
     HRESULT CreateD3DSample(IMFSample **ppVideoSample);
     HRESULT UpdateDestRect();
@@ -100,8 +94,10 @@ protected:
     #endif
     // virtual void    OnReleaseResources() ;
 
+    #if 0
     virtual HRESULT PresentSwapChain(IDirect3DSwapChain9* pSwapChain, IDirect3DSurface9* pSurface);
     virtual void    PaintFrameWithGDI();
+    #endif
 
 protected:
     UINT                        m_DeviceResetToken;     // Reset token for the D3D device manager.
@@ -116,7 +112,9 @@ protected:
     IDirect3D9Ex                *m_pD3D9;
     IDirect3DDevice9Ex          *m_pDevice;
     IDirect3DDeviceManager9     *m_pDeviceManager;        // Direct3D device manager.
+    #if 0
     IDirect3DSurface9           *m_pSurfaceRepaint;       // Surface for repaint requests.
+    #endif
 
 protected:
     #if 0
@@ -129,7 +127,7 @@ protected:
     DWORD _shared_handle_val;
     #endif
 
-    #if NATIVE_TOOLKIT_SDL_ANGLE
+    #ifdef NATIVE_TOOLKIT_SDL_ANGLE
     EGLDisplay egl_display;
     EGLSurface egl_surface;
     #endif
