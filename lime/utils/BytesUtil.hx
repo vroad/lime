@@ -14,5 +14,15 @@ class BytesUtil
 		#end
 		
 	}
+
+	public static function getUInt8ArrayFromByteArray(byteArray:ByteArray) {
+		
+		#if nodejs
+		return byteArray.byteView;
+		#else
+		return new UInt8Array (byteArray);
+		#end
+		
+	}
 	
 }
