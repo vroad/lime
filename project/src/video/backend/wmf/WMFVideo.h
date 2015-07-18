@@ -10,8 +10,8 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
 
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef WMFVIDEO_H
+#define WMFVIDEO_H
 
 #include "ofMain.h"
 
@@ -56,10 +56,10 @@ enum PlayerState
     Closing         // Application has closed the session, but is waiting for MESessionClosed.
 };
 
-class CPlayer : public IMFAsyncCallback
+class WMFVideo : public IMFAsyncCallback
 {
 public:
-    static HRESULT CreateInstance(HWND hVideo, HWND hEvent, CPlayer **ppPlayer);
+    static HRESULT CreateInstance(HWND hVideo, HWND hEvent, WMFVideo **ppPlayer);
 
     // IUnknown methods
     STDMETHODIMP QueryInterface(REFIID iid, void** ppv);
@@ -115,10 +115,10 @@ public:
 protected:
     
     // Constructor is private. Use static CreateInstance method to instantiate.
-    CPlayer(HWND hVideo, HWND hEvent);
+    WMFVideo(HWND hVideo, HWND hEvent);
 
     // Destructor is private. Caller should call Release.
-    virtual ~CPlayer(); 
+    virtual ~WMFVideo(); 
 
     HRESULT Initialize();
     HRESULT CreateSession();

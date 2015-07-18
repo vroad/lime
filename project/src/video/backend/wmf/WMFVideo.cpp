@@ -49,19 +49,19 @@ HRESULT CreatePlaybackTopology(IMFMediaSource *pSource,
 HRESULT AddToPlaybackTopology(IMFMediaSource *pSource, 
 							   IMFPresentationDescriptor *pPD, HWND hVideoWnd,IMFTopology *pTopology,IMFVideoPresenter *pVideoPresenter);
 
-//  Static class method to create the CPlayer object.
+//  Static class method to create the WMFVideo object.
 
-HRESULT CPlayer::CreateInstance(
+HRESULT WMFVideo::CreateInstance(
     HWND hVideo,                  // Video window.
     HWND hEvent,                  // Window to receive notifications.
-    CPlayer **ppPlayer)           // Receives a pointer to the CPlayer object.
+    WMFVideo **ppPlayer)           // Receives a pointer to the WMFVideo object.
 {
     if (ppPlayer == NULL)
     {
         return E_POINTER;
     }
 
-    CPlayer *pPlayer = new (std::nothrow) CPlayer(hVideo, hEvent);
+    WMFVideo *pPlayer = new (std::nothrow) WMFVideo(hVideo, hEvent);
     if (pPlayer == NULL)
     {
         return E_OUTOFMEMORY;
@@ -79,7 +79,7 @@ HRESULT CPlayer::CreateInstance(
     return hr;
 }
 
-HRESULT CPlayer::Initialize()
+HRESULT WMFVideo::Initialize()
 {
     
    HRESULT hr = 0;
@@ -98,7 +98,7 @@ HRESULT CPlayer::Initialize()
     return hr;
 }
 
-CPlayer::CPlayer(HWND hVideo, HWND hEvent) : 
+WMFVideo::WMFVideo(HWND hVideo, HWND hEvent) : 
     m_pSession(NULL),
     m_pSource(NULL),
     m_pVideoDisplay(NULL),
@@ -116,16 +116,16 @@ CPlayer::CPlayer(HWND hVideo, HWND hEvent) :
 
 }
 
-CPlayer::~CPlayer()
+WMFVideo::~WMFVideo()
 {
     assert(m_pSession == NULL);  
     // If FALSE, the app did not call Shutdown().
 
-    // When CPlayer calls IMediaEventGenerator::BeginGetEvent on the
+    // When WMFVideo calls IMediaEventGenerator::BeginGetEvent on the
     // media session, it causes the media session to hold a reference 
-    // count on the CPlayer. 
+    // count on the WMFVideo. 
     
-    // This creates a circular reference count between CPlayer and the 
+    // This creates a circular reference count between WMFVideo and the 
     // media session. Calling Shutdown breaks the circular reference 
     // count.
 
@@ -147,22 +147,22 @@ CPlayer::~CPlayer()
 
 // IUnknown methods
 
-HRESULT CPlayer::QueryInterface(REFIID riid, void** ppv)
+HRESULT WMFVideo::QueryInterface(REFIID riid, void** ppv)
 {
     static const QITAB qit[] = 
     {
-        QITABENT(CPlayer, IMFAsyncCallback),
+        QITABENT(WMFVideo, IMFAsyncCallback),
         { 0 }
     };
     return QISearch(this, qit, riid, ppv);
 }
 
-ULONG CPlayer::AddRef()
+ULONG WMFVideo::AddRef()
 {
     return InterlockedIncrement(&m_nRefCount);
 }
 
-ULONG CPlayer::Release()
+ULONG WMFVideo::Release()
 {
     ULONG uCount = InterlockedDecrement(&m_nRefCount);
     if (uCount == 0)
@@ -172,7 +172,7 @@ ULONG CPlayer::Release()
     return uCount;
 }
 
-HRESULT CPlayer::OpenMultipleURL(vector<const WCHAR *> &urls)
+HRESULT WMFVideo::OpenMultipleURL(vector<const WCHAR *> &urls)
 {
 
 
@@ -327,7 +327,7 @@ done:
 
 
 //  Open a URL for playback.
-HRESULT CPlayer::OpenURL(const WCHAR *sURL)
+HRESULT WMFVideo::OpenURL(const WCHAR *sURL)
 {
     // 1. Create a new media session.
     // 2. Create the media source.
@@ -401,7 +401,7 @@ done:
 }
 
 //  Pause playback.
-HRESULT CPlayer::Pause()    
+HRESULT WMFVideo::Pause()    
 {
     if (m_state != Started)
     {
@@ -422,7 +422,7 @@ HRESULT CPlayer::Pause()
 }
 
 // Stop playback.
-HRESULT CPlayer::Stop()
+HRESULT WMFVideo::Stop()
 {
     if (m_state != Started && m_state != Paused)
     {
@@ -442,7 +442,7 @@ HRESULT CPlayer::Stop()
 }
 
 
-HRESULT CPlayer::setPosition(float pos)
+HRESULT WMFVideo::setPosition(float pos)
 {
 	if (m_state == OpenPending)
 	{
@@ -486,7 +486,7 @@ HRESULT CPlayer::setPosition(float pos)
 	return S_OK;
 }
 
-HRESULT CPlayer::setVolume(float vol)
+HRESULT WMFVideo::setVolume(float vol)
 {
 	//Should we lock here as well ?
 	if (m_pSession == NULL)
@@ -528,7 +528,7 @@ HRESULT CPlayer::setVolume(float vol)
 
 //  Callback for the asynchronous BeginGetEvent method.
 
-HRESULT CPlayer::Invoke(IMFAsyncResult *pResult)
+HRESULT WMFVideo::Invoke(IMFAsyncResult *pResult)
 {
     MediaEventType meType = MEUnknown;  // Event type
 
@@ -586,7 +586,7 @@ done:
     return S_OK;
 }
 
-HRESULT CPlayer::HandleEvent(UINT_PTR pEventPtr)
+HRESULT WMFVideo::HandleEvent(UINT_PTR pEventPtr)
 {
     HRESULT hrStatus = S_OK;            
     MediaEventType meType = MEUnknown;  
@@ -657,7 +657,7 @@ done:
 }
 
 //  Release all resources held by this object.
-HRESULT CPlayer::Shutdown()
+HRESULT WMFVideo::Shutdown()
 {
     // Close the session
 
@@ -697,7 +697,7 @@ HRESULT CPlayer::Shutdown()
 
 /// Protected methods
 
-HRESULT CPlayer::OnTopologyStatus(IMFMediaEvent *pEvent)
+HRESULT WMFVideo::OnTopologyStatus(IMFMediaEvent *pEvent)
 {
     UINT32 status; 
 
@@ -715,7 +715,7 @@ HRESULT CPlayer::OnTopologyStatus(IMFMediaEvent *pEvent)
 
 
 //  Handler for MEEndOfPresentation event.
-HRESULT CPlayer::OnPresentationEnded(IMFMediaEvent *pEvent)
+HRESULT WMFVideo::OnPresentationEnded(IMFMediaEvent *pEvent)
 {
 
 		m_pSession->Pause();
@@ -750,7 +750,7 @@ HRESULT CPlayer::OnPresentationEnded(IMFMediaEvent *pEvent)
 //  This event is sent if the media source has a new presentation, which 
 //  requires a new topology. 
 
-HRESULT CPlayer::OnNewPresentation(IMFMediaEvent *pEvent)
+HRESULT WMFVideo::OnNewPresentation(IMFMediaEvent *pEvent)
 {
     IMFPresentationDescriptor *pPD = NULL;
     IMFTopology *pTopology = NULL;
@@ -789,7 +789,7 @@ done:
 }
 
 //  Create a new instance of the media session.
-HRESULT CPlayer::CreateSession()
+HRESULT WMFVideo::CreateSession()
 {
     // Close the old session, if any.
     HRESULT hr = CloseSession();
@@ -821,10 +821,10 @@ done:
 }
 
 //  Close the media session. 
-HRESULT CPlayer::CloseSession()
+HRESULT WMFVideo::CloseSession()
 {
     //  The IMFMediaSession::Close method is asynchronous, but the 
-    //  CPlayer::CloseSession method waits on the MESessionClosed event.
+    //  WMFVideo::CloseSession method waits on the MESessionClosed event.
     //  
     //  MESessionClosed is guaranteed to be the last event that the 
     //  media session fires.
@@ -877,7 +877,7 @@ HRESULT CPlayer::CloseSession()
 }
 
 //  Start playback from the current position. 
-HRESULT CPlayer::StartPlayback()
+HRESULT WMFVideo::StartPlayback()
 {
     assert(m_pSession != NULL);
 
@@ -899,7 +899,7 @@ HRESULT CPlayer::StartPlayback()
 }
 
 //  Start playback from paused or stopped.
-HRESULT CPlayer::Play()
+HRESULT WMFVideo::Play()
 {
     if (m_state != Paused && m_state != Stopped)
     {
@@ -1385,7 +1385,7 @@ done:
 //---------------
 
 
-float CPlayer::getDuration() {
+float WMFVideo::getDuration() {
 	float duration = 0.0;
 	if (m_pSource == NULL)
 		return 0.0;
@@ -1401,7 +1401,7 @@ float CPlayer::getDuration() {
 	return duration;
 }
 
-float CPlayer::getPosition() {
+float WMFVideo::getPosition() {
 	float position = 0.0;
 	if (m_pSession == NULL)
 		return 0.0;
@@ -1418,7 +1418,7 @@ float CPlayer::getPosition() {
 	return position;
 }
 
-float CPlayer::getFrameRate() {
+float WMFVideo::getFrameRate() {
 	float fps = 0.0;
 	if (m_pSource == NULL)
 		return 0.0;
@@ -1467,7 +1467,7 @@ done:
 
 
 
-HRESULT CPlayer:: SetMediaInfo( IMFPresentationDescriptor *pPD ) {
+HRESULT WMFVideo:: SetMediaInfo( IMFPresentationDescriptor *pPD ) {
 	_width = 0;
 	_height = 0;
 	HRESULT hr = S_OK;
