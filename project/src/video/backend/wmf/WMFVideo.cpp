@@ -47,7 +47,7 @@ HRESULT CreatePlaybackTopology(IMFMediaSource *pSource,
     IMFPresentationDescriptor *pPD, HWND hVideoWnd,IMFTopology **ppTopology,IMFVideoPresenter *pVideoPresenter);
 
 HRESULT AddToPlaybackTopology(IMFMediaSource *pSource, 
-							   IMFPresentationDescriptor *pPD, HWND hVideoWnd,IMFTopology *pTopology,IMFVideoPresenter *pVideoPresenter);
+                               IMFPresentationDescriptor *pPD, HWND hVideoWnd,IMFTopology *pTopology,IMFVideoPresenter *pVideoPresenter);
 
 //  Static class method to create the WMFVideo object.
 
@@ -90,10 +90,10 @@ HRESULT WMFVideo::Initialize()
             hr = HRESULT_FROM_WIN32(GetLastError());
         }
 
-		if (!m_pEVRPresenter)  { 
-			m_pEVRPresenter = new EVRCustomPresenter(hr);
-			m_pEVRPresenter->SetVideoWindow(m_hwndVideo);
-		}
+        if (!m_pEVRPresenter)  { 
+            m_pEVRPresenter = new EVRCustomPresenter(hr);
+            m_pEVRPresenter->SetVideoWindow(m_hwndVideo);
+        }
     
     return hr;
 }
@@ -107,11 +107,11 @@ WMFVideo::WMFVideo(HWND hVideo, HWND hEvent) :
     m_state(Closed),
     m_hCloseEvent(NULL),
     m_nRefCount(1),
-	m_pEVRPresenter(NULL),
-	m_pSequencerSource(NULL),
-	m_pVolumeControl(NULL),
-	_previousTopoID(0),
-	_isLooping(false)
+    m_pEVRPresenter(NULL),
+    m_pSequencerSource(NULL),
+    m_pVolumeControl(NULL),
+    _previousTopoID(0),
+    _isLooping(false)
 {
 
 }
@@ -133,14 +133,14 @@ WMFVideo::~WMFVideo()
     // Shutdown. To handle that case, call Shutdown in the destructor. 
 
 
-	if (v_EVRPresenters.size() >1) {
-		SAFE_RELEASE(v_EVRPresenters[0]);
-		SAFE_RELEASE(v_EVRPresenters[1]);
-	}
+    if (v_EVRPresenters.size() >1) {
+        SAFE_RELEASE(v_EVRPresenters[0]);
+        SAFE_RELEASE(v_EVRPresenters[1]);
+    }
 
     Shutdown();
-	//SAFE_RELEASE(m_pEVRPresenter);
-	SafeRelease(&m_pSequencerSource);
+    //SAFE_RELEASE(m_pEVRPresenter);
+    SafeRelease(&m_pSequencerSource);
 
 
 }
@@ -176,151 +176,151 @@ HRESULT WMFVideo::OpenMultipleURL(vector<const WCHAR *> &urls)
 {
 
 
-	if (m_state == OpenPending) return S_FALSE;
-	IMFTopology *pTopology = NULL;
-	IMFPresentationDescriptor* pSourcePD = NULL;
+    if (m_state == OpenPending) return S_FALSE;
+    IMFTopology *pTopology = NULL;
+    IMFPresentationDescriptor* pSourcePD = NULL;
 
 
-	//Some lolilol for the sequencer that's coming from the outerspace (see topoEdit src code)
-	IMFMediaSource* spSrc = NULL;
-	IMFPresentationDescriptor* spPD = NULL;
-	IMFMediaSourceTopologyProvider* spSrcTopoProvider = NULL;
-
-
-
-	HRESULT hr = S_OK;
-
-
-	if(_previousTopoID != 0)
-	{
-		hr = m_pSequencerSource->DeleteTopology(_previousTopoID) ;
-		_previousTopoID = 0;
-	}
-
-	SafeRelease(&m_pSequencerSource);
-
-	if (!m_pSequencerSource) 	
-	{
-		hr = MFCreateSequencerSource(NULL,&m_pSequencerSource);
-		if (FAILED(hr))	goto done;
-
-		hr = CreateSession();
-		if (FAILED(hr))
-		{
-			goto done;
-		}
-
-		hr = m_pSequencerSource->QueryInterface(IID_PPV_ARGS(&m_pSource));
-
-	}
-
-
-	int nUrl = urls.size();
-	int nPresenters = v_EVRPresenters.size();
-
-	
-
-	for (int i=nPresenters; i < nUrl; i ++ )
-	{
-		EVRCustomPresenter* presenter = new EVRCustomPresenter(hr);
-		presenter->SetVideoWindow(m_hwndVideo);
-		v_EVRPresenters.push_back(presenter);
-	}
-
-
-	
-
-	// Create the media session.
-
-	//SafeRelease(&m_pSource);
-
-	for (int i=0; i < nUrl; i++)
-	{
-
-	
-		IMFMediaSource* source = NULL;
-
-		const WCHAR* sURL = urls[i];
-		// Create the media source.
-		hr = CreateMediaSource(sURL, &source);
-		if (FAILED(hr))
-		{
-			goto done;
-		}
-
-		// Create the presentation descriptor for the media source.
-		hr = source->CreatePresentationDescriptor(&pSourcePD);
-		if (FAILED(hr))
-		{
-			goto done;
-		}
-
-		if (i==0)  	hr = CreatePlaybackTopology(source, pSourcePD, m_hwndVideo, &pTopology,v_EVRPresenters[i]);
-		else hr =  AddToPlaybackTopology(source, pSourcePD, m_hwndVideo, pTopology,v_EVRPresenters[i]);
-		if (FAILED(hr))
-		{
-			goto done;
-		}
-
-
-		//v_sources.push_back(source);
-
-		/*if (i==0) m_pSource = source; //keep one source for time tracking
-		else */ SafeRelease(&source);
-		SetMediaInfo(pSourcePD);
-
-		SafeRelease(&pSourcePD);
-	}
-
-
-	MFSequencerElementId NewID;
+    //Some lolilol for the sequencer that's coming from the outerspace (see topoEdit src code)
+    IMFMediaSource* spSrc = NULL;
+    IMFPresentationDescriptor* spPD = NULL;
+    IMFMediaSourceTopologyProvider* spSrcTopoProvider = NULL;
 
 
 
-	hr = m_pSequencerSource->AppendTopology(pTopology, SequencerTopologyFlags_Last, &NewID) ;
+    HRESULT hr = S_OK;
+
+
+    if(_previousTopoID != 0)
+    {
+        hr = m_pSequencerSource->DeleteTopology(_previousTopoID) ;
+        _previousTopoID = 0;
+    }
+
+    SafeRelease(&m_pSequencerSource);
+
+    if (!m_pSequencerSource)     
+    {
+        hr = MFCreateSequencerSource(NULL,&m_pSequencerSource);
+        if (FAILED(hr))    goto done;
+
+        hr = CreateSession();
+        if (FAILED(hr))
+        {
+            goto done;
+        }
+
+        hr = m_pSequencerSource->QueryInterface(IID_PPV_ARGS(&m_pSource));
+
+    }
+
+
+    int nUrl = urls.size();
+    int nPresenters = v_EVRPresenters.size();
+
+    
+
+    for (int i=nPresenters; i < nUrl; i ++ )
+    {
+        EVRCustomPresenter* presenter = new EVRCustomPresenter(hr);
+        presenter->SetVideoWindow(m_hwndVideo);
+        v_EVRPresenters.push_back(presenter);
+    }
+
+
+    
+
+    // Create the media session.
+
+    //SafeRelease(&m_pSource);
+
+    for (int i=0; i < nUrl; i++)
+    {
+
+    
+        IMFMediaSource* source = NULL;
+
+        const WCHAR* sURL = urls[i];
+        // Create the media source.
+        hr = CreateMediaSource(sURL, &source);
+        if (FAILED(hr))
+        {
+            goto done;
+        }
+
+        // Create the presentation descriptor for the media source.
+        hr = source->CreatePresentationDescriptor(&pSourcePD);
+        if (FAILED(hr))
+        {
+            goto done;
+        }
+
+        if (i==0)      hr = CreatePlaybackTopology(source, pSourcePD, m_hwndVideo, &pTopology,v_EVRPresenters[i]);
+        else hr =  AddToPlaybackTopology(source, pSourcePD, m_hwndVideo, pTopology,v_EVRPresenters[i]);
+        if (FAILED(hr))
+        {
+            goto done;
+        }
+
+
+        //v_sources.push_back(source);
+
+        /*if (i==0) m_pSource = source; //keep one source for time tracking
+        else */ SafeRelease(&source);
+        SetMediaInfo(pSourcePD);
+
+        SafeRelease(&pSourcePD);
+    }
+
+
+    MFSequencerElementId NewID;
 
 
 
-	_previousTopoID = NewID;
-
-	
-	hr = m_pSequencerSource->QueryInterface(IID_IMFMediaSource, (void**) &spSrc) ;
+    hr = m_pSequencerSource->AppendTopology(pTopology, SequencerTopologyFlags_Last, &NewID) ;
 
 
-	hr = spSrc->CreatePresentationDescriptor(&spPD) ;
 
-	
-	hr = m_pSequencerSource->QueryInterface(IID_IMFMediaSourceTopologyProvider, (void**) &spSrcTopoProvider) ;
+    _previousTopoID = NewID;
 
-	SafeRelease(&pTopology);
-	hr = spSrcTopoProvider->GetMediaSourceTopology(spPD, &pTopology) ;
-
-	//Now that we're done, we set the topolgy as it should be....
-
-	hr = m_pSession->SetTopology(0, pTopology);
-	if (FAILED(hr))
-	{
-		goto done;
-	}
+    
+    hr = m_pSequencerSource->QueryInterface(IID_IMFMediaSource, (void**) &spSrc) ;
 
 
-	m_state = OpenPending;
-	_currentVolume = 1.0f;
+    hr = spSrc->CreatePresentationDescriptor(&spPD) ;
 
-	// If SetTopology succeeds, the media session will queue an 
-	// MESessionTopologySet event.
+    
+    hr = m_pSequencerSource->QueryInterface(IID_IMFMediaSourceTopologyProvider, (void**) &spSrcTopoProvider) ;
+
+    SafeRelease(&pTopology);
+    hr = spSrcTopoProvider->GetMediaSourceTopology(spPD, &pTopology) ;
+
+    //Now that we're done, we set the topolgy as it should be....
+
+    hr = m_pSession->SetTopology(0, pTopology);
+    if (FAILED(hr))
+    {
+        goto done;
+    }
+
+
+    m_state = OpenPending;
+    _currentVolume = 1.0f;
+
+    // If SetTopology succeeds, the media session will queue an 
+    // MESessionTopologySet event.
 
 done:
-	if (FAILED(hr))
-	{
-		m_state = Closed;
-	}
-	SafeRelease(&pSourcePD);
-	SafeRelease(&pTopology);
-	//SafeRelease(&spPD);
-	//SafeRelease(&spSrc);
-	//SafeRelease(&spSrcTopoProvider);  //Uncoment this and get a crash in D3D shared texture..
-	return hr;
+    if (FAILED(hr))
+    {
+        m_state = Closed;
+    }
+    SafeRelease(&pSourcePD);
+    SafeRelease(&pTopology);
+    //SafeRelease(&spPD);
+    //SafeRelease(&spSrc);
+    //SafeRelease(&spSrcTopoProvider);  //Uncoment this and get a crash in D3D shared texture..
+    return hr;
 }
 
 
@@ -334,21 +334,21 @@ HRESULT WMFVideo::OpenURL(const WCHAR *sURL)
     // 3. Create the topology.
     // 4. Queue the topology [asynchronous]
     // 5. Start playback [asynchronous - does not happen in this method.]
-	
+    
     IMFTopology *pTopology = NULL;
     IMFPresentationDescriptor* pSourcePD = NULL;
 
-	
+    
 
-	
-	
+    
+    
     // Create the media session.
     HRESULT hr = CreateSession();
     if (FAILED(hr))
     {
         goto done;
     }
-	
+    
 
 
 
@@ -373,7 +373,7 @@ HRESULT WMFVideo::OpenURL(const WCHAR *sURL)
         goto done;
     }
 
-	SetMediaInfo(pSourcePD);
+    SetMediaInfo(pSourcePD);
 
 
     // Set the topology on the media session.
@@ -384,7 +384,7 @@ HRESULT WMFVideo::OpenURL(const WCHAR *sURL)
     }
 
     m_state = OpenPending;
-	_currentVolume = 1.0f;
+    _currentVolume = 1.0f;
 
     // If SetTopology succeeds, the media session will queue an 
     // MESessionTopologySet event.
@@ -444,83 +444,83 @@ HRESULT WMFVideo::Stop()
 
 HRESULT WMFVideo::setPosition(float pos)
 {
-	if (m_state == OpenPending)
-	{
-		printf("ofxWMFPlayer : Error cannot seek during opening\n");
-		return S_FALSE;
-	}
+    if (m_state == OpenPending)
+    {
+        printf("ofxWMFPlayer : Error cannot seek during opening\n");
+        return S_FALSE;
+    }
 
-/*	bool wasPlaying = (m_state == Started);
-	m_pSession->Pause();
-	m_state = Paused;*/
+/*    bool wasPlaying = (m_state == Started);
+    m_pSession->Pause();
+    m_state = Paused;*/
 
-	//Create variant for seeking information
-	PROPVARIANT varStart;
-	PropVariantInit(&varStart);
-	varStart.vt = VT_I8;
-	varStart.hVal.QuadPart = pos* 10000000.0; //i.e. seeking to pos // should be MFTIME and not float :(
-
-
-	HRESULT hr = m_pSession->Start(&GUID_NULL,&varStart);
-
-	if (SUCCEEDED(hr))
-	{
-
-		m_state = Started;
-	
-	}
-	else 
-	{
-		printf("ofxWMFPlayer : Error while seeking\n");
-		return S_FALSE;
-	}
+    //Create variant for seeking information
+    PROPVARIANT varStart;
+    PropVariantInit(&varStart);
+    varStart.vt = VT_I8;
+    varStart.hVal.QuadPart = pos* 10000000.0; //i.e. seeking to pos // should be MFTIME and not float :(
 
 
-	/*if (!wasPlaying) m_pSession->Pause();
-	m_state = Paused;*/
+    HRESULT hr = m_pSession->Start(&GUID_NULL,&varStart);
 
-	PropVariantClear(&varStart);
+    if (SUCCEEDED(hr))
+    {
+
+        m_state = Started;
+    
+    }
+    else 
+    {
+        printf("ofxWMFPlayer : Error while seeking\n");
+        return S_FALSE;
+    }
+
+
+    /*if (!wasPlaying) m_pSession->Pause();
+    m_state = Paused;*/
+
+    PropVariantClear(&varStart);
 
 
 
-	return S_OK;
+    return S_OK;
 }
 
 HRESULT WMFVideo::setVolume(float vol)
 {
-	//Should we lock here as well ?
-	if (m_pSession == NULL)
-	{
-		ofLogError("ofxWMFVideoPlayer", "setVolume: Error session is null");
-		return E_FAIL;
-	}
-	if (m_pVolumeControl == NULL)
-	{
+    //Should we lock here as well ?
+    if (m_pSession == NULL)
+    {
+        ofLogError("ofxWMFVideoPlayer", "setVolume: Error session is null");
+        return E_FAIL;
+    }
+    if (m_pVolumeControl == NULL)
+    {
 
-		HRESULT hr = MFGetService(m_pSession, MR_STREAM_VOLUME_SERVICE, __uuidof(IMFAudioStreamVolume), (void**)&m_pVolumeControl);
-		//HRESULT hr = MFGetService(m_pSession, MR_POLICY_VOLUME_SERVICE, __uuidof(IMFSimpleAudioVolume), (void**)&m_pVolumeControl);
-		_currentVolume = vol;
-		if (FAILED(hr))
-		{
-			ofLogError("ofxWMFVideoPlayer", "setVolume: Error while getting sound control interface");
-			return E_FAIL;
-		}
+        HRESULT hr = MFGetService(m_pSession, MR_STREAM_VOLUME_SERVICE, __uuidof(IMFAudioStreamVolume), (void**)&m_pVolumeControl);
+        //HRESULT hr = MFGetService(m_pSession, MR_POLICY_VOLUME_SERVICE, __uuidof(IMFSimpleAudioVolume), (void**)&m_pVolumeControl);
+        _currentVolume = vol;
+        if (FAILED(hr))
+        {
+            ofLogError("ofxWMFVideoPlayer", "setVolume: Error while getting sound control interface");
+            return E_FAIL;
+        }
 
-	}
-	UINT32 nChannels;
-	m_pVolumeControl->GetChannelCount(&nChannels);
-	//float * volumes= new float[nChannels];
-	for (int i = 0; i < nChannels; i++)
-	{
-		m_pVolumeControl->SetChannelVolume(i, vol);
-	}
+    }
+    UINT32 nChannels;
+    m_pVolumeControl->GetChannelCount(&nChannels);
+    //float * volumes= new float[nChannels];
+    for (int i = 0; i < nChannels; i++)
+    {
+        m_pVolumeControl->SetChannelVolume(i, vol);
+    }
 
-	//	m_pVolumeControl->SetAllVolumes(nChannels,vol);
-	//	delete[] volumes;
+    //    m_pVolumeControl->SetAllVolumes(nChannels,vol);
+    //    delete[] volumes;
 
-	_currentVolume = vol;
+    _currentVolume = vol;
 
-	return S_OK;
+    return S_OK;
 }
 
 
@@ -533,7 +533,7 @@ HRESULT WMFVideo::Invoke(IMFAsyncResult *pResult)
     MediaEventType meType = MEUnknown;  // Event type
 
     IMFMediaEvent *pEvent = NULL;
-	if (!m_pSession) return -1; //Sometimes Invoke is called but m_pSession is closed
+    if (!m_pSession) return -1; //Sometimes Invoke is called but m_pSession is closed
     // Get the event from the event queue.
     HRESULT hr = m_pSession->EndGetEvent(pResult, &pEvent);
     if (FAILED(hr))
@@ -633,18 +633,18 @@ HRESULT WMFVideo::HandleEvent(UINT_PTR pEventPtr)
         hr = OnNewPresentation(pEvent);
         break;
 
-	case MESessionTopologySet:
-		IMFTopology * topology;
-		GetEventObject<IMFTopology> (pEvent,&topology);
-		WORD nodeCount;
-		topology->GetNodeCount(&nodeCount);
-		cout << "Topo set and we have "  << nodeCount << " nodes" << endl;
-		SafeRelease(&topology);
-		break;
+    case MESessionTopologySet:
+        IMFTopology * topology;
+        GetEventObject<IMFTopology> (pEvent,&topology);
+        WORD nodeCount;
+        topology->GetNodeCount(&nodeCount);
+        cout << "Topo set and we have "  << nodeCount << " nodes" << endl;
+        SafeRelease(&topology);
+        break;
 
-	case MESessionStarted:
+    case MESessionStarted:
 
-		break;
+        break;
 
     default:
         hr = OnSessionEvent(pEvent, meType);
@@ -674,22 +674,22 @@ HRESULT WMFVideo::Shutdown()
         m_hCloseEvent = NULL;
     }
 
-	if (v_EVRPresenters.size() > 0)
-	{
+    if (v_EVRPresenters.size() > 0)
+    {
 
-		if (v_EVRPresenters[0]) v_EVRPresenters[0]->releaseSharedTexture();
-		if (v_EVRPresenters[1]) v_EVRPresenters[1]->releaseSharedTexture();
+        if (v_EVRPresenters[0]) v_EVRPresenters[0]->releaseSharedTexture();
+        if (v_EVRPresenters[1]) v_EVRPresenters[1]->releaseSharedTexture();
 
-		SafeRelease(&v_EVRPresenters[0]);
-		SafeRelease(&v_EVRPresenters[1]);
+        SafeRelease(&v_EVRPresenters[0]);
+        SafeRelease(&v_EVRPresenters[1]);
 
-	}
-	else
-	{
-		if (m_pEVRPresenter) { m_pEVRPresenter->releaseSharedTexture(); }
-		SafeRelease(&m_pEVRPresenter);
+    }
+    else
+    {
+        if (m_pEVRPresenter) { m_pEVRPresenter->releaseSharedTexture(); }
+        SafeRelease(&m_pEVRPresenter);
 
-	}
+    }
 
 
     return hr;
@@ -706,9 +706,9 @@ HRESULT WMFVideo::OnTopologyStatus(IMFMediaEvent *pEvent)
     {
         SafeRelease(&m_pVideoDisplay);
 
-	
+    
         hr = StartPlayback();
-		hr = Pause();
+        hr = Pause();
     }
     return hr;
 }
@@ -718,28 +718,28 @@ HRESULT WMFVideo::OnTopologyStatus(IMFMediaEvent *pEvent)
 HRESULT WMFVideo::OnPresentationEnded(IMFMediaEvent *pEvent)
 {
 
-		m_pSession->Pause();
-		m_state = Paused;
+        m_pSession->Pause();
+        m_state = Paused;
 
-		//Create variant for seeking information
-		PROPVARIANT varStart;
-		PropVariantInit(&varStart);
-		varStart.vt = VT_I8;
-		varStart.hVal.QuadPart = 0; //i.e. seeking to the beginning
-		
-		HRESULT hr = S_OK;
-		hr = m_pSession->Start(&GUID_NULL,&varStart);
+        //Create variant for seeking information
+        PROPVARIANT varStart;
+        PropVariantInit(&varStart);
+        varStart.vt = VT_I8;
+        varStart.hVal.QuadPart = 0; //i.e. seeking to the beginning
+        
+        HRESULT hr = S_OK;
+        hr = m_pSession->Start(&GUID_NULL,&varStart);
 
-		if FAILED(hr)
-		{
-			ofLogError("ofxWMFVideoPlayerUtils", "Error while looping");
-		}
-		if (!_isLooping) m_pSession->Pause();
-		else m_state = Started;
-		
-		PropVariantClear(&varStart);
+        if FAILED(hr)
+        {
+            ofLogError("ofxWMFVideoPlayerUtils", "Error while looping");
+        }
+        if (!_isLooping) m_pSession->Pause();
+        else m_state = Started;
+        
+        PropVariantClear(&varStart);
 
-	
+    
     // The session puts itself into the stopped state automatically.
    // else m_state = Stopped;
     return S_OK;
@@ -771,7 +771,7 @@ HRESULT WMFVideo::OnNewPresentation(IMFMediaEvent *pEvent)
 
 
 
-	SetMediaInfo(pPD);
+    SetMediaInfo(pPD);
 
     // Set the topology on the media session.
     hr = m_pSession->SetTopology(0, pTopology);
@@ -830,10 +830,10 @@ HRESULT WMFVideo::CloseSession()
     //  media session fires.
 
     HRESULT hr = S_OK;
-	
+    
 
     if (m_pVideoDisplay != NULL ) SafeRelease(&m_pVideoDisplay);
-	if (m_pVolumeControl != NULL) SafeRelease(&m_pVolumeControl);
+    if (m_pVolumeControl != NULL) SafeRelease(&m_pVolumeControl);
 
     // First close the media session.
     if (m_pSession)
@@ -893,7 +893,7 @@ HRESULT WMFVideo::StartPlayback()
         // an error code, and we will update our state then.
         m_state = Started;
     }
-	
+    
     PropVariantClear(&varStart);
     return hr;
 }
@@ -952,7 +952,7 @@ HRESULT CreateMediaSource(PCWSTR sURL, IMFMediaSource **ppSource)
 
     // Get the IMFMediaSource interface from the media source.
     hr = pSource->QueryInterface(IID_PPV_ARGS(ppSource));
-	
+    
 
 done:
     SafeRelease(&pSourceResolver);
@@ -966,14 +966,14 @@ HRESULT CreateMediaSinkActivate(
     IMFStreamDescriptor *pSourceSD,     // Pointer to the stream descriptor.
     HWND hVideoWindow,                  // Handle to the video clipping window.
     IMFActivate **ppActivate,
-	IMFVideoPresenter *pVideoPresenter,
-	IMFMediaSink **ppMediaSink
+    IMFVideoPresenter *pVideoPresenter,
+    IMFMediaSink **ppMediaSink
 
 )
 {
     IMFMediaTypeHandler *pHandler = NULL;
     IMFActivate *pActivate = NULL;
-	IMFMediaSink *pSink = NULL;
+    IMFMediaSink *pSink = NULL;
 
     // Get the media type handler for the stream.
     HRESULT hr = pSourceSD->GetMediaTypeHandler(&pHandler);
@@ -995,25 +995,25 @@ HRESULT CreateMediaSinkActivate(
     {
         // Create the audio renderer.
         hr = MFCreateAudioRendererActivate(&pActivate);
-		*ppActivate = pActivate;
-		(*ppActivate)->AddRef();
+        *ppActivate = pActivate;
+        (*ppActivate)->AddRef();
     }
     else if (MFMediaType_Video == guidMajorType)
     {
         // Create the video renderer.
        // hr = MFCreateVideoRendererActivate(hVideoWindow, &pActivate);
-		
+        
 
-		hr = MFCreateVideoRenderer( __uuidof(IMFMediaSink), (void**)&pSink);
+        hr = MFCreateVideoRenderer( __uuidof(IMFMediaSink), (void**)&pSink);
 
-		IMFVideoRenderer*  pVideoRenderer=NULL;
-		hr = pSink->QueryInterface(__uuidof(IMFVideoRenderer),(void**) &pVideoRenderer);
+        IMFVideoRenderer*  pVideoRenderer=NULL;
+        hr = pSink->QueryInterface(__uuidof(IMFVideoRenderer),(void**) &pVideoRenderer);
 
-		//ThrowIfFail( pVideoRenderer->InitializeRenderer( NULL, pVideoPresenter ) );
-		hr = pVideoRenderer->InitializeRenderer( NULL, pVideoPresenter ) ;
+        //ThrowIfFail( pVideoRenderer->InitializeRenderer( NULL, pVideoPresenter ) );
+        hr = pVideoRenderer->InitializeRenderer( NULL, pVideoPresenter ) ;
 
-		*ppMediaSink = pSink;
-		(*ppMediaSink)->AddRef();
+        *ppMediaSink = pSink;
+        (*ppMediaSink)->AddRef();
     }
     else
     {
@@ -1032,7 +1032,7 @@ HRESULT CreateMediaSinkActivate(
 done:
     SafeRelease(&pHandler);
     SafeRelease(&pActivate);
-	SafeRelease(&pSink);
+    SafeRelease(&pSink);
     return hr;
 }
 
@@ -1090,46 +1090,46 @@ done:
 
 
 HRESULT AddOutputNode(
-	IMFTopology *pTopology,     // Topology.
-	IMFStreamSink *pStreamSink, // Stream sink.
-	IMFTopologyNode **ppNode    // Receives the node pointer.
-	)
+    IMFTopology *pTopology,     // Topology.
+    IMFStreamSink *pStreamSink, // Stream sink.
+    IMFTopologyNode **ppNode    // Receives the node pointer.
+    )
 {
-	IMFTopologyNode *pNode = NULL;
-	HRESULT hr = S_OK;
+    IMFTopologyNode *pNode = NULL;
+    HRESULT hr = S_OK;
 
-	// Create the node.
-	hr = MFCreateTopologyNode(MF_TOPOLOGY_OUTPUT_NODE, &pNode);
+    // Create the node.
+    hr = MFCreateTopologyNode(MF_TOPOLOGY_OUTPUT_NODE, &pNode);
 
-	// Set the object pointer.
-	if (SUCCEEDED(hr))
-	{
-		hr = pNode->SetObject(pStreamSink);
-	}
+    // Set the object pointer.
+    if (SUCCEEDED(hr))
+    {
+        hr = pNode->SetObject(pStreamSink);
+    }
 
-	// Add the node to the topology.
-	if (SUCCEEDED(hr))
-	{
-		hr = pTopology->AddNode(pNode);
-	}
+    // Add the node to the topology.
+    if (SUCCEEDED(hr))
+    {
+        hr = pTopology->AddNode(pNode);
+    }
 
-	if (SUCCEEDED(hr))
-	{
-		hr = pNode->SetUINT32(MF_TOPONODE_NOSHUTDOWN_ON_REMOVE, TRUE);
-	}
+    if (SUCCEEDED(hr))
+    {
+        hr = pNode->SetUINT32(MF_TOPONODE_NOSHUTDOWN_ON_REMOVE, TRUE);
+    }
 
-	// Return the pointer to the caller.
-	if (SUCCEEDED(hr))
-	{
-		*ppNode = pNode;
-		(*ppNode)->AddRef();
-	}
+    // Return the pointer to the caller.
+    if (SUCCEEDED(hr))
+    {
+        *ppNode = pNode;
+        (*ppNode)->AddRef();
+    }
 
-	if (pNode)
-	{
-		pNode->Release();
-	}
-	return hr;
+    if (pNode)
+    {
+        pNode->Release();
+    }
+    return hr;
 }
 
 
@@ -1202,13 +1202,13 @@ HRESULT AddBranchToPartialTopology(
     IMFPresentationDescriptor *pPD, // Presentation descriptor.
     DWORD iStream,                  // Stream index.
     HWND hVideoWnd,
-	IMFVideoPresenter *pVideoPresenter)                 // Window for video playback.
+    IMFVideoPresenter *pVideoPresenter)                 // Window for video playback.
 {
     IMFStreamDescriptor *pSD = NULL;
     IMFActivate         *pSinkActivate = NULL;
     IMFTopologyNode     *pSourceNode = NULL;
     IMFTopologyNode     *pOutputNode = NULL;
-	IMFMediaSink        *pMediaSink = NULL;
+    IMFMediaSink        *pMediaSink = NULL;
 
 
     BOOL fSelected = FALSE;
@@ -1236,25 +1236,25 @@ HRESULT AddBranchToPartialTopology(
         }
 
         // Create the output node for the renderer.
-		if ( pSinkActivate )
-		{
-			 hr = AddOutputNode(pTopology, pSinkActivate, 0, &pOutputNode);
-		}
-		else if ( pMediaSink )
-		{
-			IMFStreamSink  * pStreamSink=NULL;
-			DWORD streamCount;
+        if ( pSinkActivate )
+        {
+             hr = AddOutputNode(pTopology, pSinkActivate, 0, &pOutputNode);
+        }
+        else if ( pMediaSink )
+        {
+            IMFStreamSink  * pStreamSink=NULL;
+            DWORD streamCount;
 
-			pMediaSink->GetStreamSinkCount( &streamCount ) ;
+            pMediaSink->GetStreamSinkCount( &streamCount ) ;
 
-			pMediaSink->GetStreamSinkByIndex( 0, &pStreamSink );
+            pMediaSink->GetStreamSinkByIndex( 0, &pStreamSink );
 
-			hr = AddOutputNode( pTopology, pStreamSink, &pOutputNode );
+            hr = AddOutputNode( pTopology, pStreamSink, &pOutputNode );
 
-			
+            
 
-			//ThrowIfFail( pNode->SetObject( pStreamSink ) );
-		}
+            //ThrowIfFail( pNode->SetObject( pStreamSink ) );
+        }
         if (FAILED(hr))
         {
             goto done;
@@ -1264,7 +1264,7 @@ HRESULT AddBranchToPartialTopology(
         hr = pSourceNode->ConnectOutput(0, pOutputNode, 0);
 
 
-		
+        
 
 
 
@@ -1277,7 +1277,7 @@ done:
     SafeRelease(&pSinkActivate);
     SafeRelease(&pSourceNode);
     SafeRelease(&pOutputNode);
-	
+    
     return hr;
 }
 
@@ -1287,7 +1287,7 @@ HRESULT CreatePlaybackTopology(
     IMFPresentationDescriptor *pPD,   // Presentation descriptor.
     HWND hVideoWnd,                   // Video window.
     IMFTopology **ppTopology,        // Receives a pointer to the topology.
-	IMFVideoPresenter *pVideoPresenter)         
+    IMFVideoPresenter *pVideoPresenter)         
 {
     IMFTopology *pTopology = NULL;
     DWORD cSourceStreams = 0;
@@ -1309,7 +1309,7 @@ HRESULT CreatePlaybackTopology(
         goto done;
     }
 
-	
+    
     // For each stream, create the topology nodes and add them to the topology.
     for (DWORD i = 0; i < cSourceStreams; i++)
     {
@@ -1319,13 +1319,13 @@ HRESULT CreatePlaybackTopology(
             goto done;
         }
 
-	
+    
 
 
 
 
     }
-	
+    
 
     // Return the IMFTopology pointer to the caller.
     *ppTopology = pTopology;
@@ -1339,42 +1339,42 @@ done:
 
 
 HRESULT AddToPlaybackTopology(
-	IMFMediaSource *pSource,          // Media source.
-	IMFPresentationDescriptor *pPD,   // Presentation descriptor.
-	HWND hVideoWnd,                   // Video window.
-	IMFTopology *pTopology,        // Receives a pointer to the topology.
-	IMFVideoPresenter *pVideoPresenter)         
+    IMFMediaSource *pSource,          // Media source.
+    IMFPresentationDescriptor *pPD,   // Presentation descriptor.
+    HWND hVideoWnd,                   // Video window.
+    IMFTopology *pTopology,        // Receives a pointer to the topology.
+    IMFVideoPresenter *pVideoPresenter)         
 {
-	DWORD cSourceStreams = 0;
+    DWORD cSourceStreams = 0;
 
 
-	HRESULT hr;
+    HRESULT hr;
 
-	// Get the number of streams in the media source.
-	hr = pPD->GetStreamDescriptorCount(&cSourceStreams);
-	if (FAILED(hr))
-	{
-		goto done;
-	}
+    // Get the number of streams in the media source.
+    hr = pPD->GetStreamDescriptorCount(&cSourceStreams);
+    if (FAILED(hr))
+    {
+        goto done;
+    }
 
-	
-	// For each stream, create the topology nodes and add them to the topology.
-	for (DWORD i = 1; i < cSourceStreams; i++)
-	{
-		ofLogWarning("Ignoring audio stream of video2. If the video is missing check : ofxWMFVideoPlayerUtils");
-		hr = AddBranchToPartialTopology(pTopology, pSource, pPD, i, hVideoWnd,pVideoPresenter);
-		if (FAILED(hr))
-		{
-			goto done;
-		}
+    
+    // For each stream, create the topology nodes and add them to the topology.
+    for (DWORD i = 1; i < cSourceStreams; i++)
+    {
+        ofLogWarning("Ignoring audio stream of video2. If the video is missing check : ofxWMFVideoPlayerUtils");
+        hr = AddBranchToPartialTopology(pTopology, pSource, pPD, i, hVideoWnd,pVideoPresenter);
+        if (FAILED(hr))
+        {
+            goto done;
+        }
 
-	}
+    }
 
 
 
 done:
-	
-	return hr;
+    
+    return hr;
 }
 
 
@@ -1386,129 +1386,129 @@ done:
 
 
 float WMFVideo::getDuration() {
-	float duration = 0.0;
-	if (m_pSource == NULL)
-		return 0.0;
-	IMFPresentationDescriptor *pDescriptor = NULL;
-	HRESULT hr = m_pSource->CreatePresentationDescriptor(&pDescriptor);
-	if (SUCCEEDED(hr)) {
-		UINT64 longDuration = 0;
-		hr = pDescriptor->GetUINT64(MF_PD_DURATION, &longDuration);
-		if (SUCCEEDED(hr))
-			duration = (float)longDuration / 10000000.0;
-	}
-	SafeRelease(&pDescriptor);
-	return duration;
+    float duration = 0.0;
+    if (m_pSource == NULL)
+        return 0.0;
+    IMFPresentationDescriptor *pDescriptor = NULL;
+    HRESULT hr = m_pSource->CreatePresentationDescriptor(&pDescriptor);
+    if (SUCCEEDED(hr)) {
+        UINT64 longDuration = 0;
+        hr = pDescriptor->GetUINT64(MF_PD_DURATION, &longDuration);
+        if (SUCCEEDED(hr))
+            duration = (float)longDuration / 10000000.0;
+    }
+    SafeRelease(&pDescriptor);
+    return duration;
 }
 
 float WMFVideo::getPosition() {
-	float position = 0.0;
-	if (m_pSession == NULL)
-		return 0.0;
-	IMFPresentationClock *pClock = NULL;
-	HRESULT hr = m_pSession->GetClock((IMFClock **)&pClock);
-	
-	if (SUCCEEDED(hr)) {
-		MFTIME longPosition = 0;
-		hr = pClock->GetTime(&longPosition);
-		if (SUCCEEDED(hr))
-			position = (float)longPosition / 10000000.0;
-	}
-	SafeRelease(&pClock);
-	return position;
+    float position = 0.0;
+    if (m_pSession == NULL)
+        return 0.0;
+    IMFPresentationClock *pClock = NULL;
+    HRESULT hr = m_pSession->GetClock((IMFClock **)&pClock);
+    
+    if (SUCCEEDED(hr)) {
+        MFTIME longPosition = 0;
+        hr = pClock->GetTime(&longPosition);
+        if (SUCCEEDED(hr))
+            position = (float)longPosition / 10000000.0;
+    }
+    SafeRelease(&pClock);
+    return position;
 }
 
 float WMFVideo::getFrameRate() {
-	float fps = 0.0;
-	if (m_pSource == NULL)
-		return 0.0;
-	IMFPresentationDescriptor *pDescriptor = NULL;
-	IMFStreamDescriptor *pStreamHandler = NULL;
-	IMFMediaTypeHandler *pMediaType = NULL;
-	IMFMediaType  *pType;
-	DWORD nStream;
-	if FAILED(m_pSource->CreatePresentationDescriptor(&pDescriptor)) goto done;
-	if FAILED(pDescriptor->GetStreamDescriptorCount(&nStream)) goto done;
-	for (int i = 0; i < nStream; i++)
-	{
-		BOOL selected;
-		GUID type;
-		if FAILED(pDescriptor->GetStreamDescriptorByIndex(i, &selected, &pStreamHandler)) goto done;
-		if FAILED(pStreamHandler->GetMediaTypeHandler(&pMediaType)) goto done;
-		if FAILED(pMediaType->GetMajorType(&type)) goto done;
-		if FAILED(pMediaType->GetCurrentMediaType(&pType)) goto done;
-		if (type  == MFMediaType_Video)
-		{
-			UINT32 num = 0;
-			UINT32 denum = 1;
+    float fps = 0.0;
+    if (m_pSource == NULL)
+        return 0.0;
+    IMFPresentationDescriptor *pDescriptor = NULL;
+    IMFStreamDescriptor *pStreamHandler = NULL;
+    IMFMediaTypeHandler *pMediaType = NULL;
+    IMFMediaType  *pType;
+    DWORD nStream;
+    if FAILED(m_pSource->CreatePresentationDescriptor(&pDescriptor)) goto done;
+    if FAILED(pDescriptor->GetStreamDescriptorCount(&nStream)) goto done;
+    for (int i = 0; i < nStream; i++)
+    {
+        BOOL selected;
+        GUID type;
+        if FAILED(pDescriptor->GetStreamDescriptorByIndex(i, &selected, &pStreamHandler)) goto done;
+        if FAILED(pStreamHandler->GetMediaTypeHandler(&pMediaType)) goto done;
+        if FAILED(pMediaType->GetMajorType(&type)) goto done;
+        if FAILED(pMediaType->GetCurrentMediaType(&pType)) goto done;
+        if (type  == MFMediaType_Video)
+        {
+            UINT32 num = 0;
+            UINT32 denum = 1;
 
-			MFGetAttributeRatio(
-				pType,
-				MF_MT_FRAME_RATE,
-				&num,
-				&denum
-				);
-			if (denum != 0) fps = (float) num /  (float) denum;
-		}
-	
+            MFGetAttributeRatio(
+                pType,
+                MF_MT_FRAME_RATE,
+                &num,
+                &denum
+                );
+            if (denum != 0) fps = (float) num /  (float) denum;
+        }
+    
 
-		SafeRelease(&pStreamHandler);
-		SafeRelease(&pMediaType);
-		SafeRelease(&pType);
-		if (fps != 0.0) break; // we found the right stream, no point in continuing the loop
-	}
+        SafeRelease(&pStreamHandler);
+        SafeRelease(&pMediaType);
+        SafeRelease(&pType);
+        if (fps != 0.0) break; // we found the right stream, no point in continuing the loop
+    }
 done:
-	SafeRelease(&pDescriptor);
-	SafeRelease(&pStreamHandler);
-	SafeRelease(&pMediaType);
-	SafeRelease(&pType);
-	return fps;
+    SafeRelease(&pDescriptor);
+    SafeRelease(&pStreamHandler);
+    SafeRelease(&pMediaType);
+    SafeRelease(&pType);
+    return fps;
 }
 
 
 
 HRESULT WMFVideo:: SetMediaInfo( IMFPresentationDescriptor *pPD ) {
-	_width = 0;
-	_height = 0;
-	HRESULT hr = S_OK;
-	GUID guidMajorType = GUID_NULL;
-	IMFMediaTypeHandler *pHandler = NULL;
-	IMFStreamDescriptor* spStreamDesc = NULL;
-	IMFMediaType *sourceType = NULL;
+    _width = 0;
+    _height = 0;
+    HRESULT hr = S_OK;
+    GUID guidMajorType = GUID_NULL;
+    IMFMediaTypeHandler *pHandler = NULL;
+    IMFStreamDescriptor* spStreamDesc = NULL;
+    IMFMediaType *sourceType = NULL;
 
-	
-	DWORD count;
-	pPD->GetStreamDescriptorCount(&count);
-	for(DWORD i = 0; i < count; i++) {
-		BOOL selected;
-		
-		hr = pPD->GetStreamDescriptorByIndex(i, &selected, &spStreamDesc);
-		if (FAILED(hr)) goto done;
-		if(selected) {
-			hr = spStreamDesc->GetMediaTypeHandler(&pHandler);
-			if (FAILED(hr)) goto done;
-			hr = pHandler->GetMajorType(&guidMajorType);
-			if (FAILED(hr)) goto done;
-			
-			if (MFMediaType_Video == guidMajorType) {
-				
+    
+    DWORD count;
+    pPD->GetStreamDescriptorCount(&count);
+    for(DWORD i = 0; i < count; i++) {
+        BOOL selected;
+        
+        hr = pPD->GetStreamDescriptorByIndex(i, &selected, &spStreamDesc);
+        if (FAILED(hr)) goto done;
+        if(selected) {
+            hr = spStreamDesc->GetMediaTypeHandler(&pHandler);
+            if (FAILED(hr)) goto done;
+            hr = pHandler->GetMajorType(&guidMajorType);
+            if (FAILED(hr)) goto done;
+            
+            if (MFMediaType_Video == guidMajorType) {
+                
 
-				// first get the source video size and allocate a new texture
-				hr = pHandler->GetCurrentMediaType(&sourceType) ;
+                // first get the source video size and allocate a new texture
+                hr = pHandler->GetCurrentMediaType(&sourceType) ;
 
-				UINT32 w, h;
-				hr = MFGetAttributeSize(sourceType, MF_MT_FRAME_SIZE, &w, &h);
-				if (hr == S_OK) {
-					_width = w;
-					_height =h;
-				}
+                UINT32 w, h;
+                hr = MFGetAttributeSize(sourceType, MF_MT_FRAME_SIZE, &w, &h);
+                if (hr == S_OK) {
+                    _width = w;
+                    _height =h;
+                }
 
 
-				goto done;
-			}
+                goto done;
+            }
 
-		}
-	}
+        }
+    }
 
 
 done:

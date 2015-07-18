@@ -77,8 +77,8 @@ public:
     // Playback
     HRESULT       OpenURL(const WCHAR *sURL);
 
-	//Open multiple url in a same topology... Play with that of you want to do some video syncing
-	HRESULT       OpenMultipleURL(vector<const WCHAR *> &sURL);
+    //Open multiple url in a same topology... Play with that of you want to do some video syncing
+    HRESULT       OpenMultipleURL(vector<const WCHAR *> &sURL);
     HRESULT       Play();
     HRESULT       Pause();
     HRESULT       Stop();
@@ -92,24 +92,24 @@ public:
 
 
 
-	float getDuration();
-	float getPosition();
-	float getWidth() { return _width; }
-	float getHeight() { 
-		return _height;
-	}
+    float getDuration();
+    float getPosition();
+    float getWidth() { return _width; }
+    float getHeight() { 
+        return _height;
+    }
 
-	HRESULT setPosition(float pos);
+    HRESULT setPosition(float pos);
 
-	bool _isLooping;
-	bool isLooping() { return _isLooping; }
-	void setLooping(bool isLooping) { _isLooping = isLooping; }
+    bool _isLooping;
+    bool isLooping() { return _isLooping; }
+    void setLooping(bool isLooping) { _isLooping = isLooping; }
 
-	
-	HRESULT setVolume(float vol);
-	float   getVolume() { return _currentVolume; }
+    
+    HRESULT setVolume(float vol);
+    float   getVolume() { return _currentVolume; }
 
-	float getFrameRate();
+    float getFrameRate();
 
 
 protected:
@@ -126,7 +126,7 @@ protected:
     HRESULT StartPlayback();
 
 
-	HRESULT SetMediaInfo( IMFPresentationDescriptor *pPD );
+    HRESULT SetMediaInfo( IMFPresentationDescriptor *pPD );
 
     // Media event handlers
     virtual HRESULT OnTopologyStatus(IMFMediaEvent *pEvent);
@@ -145,24 +145,24 @@ protected:
     IMFSequencerSource     *m_pSequencerSource;
     IMFMediaSource          *m_pSource;
     IMFVideoDisplayControl  *m_pVideoDisplay;
-	MFSequencerElementId		_previousTopoID;
+    MFSequencerElementId        _previousTopoID;
     HWND                    m_hwndVideo;        // Video window.
     HWND                    m_hwndEvent;        // App window to receive events.
     PlayerState             m_state;            // Current state of the media session.
     HANDLE                  m_hCloseEvent;      // Event to wait on while closing.
-	IMFAudioStreamVolume   *m_pVolumeControl;
+    IMFAudioStreamVolume   *m_pVolumeControl;
 
 public:
-	EVRCustomPresenter * m_pEVRPresenter; // Custom EVR for texture sharing
-	IMFMediaSession         *m_pSession;
-	
-	vector<EVRCustomPresenter*> v_EVRPresenters;  //if you want to load multiple sources in one go
-	vector<IMFMediaSource*>     v_sources;        //for doing frame symc... this is experimental
+    EVRCustomPresenter * m_pEVRPresenter; // Custom EVR for texture sharing
+    IMFMediaSession         *m_pSession;
+    
+    vector<EVRCustomPresenter*> v_EVRPresenters;  //if you want to load multiple sources in one go
+    vector<IMFMediaSource*>     v_sources;        //for doing frame symc... this is experimental
 
 protected:
-	int _width;
-	int _height;
-	float _currentVolume;
+    int _width;
+    int _height;
+    float _currentVolume;
 };
 
 #endif PLAYER_H
