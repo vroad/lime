@@ -2,7 +2,7 @@ package lime.graphics.cairo;
 
 
 import lime.system.System;
-
+import lime.utils.BytesUtil;
 
 @:forward abstract CairoImageSurface(CairoSurface) from CairoSurface to CairoSurface {
 	
@@ -39,7 +39,7 @@ import lime.system.System;
 	public static function fromImage (image:Image):CairoSurface {
 		
 		#if lime_cairo
-		return create (lime_bytes_get_data_pointer (#if nodejs image.data #else image.data.buffer #end), CairoFormat.ARGB32, image.width, image.height, image.buffer.stride);
+		return create (lime_bytes_get_data_pointer (BytesUtil.getBytesFromUInt8Array (image.data)), CairoFormat.ARGB32, image.width, image.height, image.buffer.stride);
 		#else
 		return null;
 		#end

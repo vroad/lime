@@ -64,8 +64,7 @@ namespace lime {
 		value handleValue;
 		if (handle != NULL) {
 			
-			NativePointer<AudioStream> ptr (handle);
-			handleValue = ptr.mValue;
+			handleValue = CreateNativePointer<AudioStream> (handle);
 			
 		} else {
 			

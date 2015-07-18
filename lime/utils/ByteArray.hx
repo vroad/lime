@@ -947,7 +947,7 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	#if (cpp || neko || nodejs)
 	public function __getNativePointer ():Dynamic {
 		
-		return lime_bytes_get_data_pointer (this);
+		return lime_bytes_get_data_pointer (BytesUtil.getBytesFromByteArray (this));
 		
 	}
 	#end

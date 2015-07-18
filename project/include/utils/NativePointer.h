@@ -13,13 +13,17 @@ namespace lime {
 		
 		public:
 			
-			NativePointer (T *pointer) {
+			NativePointer (T *pointer, bool setGC) {
 				
 				mPointer = pointer;
 				mValue = alloc_empty_object ();
 				alloc_field (mValue, val_id ("pointer"), alloc_float ((intptr_t)pointer));
-				val_gc (mValue, lime_pointer_destroy<T>);
-				
+				if (setGC) {
+
+					val_gc (mValue, lime_pointer_destroy<T>);
+
+				}
+
 			}
 			
 			NativePointer (value inValue) {
@@ -40,6 +44,22 @@ namespace lime {
 			value mValue;
 			
 	};
+	
+	template <class T>
+	T *GetNativePointer (value handle) {
+		
+		NativePointer<T> ptr (handle);
+		return ptr.mPointer;
+		
+	}
+
+	template <class T>
+	value CreateNativePointer (T *pointer, bool setGC = true) {
+		
+		NativePointer<T> ptr (pointer, setGC);
+		return ptr.mValue;
+		
+	}
 	
 	template <class T>
 	void lime_pointer_destroy (value handle) {
