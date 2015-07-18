@@ -992,6 +992,7 @@ HRESULT CreateMediaSinkActivate(
 
         *ppMediaSink = pSink;
         (*ppMediaSink)->AddRef();
+        SafeRelease(&pVideoRenderer);
     }
     else
     {
