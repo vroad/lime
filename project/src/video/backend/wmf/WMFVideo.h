@@ -45,17 +45,6 @@ const UINT WM_APP_PLAYER_EVENT = WM_APP + 1;
 
     // WPARAM = IMFMediaEvent*, WPARAM = MediaEventType
 
-enum PlayerState
-{
-    Closed = 0,     // No session.
-    Ready,          // Session was created, ready to open a file. 
-    OpenPending,    // Session is opening a file.
-    Started,        // Session is playing a file.
-    Paused,         // Session is paused.
-    Stopped,        // Session is stopped (ready to play). 
-    Closing         // Application has closed the session, but is waiting for MESessionClosed.
-};
-
 class WMFVideo : public IMFAsyncCallback, public Video
 {
 public:

@@ -1163,11 +1163,11 @@ namespace lime {
 	}
 
 
-	value lime_video_is_ready (value inVideo) {
+	value lime_video_get_state (value inVideo) {
 
 		#ifdef LIME_VIDEO
 		Video *video = GetNativePointer<Video> (inVideo);
-		return alloc_bool (video->IsReady ());
+		return alloc_int (video->GetState ());
 		#else
 		return alloc_null ();
 		#endif
@@ -1292,7 +1292,7 @@ namespace lime {
 	DEFINE_PRIM (lime_video_lib_create, 0);
 	DEFINE_PRIM (lime_video_lib_create_video, 1);
 	DEFINE_PRIM (lime_video_open_url, 2);
-	DEFINE_PRIM (lime_video_is_ready, 1);
+	DEFINE_PRIM (lime_video_get_state, 1);
 	DEFINE_PRIM (lime_video_play, 1);
 	DEFINE_PRIM (lime_video_set_texture, 2);
 	
