@@ -19,10 +19,14 @@
 
 #pragma once
 
+#if 0
 //#include "glu.h"
 #include "GL/glew.h"
 #include "GL/wglew.h"
 //#include "GLFW/glfw3.h"
+#else
+#include "EGLSurfaceContainer.h"
+#endif
 
 //-----------------------------------------------------------------------------
 // D3DPresentEngine class
@@ -74,7 +78,8 @@ public:
     HRESULT SetDestinationRect(const RECT& rcDest);
     RECT    GetDestinationRect() const { return m_rcDestRect; };
 
-    HRESULT CreateVideoSamples(IMFMediaType *pFormat, VideoSampleList& videoSampleQueue);
+    HRESULT SetSampleFormat(IMFMediaType *pFormat);
+    HRESULT CreateVideoSamples(VideoSampleList& videoSampleQueue);
     void    ReleaseResources();
 
     HRESULT CheckDeviceState(DeviceState *pState);
@@ -84,14 +89,16 @@ public:
 
 protected:
     HRESULT InitializeD3D();
-    HRESULT GetSwapChainPresentParameters(IMFMediaType *pType, D3DPRESENT_PARAMETERS* pPP);
+    HRESULT GetSwapChainPresentParameters(IMFMediaType *pType, UINT *pWidth, UINT *pHeight, D3DFORMAT *pD3DFormat);
     HRESULT CreateD3DDevice();
-    HRESULT CreateD3DSample(IDirect3DSwapChain9 *pSwapChain, IMFSample **ppVideoSample);
+    HRESULT CreateD3DSample(IMFSample **ppVideoSample);
     HRESULT UpdateDestRect();
 
     // A derived class can override these handlers to allocate any additional D3D resources.
+    #if 0
     virtual HRESULT OnCreateVideoSamples(D3DPRESENT_PARAMETERS& pp) { return S_OK; }
-   // virtual void    OnReleaseResources() ;
+    #endif
+    // virtual void    OnReleaseResources() ;
 
     virtual HRESULT PresentSwapChain(IDirect3DSwapChain9* pSwapChain, IDirect3DSurface9* pSurface);
     virtual void    PaintFrameWithGDI();
@@ -112,31 +119,41 @@ protected:
     IDirect3DSurface9           *m_pSurfaceRepaint;       // Surface for repaint requests.
 
 protected:
-	HANDLE gl_handleD3D;
-	HANDLE d3d_shared_handle;
-	
-	GLuint gl_name;
-	HANDLE gl_handle;
+    #if 0
+    HANDLE gl_handleD3D;
+    HANDLE d3d_shared_handle;
 
-	DWORD _shared_handle_val;
-	IDirect3DSurface9 *d3d_shared_surface;
-	IDirect3DTexture9 *d3d_shared_texture;
+    GLuint gl_name;
+    HANDLE gl_handle;
 
-	int _w,_h;
+    DWORD _shared_handle_val;
+    #endif
+
+    #if NATIVE_TOOLKIT_SDL_ANGLE
+    EGLDisplay egl_display;
+    EGLSurface egl_surface;
+    #endif
+    IDirect3DSurface9 *d3d_shared_surface;
+    IDirect3DTexture9 *d3d_shared_texture;
+
+    UINT _w,_h;
+    D3DFORMAT _format;
 
 public:
 
-	HANDLE getSharedDeviceHandle() { return gl_handleD3D;}
+    #ifndef NATIVE_TOOLKIT_SDL_ANGLE
+    HANDLE getSharedDeviceHandle() { return gl_handleD3D;}
+    #endif
 
-	virtual void OnReleaseResources()
-	{
-		
+    virtual void OnReleaseResources()
+    {
+        
 
-	}
-	bool createSharedTexture(int w, int h, int textureID);
+    }
+    bool createSharedTexture(unsigned int textureID);
 
-	void releaseSharedTexture();
-	bool lockSharedTexture();
+    void releaseSharedTexture();
+    bool lockSharedTexture();
 
-	bool unlockSharedTexture();
+    bool unlockSharedTexture();
 };

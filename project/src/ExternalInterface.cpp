@@ -41,6 +41,10 @@
 #ifdef LIME_OGG
 #include <vorbis/vorbisfile.h>
 #endif
+#ifdef LIME_VIDEO
+#include <video/VideoLib.h>
+#include <video/Video.h>
+#endif
 
 namespace lime {
 	
@@ -1122,7 +1126,79 @@ namespace lime {
 		return alloc_bool (targetWindow->SetMinimized (val_bool (fullscreen)));
 		
 	}
-	
+
+	value lime_video_lib_create () {
+
+		#ifdef LIME_VIDEO
+		VideoLib *lib = CreateVideoLib ();
+		return CreateNativePointer<VideoLib> (lib);
+		#else
+		return alloc_null ();
+		#endif
+
+	}
+
+
+	value lime_video_lib_create_video (value videoLib) {
+
+		#ifdef LIME_VIDEO
+		VideoLib *lib = GetNativePointer<VideoLib> (videoLib);
+		return CreateNativePointer<Video> (lib->CreateVideo ());
+		#else
+		return alloc_null ();
+		#endif
+
+	}
+
+	value lime_video_open_url (value inVideo, value url) {
+
+		#ifdef LIME_VIDEO
+		Video *video = GetNativePointer<Video> (inVideo);
+		video->OpenURL (val_wstring (url));
+		return alloc_null ();
+		#else
+		return alloc_null ();
+		#endif
+
+	}
+
+
+	value lime_video_is_ready (value inVideo) {
+
+		#ifdef LIME_VIDEO
+		Video *video = GetNativePointer<Video> (inVideo);
+		return alloc_bool (video->IsReady ());
+		#else
+		return alloc_null ();
+		#endif
+
+	}
+
+
+	value lime_video_play (value inVideo) {
+
+		#ifdef LIME_VIDEO
+		Video *video = GetNativePointer<Video> (inVideo);
+		video->Play ();
+		return alloc_null ();
+		#else
+		return alloc_null ();
+		#endif
+
+	}
+
+
+	value lime_video_set_texture (value inVideo, value texture) {
+
+		#ifdef LIME_VIDEO
+		Video *video = GetNativePointer<Video> (inVideo);;
+		video->SetTexture (val_int (texture));
+		return alloc_null ();
+		#else
+		return alloc_null ();
+		#endif
+
+	}
 	
 	DEFINE_PRIM (lime_application_create, 1);
 	DEFINE_PRIM (lime_application_exec, 1);
@@ -1213,7 +1289,12 @@ namespace lime {
 	DEFINE_PRIM (lime_window_set_fullscreen, 2);
 	DEFINE_PRIM (lime_window_set_icon, 2);
 	DEFINE_PRIM (lime_window_set_minimized, 2);
-	
+	DEFINE_PRIM (lime_video_lib_create, 0);
+	DEFINE_PRIM (lime_video_lib_create_video, 1);
+	DEFINE_PRIM (lime_video_open_url, 2);
+	DEFINE_PRIM (lime_video_is_ready, 1);
+	DEFINE_PRIM (lime_video_play, 1);
+	DEFINE_PRIM (lime_video_set_texture, 2);
 	
 }
 

@@ -81,7 +81,7 @@ class EVRCustomPresenter :
 {
 
 public:
-	EVRCustomPresenter(HRESULT& hr); //seems wrong... meh
+    EVRCustomPresenter(HRESULT& hr); //seems wrong... meh
     static HRESULT CreateInstance(IUnknown *pUnkOuter, REFIID iid, void **ppv);
 
     // IUnknown methods
@@ -258,11 +258,10 @@ protected:
 
 
 public:
-	HANDLE getSharedDeviceHandle();
-	bool createSharedTexture(int w, int h, int textureID) { return m_pD3DPresentEngine->createSharedTexture(w,h, textureID ); }
-	bool lockSharedTexture() { return m_pD3DPresentEngine->lockSharedTexture(); }
-	bool unlockSharedTexture() { return m_pD3DPresentEngine->unlockSharedTexture(); }
-	void releaseSharedTexture() { return m_pD3DPresentEngine->releaseSharedTexture(); } ;
+    HANDLE getSharedDeviceHandle();
+    bool createSharedTexture(unsigned int textureID) { return m_pD3DPresentEngine->createSharedTexture(textureID); }
+    bool lockSharedTexture() { return m_pD3DPresentEngine->lockSharedTexture(); }
+    bool unlockSharedTexture() { return m_pD3DPresentEngine->unlockSharedTexture(); }
+    void releaseSharedTexture() { return m_pD3DPresentEngine->releaseSharedTexture(); } ;
 };
-
 

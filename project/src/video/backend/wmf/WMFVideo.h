@@ -10,10 +10,8 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
 
-#ifndef WMFVIDEO_H
-#define WMFVIDEO_H
-
-#include "ofMain.h"
+#ifndef LIME_WMFVIDEO_H
+#define LIME_WMFVIDEO_H
 
 #include <new>
 #include <windows.h>
@@ -30,7 +28,10 @@
 #include <evr.h>
 
 #include "EVRPresenter.h"
+#include <video/Video.h>
 
+namespace lime
+{
 
 template <class T> void SafeRelease(T **ppT)
 {
@@ -56,7 +57,7 @@ enum PlayerState
     Closing         // Application has closed the session, but is waiting for MESessionClosed.
 };
 
-class WMFVideo : public IMFAsyncCallback
+class WMFVideo : public IMFAsyncCallback, public Video
 {
 public:
     static HRESULT CreateInstance(HWND hVideo, HWND hEvent, WMFVideo **ppPlayer);
@@ -75,11 +76,14 @@ public:
     STDMETHODIMP  Invoke(IMFAsyncResult* pAsyncResult);
 
     // Playback
-    HRESULT       OpenURL(const WCHAR *sURL);
+    virtual bool  OpenURL(const wchar_t *url);
+    virtual bool  IsReady () const;
+    virtual bool  Play ();
 
-    //Open multiple url in a same topology... Play with that of you want to do some video syncing
-    HRESULT       OpenMultipleURL(vector<const WCHAR *> &sURL);
-    HRESULT       Play();
+    virtual void  SetTexture (unsigned int texture);
+
+    HRESULT       OpenURLInternal(const WCHAR *sURL);
+    HRESULT       PlayInternal();
     HRESULT       Pause();
     HRESULT       Stop();
     HRESULT       Shutdown();
@@ -142,22 +146,21 @@ protected:
 protected:
     long                    m_nRefCount;        // Reference count.
 
-    IMFSequencerSource     *m_pSequencerSource;
+    #if 0
+    IMFSequencerSource      *m_pSequencerSource;
+    #endif
     IMFMediaSource          *m_pSource;
     IMFVideoDisplayControl  *m_pVideoDisplay;
-    MFSequencerElementId        _previousTopoID;
+    MFSequencerElementId    _previousTopoID;
     HWND                    m_hwndVideo;        // Video window.
     HWND                    m_hwndEvent;        // App window to receive events.
     PlayerState             m_state;            // Current state of the media session.
     HANDLE                  m_hCloseEvent;      // Event to wait on while closing.
-    IMFAudioStreamVolume   *m_pVolumeControl;
+    IMFAudioStreamVolume    *m_pVolumeControl;
 
 public:
-    EVRCustomPresenter * m_pEVRPresenter; // Custom EVR for texture sharing
+    EVRCustomPresenter      *m_pEVRPresenter; // Custom EVR for texture sharing
     IMFMediaSession         *m_pSession;
-    
-    vector<EVRCustomPresenter*> v_EVRPresenters;  //if you want to load multiple sources in one go
-    vector<IMFMediaSource*>     v_sources;        //for doing frame symc... this is experimental
 
 protected:
     int _width;
@@ -165,4 +168,6 @@ protected:
     float _currentVolume;
 };
 
-#endif PLAYER_H
+} // namespace lime
+
+#endif LIME_WMFVIDEO_H

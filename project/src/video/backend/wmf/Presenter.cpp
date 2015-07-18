@@ -1054,7 +1054,7 @@ HRESULT EVRCustomPresenter::RenegotiateMediaType()
         // Step 1. Get the next media type supported by mixer.
         hr = m_pMixer->GetOutputAvailableType(0, iTypeIndex++, &pMixerType);
 
-		
+        
         if (FAILED(hr))
         {
             break;
@@ -1074,7 +1074,7 @@ HRESULT EVRCustomPresenter::RenegotiateMediaType()
         // Step 3. Adjust the mixer's type to match our requirements.
         if (SUCCEEDED(hr))
         {
-			//pOptimalType =pMixerType ;
+            //pOptimalType =pMixerType ;
             hr = CreateOptimalVideoType(pMixerType, &pOptimalType);
         }
 
@@ -1095,8 +1095,8 @@ HRESULT EVRCustomPresenter::RenegotiateMediaType()
         {
             hr = m_pMixer->SetOutputType(0, pOptimalType, 0);
 
-			
-			
+            
+            
 
             assert(SUCCEEDED(hr)); // This should succeed unless the MFT lied in the previous call.
 
@@ -1419,11 +1419,11 @@ HRESULT EVRCustomPresenter::CreateOptimalVideoType(IMFMediaType* pProposedType, 
 
     // Helper object to manipulate the optimal type.
     VideoType mtOptimal;
-	mtOptimal.CreateEmptyType();
+    mtOptimal.CreateEmptyType();
 
     // Clone the proposed type.
     CHECK_HR(hr = mtOptimal.CopyFrom(pProposedType));
-	
+    
 
     // Modify the new type.
 
@@ -1443,7 +1443,7 @@ HRESULT EVRCustomPresenter::CreateOptimalVideoType(IMFMediaType* pProposedType, 
     }
 
     // Set the extended color information: Use BT.709
-	
+    
     CHECK_HR(hr = mtOptimal.SetYUVMatrix(MFVideoTransferMatrix_BT709));
     CHECK_HR(hr = mtOptimal.SetTransferFunction(MFVideoTransFunc_709));
     CHECK_HR(hr = mtOptimal.SetVideoPrimaries(MFVideoPrimaries_BT709));
@@ -1467,8 +1467,8 @@ HRESULT EVRCustomPresenter::CreateOptimalVideoType(IMFMediaType* pProposedType, 
     CHECK_HR(hr = mtOptimal.SetPanScanAperture(displayArea));
     CHECK_HR(hr = mtOptimal.SetMinDisplayAperture(displayArea));
 
-	
-	
+    
+    
 
     // Return the pointer to the caller.
     *ppOptimalType = mtOptimal.Detach();
@@ -1595,7 +1595,8 @@ HRESULT EVRCustomPresenter::SetMediaType(IMFMediaType *pMediaType)
     // Initialize the presenter engine with the new media type.
     // The presenter engine allocates the samples. 
 
-    CHECK_HR(hr = m_pD3DPresentEngine->CreateVideoSamples(pMediaType, sampleQueue));
+    CHECK_HR(hr = m_pD3DPresentEngine->SetSampleFormat(pMediaType));
+    CHECK_HR(hr = m_pD3DPresentEngine->CreateVideoSamples(sampleQueue));
 
     // Mark each sample with our token counter. If this batch of samples becomes
     // invalid, we increment the counter, so that we know they should be discarded. 
@@ -1817,6 +1818,8 @@ HRESULT EVRCustomPresenter::ProcessOutput()
     dataBuffer.pSample = pSample;
     dataBuffer.dwStatus = 0;
 
+    MFT_OUTPUT_STREAM_INFO info;
+    m_pMixer->GetOutputStreamInfo (0, &info);
     hr = m_pMixer->ProcessOutput(0, 1, &dataBuffer, &dwStatus);
 
     if (FAILED(hr))
@@ -2322,7 +2325,6 @@ HRESULT ClearDesiredSampleTime(IMFSample *pSample)
     HRESULT hr = S_OK;
     
     IMFDesiredSample *pDesired = NULL;
-    IUnknown *pUnkSwapChain = NULL;
     
     // We store some custom attributes on the sample, so we need to cache them
     // and reset them.
@@ -2332,8 +2334,6 @@ HRESULT ClearDesiredSampleTime(IMFSample *pSample)
 
     UINT32 counter = MFGetAttributeUINT32(pSample, MFSamplePresenter_SampleCounter, (UINT32)-1);
 
-    (void)pSample->GetUnknown(MFSamplePresenter_SampleSwapChain, IID_IUnknown, (void**)&pUnkSwapChain);
-
     hr = pSample->QueryInterface(__uuidof(IMFDesiredSample), (void**)&pDesired);
     if (SUCCEEDED(hr))
     {
@@ -2341,15 +2341,9 @@ HRESULT ClearDesiredSampleTime(IMFSample *pSample)
         (void)pDesired->Clear();
 
         CHECK_HR(hr = pSample->SetUINT32(MFSamplePresenter_SampleCounter, counter));
-
-        if (pUnkSwapChain)
-        {
-            CHECK_HR(hr = pSample->SetUnknown(MFSamplePresenter_SampleSwapChain, pUnkSwapChain));
-        }
     }
 
 done:
-    SAFE_RELEASE(pUnkSwapChain);
     SAFE_RELEASE(pDesired);
     return hr;
 }

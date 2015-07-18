@@ -20,7 +20,7 @@ namespace lime {
 	
 	bool OpenGLBindings::initialized = false;
 	void *OpenGLBindings::handle = 0;
-	
+	void *OpenGLBindings::eglHandle = 0;
 	
 	value lime_gl_active_texture (value inSlot) {
 		
@@ -1713,6 +1713,17 @@ namespace lime {
 			}
 			
 			if (!OpenGLBindings::handle) {
+				
+				result = false;
+				return result;
+				
+			}
+			
+			#elif defined (NATIVE_TOOLKIT_SDL_ANGLE)
+			
+			OpenGLBindings::eglHandle = LoadLibrary (L"libegl.dll");
+			
+			if (!OpenGLBindings::eglHandle) {
 				
 				result = false;
 				return result;

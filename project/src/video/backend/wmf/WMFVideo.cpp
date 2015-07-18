@@ -5,19 +5,15 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
 
-#include "ofxWMFVideoPlayerUtils.h"
+#include "WMFVideo.h"
+#include "../../../graphics/opengl/OpenGL.h"
 #include <assert.h>
+#include <iostream>
 
-#pragma comment(lib, "shlwapi")
-#pragma comment(lib, "mf.lib")
-#pragma comment(lib, "mfplat.lib")
-#pragma comment(lib, "mfuuid.lib")
-#pragma comment(lib, "strmiids.lib")
-#pragma comment(lib, "Shlwapi.lib")
+namespace lime
+{
 
-
-#include "Presenter.h"
-
+using namespace std;
 
 template <class Q>
 HRESULT GetEventObject(IMFMediaEvent *pEvent, Q **ppObject)
@@ -108,7 +104,6 @@ WMFVideo::WMFVideo(HWND hVideo, HWND hEvent) :
     m_hCloseEvent(NULL),
     m_nRefCount(1),
     m_pEVRPresenter(NULL),
-    m_pSequencerSource(NULL),
     m_pVolumeControl(NULL),
     _previousTopoID(0),
     _isLooping(false)
@@ -118,7 +113,7 @@ WMFVideo::WMFVideo(HWND hVideo, HWND hEvent) :
 
 WMFVideo::~WMFVideo()
 {
-    assert(m_pSession == NULL);  
+    //assert(m_pSession == NULL);
     // If FALSE, the app did not call Shutdown().
 
     // When WMFVideo calls IMediaEventGenerator::BeginGetEvent on the
@@ -132,15 +127,8 @@ WMFVideo::~WMFVideo()
     // If CreateInstance fails, the application will not call 
     // Shutdown. To handle that case, call Shutdown in the destructor. 
 
-
-    if (v_EVRPresenters.size() >1) {
-        SAFE_RELEASE(v_EVRPresenters[0]);
-        SAFE_RELEASE(v_EVRPresenters[1]);
-    }
-
     Shutdown();
     //SAFE_RELEASE(m_pEVRPresenter);
-    SafeRelease(&m_pSequencerSource);
 
 
 }
@@ -172,6 +160,7 @@ ULONG WMFVideo::Release()
     return uCount;
 }
 
+#if 0
 HRESULT WMFVideo::OpenMultipleURL(vector<const WCHAR *> &urls)
 {
 
@@ -322,12 +311,30 @@ done:
     //SafeRelease(&spSrcTopoProvider);  //Uncoment this and get a crash in D3D shared texture..
     return hr;
 }
+#endif
 
+bool WMFVideo::OpenURL (const wchar_t *url)
+{
+    return SUCCEEDED(OpenURLInternal(url));
+}
 
+bool WMFVideo::IsReady () const
+{
+    return m_state != Closed && m_state != OpenPending;
+}
 
+bool WMFVideo::Play ()
+{
+    return SUCCEEDED(PlayInternal());
+}
+
+void WMFVideo::SetTexture (unsigned int texture)
+{
+    m_pEVRPresenter->createSharedTexture(texture);
+}
 
 //  Open a URL for playback.
-HRESULT WMFVideo::OpenURL(const WCHAR *sURL)
+HRESULT WMFVideo::OpenURLInternal(const WCHAR *sURL)
 {
     // 1. Create a new media session.
     // 2. Create the media source.
@@ -450,7 +457,7 @@ HRESULT WMFVideo::setPosition(float pos)
         return S_FALSE;
     }
 
-/*    bool wasPlaying = (m_state == Started);
+/*  bool wasPlaying = (m_state == Started);
     m_pSession->Pause();
     m_state = Paused;*/
 
@@ -491,7 +498,7 @@ HRESULT WMFVideo::setVolume(float vol)
     //Should we lock here as well ?
     if (m_pSession == NULL)
     {
-        ofLogError("ofxWMFVideoPlayer", "setVolume: Error session is null");
+        printf("ofxWMFVideoPlayer", "setVolume: Error session is null\n");
         return E_FAIL;
     }
     if (m_pVolumeControl == NULL)
@@ -502,7 +509,7 @@ HRESULT WMFVideo::setVolume(float vol)
         _currentVolume = vol;
         if (FAILED(hr))
         {
-            ofLogError("ofxWMFVideoPlayer", "setVolume: Error while getting sound control interface");
+            printf("ofxWMFVideoPlayer", "setVolume: Error while getting sound control interface\n");
             return E_FAIL;
         }
 
@@ -515,8 +522,8 @@ HRESULT WMFVideo::setVolume(float vol)
         m_pVolumeControl->SetChannelVolume(i, vol);
     }
 
-    //    m_pVolumeControl->SetAllVolumes(nChannels,vol);
-    //    delete[] volumes;
+    //  m_pVolumeControl->SetAllVolumes(nChannels,vol);
+    //  delete[] volumes;
 
     _currentVolume = vol;
 
@@ -577,8 +584,12 @@ HRESULT WMFVideo::Invoke(IMFAsyncResult *pResult)
         // Leave a reference count on the event.
         pEvent->AddRef();
 
+        #if 0
         PostMessage(m_hwndEvent, WM_APP_PLAYER_EVENT, 
             (WPARAM)pEvent, (LPARAM)meType);
+        #else
+        HandleEvent((UINT_PTR)pEvent);
+        #endif
     }
 
 done:
@@ -674,23 +685,10 @@ HRESULT WMFVideo::Shutdown()
         m_hCloseEvent = NULL;
     }
 
-    if (v_EVRPresenters.size() > 0)
-    {
+    if (m_pEVRPresenter)
+        m_pEVRPresenter->releaseSharedTexture();
 
-        if (v_EVRPresenters[0]) v_EVRPresenters[0]->releaseSharedTexture();
-        if (v_EVRPresenters[1]) v_EVRPresenters[1]->releaseSharedTexture();
-
-        SafeRelease(&v_EVRPresenters[0]);
-        SafeRelease(&v_EVRPresenters[1]);
-
-    }
-    else
-    {
-        if (m_pEVRPresenter) { m_pEVRPresenter->releaseSharedTexture(); }
-        SafeRelease(&m_pEVRPresenter);
-
-    }
-
+    SafeRelease(&m_pEVRPresenter);
 
     return hr;
 }
@@ -732,7 +730,7 @@ HRESULT WMFVideo::OnPresentationEnded(IMFMediaEvent *pEvent)
 
         if FAILED(hr)
         {
-            ofLogError("ofxWMFVideoPlayerUtils", "Error while looping");
+            printf("ofxWMFVideoPlayerUtils", "Error while looping\n");
         }
         if (!_isLooping) m_pSession->Pause();
         else m_state = Started;
@@ -899,7 +897,7 @@ HRESULT WMFVideo::StartPlayback()
 }
 
 //  Start playback from paused or stopped.
-HRESULT WMFVideo::Play()
+HRESULT WMFVideo::PlayInternal()
 {
     if (m_state != Paused && m_state != Stopped)
     {
@@ -1361,7 +1359,7 @@ HRESULT AddToPlaybackTopology(
     // For each stream, create the topology nodes and add them to the topology.
     for (DWORD i = 1; i < cSourceStreams; i++)
     {
-        ofLogWarning("Ignoring audio stream of video2. If the video is missing check : ofxWMFVideoPlayerUtils");
+        printf("Ignoring audio stream of video2. If the video is missing check : ofxWMFVideoPlayerUtils\n");
         hr = AddBranchToPartialTopology(pTopology, pSource, pPD, i, hVideoWnd,pVideoPresenter);
         if (FAILED(hr))
         {
@@ -1467,7 +1465,7 @@ done:
 
 
 
-HRESULT WMFVideo:: SetMediaInfo( IMFPresentationDescriptor *pPD ) {
+HRESULT WMFVideo::SetMediaInfo( IMFPresentationDescriptor *pPD ) {
     _width = 0;
     _height = 0;
     HRESULT hr = S_OK;
@@ -1521,4 +1519,4 @@ return hr;
 
 
 
-
+} // namespace lime

@@ -32,10 +32,19 @@
 	<set name="NATIVE_TOOLKIT_CURL_DISABLE_AXTLS_NONBLOCKING" value="1" />
 	<set name="NATIVE_TOOLKIT_SDL_STATIC" value="1" />
 	
+	<set name="LIME_SDL_ANGLE" value="1" />
 	<set name="NATIVE_TOOLKIT_SDL_ANGLE" value="1" if="LIME_SDL_ANGLE" />
 	
+	<set name="LIME_VIDEO" value="1" />
+	<section if="LIME_VIDEO">
+
+		<set name="LIME_WMF" value="1" if="windows"/>
+
+	</section>
 	
 	<files id="lime">
+		
+		<compilerflag value="-DUNICODE" if="windows"/>
 		
 		<compilerflag value="-Iinclude" />
 		
@@ -184,6 +193,26 @@
 			
 		</section>
 		
+		<section if="LIME_VIDEO">
+			
+			<compilerflag value="-DLIME_VIDEO" />
+			
+			<section if="LIME_WMF">
+				
+				<compilerflag value="-DLIME_WMF" />
+				<compilerflag value="-Isrc/video/backend/wmf/common" />
+				
+				<file name="src/video/backend/wmf/Helpers.cpp" />
+				<file name="src/video/backend/wmf/PresentEngine.cpp" />
+				<file name="src/video/backend/wmf/Presenter.cpp" />
+				<file name="src/video/backend/wmf/scheduler.cpp" />
+				<file name="src/video/backend/wmf/WMFVideo.cpp" />
+				<file name="src/video/backend/wmf/WMFVideoLib.cpp" />
+				
+			</section>
+			
+		</section>
+		
 		<section if="LIME_ZLIB">
 			
 			<compilerflag value="-DSTATIC_LINK" if="emscripten" />
@@ -275,6 +304,15 @@
 				<lib name="shell32.lib" />
 				<lib name="comdlg32.lib" />
 				<lib name="dwmapi.lib" />
+				
+				<lib name="evr.lib" if="LIME_WMF" />
+				<lib name="Mf.lib" if="LIME_WMF" />
+				<lib name="Mfplat.lib" if="LIME_WMF" />
+				<lib name="Shlwapi.lib" if="LIME_WMF" />
+				<lib name="mfuuid.lib" if="LIME_WMF" />
+				<lib name="strmiids.lib" if="LIME_WMF" />
+				<lib name="d3d9.lib" if="LIME_WMF" />
+				<lib name="Dxva2.lib" if="LIME_WMF" />
 				
 			</section>
 			

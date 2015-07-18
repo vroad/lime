@@ -14,6 +14,9 @@
 
 #ifdef LIME_SDL
 #include <SDL.h>
+#ifdef NATIVE_TOOLKIT_SDL_ANGLE
+#include <SDL_egl.h>
+#endif
 #endif
 
 
@@ -24,14 +27,38 @@
 #define OGL_EXT(func,ret,args) \
    namespace lime { extern ret (CALLING_CONVENTION *func)args; }
 
+#define EGL_EXT(func,ret,args) \
+   namespace lime { extern ret (CALLING_CONVENTION *func)args; }
+
 #elif defined(DEFINE_EXTENSION)
 
 #define OGL_EXT(func,ret,args) \
    namespace lime { ret (CALLING_CONVENTION *func)args=0; }
 
+#define EGL_EXT(func, ret, args) \
+   namespace lime { ret (CALLING_CONVENTION *func)args=0; }
+
 #elif defined(GET_EXTENSION)
 
-#ifdef LIME_SDL
+#if defined (LIME_SDL) && defined (NATIVE_TOOLKIT_SDL_ANGLE)
+   #define OGL_EXT(func,ret,args) \
+   {\
+      *(void **)&lime::func = (void *)SDL_GL_GetProcAddress(#func);\
+      if (!func) \
+         printf ("*" #func "\n");\
+      else\
+         printf (#func "\n");\
+   }
+   
+   #define EGL_EXT(func,ret,args) \
+   {\
+      *(void **)&lime::func = (void *)GetProcAddress((HMODULE)lime::OpenGLBindings::eglHandle, #func);\
+      if (!func) \
+         printf ("*" #func "\n");\
+      else\
+         printf (#func "\n");\
+   }
+#elif LIME_SDL
    #define OGL_EXT(func,ret,args) \
    {\
       *(void **)&lime::func = (void *)SDL_GL_GetProcAddress(#func);\
@@ -267,10 +294,22 @@ OGL_EXT(glGetTexParameteriv,void,(GLenum target,  GLenum pname,  GLint * params)
 OGL_EXT(glIsTexture, GLboolean, ( GLuint texture) );
 OGL_EXT(glIsEnabled, GLboolean, ( GLuint texture) );
 
-
+#ifdef NATIVE_TOOLKIT_SDL_ANGLE
+EGL_EXT(eglBindTexImage, EGLBoolean, (EGLDisplay dpy, EGLSurface surface, EGLint buffer));
+EGL_EXT(eglChooseConfig, EGLBoolean, (EGLDisplay dpy, const EGLint *attrib_list, EGLConfig *configs, EGLint config_size, EGLint *num_config));
+EGL_EXT(eglCreatePbufferSurface, EGLSurface, (EGLDisplay dpy, EGLConfig config, const EGLint *attrib_list));
+EGL_EXT(eglDestroySurface, EGLBoolean, (EGLDisplay display, EGLSurface surface));
+EGL_EXT(eglGetDisplay, EGLDisplay, (EGLNativeDisplayType display_id));
+EGL_EXT(eglGetError, EGLint, (void));
+EGL_EXT(eglGetConfigs, EGLBoolean, (EGLDisplay dpy, EGLConfig *configs,EGLint config_size, EGLint *num_config));
+EGL_EXT(eglGetConfigAttrib, EGLBoolean, (EGLDisplay dpy, EGLConfig config, EGLint attribute, EGLint *value));
+EGL_EXT(eglReleaseTexImage, EGLBoolean, (EGLDisplay display, EGLSurface surface, EGLint buffer));
+EGL_EXT(eglQuerySurfacePointerANGLE, EGLBoolean, (EGLDisplay dpy, EGLSurface surface, EGLint attribute, void **value));
+#endif
 
 #endif
 
 
 #undef OGL_EXT
+#undef EGL_EXT
 #undef CALLING_CONVENTION

@@ -60,7 +60,7 @@ namespace lime {
 				
 				#elif defined (HX_WINDOWS)
 				
-				char result[MAX_PATH] = "";
+				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, result);
 				return WIN_StringToUTF8 (result);
 				
@@ -85,7 +85,7 @@ namespace lime {
 				
 				#elif defined (HX_WINDOWS)
 				
-				char result[MAX_PATH] = "";
+				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, result);
 				return WIN_StringToUTF8 (result);
 				
@@ -107,7 +107,7 @@ namespace lime {
 				
 				#elif defined (HX_WINDOWS)
 				
-				char result[MAX_PATH] = "";
+				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, result);
 				return WIN_StringToUTF8 (result);
 				
@@ -147,7 +147,7 @@ namespace lime {
 				
 				#elif defined (HX_WINDOWS)
 				
-				char result[MAX_PATH] = "";
+				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, result);
 				return WIN_StringToUTF8 (result);
 				

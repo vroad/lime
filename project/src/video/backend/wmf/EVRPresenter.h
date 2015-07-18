@@ -28,8 +28,8 @@
 
 // Common helper code.
 #define USE_LOGGING
-#include "common/common.h"
-//#include "common/registry.h"
+#include "common.h"
+#include "registry.h"
 using namespace MediaFoundationSamples;
 
 #define CHECK_HR(hr) IF_FAILED_GOTO(hr, done)
@@ -51,9 +51,10 @@ static const GUID MFSamplePresenter_SampleCounter =
 // Data type: IUNKNOWN
 // 
 // Pointer to a Direct3D swap chain.
+#if 0
 static const GUID MFSamplePresenter_SampleSwapChain = 
 { 0xad885bd1, 0x7def, 0x414a, { 0xb5, 0xb0, 0xd3, 0xd2, 0x63, 0xd6, 0xe9, 0x6d } };
-
+#endif
 
 // Project headers.
 #include "Helpers.h"

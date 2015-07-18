@@ -19,8 +19,12 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "EVRPresenter.h"
-
-
+#ifdef NATIVE_TOOLKIT_SDL_ANGLE
+#include "../../../graphics/opengl/OpenGL.h"
+#include <vector>
+#else
+#error
+#endif
 
 HRESULT FindAdapter(IDirect3D9 *pD3D9, HMONITOR hMonitor, UINT *puAdapterID);
 
@@ -36,9 +40,14 @@ D3DPresentEngine::D3DPresentEngine(HRESULT& hr) :
     m_pDevice(NULL),
     m_pDeviceManager(NULL),
     m_pSurfaceRepaint(NULL),
-	gl_handleD3D(NULL),
-	d3d_shared_texture(NULL),
-	d3d_shared_surface(NULL)
+    #ifdef NATIVE_TOOLKIT_SDL_ANGLE
+    egl_display(NULL),
+    egl_surface(NULL),
+    #else
+    gl_handleD3D(NULL),
+    #endif
+    d3d_shared_texture(NULL),
+    d3d_shared_surface(NULL)
 {
     SetRectEmpty(&m_rcDestRect);
 
@@ -59,17 +68,21 @@ D3DPresentEngine::D3DPresentEngine(HRESULT& hr) :
 
 D3DPresentEngine::~D3DPresentEngine()
 {
-	if (gl_handleD3D) {
+    #if NATIVE_TOOLKIT_SDL_ANGLE
+    releaseSharedTexture ();
+    #else
+    if (gl_handleD3D) {
 
-		releaseSharedTexture() ;
+        releaseSharedTexture() ;
 
-		printf("WMFVideoPlayer : Killing present engine.....");
-		if (wglDXCloseDeviceNV(gl_handleD3D)) 
-		{
-			printf("SUCCESS\n");
-		}
-		else printf("FAILED closing handle\n");
-	}
+        printf("WMFVideoPlayer : Killing present engine.....");
+        if (wglDXCloseDeviceNV(gl_handleD3D)) 
+        {
+            printf("SUCCESS\n");
+        }
+        else printf("FAILED closing handle\n");
+    }
+    #endif
     SAFE_RELEASE(m_pDevice);
     SAFE_RELEASE(m_pSurfaceRepaint);
     SAFE_RELEASE(m_pDeviceManager);
@@ -81,82 +94,152 @@ D3DPresentEngine::~D3DPresentEngine()
 // Texture sharing code
 //-----------------------------------------------------------------------------
 
-bool D3DPresentEngine::createSharedTexture(int w, int h, int textureID)
+bool D3DPresentEngine::createSharedTexture(unsigned int textureID)
 {
+    HRESULT hr;
+    HANDLE sharedHandle = NULL; //We need to create a shared handle for the ressource, otherwise the extension fails on ATI/Intel cards
 
-	_w = w;
-	_h = h;
-	if (gl_handleD3D == NULL ) 	gl_handleD3D = wglDXOpenDeviceNV(m_pDevice);
+    #ifdef NATIVE_TOOLKIT_SDL_ANGLE
+    egl_display = lime::eglGetDisplay(EGL_DEFAULT_DISPLAY);
 
-	if (!gl_handleD3D)
-	{
-		printf("ofxWMFVideoplayer : openning the shared device failed\nCreate SharedTexture Failed");
-		return false;
+    EGLint numConfigs = 0;
+    lime::eglGetConfigs(egl_display, NULL, 0, &numConfigs);
+    std::vector<EGLConfig> egl_configs(numConfigs);
+    lime::eglGetConfigs(egl_display, &egl_configs[0], numConfigs, &numConfigs);
 
-	}
+    EGLint attrib_list[] = {
+        EGL_WIDTH, _w,
+        EGL_HEIGHT, _h,
+        EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGB,
+        EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
+        EGL_NONE
+    };
 
-	gl_name=textureID;
+    EGLConfig egl_config;
+    lime::eglChooseConfig(egl_display, attrib_list, &egl_config, 1, &numConfigs);
 
-	HANDLE sharedHandle = NULL; //We need to create a shared handle for the ressource, otherwise the extension fails on ATI/Intel cards
-	
-	
-	HRESULT hr = m_pDevice->CreateTexture(w,h,1,D3DUSAGE_RENDERTARGET,D3DFMT_A8R8G8B8,D3DPOOL_DEFAULT,&d3d_shared_texture,&sharedHandle);
+    egl_surface = lime::eglCreatePbufferSurface(
+        egl_display,
+        egl_config,
+        attrib_list);
 
-	if (FAILED(hr))
-	{
-		printf("ofxWMFVideoplayer : Error creating D3DTexture\n");
-		return false;
-	}
+    if (!egl_surface)
+    {
+        EGLint error = lime::eglGetError();
+        printf("egl surface creation failed:%d\n");
+        return false;
+    }
 
-	if (!sharedHandle)
-	{
-		printf("ofxWMFVideoplayer : Error creating D3D sahred handle\n");
-		return false;
-	}
-	
-	wglDXSetResourceShareHandleNV(d3d_shared_texture,sharedHandle);
+    HANDLE share_handle = NULL;
+    EGLBoolean ret = lime::eglQuerySurfacePointerANGLE(
+        egl_display,
+        egl_surface,
+        EGL_D3D_TEXTURE_2D_SHARE_HANDLE_ANGLE,
+        &sharedHandle);
 
-	d3d_shared_texture->GetSurfaceLevel(0,&d3d_shared_surface);
-		
-	gl_handle = wglDXRegisterObjectNV(gl_handleD3D, d3d_shared_texture,
-		gl_name,
-		GL_TEXTURE_RECTANGLE,
-		WGL_ACCESS_READ_ONLY_NV);
+    if (!ret)
+    {
+        lime::eglDestroySurface(egl_display, egl_surface);
+        return false;
+    }
 
-	
 
-	
 
-	if (!gl_handle) 
-	{
-		printf("ofxWMFVideoplayer : openning the shared texture failed\nCreate SharedTexture Failed");
-		return false;
-	}
-	return true;
+    #else
+    if (gl_handleD3D == NULL )  gl_handleD3D = wglDXOpenDeviceNV(m_pDevice);
+
+    if (!gl_handleD3D)
+    {
+        printf("ofxWMFVideoplayer : openning the shared device failed\nCreate SharedTexture Failed");
+        return false;
+
+    }
+
+    gl_name=textureID;
+    #endif
+    
+    hr = m_pDevice->CreateTexture(_w, _h, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &d3d_shared_texture, &sharedHandle);
+
+    if (FAILED(hr))
+    {
+        printf("ofxWMFVideoplayer : Error creating D3DTexture\n");
+        return false;
+    }
+
+    if (!sharedHandle)
+    {
+        printf("ofxWMFVideoplayer : Error creating D3D sahred handle\n");
+        return false;
+    }
+    
+    #ifdef NATIVE_TOOLKIT_SDL_ANGLE
+
+    lime::glEnable(GL_TEXTURE_2D);
+    lime::glBindTexture(GL_TEXTURE_2D, textureID);
+    lime::eglBindTexImage(egl_display, egl_surface, EGL_BACK_BUFFER);
+
+    d3d_shared_texture->GetSurfaceLevel(0, &d3d_shared_surface);
+
+    #else
+    wglDXSetResourceShareHandleNV(d3d_shared_texture,sharedHandle);
+
+    d3d_shared_texture->GetSurfaceLevel(0,&d3d_shared_surface);
+        
+    gl_handle = wglDXRegisterObjectNV(gl_handleD3D, d3d_shared_texture,
+        gl_name,
+        GL_TEXTURE_RECTANGLE,
+        WGL_ACCESS_READ_ONLY_NV);
+
+    
+
+    
+
+    if (!gl_handle) 
+    {
+        printf("ofxWMFVideoplayer : openning the shared texture failed\nCreate SharedTexture Failed");
+        return false;
+    }
+    #endif
+    return true;
 }
 
 void D3DPresentEngine::releaseSharedTexture()
 {
-	if (!gl_handleD3D) return;
-	wglDXUnlockObjectsNV(gl_handleD3D, 1, &gl_handle);
-	wglDXUnregisterObjectNV(gl_handleD3D,gl_handle);
-	//glDeleteTextures(1, &gl_name);
-	SAFE_RELEASE(d3d_shared_surface);
-	SAFE_RELEASE(d3d_shared_texture);
+    #if NATIVE_TOOLKIT_SDL_ANGLE
+    lime::eglReleaseTexImage(egl_display, egl_surface, EGL_BACK_BUFFER);
+    lime::eglDestroySurface(egl_display, egl_surface);
+    egl_display = NULL;
+    egl_surface = NULL;
+    #else
+    if (!gl_handleD3D) return;
+    wglDXUnlockObjectsNV(gl_handleD3D, 1, &gl_handle);
+    wglDXUnregisterObjectNV(gl_handleD3D,gl_handle);
+    //glDeleteTextures(1, &gl_name);
+    SAFE_RELEASE(d3d_shared_surface);
+    SAFE_RELEASE(d3d_shared_texture);
+    #endif
 
 }
 bool D3DPresentEngine::lockSharedTexture()
 {
-	if (!gl_handleD3D) return false;
-	if (!gl_handle) return false;
-	return wglDXLockObjectsNV(gl_handleD3D, 1, &gl_handle);
+    #if 0
+    if (!gl_handleD3D) return false;
+    if (!gl_handle) return false;
+    return wglDXLockObjectsNV(gl_handleD3D, 1, &gl_handle);
+    #else
+    return true;
+    #endif
 }
 
 bool D3DPresentEngine::unlockSharedTexture()
 {
-	if (!gl_handleD3D) return false;
-	if (!gl_handle) return false;
-	return wglDXUnlockObjectsNV(gl_handleD3D, 1, &gl_handle);
+    #if 0
+    if (!gl_handleD3D) return false;
+    if (!gl_handle) return false;
+    return wglDXUnlockObjectsNV(gl_handleD3D, 1, &gl_handle);
+    #else
+    return true;
+    #endif
 }
 
 
@@ -287,7 +370,10 @@ HRESULT D3DPresentEngine::SetDestinationRect(const RECT& rcDest)
     return hr;
 }
 
-
+HRESULT D3DPresentEngine::SetSampleFormat(IMFMediaType *pFormat)
+{
+    return GetSwapChainPresentParameters(pFormat, &_w, &_h, &_format);
+}
 
 //-----------------------------------------------------------------------------
 // CreateVideoSamples
@@ -304,7 +390,6 @@ HRESULT D3DPresentEngine::SetDestinationRect(const RECT& rcDest)
 //-----------------------------------------------------------------------------
 
 HRESULT D3DPresentEngine::CreateVideoSamples(
-    IMFMediaType *pFormat, 
     VideoSampleList& videoSampleQueue
     )
 {
@@ -313,58 +398,37 @@ HRESULT D3DPresentEngine::CreateVideoSamples(
         return MF_E_INVALIDREQUEST;
     }
 
-    if (pFormat == NULL)
-    {
-        return MF_E_UNEXPECTED;
-    }
-
     HRESULT hr = S_OK;
-    D3DPRESENT_PARAMETERS pp;
-
-    IDirect3DSwapChain9 *pSwapChain = NULL;    // Swap chain
+    UINT width = _w, height = _h;
+    D3DFORMAT d3dFormat = _format;
+    
     IMFSample *pVideoSample = NULL;            // Sampl
     
     AutoLock lock(m_ObjectLock);
 
     ReleaseResources();
 
-    // Get the swap chain parameters from the media type.
-    CHECK_HR(hr = GetSwapChainPresentParameters(pFormat, &pp));
-
     UpdateDestRect();
 
     // Create the video samples.
     for (int i = 0; i < PRESENTER_BUFFER_COUNT; i++)
     {
-        // Create a new swap chain.
-        CHECK_HR(hr = m_pDevice->CreateAdditionalSwapChain(&pp, &pSwapChain));
-
         
         // Create the video sample from the swap chain.
-        CHECK_HR(hr = CreateD3DSample(pSwapChain, &pVideoSample));
+        CHECK_HR(hr = CreateD3DSample(&pVideoSample));
 
         // Add it to the list.
         CHECK_HR(hr = videoSampleQueue.InsertBack(pVideoSample));
 
-        // Set the swap chain pointer as a custom attribute on the sample. This keeps
-        // a reference count on the swap chain, so that the swap chain is kept alive
-        // for the duration of the sample's lifetime.
-        CHECK_HR(hr = pVideoSample->SetUnknown(MFSamplePresenter_SampleSwapChain, pSwapChain));
-
         SAFE_RELEASE(pVideoSample);
-        SAFE_RELEASE(pSwapChain);
     }
-
-    // Let the derived class create any additional D3D resources that it needs.
-    CHECK_HR(hr = OnCreateVideoSamples(pp));
 
 done:
     if (FAILED(hr))
     {
         ReleaseResources();
     }
-        
-    SAFE_RELEASE(pSwapChain);
+    
     SAFE_RELEASE(pVideoSample);
     return hr;
 }
@@ -454,6 +518,26 @@ HRESULT D3DPresentEngine::PresentSample(IMFSample* pSample, LONGLONG llTarget)
 {
     HRESULT hr = S_OK;
 
+#ifdef NATIVE_TOOLKIT_SDL_ANGLE
+    IMFMediaBuffer* pBuffer = NULL;
+    IDirect3DSurface9* pSurface = NULL;
+
+    if (pSample)
+    {
+        // Get the buffer from the sample.
+        CHECK_HR(hr = pSample->GetBufferByIndex(0, &pBuffer));
+
+        // Get the surface from the buffer.
+        CHECK_HR(hr = MFGetService(pBuffer, MR_BUFFER_SERVICE, __uuidof(IDirect3DSurface9), (void**)&pSurface));
+
+        CHECK_HR(hr = m_pDevice->StretchRect(pSurface, NULL, d3d_shared_surface, NULL, D3DTEXF_NONE));
+    }
+done:
+    SAFE_RELEASE(pSurface);
+    SAFE_RELEASE(pBuffer);
+
+    return hr;
+#else
     IMFMediaBuffer* pBuffer = NULL;
     IDirect3DSurface9* pSurface = NULL;
     IDirect3DSwapChain9* pSwapChain = NULL;
@@ -513,6 +597,7 @@ done:
         }
     }
     return hr;
+#endif
 }
 
 
@@ -608,7 +693,7 @@ HRESULT D3DPresentEngine::CreateD3DDevice()
     }
     else
     {
-		printf("Software cap, no bueno\n");
+        printf("Software cap, no bueno\n");
         vp = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
     }
 
@@ -623,7 +708,7 @@ HRESULT D3DPresentEngine::CreateD3DDevice()
         &pDevice
         ));
 
-	
+    
 
     // Get the adapter display mode.
     CHECK_HR(hr = m_pD3D9->GetAdapterDisplayMode(uAdapterID, &m_DisplayMode));
@@ -631,7 +716,7 @@ HRESULT D3DPresentEngine::CreateD3DDevice()
     // Reset the D3DDeviceManager with the new device 
     CHECK_HR(hr = m_pDeviceManager->ResetDevice(pDevice, m_DeviceResetToken));
 
-	
+    
 
     SAFE_RELEASE(m_pDevice);
 
@@ -650,9 +735,9 @@ done:
 // Creates an sample object (IMFSample) to hold a Direct3D swap chain.
 //-----------------------------------------------------------------------------
 
-HRESULT D3DPresentEngine::CreateD3DSample(IDirect3DSwapChain9 *pSwapChain, IMFSample **ppVideoSample)
+HRESULT D3DPresentEngine::CreateD3DSample(IMFSample **ppVideoSample)
 {
-    // Caller holds the object lock.	
+    // Caller holds the object lock.
 
     HRESULT hr = S_OK;
     D3DCOLOR clrBlack = D3DCOLOR_ARGB(0xFF, 0x00, 0x00, 0x00);
@@ -661,7 +746,8 @@ HRESULT D3DPresentEngine::CreateD3DSample(IDirect3DSwapChain9 *pSwapChain, IMFSa
     IMFSample* pSample = NULL;
 
     // Get the back buffer surface.
-    CHECK_HR(hr = pSwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pSurface));
+    HANDLE share_handle = NULL;
+    CHECK_HR(hr = m_pDevice->CreateRenderTarget(_w, _h, _format, D3DMULTISAMPLE_NONE, 0, false, &pSurface, &share_handle));
 
     // Fill it with black.
     CHECK_HR(hr = m_pDevice->ColorFill(pSurface, NULL, clrBlack));
@@ -698,27 +784,27 @@ HRESULT D3DPresentEngine::PresentSwapChain(IDirect3DSwapChain9* pSwapChain, IDir
 {
     HRESULT hr = S_OK;
 
-
-	//pSwapChain->GetFrontBufferData(d3d_shared_surface);
-	IDirect3DSurface9 *surface;
-	pSwapChain->GetBackBuffer(0,D3DBACKBUFFER_TYPE_MONO,&surface);
+    #if 0
+    //pSwapChain->GetFrontBufferData(d3d_shared_surface);
+    IDirect3DSurface9 *surface;
+    pSwapChain->GetBackBuffer(0,D3DBACKBUFFER_TYPE_MONO,&surface);
     if (m_pDevice->StretchRect(surface,NULL,d3d_shared_surface,NULL,D3DTEXF_NONE) != D3D_OK)
-	{
-		printf("ofxWMFVideoPlayer: Error while copying texture to gl context \n");
-	}
-	SAFE_RELEASE(surface);
+    {
+        printf("ofxWMFVideoPlayer: Error while copying texture to gl context \n");
+    }
+    SAFE_RELEASE(surface);
 
     if (m_hwnd == NULL)
     {
         return MF_E_INVALIDREQUEST;
     }
-	
+    
     hr = pSwapChain->Present(NULL, &m_rcDestRect, m_hwnd, NULL, 0);
 
-	
+    
 
     LOG_MSG_IF_FAILED(L"D3DPresentEngine::PresentSwapChain, IDirect3DSwapChain9::Present failed.", hr);
-
+    #endif
 
     return hr;
 }
@@ -755,14 +841,16 @@ void D3DPresentEngine::PaintFrameWithGDI()
 // D3DPRESENT_PARAMETERS for creating a swap chain.
 //-----------------------------------------------------------------------------
 
-HRESULT D3DPresentEngine::GetSwapChainPresentParameters(IMFMediaType *pType, D3DPRESENT_PARAMETERS* pPP)
+HRESULT D3DPresentEngine::GetSwapChainPresentParameters(IMFMediaType *pType, UINT *pWidth, UINT *pHeight, D3DFORMAT *pD3DFormat)
 {
     // Caller holds the object lock.
 
     HRESULT hr = S_OK; 
 
+    #if 0
     UINT32 width = 0, height = 0;
     DWORD d3dFormat = 0;
+    #endif
 
     // Helper object for reading the proposed type.
     VideoType videoType(pType);
@@ -772,12 +860,15 @@ HRESULT D3DPresentEngine::GetSwapChainPresentParameters(IMFMediaType *pType, D3D
         return MF_E_INVALIDREQUEST;
     }
 
+    #if 0
     ZeroMemory(pPP, sizeof(D3DPRESENT_PARAMETERS));
+    #endif
 
     // Get some information about the video format.
-    CHECK_HR(hr = videoType.GetFrameDimensions(&width, &height));
-    CHECK_HR(hr = videoType.GetFourCC(&d3dFormat));
+    CHECK_HR(hr = videoType.GetFrameDimensions(pWidth, pHeight));
+    CHECK_HR(hr = videoType.GetFourCC((DWORD*)pD3DFormat));
 
+    #if 0
     ZeroMemory(pPP, sizeof(D3DPRESENT_PARAMETERS));
     pPP->BackBufferWidth = width;
     pPP->BackBufferHeight = height;
@@ -795,6 +886,7 @@ HRESULT D3DPresentEngine::GetSwapChainPresentParameters(IMFMediaType *pType, D3D
     {
         pPP->Flags |= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
     }
+    #endif
 
 done:
     return S_OK;
