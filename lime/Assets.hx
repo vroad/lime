@@ -939,6 +939,7 @@ class Assets {
 		if (library != null) {
 			
 			cache.clear (name + ":");
+			library.unload ();
 			library.eventCallback = null;
 			
 		}

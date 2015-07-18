@@ -369,16 +369,7 @@ namespace lime {
 	}
 	
 	
-	value lime_bytes_read_file (value inFilename) {
-		
-		Bytes result = Bytes (val_string (inFilename));
-		
-		return result.Value ();
-		
-	}
-	
 	DEFINE_PRIM (lime_bytes_overwrite_file, 2);
-	DEFINE_PRIM (lime_bytes_read_file, 1);
 	
 	
 }

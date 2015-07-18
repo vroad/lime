@@ -1,3 +1,40 @@
+2.5.0 (07/17/2015)
+------------------
+
+* Added guards against duplicate gamepad connect events
+* Added guards against gamepad events after a disconnect
+* Added dead zone and repeat value filtering for gamepad axis
+* Added CairoImageSurface, properly separate from CairoSurface
+* Improved HTML5 to use the project FPS setting
+* Improved asset libraries to have an "unload" method
+* Fixed repeated calls to Assets.load* with the same ID
+* Fixed "lime build" to not progress without sources
+* Fixed a regression in ByteArray.fromFile on Android
+* Fixed a bug in arrayBufferView.set
+* Quieted libpng "known incorrect profile" messages
+* Added a patch to allow Wii Remote detection (legacy)
+
+
+2.4.9 (07/13/2015)
+------------------
+
+* Added lime.system.ThreadPool
+* Added lime.utils.Log
+* Added image.scroll
+* Added event.has
+* Improved performance of Flash target logging
+* Improved "lime upgrade" when Git is not in the PATH
+* Improved image.clone when using canvas
+* Updated for compatibility with newer lime-samples
+* Updated to use a default icon when none is available
+* Updated Assets to use a ThreadPool for asynchronous loads
+* Updated to pass -verbose during "run" when in verbose mode
+* Fixed an issue when tracing null typed arrays
+* Fixed image.copyChannel when clipping is necessary
+* Fixed use of cURL basic types as Int
+* Improved support for asynchronous SSL requests (legacy)
+
+
 2.4.8 (07/09/2015)
 ------------------
 
@@ -21,7 +58,7 @@
 
 * Added lime.system.BackgroundWorker for easy threads
 * Made Assets loadImage/loadBytes asynchronous on native
-* Removed the ByteArray __init__ and matching CFFI functions
+* Removed the ByteArray \__init__ and matching CFFI functions
 * Improved the help documentation when using "lime create"
 * Fixed a crash that could occur when using Bytes
 * Fixed audioSource.play on native when there is no data

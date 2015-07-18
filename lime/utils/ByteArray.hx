@@ -328,14 +328,11 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	
 	public static function readFile (path:String):ByteArray {
 		
-		#if html5
-		return null;
-		#elseif nodejs
-		var bytes = lime_bytes_read_file (path);
-		return ByteArray.fromBytes (bytes);
-		#else
-		return ByteArray.fromBytes (File.getBytes (path));
+		#if !html5
+		var data = lime_bytes_read_file (path);
+		if (data != null) return ByteArray.fromBytes (@:privateAccess new Bytes (data.length, data.b));
 		#end
+		return null;
 		
 	}
 	
@@ -911,6 +908,16 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	}
 	
 	
+	#if (cpp || neko || nodejs)
+	public static function __fromNativePointer (data:Dynamic, length:Int):ByteArray {
+		
+		var bytes = lime_bytes_from_data_pointer (data, length);
+		return ByteArray.fromBytes (@:privateAccess new Bytes (bytes.length, bytes.b));
+		
+	}
+	#end
+	
+	
 	@:keep public #if !codegen inline #end function __get (pos:Int):Int {
 		
 		#if js
@@ -1098,11 +1105,12 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	
 	
 	
+	private static var lime_bytes_from_data_pointer = System.load ("lime", "lime_bytes_from_data_pointer", 2);
 	private static var lime_bytes_get_data_pointer = System.load ("lime", "lime_bytes_get_data_pointer", 1);
 	#if nodejs
 	private static var lime_bytes_overwrite_file = System.load ("lime", "lime_bytes_overwrite_file", 2);
-	private static var lime_bytes_read_file = System.load ("lime", "lime_bytes_read_file", 1);
 	#end
+	private static var lime_bytes_read_file = System.load ("lime", "lime_bytes_read_file", 1);
 	
 }
 
