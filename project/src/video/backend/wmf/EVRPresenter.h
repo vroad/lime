@@ -28,8 +28,8 @@
 
 // Common helper code.
 #define USE_LOGGING
-#include "common.h"
-#include "registry.h"
+#include "common/common.h"
+//#include "common/registry.h"
 using namespace MediaFoundationSamples;
 
 #define CHECK_HR(hr) IF_FAILED_GOTO(hr, done)

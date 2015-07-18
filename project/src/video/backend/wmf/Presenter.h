@@ -13,7 +13,16 @@
 //////////////////////////////////////////////////////////////////////////
 
 
+
 #pragma once
+
+#include "common/common.h"
+//#include "common/ClassFactory.h"
+#include "EVRPresenter.h"
+
+//DEFINE_CLASSFACTORY_SERVER_LOCK;
+
+using namespace MediaFoundationSamples;
 
 // RENDER_STATE: Defines the state of the presenter. 
 enum RENDER_STATE
@@ -72,6 +81,7 @@ class EVRCustomPresenter :
 {
 
 public:
+	EVRCustomPresenter(HRESULT& hr); //seems wrong... meh
     static HRESULT CreateInstance(IUnknown *pUnkOuter, REFIID iid, void **ppv);
 
     // IUnknown methods
@@ -124,7 +134,7 @@ public:
     STDMETHOD(GetFullscreen)(BOOL* pbFullscreen) { return E_NOTIMPL; }
 
 protected:
-    EVRCustomPresenter(HRESULT& hr);
+
     virtual ~EVRCustomPresenter();
 
     // CheckShutdown: 
@@ -245,5 +255,14 @@ protected:
     IMFTransform                *m_pMixer;               // The mixer.
     IMediaEventSink             *m_pMediaEventSink;      // The EVR's event-sink interface.
     IMFMediaType                *m_pMediaType;           // Output media type
+
+
+public:
+	HANDLE getSharedDeviceHandle();
+	bool createSharedTexture(int w, int h, int textureID) { return m_pD3DPresentEngine->createSharedTexture(w,h, textureID ); }
+	bool lockSharedTexture() { return m_pD3DPresentEngine->lockSharedTexture(); }
+	bool unlockSharedTexture() { return m_pD3DPresentEngine->unlockSharedTexture(); }
+	void releaseSharedTexture() { return m_pD3DPresentEngine->releaseSharedTexture(); } ;
 };
+
 

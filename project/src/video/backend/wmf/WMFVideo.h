@@ -1,3 +1,7 @@
+//ofxWMFVideoPlayer addon written by Philippe Laulheret for Second Story (secondstory.com)
+//Based upon Windows SDK samples
+//MIT Licensing
+
 
 // THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -6,14 +10,17 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
 
-#ifndef WMFVIDEO_H
-#define WMFVIDEO_H
+#ifndef PLAYER_H
+#define PLAYER_H
+
+#include "ofMain.h"
 
 #include <new>
 #include <windows.h>
 #include <shobjidl.h> 
 #include <shlwapi.h>
 #include <assert.h>
+#include <tchar.h>
 #include <strsafe.h>
 
 // Media Foundation headers
@@ -22,7 +29,8 @@
 #include <mferror.h>
 #include <evr.h>
 
-#include "resource.h"
+#include "EVRPresenter.h"
+
 
 template <class T> void SafeRelease(T **ppT)
 {
@@ -48,10 +56,10 @@ enum PlayerState
     Closing         // Application has closed the session, but is waiting for MESessionClosed.
 };
 
-class WMFVideo : public IMFAsyncCallback
+class CPlayer : public IMFAsyncCallback
 {
 public:
-    static HRESULT CreateInstance(HWND hVideo, HWND hEvent, WMFVideo **ppPlayer);
+    static HRESULT CreateInstance(HWND hVideo, HWND hEvent, CPlayer **ppPlayer);
 
     // IUnknown methods
     STDMETHODIMP QueryInterface(REFIID iid, void** ppv);
@@ -68,6 +76,9 @@ public:
 
     // Playback
     HRESULT       OpenURL(const WCHAR *sURL);
+
+	//Open multiple url in a same topology... Play with that of you want to do some video syncing
+	HRESULT       OpenMultipleURL(vector<const WCHAR *> &sURL);
     HRESULT       Play();
     HRESULT       Pause();
     HRESULT       Stop();
@@ -75,24 +86,47 @@ public:
     HRESULT       HandleEvent(UINT_PTR pUnkPtr);
     PlayerState   GetState() const { return m_state; }
 
-    // Video functionality
-    HRESULT       Repaint();
-    HRESULT       ResizeVideo(WORD width, WORD height);
+
     
     BOOL          HasVideo() const { return (m_pVideoDisplay != NULL);  }
+
+
+
+	float getDuration();
+	float getPosition();
+	float getWidth() { return _width; }
+	float getHeight() { 
+		return _height;
+	}
+
+	HRESULT setPosition(float pos);
+
+	bool _isLooping;
+	bool isLooping() { return _isLooping; }
+	void setLooping(bool isLooping) { _isLooping = isLooping; }
+
+	
+	HRESULT setVolume(float vol);
+	float   getVolume() { return _currentVolume; }
+
+	float getFrameRate();
+
 
 protected:
     
     // Constructor is private. Use static CreateInstance method to instantiate.
-    WMFVideo(HWND hVideo, HWND hEvent);
+    CPlayer(HWND hVideo, HWND hEvent);
 
     // Destructor is private. Caller should call Release.
-    virtual ~WMFVideo(); 
+    virtual ~CPlayer(); 
 
     HRESULT Initialize();
     HRESULT CreateSession();
     HRESULT CloseSession();
     HRESULT StartPlayback();
+
+
+	HRESULT SetMediaInfo( IMFPresentationDescriptor *pPD );
 
     // Media event handlers
     virtual HRESULT OnTopologyStatus(IMFMediaEvent *pEvent);
@@ -108,15 +142,27 @@ protected:
 protected:
     long                    m_nRefCount;        // Reference count.
 
-    IMFMediaSession         *m_pSession;
+    IMFSequencerSource     *m_pSequencerSource;
     IMFMediaSource          *m_pSource;
     IMFVideoDisplayControl  *m_pVideoDisplay;
-
+	MFSequencerElementId		_previousTopoID;
     HWND                    m_hwndVideo;        // Video window.
     HWND                    m_hwndEvent;        // App window to receive events.
     PlayerState             m_state;            // Current state of the media session.
     HANDLE                  m_hCloseEvent;      // Event to wait on while closing.
+	IMFAudioStreamVolume   *m_pVolumeControl;
+
+public:
+	EVRCustomPresenter * m_pEVRPresenter; // Custom EVR for texture sharing
+	IMFMediaSession         *m_pSession;
+	
+	vector<EVRCustomPresenter*> v_EVRPresenters;  //if you want to load multiple sources in one go
+	vector<IMFMediaSource*>     v_sources;        //for doing frame symc... this is experimental
+
+protected:
+	int _width;
+	int _height;
+	float _currentVolume;
 };
 
 #endif PLAYER_H
-
