@@ -1,6 +1,7 @@
 package lime.video;
 
 import haxe.io.Bytes;
+import haxe.io.Path;
 import lime.graphics.opengl.GLTexture;
 import lime.system.System;
 import lime.utils.ByteArray;
@@ -51,7 +52,6 @@ class Video {
 
 
 	#if (cpp || neko || nodejs)
-	private static var lime_video_is_ready = System.load ("lime", "lime_video_is_ready", 1);
 	private static var lime_video_play = System.load ("lime", "lime_video_play", 1);
 	private static var lime_video_open_url = System.load ("lime", "lime_video_open_url", 2);
 	private static var lime_video_set_texture = System.load ("lime", "lime_video_set_texture", 2);
