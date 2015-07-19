@@ -28,6 +28,15 @@ class Video {
 		
 	}
 	
+	public function openFile (path:String)
+	{
+		
+		var cwd = Sys.getCwd ();
+		var url = "file:///" + Path.join([cwd, path]);
+		lime_video_open_url (__handle, url);
+		
+	}
+	
 	public function play () {
 		
 		lime_video_play (__handle);
