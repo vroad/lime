@@ -80,6 +80,7 @@ D3DPresentEngine::~D3DPresentEngine()
         else printf("FAILED closing handle\n");
     }
     #endif
+    SAFE_RELEASE(m_pQuery);
     SAFE_RELEASE(m_pDevice);
     #if 0
     SAFE_RELEASE(m_pSurfaceRepaint);
@@ -530,6 +531,18 @@ HRESULT D3DPresentEngine::PresentSample(IMFSample* pSample, LONGLONG llTarget)
         CHECK_HR(hr = MFGetService(pBuffer, MR_BUFFER_SERVICE, __uuidof(IDirect3DSurface9), (void**)&pSurface));
 
         CHECK_HR(hr = m_pDevice->StretchRect(pSurface, NULL, d3d_shared_surface, NULL, D3DTEXF_NONE));
+
+        // Add an end marker to the command buffer queue.
+        CHECK_HR(m_pQuery->Issue(D3DISSUE_END));
+
+        // Force the driver to execute the commands from the command buffer.
+        // Empty the command buffer and wait until the GPU is idle.
+        int iterationCount = 0;
+        while(S_FALSE == m_pQuery->GetData(NULL, 0, D3DGETDATA_FLUSH) || iterationCount == 10)
+        {
+           Sleep(1);
+           ++iterationCount;
+        }
     }
 done:
     SAFE_RELEASE(pSurface);
@@ -655,13 +668,21 @@ HRESULT D3DPresentEngine::CreateD3DDevice()
     // Reset the D3DDeviceManager with the new device 
     CHECK_HR(hr = m_pDeviceManager->ResetDevice(pDevice, m_DeviceResetToken));
 
+    // Create the query;
+    IDirect3DQuery9* pQuery;
+    CHECK_HR(hr = pDevice->CreateQuery(D3DQUERYTYPE_EVENT, &pQuery));
+
     SAFE_RELEASE(m_pDevice);
 
     m_pDevice = pDevice;
     m_pDevice->AddRef();
 
+    m_pQuery = pQuery;
+    m_pQuery->AddRef();
+
 done:
     SAFE_RELEASE(pDevice);
+    SAFE_RELEASE(pQuery);
     return hr;
 }
 
