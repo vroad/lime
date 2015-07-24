@@ -613,7 +613,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 				handler (Image.fromImageElement (image));
 				
 			}
-			image.src = id;
+			image.src = path.get (id);
 			
 		} else {
 			
