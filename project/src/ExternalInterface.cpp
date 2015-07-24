@@ -78,7 +78,9 @@ namespace lime {
 	value lime_application_quit (value application) {
 		
 		Application* app = GetNativePointer<Application> (application);
-		return alloc_int (app->Quit ());
+		int result = app->Quit ();
+		delete app;
+		return alloc_int (result);
 		
 	}
 	
