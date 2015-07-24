@@ -662,9 +662,6 @@ HRESULT WMFVideo::Shutdown()
     // Close the session
     HRESULT hr = CloseSession();
 
-    // Shutdown the Media Foundation platform
-    MFShutdown();
-
     if (m_hCloseEvent)
     {
         CloseHandle(m_hCloseEvent);
