@@ -103,6 +103,9 @@ import lime.project.SplashScreen;
 import lime.project.WindowData;
 #end
 import lime.system.System;
+import lime.system.ThreadPool;
+import lime.system.ThreadPoolMessage;
+import lime.system.ThreadPoolMessageType;
 import lime.text.Font;
 import lime.text.TextDirection;
 import lime.text.TextLayout;

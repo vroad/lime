@@ -12,6 +12,7 @@
 -lime.graphics.cairo.CairoFormat
 -lime.graphics.cairo.CairoHintMetrics
 -lime.graphics.cairo.CairoHintStyle
+-lime.graphics.cairo.CairoImageSurface
 -lime.graphics.cairo.CairoLineCap
 -lime.graphics.cairo.CairoLineJoin
 -lime.graphics.cairo.CairoOperator
