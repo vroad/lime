@@ -889,7 +889,7 @@ namespace lime {
 	
 	value lime_renderer_get_type (value renderer) {
 		
-		Renderer* targetRenderer = (Renderer*)(intptr_t)val_float (renderer);
+		Renderer *targetRenderer = GetNativePointer<Renderer> (renderer);
 		return alloc_string (targetRenderer->Type ());
 		
 	}
