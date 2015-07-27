@@ -1147,7 +1147,7 @@ class Image {
 					#else
 					var u8a = new UInt8Array (@:privateAccess new Bytes (data.data.length, data.data.b));
 					#end
-					buffer = new ImageBuffer (u8a, data.width, data.height, data.bitsPerPixel);
+					buffer = new ImageBuffer (u8a, data.width, data.height, data.bitsPerPixel, data.format);
 					
 				}
 				
