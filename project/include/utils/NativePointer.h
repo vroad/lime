@@ -2,11 +2,34 @@
 #define LIME_UTILS_NATIVE_POINTER_H
 
 #include <hx/CFFI.h>
+#include <utils/ThreadLocalStorage.h>
 
 namespace lime {
 	
 	template <class T>
 	void lime_pointer_destroy (value handle);
+	
+	struct NativePointerId {
+			
+		NativePointerId () {
+			
+			init = false;
+			
+		}
+		
+		int pointer;
+		bool init;
+		
+	};
+	
+	static ThreadLocalStorage<NativePointerId> gNativePointerId;
+			
+	static void initializeNativePointerId (NativePointerId &id) {
+		
+		id.pointer = val_id ("pointer");
+		id.init = true;
+		
+	}
 	
 	template <class T>
 	class NativePointer {
@@ -17,19 +40,38 @@ namespace lime {
 				
 				mPointer = pointer;
 				mValue = alloc_empty_object ();
-				alloc_field (mValue, val_id ("pointer"), alloc_float ((intptr_t)pointer));
-				if (setGC) {
-
-					val_gc (mValue, lime_pointer_destroy<T>);
-
+				NativePointerId id = gNativePointerId.Get ();
+				
+				if (id.init == false) {
+					
+					initializeNativePointerId (id);
+					gNativePointerId.Set (id);
+					
 				}
-
+				
+				alloc_field (mValue, id.pointer, alloc_float ((intptr_t)pointer));
+				
+				if (setGC) {
+					
+					val_gc (mValue, lime_pointer_destroy<T>);
+					
+				}
+				
 			}
 			
 			NativePointer (value inValue) {
 				
+				NativePointerId id = gNativePointerId.Get ();
+				
+				if (id.init == false) {
+					
+					initializeNativePointerId (id);
+					gNativePointerId.Set (id);
+					
+				}
+				
 				mValue = inValue;
-				mPointer = (T*)(intptr_t)val_float (val_field (inValue, val_id ("pointer")));
+				mPointer = (T*)(intptr_t)val_float (val_field (inValue, id.pointer));
 				
 			}
 			
