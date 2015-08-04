@@ -184,6 +184,7 @@ OGL_EXT(glClear,void, (GLbitfield mask));
 OGL_EXT(glClearColor,void, (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha));
 //OGL_EXT(glClearColorx,void, (GLclampx red, GLclampx green, GLclampx blue, GLclampx alpha));
 //OGL_EXT(glClearDepth,void, (GLclampd depth));
+OGL_EXT(glClearDepthf,void, (GLclampf depth));
 //OGL_EXT(glClearDepthx,void, (GLclampx depth));
 OGL_EXT(glClearStencil,void, (GLint s));
 //OGL_EXT(glClientActiveTexture,void, (GLenum texture));

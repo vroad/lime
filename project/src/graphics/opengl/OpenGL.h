@@ -57,7 +57,9 @@
 #elif defined (HX_WINDOWS)
 
 #include <windows.h>
+#ifndef NATIVE_TOOLKIT_SDL_ANGLE 
 #include <gl/GL.h>
+#endif
 typedef ptrdiff_t GLsizeiptrARB;
 #define NEED_EXTENSIONS
 #ifdef NATIVE_TOOLKIT_SDL_ANGLE

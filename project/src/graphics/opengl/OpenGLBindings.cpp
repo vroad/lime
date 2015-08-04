@@ -20,7 +20,9 @@ namespace lime {
 	
 	bool OpenGLBindings::initialized = false;
 	void *OpenGLBindings::handle = 0;
+	#ifdef NATIVE_TOOLKIT_SDL_ANGLE
 	void *OpenGLBindings::eglHandle = 0;
+	#endif
 	
 	value lime_gl_active_texture (value inSlot) {
 		
@@ -191,7 +193,7 @@ namespace lime {
 	
 	value lime_gl_clear_depth (value depth) {
 		
-		#ifdef LIME_GLES
+		#if defined (LIME_GLES) || defined (NATIVE_TOOLKIT_SDL_ANGLE)
 		glClearDepthf (val_number (depth));
 		#else
 		glClearDepth (val_number (depth));
