@@ -8,7 +8,9 @@ class BytesUtil
 	public static function getBytesFromByteArray(byteArray:ByteArray) {
 		
 		#if nodejs
-		@:privateAccess return new Bytes (byteArray.length, cast byteArray.byteView);
+		@:privateAccess return new Bytes (byteArray.length, cast byteArray.byteView.buffer);
+		#elseif js
+		@:privateAccess return new Bytes (byteArray.byteView.buffer);
 		#else
 		return byteArray;
 		#end
@@ -18,7 +20,9 @@ class BytesUtil
 	public static function getBytesFromUInt8Array(u8a:UInt8Array) {
 		
 		#if nodejs
-		@:privateAccess return new Bytes (u8a.byteLength, cast u8a);
+		@:privateAccess return new Bytes (u8a.byteLength, cast u8a.buffer);
+		#elseif js
+		@:privateAccess return new Bytes (u8a.buffer);
 		#else
 		return u8a.buffer;
 		#end
@@ -27,7 +31,7 @@ class BytesUtil
 
 	public static function getUInt8ArrayFromByteArray(byteArray:ByteArray) {
 		
-		#if nodejs
+		#if js
 		return byteArray.byteView;
 		#else
 		return new UInt8Array (byteArray);
