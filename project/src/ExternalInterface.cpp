@@ -36,7 +36,9 @@
 #include <ui/WindowEvent.h>
 #include <utils/NativePointer.h>
 #include <utils/JNI.h>
+#ifdef LIME_LZMA
 #include <utils/LZMA.h>
+#endif
 #include <vm/NekoVM.h>
 #ifdef LIME_OGG
 #include <vorbis/vorbisfile.h>
@@ -733,24 +735,32 @@ namespace lime {
 	
 	value lime_lzma_decode (value buffer) {
 		
+		#ifdef LIME_LZMA
 		Bytes data = Bytes (buffer);
 		Bytes result;
 		
 		LZMA::Decode (&data, &result);
 		
 		return result.Value ();
+		#else
+		return alloc_null ();
+		#endif
 		
 	}
 	
 	
 	value lime_lzma_encode (value buffer) {
 		
+		#ifdef LIME_LZMA
 		Bytes data = Bytes (buffer);
 		Bytes result;
 		
 		LZMA::Encode (&data, &result);
 		
 		return result.Value ();
+		#else
+		return alloc_null ();
+		#endif
 		
 	}
 	
