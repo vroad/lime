@@ -1,6 +1,6 @@
 package lime.system;
 
-private class ThreadPoolMessage {
+class ThreadPoolMessage {
 	
 	
 	public var id:String;
