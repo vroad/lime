@@ -174,6 +174,7 @@ class GL {
 	
 	public static inline var DEPTH_COMPONENT = 0x1902;
 	public static inline var ALPHA = 0x1906;
+	public static inline var BGRA_EXT = 0x80E1;
 	public static inline var RGB = 0x1907;
 	public static inline var RGBA = 0x1908;
 	public static inline var LUMINANCE = 0x1909;
