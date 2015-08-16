@@ -634,7 +634,7 @@ class System {
 	
 	#if (cpp || neko || nodejs)
 	private static var lime_system_get_directory = System.load ("lime", "lime_system_get_directory", 3);
-	private static var lime_system_get_display = System.load ("lime", "lime_system_get_display", 1);
+	private static var lime_system_get_display:Dynamic = System.load ("lime", "lime_system_get_display", 1);
 	private static var lime_system_get_num_displays = System.load ("lime", "lime_system_get_num_displays", 0);
 	private static var lime_system_get_timer = System.load ("lime", "lime_system_get_timer", 0);
 	#end

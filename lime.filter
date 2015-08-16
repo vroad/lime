@@ -3,6 +3,8 @@
 -lime.AssetType
 -lime.audio.openal.ALContext
 -lime.audio.openal.ALDevice
+-lime.graphics.console
+-lime.graphics.ConsoleRenderContext
 -lime.graphics.GLRenderContext
 -lime.graphics.cairo.CairoAntialias
 -lime.graphics.cairo.CairoContent
