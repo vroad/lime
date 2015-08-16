@@ -107,10 +107,14 @@ bool D3DPresentEngine::createSharedTexture(unsigned int textureID)
     std::vector<EGLConfig> egl_configs(numConfigs);
     lime::eglGetConfigs(egl_display, &egl_configs[0], numConfigs, &numConfigs);
 
+    EGLint use_rgb = 1;
+    lime::eglGetConfigAttrib(egl_display, egl_configs[0], EGL_BIND_TO_TEXTURE_RGB,
+        &use_rgb);
+
     EGLint attrib_list[] = {
         EGL_WIDTH, _w,
         EGL_HEIGHT, _h,
-        EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGB,
+        EGL_TEXTURE_FORMAT, use_rgb ? EGL_TEXTURE_RGB : EGL_TEXTURE_RGBA,
         EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
         EGL_NONE
     };
@@ -158,11 +162,11 @@ bool D3DPresentEngine::createSharedTexture(unsigned int textureID)
     gl_name=textureID;
     #endif
     
-    hr = m_pDevice->CreateTexture(_w, _h, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &d3d_shared_texture, &sharedHandle);
+    hr = m_pDevice->CreateTexture(_w, _h, 1, D3DUSAGE_RENDERTARGET, use_rgb ? D3DFMT_X8R8G8B8 : D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d_shared_texture, &sharedHandle);
 
     if (FAILED(hr))
     {
-        printf("ofxWMFVideoplayer : Error creating D3DTexture\n");
+        printf("ofxWMFVideoplayer : Error creating D3DTexture:%u\n", hr);
         return false;
     }
 
