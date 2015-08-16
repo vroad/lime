@@ -57,6 +57,7 @@
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/cairo/include/configs/linux/" if="linux"/>
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/cairo/include/configs/windows/" if="windows"/>
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/cairo/include/configs/mac/" if="mac"/>
+			<compilerflag value="-DLIME_CAIRO" />
 			<compilerflag value="-DHAVE_CONFIG_H" />
 			<compilerflag value="-DCAIRO_WIN32_STATIC_BUILD" if="windows" />
 			<compilerflag value="-DCAIRO_HAS_FT_FONT" />
@@ -189,7 +190,6 @@
 			<file name="src/backend/sdl/SDLGamepad.cpp" />
 			<file name="src/backend/sdl/SDLMouse.cpp" />
 			<file name="src/backend/sdl/SDLSystem.cpp" />
-			<file name="src/backend/sdl/SDLJNI.cpp" />
 			
 		</section>
 		
@@ -232,6 +232,7 @@
 		<file name="src/math/Matrix3.cpp" />
 		<file name="src/math/Rectangle.cpp" />
 		<file name="src/math/Vector2.cpp" />
+		<file name="src/system/JNI.cpp" if="android" />
 		<file name="src/ui/GamepadEvent.cpp" />
 		<file name="src/ui/KeyEvent.cpp" />
 		<file name="src/ui/MouseEvent.cpp" />

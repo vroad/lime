@@ -1084,6 +1084,49 @@ class Assets {
 		
 	}
 	
+	#if lime_console
+	
+	private static function embedData (metaName:String, encode:Bool = false):Array<Field> {
+		
+		var classType = Context.getLocalClass().get();
+		var metaData = classType.meta.get();
+		var position = Context.currentPos();
+		var fields = Context.getBuildFields();
+		
+		for (meta in metaData) {
+			
+			if (meta.name != metaName || meta.params.length <= 0) {
+				continue;
+			}
+				
+			switch (meta.params[0].expr) {
+				
+				case EConst(CString(filePath)):
+					
+					var fieldValue = {
+						pos: position,
+						expr: EConst(CString(filePath))
+					};
+					fields.push ({
+						kind: FVar(macro :String, fieldValue),
+						name: "filePath",
+						access: [ APrivate, AStatic ],
+						pos: position
+					});
+					
+					return fields;
+					
+				default:
+				
+			}
+			
+		}
+		
+		return null;
+		
+	}
+
+	#else
 	
 	private static function embedData (metaName:String, encode:Bool = false):Array<Field> {
 		
@@ -1153,6 +1196,8 @@ class Assets {
 		return null;
 		
 	}
+
+	#end
 	
 	
 	macro public static function embedFile ():Array<Field> {
@@ -1165,7 +1210,11 @@ class Assets {
 				
 				super();
 				
+				#if lime_console
+				throw "not implemented";
+				#else
 				__fromBytes (haxe.Resource.getBytes (resourceName));
+				#end
 				
 			};
 			
@@ -1299,8 +1348,12 @@ class Assets {
 				
 				super ();
 				
+				#if lime_console
+				throw "not implemented";
+				#else
 				var byteArray = lime.utils.ByteArray.fromBytes (haxe.Resource.getBytes (resourceName));
 				__fromBytes (byteArray, null);
+				#end
 				
 				#end
 				
@@ -1334,8 +1387,12 @@ class Assets {
 				
 				super();
 				
+				#if lime_console
+				throw "not implemented";
+				#else
 				var byteArray = openfl.utils.ByteArray.fromBytes (haxe.Resource.getBytes(resourceName));
 				loadCompressedDataFromByteArray(byteArray, byteArray.length, forcePlayAsMusic);
+				#end
 				
 			};
 			

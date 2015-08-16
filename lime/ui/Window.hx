@@ -6,13 +6,16 @@ import lime.app.Config;
 import lime.app.Event;
 import lime.graphics.Image;
 import lime.graphics.Renderer;
+import lime.system.Display;
 
 
 class Window {
 	
 	
+	public var application (default, null):Application;
 	public var currentRenderer:Renderer;
 	public var config:Config;
+	public var display (get, null):Display;
 	public var enableTextEvents (get, set):Bool;
 	public var fullscreen (get, set):Bool;
 	public var height (get, set):Int;
@@ -46,6 +49,7 @@ class Window {
 	public var onWindowMove = new Event<Float->Float->Void> ();
 	public var onWindowResize = new Event<Int->Int->Void> ();
 	public var onWindowRestore = new Event<Void->Void> ();
+	public var title (get, set):String;
 	public var width (get, set):Int;
 	public var x (get, set):Int;
 	public var y (get, set):Int;
@@ -54,6 +58,7 @@ class Window {
 	@:noCompletion private var __fullscreen:Bool;
 	@:noCompletion private var __height:Int;
 	@:noCompletion private var __minimized:Bool;
+	@:noCompletion private var __title:String;
 	@:noCompletion private var __width:Int;
 	@:noCompletion private var __x:Int;
 	@:noCompletion private var __y:Int;
@@ -68,6 +73,7 @@ class Window {
 		__fullscreen = false;
 		__x = 0;
 		__y = 0;
+		__title = "";
 		
 		if (config != null) {
 			
@@ -76,6 +82,7 @@ class Window {
 			if (Reflect.hasField (config, "width")) __width = config.width;
 			if (Reflect.hasField (config, "height")) __height = config.height;
 			if (Reflect.hasField (config, "fullscreen")) __fullscreen = config.fullscreen;
+			if (Reflect.hasField (config, "title")) __title = config.title;
 			
 		}
 		
@@ -92,6 +99,8 @@ class Window {
 	
 	
 	public function create (application:Application):Void {
+		
+		this.application = application;
 		
 		backend.create (application);
 		
@@ -252,11 +261,25 @@ class Window {
 	}
 	
 	
+	public function toString ():String {
+		
+		return "[object Window]";
+		
+	}
+	
+	
 	
 	
 	// Get & Set Methods
 	
 	
+	
+	
+	@:noCompletion private function get_display ():Display {
+		
+		return backend.getDisplay ();
+		
+	}
 	
 	
 	@:noCompletion private inline function get_enableTextEvents ():Bool {
@@ -312,6 +335,20 @@ class Window {
 	@:noCompletion private function set_minimized (value:Bool):Bool {
 		
 		return __minimized = backend.setMinimized (value);
+		
+	}
+	
+	
+	@:noCompletion private inline function get_title ():String {
+		
+		return __title;
+		
+	}
+	
+	
+	@:noCompletion private function set_title (value:String):String {
+		
+		return __title = backend.setTitle (__title);
 		
 	}
 	

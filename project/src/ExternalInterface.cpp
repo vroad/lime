@@ -21,6 +21,8 @@
 #include <graphics/ImageBuffer.h>
 #include <graphics/Renderer.h>
 #include <graphics/RenderEvent.h>
+#include <system/Clipboard.h>
+#include <system/JNI.h>
 #include <system/System.h>
 #include <text/Font.h>
 #include <text/TextLayout.h>
@@ -35,7 +37,6 @@
 #include <ui/Window.h>
 #include <ui/WindowEvent.h>
 #include <utils/NativePointer.h>
-#include <utils/JNI.h>
 #ifdef LIME_LZMA
 #include <utils/LZMA.h>
 #endif
@@ -186,6 +187,29 @@ namespace lime {
 		
 		Bytes data = Bytes (val_os_string (path));
 		return data.Value ();
+		
+	}
+	
+	
+	value lime_clipboard_get_text () {
+		
+		if (Clipboard::HasText ()) {
+			
+			return alloc_string (Clipboard::GetText ());
+			
+		} else {
+			
+			return alloc_null ();
+			
+		}
+		
+	}
+	
+	
+	value lime_clipboard_set_text (value text) {
+		
+		Clipboard::SetText (val_string (text));
+		return alloc_null ();
 		
 	}
 	
@@ -945,6 +969,20 @@ namespace lime {
 	}
 	
 	
+	value lime_system_get_display (value id) {
+		
+		return System::GetDisplay (val_int (id));
+		
+	}
+	
+	
+	value lime_system_get_num_displays () {
+		
+		return alloc_int (System::GetNumDisplays ());
+		
+	}
+	
+	
 	value lime_system_get_timer () {
 		
 		return alloc_float (System::GetTimer ());
@@ -1237,6 +1275,14 @@ namespace lime {
 
 	}
 	
+	value lime_window_set_title (value window, value title) {
+		
+		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		return alloc_string (targetWindow->SetTitle (val_string (title)));
+		
+	}
+	
+	
 	DEFINE_PRIM (lime_application_create, 1);
 	DEFINE_PRIM (lime_application_exec, 1);
 	DEFINE_PRIM (lime_application_init, 1);
@@ -1248,6 +1294,8 @@ namespace lime {
 	DEFINE_PRIM (lime_bytes_from_data_pointer, 2);
 	DEFINE_PRIM (lime_bytes_get_data_pointer, 1);
 	DEFINE_PRIM (lime_bytes_read_file, 1);
+	DEFINE_PRIM (lime_clipboard_get_text, 0);
+	DEFINE_PRIM (lime_clipboard_set_text, 1);
 	DEFINE_PRIM (lime_font_get_ascender, 1);
 	DEFINE_PRIM (lime_font_get_descender, 1);
 	DEFINE_PRIM (lime_font_get_family_name, 1);
@@ -1304,6 +1352,8 @@ namespace lime {
 	DEFINE_PRIM (lime_renderer_unlock, 1);
 	DEFINE_PRIM (lime_render_event_manager_register, 2);
 	DEFINE_PRIM (lime_system_get_directory, 3);
+	DEFINE_PRIM (lime_system_get_display, 1);
+	DEFINE_PRIM (lime_system_get_num_displays, 0);
 	DEFINE_PRIM (lime_system_get_timer, 0);
 	DEFINE_PRIM (lime_text_event_manager_register, 2);
 	DEFINE_PRIM (lime_text_layout_create, 3);
@@ -1333,6 +1383,8 @@ namespace lime {
 	DEFINE_PRIM (lime_video_get_state, 1);
 	DEFINE_PRIM (lime_video_play, 1);
 	DEFINE_PRIM (lime_video_set_texture, 2);
+	DEFINE_PRIM (lime_window_set_title, 2);
+	
 	
 }
 

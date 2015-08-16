@@ -50,6 +50,12 @@ class DefaultAssetLibrary extends AssetLibrary {
 		
 		super ();
 		
+		#if (openfl && !flash)
+		::if (assets != null)::
+		::foreach assets::::if (type == "font")::openfl.text.Font.registerFont (__ASSET__OPENFL__::flatName::);::end::
+		::end::::end::
+		#end
+		
 		#if flash
 		
 		::if (assets != null)::::foreach assets::::if (embed)::className.set ("::id::", __ASSET__::flatName::);::else::path.set ("::id::", "::resourceName::");::end::
@@ -73,12 +79,6 @@ class DefaultAssetLibrary extends AssetLibrary {
 		}
 		
 		#else
-		
-		#if openfl
-		::if (assets != null)::
-		::foreach assets::::if (type == "font")::openfl.text.Font.registerFont (__ASSET__OPENFL__::flatName::);::end::
-		::end::::end::
-		#end
 		
 		#if (windows || mac || linux)
 		
@@ -794,7 +794,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 ::if (assets != null)::::foreach assets::::if (!embed)::::if (type == "font")::@:keep #if display private #end class __ASSET__::flatName:: extends lime.text.Font { public function new () { __fontPath = #if ios "assets/" + #end "::targetPath::"; name = "::fontName::"; super (); }}
 ::end::::end::::end::::end::
 
-#if (windows || mac || linux)
+#if (windows || mac || linux || cpp)
 
 ::if (assets != null)::
 ::foreach assets::::if (embed)::::if (type == "image")::@:image("::sourcePath::") #if display private #end class __ASSET__::flatName:: extends lime.graphics.Image {}
@@ -806,12 +806,11 @@ class DefaultAssetLibrary extends AssetLibrary {
 ::end::
 
 #end
+#end
 
-#if openfl
+#if (openfl && !flash)
 ::if (assets != null)::::foreach assets::::if (type == "font")::@:keep #if display private #end class __ASSET__OPENFL__::flatName:: extends openfl.text.Font { public function new () { ::if (embed)::var font = new __ASSET__::flatName:: (); src = font.src; name = font.name;::else::__fontPath = #if ios "assets/" + #end "::targetPath::"; name = "::fontName::";::end:: super (); }}
 ::end::::end::::end::
 #end
 
 #end
-#end
-

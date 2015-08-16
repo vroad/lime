@@ -11,6 +11,8 @@ import lime.utils.Float32Array;
 import js.html.Audio;
 #elseif flash
 import flash.media.Sound;
+#elseif lime_console
+import lime.audio.fmod.Sound;
 #end
 
 
@@ -29,6 +31,8 @@ class AudioBuffer {
 	#if (js && html5)
 	public var src:Audio;
 	#elseif flash
+	public var src:Sound;
+	#elseif lime_console
 	public var src:Sound;
 	#else
 	public var src:Dynamic;
@@ -49,9 +53,43 @@ class AudioBuffer {
 	}
 	
 	
+	public function dispose ():Void {
+		
+		#if lime_console
+
+			src.release ();
+		
+		#else
+
+			// TODO
+
+		#end
+		
+	}
+	
+	
 	public static function fromBytes (bytes:ByteArray, stream:Bool = false):AudioBuffer {
 		
-		#if (cpp || neko || nodejs)
+		#if lime_console
+
+			trace ("not implemented");
+/*
+			var sound:Sound = Sound.fromBytes (bytes);
+
+			if (sound.valid) {
+
+				var audioBuffer = new AudioBuffer ();
+				audioBuffer.bitsPerSample = 0;
+				audioBuffer.channels = 0;
+				audioBuffer.data = null;
+				audioBuffer.sampleRate = 0;
+				audioBuffer.src = sound;
+				return audioBuffer;
+
+			}
+*/
+	
+		#elseif (cpp || neko || nodejs)
 			
 			var data = lime_audio_load (bytes, stream);
 			
@@ -81,7 +119,23 @@ class AudioBuffer {
 	
 	public static function fromFile (path:String, stream:Bool = false):AudioBuffer {
 		
-		#if (cpp || neko || nodejs)
+		#if lime_console
+
+			var sound:Sound = Sound.fromFile (path);
+
+			if (sound.valid) {
+	
+				var audioBuffer = new AudioBuffer ();
+				audioBuffer.bitsPerSample = 0;
+				audioBuffer.channels = 0;
+				audioBuffer.data = null;
+				audioBuffer.sampleRate = 0;
+				audioBuffer.src = sound;
+				return audioBuffer;
+	
+			}	
+
+		#elseif (cpp || neko || nodejs)
 			
 			var data = lime_audio_load (path, stream);
 			
