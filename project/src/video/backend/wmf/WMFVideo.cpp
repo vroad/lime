@@ -442,7 +442,7 @@ HRESULT WMFVideo::setPosition(float pos)
 {
     if (m_state == OpenPending)
     {
-        printf("ofxWMFPlayer : Error cannot seek during opening\n");
+        printf("Error cannot seek during opening\n");
         return S_FALSE;
     }
 
@@ -467,7 +467,7 @@ HRESULT WMFVideo::setPosition(float pos)
     }
     else 
     {
-        printf("ofxWMFPlayer : Error while seeking\n");
+        printf("Error while seeking\n");
         return S_FALSE;
     }
 
@@ -487,7 +487,7 @@ HRESULT WMFVideo::setVolume(float vol)
     //Should we lock here as well ?
     if (m_pSession == NULL)
     {
-        printf("ofxWMFVideoPlayer", "setVolume: Error session is null\n");
+        printf("setVolume: Error session is null\n");
         return E_FAIL;
     }
     if (m_pVolumeControl == NULL)
@@ -498,7 +498,7 @@ HRESULT WMFVideo::setVolume(float vol)
         _currentVolume = vol;
         if (FAILED(hr))
         {
-            printf("ofxWMFVideoPlayer", "setVolume: Error while getting sound control interface\n");
+            printf("setVolume: Error while getting sound control interface\n");
             return E_FAIL;
         }
 
@@ -638,7 +638,7 @@ HRESULT WMFVideo::HandleEvent(UINT_PTR pEventPtr)
         GetEventObject<IMFTopology> (pEvent,&topology);
         WORD nodeCount;
         topology->GetNodeCount(&nodeCount);
-        cout << "Topo set and we have "  << nodeCount << " nodes" << endl;
+        //cout << "Topo set and we have "  << nodeCount << " nodes" << endl;
         SafeRelease(&topology);
         break;
 
@@ -713,7 +713,7 @@ HRESULT WMFVideo::OnPresentationEnded(IMFMediaEvent *pEvent)
 
         if FAILED(hr)
         {
-            printf("ofxWMFVideoPlayerUtils", "Error while looping\n");
+            printf("ofxWMFVideoPlayerUtils: Error while looping\n");
         }
         if (!_isLooping) m_pSession->Pause();
         else m_state = Started;
@@ -1321,7 +1321,7 @@ HRESULT AddToPlaybackTopology(
     // For each stream, create the topology nodes and add them to the topology.
     for (DWORD i = 1; i < cSourceStreams; i++)
     {
-        printf("Ignoring audio stream of video2. If the video is missing check : ofxWMFVideoPlayerUtils\n");
+        printf("Ignoring audio stream of video2. If the video is missing check\n");
         hr = AddBranchToPartialTopology(pTopology, pSource, pPD, i, hVideoWnd,pVideoPresenter);
         if (FAILED(hr))
         {

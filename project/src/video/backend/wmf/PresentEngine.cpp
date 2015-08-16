@@ -154,7 +154,7 @@ bool D3DPresentEngine::createSharedTexture(unsigned int textureID)
 
     if (!gl_handleD3D)
     {
-        printf("ofxWMFVideoplayer : openning the shared device failed\nCreate SharedTexture Failed");
+        printf("openning the shared device failed\nCreate SharedTexture Failed");
         return false;
 
     }
@@ -166,13 +166,13 @@ bool D3DPresentEngine::createSharedTexture(unsigned int textureID)
 
     if (FAILED(hr))
     {
-        printf("ofxWMFVideoplayer : Error creating D3DTexture:%u\n", hr);
+        printf("Error creating D3DTexture:%u\n", hr);
         return false;
     }
 
     if (!sharedHandle)
     {
-        printf("ofxWMFVideoplayer : Error creating D3D sahred handle\n");
+        printf("Error creating D3D shared handle\n");
         return false;
     }
     
@@ -200,7 +200,7 @@ bool D3DPresentEngine::createSharedTexture(unsigned int textureID)
 
     if (!gl_handle) 
     {
-        printf("ofxWMFVideoplayer : openning the shared texture failed\nCreate SharedTexture Failed");
+        printf("openning the shared texture failed\nCreate SharedTexture Failed");
         return false;
     }
     #endif
