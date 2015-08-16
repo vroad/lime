@@ -1229,8 +1229,7 @@ namespace lime {
 
 		#ifdef LIME_VIDEO
 		Video *video = GetNativePointer<Video> (inVideo);
-		video->OpenURL (val_wstring (url));
-		return alloc_null ();
+		return alloc_bool (video->OpenURL (val_wstring (url)));
 		#else
 		return alloc_null ();
 		#endif
@@ -1254,8 +1253,7 @@ namespace lime {
 
 		#ifdef LIME_VIDEO
 		Video *video = GetNativePointer<Video> (inVideo);
-		video->Play ();
-		return alloc_null ();
+		return alloc_bool (video->Play ());
 		#else
 		return alloc_null ();
 		#endif

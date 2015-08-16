@@ -22,24 +22,24 @@ class Video {
 
 	}
 	
-	public function openURL (url:String) {
+	public function openURL (url:String):Bool {
 		
-		lime_video_open_url (__handle, url);
+		return lime_video_open_url (__handle, url);
 		
 	}
 	
-	public function openFile (path:String)
+	public function openFile (path:String):Bool
 	{
 		
 		var cwd = Sys.getCwd ();
 		var url = "file:///" + Path.join([cwd, path]);
-		lime_video_open_url (__handle, url);
+		return lime_video_open_url (__handle, url);
 		
 	}
 	
-	public function play () {
+	public function play ():Bool {
 		
-		lime_video_play (__handle);
+		return lime_video_play (__handle);
 		
 	}
 	
