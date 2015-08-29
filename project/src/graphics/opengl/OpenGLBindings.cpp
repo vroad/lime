@@ -193,7 +193,7 @@ namespace lime {
 	
 	value lime_gl_clear_depth (value depth) {
 		
-		#if defined (LIME_GLES) || defined (NATIVE_TOOLKIT_SDL_ANGLE)
+		#ifdef LIME_GLES
 		glClearDepthf (val_number (depth));
 		#else
 		glClearDepth (val_number (depth));

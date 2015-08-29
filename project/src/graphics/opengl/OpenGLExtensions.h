@@ -201,6 +201,9 @@ OGL_EXT(glDeleteTextures,void, (GLsizei n, const GLuint *textures));
 OGL_EXT(glDepthFunc,void, (GLenum func));
 OGL_EXT(glDepthMask,void, (GLboolean flag));
 //OGL_EXT(glDepthRange,void, (GLclampd zNear, GLclampd zFar));
+#ifdef LIME_GLES
+OGL_EXT(glDepthRangef,void, (GLclampf nearVal,GLclampf farVal));
+#endif
 //OGL_EXT(glDepthRangex,void, (GLclampx zNear, GLclampx zFar));
 OGL_EXT(glDisable,void, (GLenum cap));
 //OGL_EXT(glDisableClientState,void, (GLenum array));
@@ -221,6 +224,9 @@ OGL_EXT(glGenTextures,void, (GLsizei n, GLuint *textures));
 OGL_EXT(glGetError,GLenum, (void));
 OGL_EXT(glGetFloatv,void, (GLenum pname, GLfloat* params));
 OGL_EXT(glGetIntegerv,void, (GLenum pname, GLint *params));
+#ifdef LIME_GLES
+OGL_EXT(glGetShaderPrecisionFormat,void, (GLenum shaderType, GLenum precisionType, GLint *range, GLint *precision));
+#endif
 OGL_EXT(glGetString, const GLubyte *,(GLenum name));
 OGL_EXT(glHint,void, (GLenum target, GLenum mode));
 //OGL_EXT(glLightModelf,void, (GLenum pname, GLfloat param));

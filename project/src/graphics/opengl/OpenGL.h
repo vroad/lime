@@ -57,13 +57,14 @@
 #elif defined (HX_WINDOWS)
 
 #include <windows.h>
-#ifndef NATIVE_TOOLKIT_SDL_ANGLE 
+#ifndef NATIVE_TOOLKIT_SDL_ANGLE
 #include <gl/GL.h>
 #endif
 typedef ptrdiff_t GLsizeiptrARB;
 #define NEED_EXTENSIONS
 #ifdef NATIVE_TOOLKIT_SDL_ANGLE
 #define DYNAMIC_OGL
+#define LIME_GLES
 #endif
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
