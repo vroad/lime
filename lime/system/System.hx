@@ -127,7 +127,11 @@ class System {
 			
 		}
 		#end
+		#if nodejs
+		untyped proces.exitCode = code;
+		#else
 		Sys.exit (code);
+		#end
 		#end
 		
 	}
