@@ -3,7 +3,6 @@ package lime.ui;
 
 import lime.app.Application;
 import lime.app.Config;
-import lime.app.WindowConfig;
 import lime.app.Event;
 import lime.graphics.Image;
 import lime.graphics.Renderer;
