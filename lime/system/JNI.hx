@@ -182,7 +182,7 @@ class JNI {
 	
 	
 	
-	#if (cpp || neko || nodejs)
+	#if ((cpp || neko || nodejs) && android)
 	private static var lime_jni_create_field = System.load ("lime", "lime_jni_create_field", 4);
 	private static var lime_jni_create_method = System.load ("lime", "lime_jni_create_method", 5);
 	private static var lime_jni_get_env = System.load ("lime", "lime_jni_get_env", 0);
@@ -235,7 +235,7 @@ class JNIMemberField {
 	
 	
 	
-	#if (cpp || neko || nodejs)
+	#if ((cpp || neko || nodejs) && android)
 	private static var lime_jni_get_member = System.load ("lime", "lime_jni_get_member", 2);
 	private static var lime_jni_set_member = System.load ("lime", "lime_jni_set_member", 3);
 	#end
@@ -285,7 +285,7 @@ class JNIStaticField {
 	
 	
 	
-	#if (cpp || neko || nodejs)
+	#if ((cpp || neko || nodejs) && android)
 	private static var lime_jni_get_static = System.load ("lime", "lime_jni_get_static", 1);
 	private static var lime_jni_set_static = System.load ("lime", "lime_jni_set_static", 2);
 	#end
@@ -366,7 +366,7 @@ class JNIMethod {
 	
 	
 	
-	#if (cpp || neko || nodejs)
+	#if ((cpp || neko || nodejs) && android)
 	private static var lime_jni_call_member = System.load ("lime", "lime_jni_call_member", 3);
 	private static var lime_jni_call_static = System.load ("lime", "lime_jni_call_static", 2);
 	#end
