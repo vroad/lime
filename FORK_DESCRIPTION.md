@@ -14,10 +14,6 @@ disable_gl_renderer compile option
 This flag was made for avoiding OpenGL render state conficts on Stage3D. Works on native and html5.
 Only Stage3D API make OpenGL calls if this option is enabled in project.xml.
 
-AtExit hook
------------
-Called before the Application exits.
-
 Streaming support on native
 ---------------------------
 AudioBuffer can be loaded with streaming enabled. Currently limited to Ogg Vorbis.
