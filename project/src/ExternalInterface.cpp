@@ -868,7 +868,7 @@ namespace lime {
 		
 		if (!val_is_null (window)) {
 			
-			windowRef = (Window*)(intptr_t)val_float (window);
+			windowRef = GetNativePointer<Window> (window);
 			
 		}
 		
@@ -979,7 +979,7 @@ namespace lime {
 	
 	value lime_renderer_get_context (value renderer) {
 		
-		Renderer* targetRenderer = (Renderer*)(intptr_t)val_float (renderer);
+		Renderer* targetRenderer = GetNativePointer<Renderer> (renderer);
 		return alloc_float ((intptr_t)targetRenderer->GetContext ());
 		
 	}
@@ -1003,7 +1003,8 @@ namespace lime {
 	
 	value lime_renderer_make_current (value renderer) {
 		
-		((Renderer*)(intptr_t)val_float (renderer))->MakeCurrent ();
+		Renderer *ptr = GetNativePointer<Renderer>(renderer);
+		ptr->MakeCurrent ();
 		return alloc_null ();
 		
 	}
@@ -1175,7 +1176,7 @@ namespace lime {
 	
 	value lime_window_focus (value window) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		Window* targetWindow = GetNativePointer<Window> (window);
 		targetWindow->Focus ();
 		return alloc_null ();
 		
@@ -1200,7 +1201,7 @@ namespace lime {
 	
 	value lime_window_get_id (value window) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		Window* targetWindow = GetNativePointer<Window> (window);
 		return alloc_int ((int32_t)targetWindow->GetID ());
 		
 	}
@@ -1355,7 +1356,7 @@ namespace lime {
 	
 	value lime_window_set_title (value window, value title) {
 		
-		Window* targetWindow = (Window*)(intptr_t)val_float (window);
+		Window* targetWindow = GetNativePointer<Window> (window);
 		return alloc_string (targetWindow->SetTitle (val_string (title)));
 		
 	}
