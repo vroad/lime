@@ -1,5 +1,6 @@
 +lime
 -lime.app.Config
+-lime.app.WindowConfig
 -lime.AssetType
 -lime.audio.openal.ALContext
 -lime.audio.openal.ALDevice
@@ -28,6 +29,7 @@
 -lime.graphics.opengl.GLUniformLocation
 -lime.graphics.PixelFormat
 -lime.graphics.RenderContext
+-lime.math.color
 -lime.math.ColorMatrix
 -lime.math.Matrix4
 -lime.math.Vector4
