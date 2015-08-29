@@ -84,6 +84,11 @@ class NativeApplication {
 			if (!active) {
 				
 				untyped process.exitCode = lime_application_quit (handle);
+				parent.onExit.dispatch (untyped process.exitCode);
+				
+			} else {
+				
+				untyped setImmediate (eventLoop);
 				
 			}
 			
