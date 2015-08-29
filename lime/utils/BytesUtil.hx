@@ -43,8 +43,10 @@ class BytesUtil
 		
 		#if nodejs
 		return ByteArray.fromBytes (@:privateAccess new Bytes (as.length, as.b.buffer));
+		#elseif js
+		return ByteArray.fromBytes (@:privateAccess new Bytes (as.b.buffer));
 		#else
-		return new ByteArray.fromBytes (@:privateAccess new Bytes (as.length, as.b));
+		return ByteArray.fromBytes (@:privateAccess new Bytes (as.length, as.b));
 		#end
 		
 	}
