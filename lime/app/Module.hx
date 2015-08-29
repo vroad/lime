@@ -68,12 +68,6 @@ class Module implements IModule {
 	
 	
 	/**
-	 * Called before the app exits
-	 */
-	public function atExit ():Void { }
-	
-	
-	/**
 	 * Called when a key down event is fired
 	 * @param	window	The window dispatching the event
 	 * @param	keyCode	The code of the key that was pressed
