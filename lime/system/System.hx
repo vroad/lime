@@ -103,10 +103,10 @@ class System {
 		}
 		
 		#if tools
-		ApplicationMain.config.background = color;
-		ApplicationMain.config.element = htmlElement;
-		ApplicationMain.config.width = width;
-		ApplicationMain.config.height = height;
+		ApplicationMain.config.windows[0].background = color;
+		ApplicationMain.config.windows[0].element = htmlElement;
+		ApplicationMain.config.windows[0].width = width;
+		ApplicationMain.config.windows[0].height = height;
 		ApplicationMain.config.assetsPrefix = assetsPrefix;
 		ApplicationMain.create ();
 		#end
@@ -118,7 +118,15 @@ class System {
 	public static function exit (code:Int):Void {
 		
 		#if sys
-		// TODO: Clean shutdown?
+		#if !macro
+		if (Application.current != null) {
+			
+			// TODO: Clean exit?
+			
+			Application.current.onExit.dispatch (code);
+			
+		}
+		#end
 		Sys.exit (code);
 		#end
 		
@@ -518,6 +526,16 @@ class System {
 		
 		#if (cpp || neko || nodejs)
 		return lime_system_get_directory (SystemDirectory.APPLICATION, null, null);
+		#elseif flash
+		if (Capabilities.playerType == "Desktop") {
+			
+			return Reflect.getProperty (Type.resolveClass ("flash.filesystem.File"), "applicationDirectory").nativePath;
+			
+		} else {
+			
+			return null;
+			
+		}
 		#else
 		return null;
 		#end
@@ -550,6 +568,16 @@ class System {
 		
 		#if (cpp || neko || nodejs)
 		return lime_system_get_directory (SystemDirectory.APPLICATION_STORAGE, company, file);
+		#elseif flash
+		if (Capabilities.playerType == "Desktop") {
+			
+			return Reflect.getProperty (Type.resolveClass ("flash.filesystem.File"), "applicationStorageDirectory").nativePath;
+			
+		} else {
+			
+			return null;
+			
+		}
 		#else
 		return null;
 		#end
@@ -561,6 +589,16 @@ class System {
 		
 		#if (cpp || neko || nodejs)
 		return lime_system_get_directory (SystemDirectory.DESKTOP, null, null);
+		#elseif flash
+		if (Capabilities.playerType == "Desktop") {
+			
+			return Reflect.getProperty (Type.resolveClass ("flash.filesystem.File"), "desktopDirectory").nativePath;
+			
+		} else {
+			
+			return null;
+			
+		}
 		#else
 		return null;
 		#end
@@ -572,6 +610,16 @@ class System {
 		
 		#if (cpp || neko || nodejs)
 		return lime_system_get_directory (SystemDirectory.DOCUMENTS, null, null);
+		#elseif flash
+		if (Capabilities.playerType == "Desktop") {
+			
+			return Reflect.getProperty (Type.resolveClass ("flash.filesystem.File"), "documentsDirectory").nativePath;
+			
+		} else {
+			
+			return null;
+			
+		}
 		#else
 		return null;
 		#end
@@ -605,6 +653,16 @@ class System {
 		
 		#if (cpp || neko || nodejs)
 		return lime_system_get_directory (SystemDirectory.USER, null, null);
+		#elseif flash
+		if (Capabilities.playerType == "Desktop") {
+			
+			return Reflect.getProperty (Type.resolveClass ("flash.filesystem.File"), "userDirectory").nativePath;
+			
+		} else {
+			
+			return null;
+			
+		}
 		#else
 		return null;
 		#end

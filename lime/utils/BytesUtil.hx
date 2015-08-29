@@ -39,4 +39,13 @@ class BytesUtil
 		
 	}
 	
+	public static function getByteArrayFromAnonStructure (as:{b:Dynamic, length:Int}) {
+		
+		#if nodejs
+		return ByteArray.fromBytes (@:privateAccess new Bytes (as.length, as.b.buffer));
+		#else
+		return new ByteArray.fromBytes (@:privateAccess new Bytes (as.length, as.b));
+		#end
+		
+	}
 }
