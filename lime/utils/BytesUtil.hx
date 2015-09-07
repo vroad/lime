@@ -33,6 +33,10 @@ class BytesUtil
 		
 		#if js
 		return byteArray.byteView;
+		#elseif flash
+		var u8a:UInt8Array = new UInt8Array (byteArray.length);
+		u8a.buffer.getData ().readBytes (byteArray);
+		return u8a;
 		#else
 		return new UInt8Array (byteArray);
 		#end
@@ -45,6 +49,8 @@ class BytesUtil
 		return ByteArray.fromBytes (@:privateAccess new Bytes (as.length, as.b.buffer));
 		#elseif js
 		return ByteArray.fromBytes (@:privateAccess new Bytes (as.b.buffer));
+		#elseif flash
+		return null;
 		#else
 		return ByteArray.fromBytes (@:privateAccess new Bytes (as.length, as.b));
 		#end
