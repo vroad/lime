@@ -610,17 +610,27 @@ namespace lime {
 		#else
 			
 			bool isVsyncEnabled = false;
-			for (int i = 0; i < windows.size(); ++i)
-				if (windows[i]->flags & WINDOW_FLAG_VSYNC) {
+			for (int i = 0; i < windows.size(); ++i) {
+				
+				if (!(SDL_GetWindowFlags (windows[i]->sdlWindow) & SDL_WINDOW_MINIMIZED)) {
 					
-					isVsyncEnabled = true;
-					break;
+					if (windows[i]->flags & WINDOW_FLAG_VSYNC) {
+						
+						isVsyncEnabled = true;
+						
+					}
 					
 				}
+				
+			}
 			
-			if (isVsyncEnabled)
+			if (isVsyncEnabled) {
+				
+				if (timerActive)
+					SDL_RemoveTimer (timerID);
 				OnTimer (0, 0);
-			else {
+				
+			} else {
 				
 				if (currentUpdate >= nextUpdate) {
 					
