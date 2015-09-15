@@ -8,7 +8,7 @@ class BytesUtil
 	public static function getBytesFromByteArray(byteArray:ByteArray) {
 		
 		#if nodejs
-		@:privateAccess return new Bytes (byteArray.length, cast byteArray.byteView.buffer);
+		@:privateAccess return new Bytes (byteArray.length, cast byteArray.byteView);
 		#elseif js
 		@:privateAccess return new Bytes (byteArray.byteView.buffer);
 		#else

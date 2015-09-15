@@ -20,6 +20,7 @@ import lime.math.Rectangle;
 import lime.math.Vector2;
 import lime.utils.ArrayBuffer;
 import lime.utils.ByteArray;
+import lime.utils.BytesUtil;
 import lime.utils.UInt8Array;
 import lime.system.System;
 
@@ -1074,7 +1075,7 @@ class Image {
 			
 		#elseif (cpp || neko || nodejs)
 			
-			var data = lime_image_load (bytes);
+			var data = lime_image_load (BytesUtil.getBytesFromByteArray(bytes));
 			
 			if (data != null) {
 				
