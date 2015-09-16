@@ -43,16 +43,12 @@ class BytesUtil
 		
 	}
 	
-	public static function getByteArrayFromAnonStructure (as:{b:Dynamic, length:Int}) {
+	public static function getUInt8ArrayFromAnonStructure (as:{b:Dynamic, length:Int}) {
 		
-		#if nodejs
-		return ByteArray.fromBytes (@:privateAccess new Bytes (as.length, as.b.buffer));
-		#elseif js
-		return ByteArray.fromBytes (@:privateAccess new Bytes (as.b.buffer));
-		#elseif flash
-		return null;
+		#if js
+		return as.b;
 		#else
-		return ByteArray.fromBytes (@:privateAccess new Bytes (as.length, as.b));
+		return new UInt8Array (@:privateAccess new Bytes (as.length, as.b));
 		#end
 		
 	}

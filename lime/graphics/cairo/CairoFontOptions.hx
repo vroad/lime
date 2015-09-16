@@ -2,10 +2,13 @@ package lime.graphics.cairo;
 
 
 import lime.text.Font;
-import lime.system.System;
+
+#if !macro
+@:build(lime.system.CFFI.build())
+#end
 
 
-class CairoFontOptions {
+abstract CairoFontOptions(Dynamic) from Float to Float {
 	
 	
 	public var antialias (get, set):CairoAntialias;
@@ -13,20 +16,23 @@ class CairoFontOptions {
 	public var hintStyle (get, set):CairoHintStyle;
 	public var subpixelOrder (get, set):CairoSubpixelOrder;
 	
-	@:noCompletion public var handle:Dynamic;
 	
-	
-	public function new (handle:Dynamic = null) {
+	public function new () {
 		
 		#if lime_cairo
-		if (handle == null) {
-			
-			handle = lime_cairo_font_options_create ();
-			
-		}
+		this = lime_cairo_font_options_create ();
+		#else
+		this = cast 0;
 		#end
 		
-		this.handle = handle;
+	}
+	
+	
+	public function destroy ():Void {
+		
+		#if lime_cairo
+		lime_cairo_font_options_destroy (this);
+		#end
 		
 	}
 	
@@ -41,7 +47,7 @@ class CairoFontOptions {
 	@:noCompletion private function get_antialias ():CairoAntialias {
 		
 		#if lime_cairo
-		return lime_cairo_font_options_get_antialias (handle);
+		return lime_cairo_font_options_get_antialias (this);
 		#end
 		
 		return cast 0;
@@ -52,7 +58,7 @@ class CairoFontOptions {
 	@:noCompletion private function set_antialias (value:CairoAntialias):CairoAntialias {
 		
 		#if lime_cairo
-		lime_cairo_font_options_set_antialias (handle, value);
+		lime_cairo_font_options_set_antialias (this, value);
 		#end
 		
 		return value;
@@ -63,7 +69,7 @@ class CairoFontOptions {
 	@:noCompletion private function get_hintMetrics ():CairoHintMetrics {
 		
 		#if lime_cairo
-		return lime_cairo_font_options_get_hint_metrics (handle);
+		return lime_cairo_font_options_get_hint_metrics (this);
 		#end
 		
 		return cast 0;
@@ -74,7 +80,7 @@ class CairoFontOptions {
 	@:noCompletion private function set_hintMetrics (value:CairoHintMetrics):CairoHintMetrics {
 		
 		#if lime_cairo
-		lime_cairo_font_options_set_hint_metrics (handle, value);
+		lime_cairo_font_options_set_hint_metrics (this, value);
 		#end
 		
 		return value;
@@ -86,7 +92,7 @@ class CairoFontOptions {
 	@:noCompletion private function get_hintStyle ():CairoHintStyle {
 		
 		#if lime_cairo
-		return lime_cairo_font_options_get_hint_style (handle);
+		return lime_cairo_font_options_get_hint_style (this);
 		#end
 		
 		return cast 0;
@@ -97,7 +103,7 @@ class CairoFontOptions {
 	@:noCompletion private function set_hintStyle (value:CairoHintStyle):CairoHintStyle {
 		
 		#if lime_cairo
-		lime_cairo_font_options_set_hint_style (handle, value);
+		lime_cairo_font_options_set_hint_style (this, value);
 		#end
 		
 		return value;
@@ -108,7 +114,7 @@ class CairoFontOptions {
 	@:noCompletion private function get_subpixelOrder ():CairoSubpixelOrder {
 		
 		#if lime_cairo
-		return lime_cairo_font_options_get_subpixel_order (handle);
+		return lime_cairo_font_options_get_subpixel_order (this);
 		#end
 		
 		return cast 0;
@@ -119,7 +125,7 @@ class CairoFontOptions {
 	@:noCompletion private function set_subpixelOrder (value:CairoSubpixelOrder):CairoSubpixelOrder {
 		
 		#if lime_cairo
-		lime_cairo_font_options_set_subpixel_order (handle, value);
+		lime_cairo_font_options_set_subpixel_order (this, value);
 		#end
 		
 		return value;
@@ -135,15 +141,16 @@ class CairoFontOptions {
 	
 	
 	#if lime_cairo
-	private static var lime_cairo_font_options_create = System.load ("lime", "lime_cairo_font_options_create", 0);
-	private static var lime_cairo_font_options_get_antialias = System.load ("lime", "lime_cairo_font_options_get_antialias", 1);
-	private static var lime_cairo_font_options_get_hint_metrics = System.load ("lime", "lime_cairo_font_options_get_hint_metrics", 1);
-	private static var lime_cairo_font_options_get_hint_style = System.load ("lime", "lime_cairo_font_options_get_hint_style", 1);
-	private static var lime_cairo_font_options_get_subpixel_order = System.load ("lime", "lime_cairo_font_options_get_subpixel_order", 1);
-	private static var lime_cairo_font_options_set_antialias = System.load ("lime", "lime_cairo_font_options_set_antialias", 2);
-	private static var lime_cairo_font_options_set_hint_metrics = System.load ("lime", "lime_cairo_font_options_set_hint_metrics", 2);
-	private static var lime_cairo_font_options_set_hint_style = System.load ("lime", "lime_cairo_font_options_set_hint_style", 2);
-	private static var lime_cairo_font_options_set_subpixel_order = System.load ("lime", "lime_cairo_font_options_set_subpixel_order", 2);
+	@:cffi private static function lime_cairo_font_options_create ():Float;
+	@:cffi private static function lime_cairo_font_options_destroy (handle:Float):Void;
+	@:cffi private static function lime_cairo_font_options_get_antialias (handle:Float):Int;
+	@:cffi private static function lime_cairo_font_options_get_hint_metrics (handle:Float):Int;
+	@:cffi private static function lime_cairo_font_options_get_hint_style (handle:Float):Int;
+	@:cffi private static function lime_cairo_font_options_get_subpixel_order (handle:Float):Int;
+	@:cffi private static function lime_cairo_font_options_set_antialias (handle:Float, v:Int):Void;
+	@:cffi private static function lime_cairo_font_options_set_hint_metrics (handle:Float, v:Int):Void;
+	@:cffi private static function lime_cairo_font_options_set_hint_style (handle:Float, v:Int):Void;
+	@:cffi private static function lime_cairo_font_options_set_subpixel_order (handle:Float, v:Int):Void;
 	#end
 	
 	

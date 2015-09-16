@@ -2,10 +2,13 @@ package lime.graphics.cairo;
 
 
 import lime.math.Matrix3;
-import lime.system.System;
+
+#if !macro
+@:build(lime.system.CFFI.build())
+#end
 
 
-abstract CairoPattern(Dynamic) {
+abstract CairoPattern(Dynamic) from Float to Float {
 	
 	
 	public var colorStopCount (get, never):Int;
@@ -168,7 +171,7 @@ abstract CairoPattern(Dynamic) {
 	@:noCompletion private function get_matrix ():Matrix3 {
 		
 		#if lime_cairo
-		var m = lime_cairo_pattern_get_matrix (this);
+		var m:Dynamic = lime_cairo_pattern_get_matrix (this);
 		return new Matrix3 (m.a, m.b, m.c, m.d, m.tx, m.ty);
 		#else
 		return null;
@@ -196,21 +199,21 @@ abstract CairoPattern(Dynamic) {
 	
 	
 	#if lime_cairo
-	private static var lime_cairo_pattern_add_color_stop_rgb = System.load ("lime", "lime_cairo_pattern_add_color_stop_rgb", 5);
-	private static var lime_cairo_pattern_add_color_stop_rgba = System.load ("lime", "lime_cairo_pattern_add_color_stop_rgba", -1);
-	private static var lime_cairo_pattern_create_for_surface = System.load ("lime", "lime_cairo_pattern_create_for_surface", 1);
-	private static var lime_cairo_pattern_create_linear = System.load ("lime", "lime_cairo_pattern_create_linear", 4);
-	private static var lime_cairo_pattern_create_radial = System.load ("lime", "lime_cairo_pattern_create_radial", -1);
-	private static var lime_cairo_pattern_create_rgb = System.load ("lime", "lime_cairo_pattern_create_rgb", 3);
-	private static var lime_cairo_pattern_create_rgba = System.load ("lime", "lime_cairo_pattern_create_rgba", 4);
-	private static var lime_cairo_pattern_destroy = System.load ("lime", "lime_cairo_pattern_destroy", 1);
-	private static var lime_cairo_pattern_get_color_stop_count = System.load ("lime", "lime_cairo_pattern_get_color_stop_count", 1);
-	private static var lime_cairo_pattern_get_extend = System.load ("lime", "lime_cairo_pattern_get_extend", 1);
-	private static var lime_cairo_pattern_get_filter = System.load ("lime", "lime_cairo_pattern_get_filter", 1);
-	private static var lime_cairo_pattern_get_matrix = System.load ("lime", "lime_cairo_pattern_get_matrix", 1);
-	private static var lime_cairo_pattern_set_extend = System.load ("lime", "lime_cairo_pattern_set_extend", 2);
-	private static var lime_cairo_pattern_set_filter = System.load ("lime", "lime_cairo_pattern_set_filter", 2);
-	private static var lime_cairo_pattern_set_matrix = System.load ("lime", "lime_cairo_pattern_set_matrix", 2);
+	@:cffi private static function lime_cairo_pattern_add_color_stop_rgb (handle:Float, offset:Float, red:Float, green:Float, blue:Float):Void;
+	@:cffi private static function lime_cairo_pattern_add_color_stop_rgba (handle:Float, offset:Float, red:Float, green:Float, blue:Float, alpha:Float):Void;
+	@:cffi private static function lime_cairo_pattern_create_for_surface (surface:Float):Float;
+	@:cffi private static function lime_cairo_pattern_create_linear (x0:Float, y0:Float, x1:Float, y1:Float):Float;
+	@:cffi private static function lime_cairo_pattern_create_radial (cx0:Float, cy0:Float, radius0:Float, cx1:Float, cy1:Float, radius1:Float):Float;
+	@:cffi private static function lime_cairo_pattern_create_rgb (r:Float, g:Float, b:Float):Float;
+	@:cffi private static function lime_cairo_pattern_create_rgba (r:Float, g:Float, b:Float, a:Float):Float;
+	@:cffi private static function lime_cairo_pattern_destroy (handle:Float):Void;
+	@:cffi private static function lime_cairo_pattern_get_color_stop_count (handle:Float):Int;
+	@:cffi private static function lime_cairo_pattern_get_extend (handle:Float):Int;
+	@:cffi private static function lime_cairo_pattern_get_filter (handle:Float):Int;
+	@:cffi private static function lime_cairo_pattern_get_matrix (handle:Float):Dynamic;
+	@:cffi private static function lime_cairo_pattern_set_extend (handle:Float, extend:Int):Void;
+	@:cffi private static function lime_cairo_pattern_set_filter (handle:Float, filter:Int):Void;
+	@:cffi private static function lime_cairo_pattern_set_matrix (handle:Float, matrix:Dynamic):Void;
 	#end
 	
 	

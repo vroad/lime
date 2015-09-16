@@ -17,6 +17,10 @@ import lime.ui.Gamepad;
 import lime.ui.Touch;
 import lime.ui.Window;
 
+#if !macro
+@:build(lime.system.CFFI.build())
+#end
+
 @:access(haxe.Timer)
 @:access(lime._backend.native.NativeRenderer)
 @:access(lime.app.Application)
@@ -57,7 +61,7 @@ class NativeApplication {
 	
 	public function create (config:Config):Void {
 		
-		handle = lime_application_create (null);
+		handle = lime_application_create ({});
 		
 	}
 	
@@ -497,20 +501,20 @@ class NativeApplication {
 	}
 	
 	
-	private static var lime_application_create = System.load ("lime", "lime_application_create", 1);
-	private static var lime_application_event_manager_register = System.load ("lime", "lime_application_event_manager_register", 2);
-	private static var lime_application_exec = System.load ("lime", "lime_application_exec", 1);
-	private static var lime_application_init = System.load ("lime", "lime_application_init", 1);
-	private static var lime_application_set_frame_rate = System.load ("lime", "lime_application_set_frame_rate", 2);
-	private static var lime_application_update = System.load ("lime", "lime_application_update", 1);
-	private static var lime_application_quit = System.load ("lime", "lime_application_quit", 1);
-	private static var lime_gamepad_event_manager_register = System.load ("lime", "lime_gamepad_event_manager_register", 2);
-	private static var lime_key_event_manager_register = System.load ("lime", "lime_key_event_manager_register", 2);
-	private static var lime_mouse_event_manager_register = System.load ("lime", "lime_mouse_event_manager_register", 2);
-	private static var lime_render_event_manager_register = System.load ("lime", "lime_render_event_manager_register", 2);
-	private static var lime_text_event_manager_register = System.load ("lime", "lime_text_event_manager_register", 2);
-	private static var lime_touch_event_manager_register = System.load ("lime", "lime_touch_event_manager_register", 2);
-	private static var lime_window_event_manager_register = System.load ("lime", "lime_window_event_manager_register", 2);
+	@:cffi private static function lime_application_create (config:Dynamic):Float;
+	@:cffi private static function lime_application_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_application_exec (handle:Float):Int;
+	@:cffi private static function lime_application_init (handle:Float):Void;
+	@:cffi private static function lime_application_quit (handle:Float):Int;
+	@:cffi private static function lime_application_set_frame_rate (handle:Float, value:Float):Void;
+	@:cffi private static function lime_application_update (handle:Float):Bool;
+	@:cffi private static function lime_gamepad_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_key_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_mouse_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_render_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_text_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_touch_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_window_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
 	
 	
 }

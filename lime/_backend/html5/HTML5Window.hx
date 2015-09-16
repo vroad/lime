@@ -48,6 +48,7 @@ class HTML5Window {
 	private var currentTouches = new Map<Int, Touch> ();
 	private var enableTextEvents:Bool;
 	private var parent:Window;
+	private var primaryTouch:Touch;
 	private var setHeight:Int;
 	private var setWidth:Int;
 	private var unusedTouchesPool = new List<Touch> ();
@@ -60,6 +61,21 @@ class HTML5Window {
 		if (parent.config != null && Reflect.hasField (parent.config, "element")) {
 			
 			element = parent.config.element;
+			
+		}
+		
+	}
+	
+	
+	public function alert (message:String, title:String):Void {
+		
+		if (message != null) {
+			
+			#if (haxe_ver >= 3.2)
+			Browser.alert (message);
+			#else
+			js.Lib.alert (message);
+			#end
 			
 		}
 		
@@ -440,7 +456,13 @@ class HTML5Window {
 					
 					Touch.onStart.dispatch (touch);
 					
-					if (data == event.touches[0]) {
+					if (primaryTouch == null) {
+						
+						primaryTouch = touch;
+						
+					}
+					
+					if (touch == primaryTouch) {
 						
 						parent.onMouseDown.dispatch (x, y, 0);
 						
@@ -466,9 +488,10 @@ class HTML5Window {
 						currentTouches.remove (data.identifier);
 						unusedTouchesPool.add (touch);
 						
-						if (data == event.touches[0]) {
+						if (touch == primaryTouch) {
 							
 							parent.onMouseUp.dispatch (x, y, 0);
+							primaryTouch = null;
 							
 						}
 						
@@ -491,7 +514,7 @@ class HTML5Window {
 						
 						Touch.onMove.dispatch (touch);
 						
-						if (data == event.touches[0]) {
+						if (touch == primaryTouch) {
 							
 							parent.onMouseMove.dispatch (x, y);
 							

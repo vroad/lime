@@ -2,7 +2,10 @@ package lime.ui;
 
 
 import lime.app.Event;
-import lime.system.System;
+
+#if !macro
+@:build(lime.system.CFFI.build())
+#end
 
 
 class Gamepad {
@@ -75,9 +78,9 @@ class Gamepad {
 	
 	
 	#if (cpp || neko || nodejs)
-	private static var lime_gamepad_add_mappings = System.load ("lime", "lime_gamepad_add_mappings", 1);
-	private static var lime_gamepad_get_device_guid = System.load ("lime", "lime_gamepad_get_device_guid", 1);
-	private static var lime_gamepad_get_device_name = System.load ("lime", "lime_gamepad_get_device_name", 1);
+	@:cffi private static function lime_gamepad_add_mappings (mappings:Dynamic):Void;
+	@:cffi private static function lime_gamepad_get_device_guid (id:Int):String;
+	@:cffi private static function lime_gamepad_get_device_name (id:Int):String;
 	#end
 	
 	

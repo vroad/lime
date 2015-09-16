@@ -1,9 +1,12 @@
 package lime._backend.native;
 
 
-import lime.system.System;
 import lime.ui.MouseCursor;
 import lime.ui.Window;
+
+#if !macro
+@:build(lime.system.CFFI.build())
+#end
 
 @:access(lime.ui.Window)
 
@@ -44,7 +47,7 @@ class NativeMouse {
 	
 	public static function warp (x:Int, y:Int, window:Window):Void {
 		
-		lime_mouse_warp (x, y, window == null ? null : window.backend.handle);
+		lime_mouse_warp (x, y, window == null ? 0 : window.backend.handle);
 		
 	}
 	
@@ -130,17 +133,17 @@ class NativeMouse {
 	
 	
 	
-	private static var lime_mouse_hide = System.load ("lime", "lime_mouse_hide", 0);
-	private static var lime_mouse_set_cursor = System.load ("lime", "lime_mouse_set_cursor", 1);
-	private static var lime_mouse_set_lock = System.load ("lime", "lime_mouse_set_lock", 1);
-	private static var lime_mouse_show = System.load ("lime", "lime_mouse_show", 0);
-	private static var lime_mouse_warp = System.load ("lime", "lime_mouse_warp", 3);
+	@:cffi private static function lime_mouse_hide ():Void;
+	@:cffi private static function lime_mouse_set_cursor (cursor:Int):Void;
+	@:cffi private static function lime_mouse_set_lock (lock:Bool):Void;
+	@:cffi private static function lime_mouse_show ():Void;
+	@:cffi private static function lime_mouse_warp (x:Int, y:Int, window:Float):Void;
 	
 	
 }
 
 
-@:enum private abstract MouseCursorType(Int) {
+@:enum private abstract MouseCursorType(Int) from Int to Int {
 	
 	var ARROW = 0;
 	var CROSSHAIR = 1;

@@ -5,10 +5,9 @@ import haxe.io.Bytes;
 import lime.audio.openal.AL;
 import lime.net.URLLoader;
 import lime.net.URLRequest;
-import lime.system.System;
 import lime.utils.ByteArray;
 import lime.utils.BytesUtil;
-import lime.utils.Float32Array;
+import lime.utils.UInt8Array;
 
 #if (js && html5)
 import js.html.Audio;
@@ -16,6 +15,10 @@ import js.html.Audio;
 import flash.media.Sound;
 #elseif lime_console
 import lime.audio.fmod.Sound;
+#end
+
+#if !macro
+@:build(lime.system.CFFI.build())
 #end
 
 
@@ -26,7 +29,7 @@ class AudioBuffer {
 	public var channels:Int;
 	public var handle:Dynamic;
 	public var sourceData:ByteArray;
-	public var data:ByteArray;
+	public var data:UInt8Array;
 	public var id:UInt;
 	public var stream(get, never):Bool;
 	public var sampleRate:Int;
@@ -89,14 +92,14 @@ class AudioBuffer {
 		
 		#elseif (cpp || neko || nodejs)
 		
-		var data = lime_audio_load (bytes, stream);
+		var data:Dynamic = lime_audio_load (BytesUtil.getBytesFromByteArray(bytes), stream);
 		
 		if (data != null) {
 			
 			var audioBuffer = new AudioBuffer ();
 			audioBuffer.bitsPerSample = data.bitsPerSample;
 			audioBuffer.channels = data.channels;
-			audioBuffer.data = BytesUtil.getByteArrayFromAnonStructure (data.data);
+			audioBuffer.data = BytesUtil.getUInt8ArrayFromAnonStructure (data.data);
 			audioBuffer.sampleRate = data.sampleRate;
 			return audioBuffer;
 			
@@ -129,14 +132,14 @@ class AudioBuffer {
 		
 		#elseif (cpp || neko || nodejs)
 		
-		var data = lime_audio_load (path, stream);
+		var data:Dynamic = lime_audio_load (path, stream);
 		
 		if (data != null) {
 			
 			var audioBuffer = new AudioBuffer ();
 			audioBuffer.bitsPerSample = data.bitsPerSample;
 			audioBuffer.channels = data.channels;
-			audioBuffer.data = BytesUtil.getByteArrayFromAnonStructure (data.data);
+			audioBuffer.data = BytesUtil.getUInt8ArrayFromAnonStructure (data.data);
 			audioBuffer.sampleRate = data.sampleRate;
 			return audioBuffer;
 			
@@ -190,7 +193,7 @@ class AudioBuffer {
 	
 	
 	#if (cpp || neko || nodejs)
-	private static var lime_audio_load:Dynamic = System.load ("lime", "lime_audio_load", 2);
+	@:cffi private static function lime_audio_load (data:Dynamic, stream:Bool):Dynamic;
 	#end
 	
 	

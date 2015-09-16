@@ -112,8 +112,8 @@ bool D3DPresentEngine::createSharedTexture(unsigned int textureID)
         &use_rgb);
 
     EGLint attrib_list[] = {
-        EGL_WIDTH, _w,
-        EGL_HEIGHT, _h,
+        EGL_WIDTH, EGLint(_w),
+        EGL_HEIGHT, EGLint(_h),
         EGL_TEXTURE_FORMAT, use_rgb ? EGL_TEXTURE_RGB : EGL_TEXTURE_RGBA,
         EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
         EGL_NONE

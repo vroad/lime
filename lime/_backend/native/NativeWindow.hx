@@ -9,6 +9,10 @@ import lime.system.Display;
 import lime.system.System;
 import lime.ui.Window;
 
+#if !macro
+@:build(lime.system.CFFI.build())
+#end
+
 @:access(lime.app.Application)
 @:access(lime.ui.Window)
 
@@ -24,6 +28,17 @@ class NativeWindow {
 	public function new (parent:Window) {
 		
 		this.parent = parent;
+		
+	}
+	
+	
+	public function alert (message:String, title:String):Void {
+		
+		if (handle != null) {
+			
+			lime_window_alert (handle, message, title);
+			
+		}
 		
 	}
 	
@@ -165,7 +180,7 @@ class NativeWindow {
 		
 		if (handle != null) {
 			
-			return lime_window_set_enable_text_events (handle, value);
+			lime_window_set_enable_text_events (handle, value);
 			
 		}
 		
@@ -230,22 +245,23 @@ class NativeWindow {
 	}
 	
 	
-	private static var lime_window_close = System.load ("lime", "lime_window_close", 1);
-	private static var lime_window_create = System.load ("lime", "lime_window_create", 5);
-	private static var lime_window_focus = System.load ("lime", "lime_window_focus", 1);
-	private static var lime_window_get_enable_text_events = System.load ("lime", "lime_window_get_enable_text_events", 1);
-	private static var lime_window_get_height = System.load ("lime", "lime_window_get_height", 1);
-	private static var lime_window_get_id = System.load ("lime", "lime_window_get_id", 1);
-	private static var lime_window_get_width = System.load ("lime", "lime_window_get_width", 1);
-	private static var lime_window_get_x = System.load ("lime", "lime_window_get_x", 1);
-	private static var lime_window_get_y = System.load ("lime", "lime_window_get_y", 1);
-	private static var lime_window_move = System.load ("lime", "lime_window_move", 3);
-	private static var lime_window_resize = System.load ("lime", "lime_window_resize", 3);
-	private static var lime_window_set_enable_text_events = System.load ("lime", "lime_window_set_enable_text_events", 2);
-	private static var lime_window_set_fullscreen = System.load ("lime", "lime_window_set_fullscreen", 2);
-	private static var lime_window_set_icon = System.load ("lime", "lime_window_set_icon", 2);
-	private static var lime_window_set_minimized = System.load ("lime", "lime_window_set_minimized", 2);
-	private static var lime_window_set_title = System.load ("lime", "lime_window_set_title", 2);
+	@:cffi private static function lime_window_alert (handle:Float, message:String, title:String):Void;
+	@:cffi private static function lime_window_close (handle:Float):Void;
+	@:cffi private static function lime_window_create (application:Float, width:Int, height:Int, flags:Int, title:String):Float;
+	@:cffi private static function lime_window_focus (handle:Float):Void;
+	@:cffi private static function lime_window_get_enable_text_events (handle:Float):Bool;
+	@:cffi private static function lime_window_get_height (handle:Float):Int;
+	@:cffi private static function lime_window_get_id (handle:Float):Int;
+	@:cffi private static function lime_window_get_width (handle:Float):Int;
+	@:cffi private static function lime_window_get_x (handle:Float):Int;
+	@:cffi private static function lime_window_get_y (handle:Float):Int;
+	@:cffi private static function lime_window_move (handle:Float, x:Int, y:Int):Void;
+	@:cffi private static function lime_window_resize (handle:Float, width:Int, height:Int):Void;
+	@:cffi private static function lime_window_set_enable_text_events (handle:Float, enabled:Bool):Void;
+	@:cffi private static function lime_window_set_fullscreen (handle:Float, fullscreen:Bool):Bool;
+	@:cffi private static function lime_window_set_icon (handle:Float, buffer:Dynamic):Void;
+	@:cffi private static function lime_window_set_minimized (handle:Float, minimized:Bool):Bool;
+	@:cffi private static function lime_window_set_title (handle:Float, title:String):String;
 	
 	
 }

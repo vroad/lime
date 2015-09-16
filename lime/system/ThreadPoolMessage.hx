@@ -2,17 +2,14 @@ package lime.system;
 
 class ThreadPoolMessage {
 	
-	
-	public var id:String;
-	public var message:Dynamic;
+	public var state:Dynamic;
 	public var type:ThreadPoolMessageType;
 	
 	
-	public function new (type:ThreadPoolMessageType, id:String, message:Dynamic) {
+	public function new (type:ThreadPoolMessageType, state:Dynamic) {
 		
 		this.type = type;
-		this.id = id;
-		this.message = message;
+		this.state = state;
 		
 	}
 	

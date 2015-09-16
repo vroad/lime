@@ -3,7 +3,11 @@ package lime.graphics.cairo;
 
 import lime.math.Matrix3;
 import lime.math.Vector2;
-import lime.system.System;
+import lime.system.CFFI;
+
+#if !macro
+@:build(lime.system.CFFI.build())
+#end
 
 
 class Cairo {
@@ -17,6 +21,8 @@ class Cairo {
 	public var dash (get, set):Array<Float>;
 	public var dashCount (get, never):Int;
 	public var fillRule (get, set):CairoFillRule;
+	public var fontFace (get, set):CairoFontFace;
+	public var fontOptions (get, set):CairoFontOptions;
 	public var groupTarget (get, never):CairoSurface;
 	public var hasCurrentPoint (get, never):Bool;
 	public var lineCap (get, set):CairoLineCap;
@@ -49,7 +55,7 @@ class Cairo {
 	public function recreate (surface:CairoSurface) : Void {
 		
 		#if lime_cairo
-		destroy();
+		destroy ();
 		handle = lime_cairo_create (surface);
 		#end
 	}
@@ -148,7 +154,7 @@ class Cairo {
 	public function fillExtents (x1:Float, y1:Float, x2:Float, y2:Float):Void {
 		
 		#if lime_cairo
-		lime_cairo_fill_extents (x1, y1, x2, y2);
+		lime_cairo_fill_extents (handle, x1, y1, x2, y2);
 		#end
 		
 	}
@@ -235,7 +241,7 @@ class Cairo {
 	public function maskSurface (surface:CairoSurface, x:Float, y:Float):Void {
 		
 		#if lime_cairo
-		lime_cairo_mask_surface (surface, x, y);
+		lime_cairo_mask_surface (handle, surface, x, y);
 		#end
 		
 	}
@@ -377,38 +383,12 @@ class Cairo {
 		
 	}
 	
-	public function setFontFace( face:CairoFont ) {
+	
+	public function setFontSize (size:Float):Void {
 		
 		#if lime_cairo
-		lime_cairo_set_font_face( handle, face.handle );
+		lime_cairo_set_font_size (handle, size);
 		#end
-	}
-	
-	public function setFontSize( size:Float ) {
-		
-		#if lime_cairo
-		lime_cairo_set_font_size( handle, size );
-		#end
-	}
-	
-	public function getFontOptions ():CairoFontOptions {
-		
-		#if lime_cairo
-		return new CairoFontOptions( handle );
-		#end
-		
-		return null;
-		
-	}
-	
-	
-	public function setFontOptions (value:CairoFontOptions):CairoFontOptions {
-		
-		#if lime_cairo
-		lime_cairo_set_font_options (handle, value.handle);
-		#end
-		
-		return value;
 		
 	}
 	
@@ -448,10 +428,11 @@ class Cairo {
 		
 	}
 	
-	public function showText ( utf8:String ) {
+	
+	public function showText (utf8:String):Void {
 		
 		#if lime_cairo
-		lime_cairo_show_text( handle, utf8 );
+		lime_cairo_show_text (handle, utf8);
 		#end
 		
 	}
@@ -563,7 +544,7 @@ class Cairo {
 	@:noCompletion private function get_currentPoint ():Vector2 {
 		
 		#if lime_cairo
-		var vec = lime_cairo_get_current_point (handle);
+		var vec:Dynamic = lime_cairo_get_current_point (handle);
 		return new Vector2 (vec.x, vec.y);
 		#end
 		
@@ -575,7 +556,8 @@ class Cairo {
 	@:noCompletion private function get_dash ():Array<Float> {
 		
 		#if lime_cairo
-		return lime_cairo_get_dash (handle);
+		var result:Dynamic = lime_cairo_get_dash (handle);
+		return result;
 		#end
 		
 		return [];
@@ -620,6 +602,50 @@ class Cairo {
 		
 		#if lime_cairo
 		lime_cairo_set_fill_rule (handle, value);
+		#end
+		
+		return value;
+		
+	}
+	
+	
+	@:noCompletion private function get_fontFace ():CairoFontFace {
+		
+		#if lime_cairo
+		return lime_cairo_get_font_face (handle);
+		#end
+		
+		return cast 0;
+		
+	}
+	
+	
+	@:noCompletion private function set_fontFace (value:CairoFontFace):CairoFontFace {
+		
+		#if lime_cairo
+		lime_cairo_set_font_face (handle, value);
+		#end
+		
+		return value;
+		
+	}
+	
+	
+	@:noCompletion private function get_fontOptions ():CairoFontOptions {
+		
+		#if lime_cairo
+		return lime_cairo_get_font_options (handle);
+		#else
+		return null;
+		#end
+		
+	}
+	
+	
+	@:noCompletion private function set_fontOptions (value:CairoFontOptions):CairoFontOptions {
+		
+		#if lime_cairo
+		lime_cairo_set_font_options (handle, value);
 		#end
 		
 		return value;
@@ -718,7 +744,7 @@ class Cairo {
 	@:noCompletion private function get_matrix ():Matrix3 {
 		
 		#if lime_cairo
-		var m = lime_cairo_get_matrix (handle);
+		var m:Dynamic = lime_cairo_get_matrix (handle);
 		return new Matrix3 (m.a, m.b, m.c, m.d, m.tx, m.ty);
 		#end
 		
@@ -785,7 +811,7 @@ class Cairo {
 	@:noCompletion private function get_referenceCount ():Int {
 		
 		#if lime_cairo
-		return lime_cairo_get_reference_count ();
+		return lime_cairo_get_reference_count (handle);
 		#else
 		return 0;
 		#end
@@ -829,7 +855,7 @@ class Cairo {
 	@:noCompletion private function get_tolerance ():Float {
 		
 		#if lime_cairo
-		return lime_cairo_get_tolerance ();
+		return lime_cairo_get_tolerance (handle);
 		#else
 		return 0;
 		#end
@@ -840,7 +866,7 @@ class Cairo {
 	@:noCompletion private function set_tolerance (value:Float):Float {
 		
 		#if lime_cairo
-		lime_cairo_set_tolerance (value);
+		lime_cairo_set_tolerance (handle, value);
 		#end
 		
 		return value;
@@ -878,89 +904,90 @@ class Cairo {
 	
 	
 	#if lime_cairo
-	private static var lime_cairo_arc = System.load ("lime", "lime_cairo_arc", -1);
-	private static var lime_cairo_arc_negative = System.load ("lime", "lime_cairo_arc_negative", -1);
-	private static var lime_cairo_clip = System.load ("lime", "lime_cairo_clip", 1);
-	private static var lime_cairo_clip_preserve = System.load ("lime", "lime_cairo_clip_preserve", 1);
-	private static var lime_cairo_clip_extents = System.load ("lime", "lime_cairo_clip_extents", 5);
-	private static var lime_cairo_close_path = System.load ("lime", "lime_cairo_close_path", 1);
-	private static var lime_cairo_copy_page = System.load ("lime", "lime_cairo_copy_page", 1);
-	private static var lime_cairo_create = System.load ("lime", "lime_cairo_create", 1);
-	private static var lime_cairo_curve_to = System.load ("lime", "lime_cairo_curve_to", -1);
-	private static var lime_cairo_destroy = System.load ("lime", "lime_cairo_destroy", 1);
-	private static var lime_cairo_fill = System.load ("lime", "lime_cairo_fill", 1);
-	private static var lime_cairo_fill_extents = System.load ("lime", "lime_cairo_fill_extents", 5);
-	private static var lime_cairo_fill_preserve = System.load ("lime", "lime_cairo_fill_preserve", 1);
-	private static var lime_cairo_get_antialias = System.load ("lime", "lime_cairo_get_antialias", 1);
-	private static var lime_cairo_get_current_point = System.load ("lime", "lime_cairo_get_current_point", 1);
-	private static var lime_cairo_get_dash = System.load ("lime", "lime_cairo_get_dash", 1);
-	private static var lime_cairo_get_dash_count = System.load ("lime", "lime_cairo_get_dash_count", 1);
-	private static var lime_cairo_get_fill_rule = System.load ("lime", "lime_cairo_get_fill_rule", 1);
-	private static var lime_cairo_get_group_target = System.load ("lime", "lime_cairo_get_group_target", 1);
-	private static var lime_cairo_get_line_cap = System.load ("lime", "lime_cairo_get_line_cap", 1);
-	private static var lime_cairo_get_line_join = System.load ("lime", "lime_cairo_get_line_join", 1);
-	private static var lime_cairo_get_line_width = System.load ("lime", "lime_cairo_get_line_width", 1);
-	private static var lime_cairo_get_matrix = System.load ("lime", "lime_cairo_get_matrix", 1);
-	private static var lime_cairo_get_miter_limit = System.load ("lime", "lime_cairo_get_miter_limit", 1);
-	private static var lime_cairo_get_operator = System.load ("lime", "lime_cairo_get_operator", 1);
-	private static var lime_cairo_get_reference_count = System.load ("lime", "lime_cairo_get_reference_count", 1);
-	private static var lime_cairo_get_source = System.load ("lime", "lime_cairo_get_source", 1);
-	private static var lime_cairo_get_target = System.load ("lime", "lime_cairo_get_target", 1);
-	private static var lime_cairo_get_tolerance = System.load ("lime", "lime_cairo_get_tolerance", 1);
-	private static var lime_cairo_has_current_point = System.load ("lime", "lime_cairo_has_current_point", 1);
-	private static var lime_cairo_identity_matrix = System.load ("lime", "lime_cairo_identity_matrix", 1);
-	private static var lime_cairo_in_clip = System.load ("lime", "lime_cairo_in_clip", 3);
-	private static var lime_cairo_in_fill = System.load ("lime", "lime_cairo_in_fill", 3);
-	private static var lime_cairo_in_stroke = System.load ("lime", "lime_cairo_in_stroke", 3);
-	private static var lime_cairo_line_to = System.load ("lime", "lime_cairo_line_to", 3);
-	private static var lime_cairo_mask = System.load ("lime", "lime_cairo_mask", 2);
-	private static var lime_cairo_mask_surface = System.load ("lime", "lime_cairo_mask_surface", 4);
-	private static var lime_cairo_move_to = System.load ("lime", "lime_cairo_move_to", 3);
-	private static var lime_cairo_new_path = System.load ("lime", "lime_cairo_new_path", 1);
-	private static var lime_cairo_paint = System.load ("lime", "lime_cairo_paint", 1);
-	private static var lime_cairo_paint_with_alpha = System.load ("lime", "lime_cairo_paint_with_alpha", 2);
-	private static var lime_cairo_pop_group = System.load ("lime", "lime_cairo_pop_group", 1);
-	private static var lime_cairo_pop_group_to_source = System.load ("lime", "lime_cairo_pop_group_to_source", 1);
-	private static var lime_cairo_push_group = System.load ("lime", "lime_cairo_push_group", 1);
-	private static var lime_cairo_push_group_with_content = System.load ("lime", "lime_cairo_push_group_with_content", 2);
-	private static var lime_cairo_rectangle = System.load ("lime", "lime_cairo_rectangle", 5);
-	private static var lime_cairo_reference = System.load ("lime", "lime_cairo_reference", 1);
-	private static var lime_cairo_rel_curve_to = System.load ("lime", "lime_cairo_rel_curve_to", -1);
-	private static var lime_cairo_rel_line_to = System.load ("lime", "lime_cairo_rel_line_to", 3);
-	private static var lime_cairo_rel_move_to = System.load ("lime", "lime_cairo_rel_move_to", 3);
-	private static var lime_cairo_reset_clip = System.load ("lime", "lime_cairo_reset_clip", 1);
-	private static var lime_cairo_restore = System.load ("lime", "lime_cairo_restore", 1);
-	private static var lime_cairo_save = System.load ("lime", "lime_cairo_save", 1);
-	private static var lime_cairo_set_antialias = System.load ("lime", "lime_cairo_set_antialias", 2);
-	private static var lime_cairo_set_dash = System.load ("lime", "lime_cairo_set_dash", 2);
-	private static var lime_cairo_set_font_face = System.load ("lime", "lime_cairo_set_font_face", 2);
-	private static var lime_cairo_set_font_size = System.load ("lime", "lime_cairo_set_font_size", 2);
-	private static var lime_cairo_set_fill_rule = System.load ("lime", "lime_cairo_set_fill_rule", 2);
-	private static var lime_cairo_set_font_options = System.load ("lime", "lime_cairo_set_font_options", 2);
-	private static var lime_cairo_get_font_options = System.load ("lime", "lime_cairo_get_font_options", 1);
-	private static var lime_cairo_set_line_cap = System.load ("lime", "lime_cairo_set_line_cap", 2);
-	private static var lime_cairo_set_line_join = System.load ("lime", "lime_cairo_set_line_join", 2);
-	private static var lime_cairo_set_line_width = System.load ("lime", "lime_cairo_set_line_width", 2);
-	private static var lime_cairo_set_matrix = System.load ("lime", "lime_cairo_set_matrix", 2);
-	private static var lime_cairo_set_miter_limit = System.load ("lime", "lime_cairo_set_miter_limit", 2);
-	private static var lime_cairo_set_operator = System.load ("lime", "lime_cairo_set_operator", 2);
-	private static var lime_cairo_set_source = System.load ("lime", "lime_cairo_set_source", 2);
-	private static var lime_cairo_set_source_rgb = System.load ("lime", "lime_cairo_set_source_rgb", 4);
-	private static var lime_cairo_set_source_rgba = System.load ("lime", "lime_cairo_set_source_rgba", 5);
-	private static var lime_cairo_set_source_surface = System.load ("lime", "lime_cairo_set_source_surface", 4);
-	private static var lime_cairo_set_tolerance = System.load ("lime", "lime_cairo_set_tolerance", 2);
-	private static var lime_cairo_show_page = System.load ("lime", "lime_cairo_show_page", 1);
-	private static var lime_cairo_show_text = System.load ("lime", "lime_cairo_show_text", 2);
-	private static var lime_cairo_status = System.load ("lime", "lime_cairo_status", 1);
-	private static var lime_cairo_stroke = System.load ("lime", "lime_cairo_stroke", 1);
-	private static var lime_cairo_stroke_extents = System.load ("lime", "lime_cairo_stroke_extents", 5);
-	private static var lime_cairo_stroke_preserve = System.load ("lime", "lime_cairo_stroke_preserve", 1);
-	private static var lime_cairo_transform = System.load ("lime", "lime_cairo_transform", 2);
-	private static var lime_cairo_rotate = System.load ("lime", "lime_cairo_rotate", 2);
-	private static var lime_cairo_scale = System.load ("lime", "lime_cairo_scale", 3);
-	private static var lime_cairo_translate = System.load ("lime", "lime_cairo_translate", 3);
-	private static var lime_cairo_version = System.load ("lime", "lime_cairo_version", 0);
-	private static var lime_cairo_version_string = System.load ("lime", "lime_cairo_version_string", 0);
+	@:cffi private static function lime_cairo_arc (handle:Float, xc:Float, yc:Float, radius:Float, angle1:Float, angle2:Float):Void;
+	@:cffi private static function lime_cairo_arc_negative (handle:Float, xc:Float, yc:Float, radius:Float, angle1:Float, angle2:Float):Void;
+	@:cffi private static function lime_cairo_clip (handle:Float):Void;
+	@:cffi private static function lime_cairo_clip_preserve (handle:Float):Void;
+	@:cffi private static function lime_cairo_clip_extents (handle:Float, x1:Float, y1:Float, x2:Float, y2:Float):Void;
+	@:cffi private static function lime_cairo_close_path (handle:Float):Void;
+	@:cffi private static function lime_cairo_copy_page (handle:Float):Void;
+	@:cffi private static function lime_cairo_create (handle:Float):Float;
+	@:cffi private static function lime_cairo_curve_to (handle:Float, x1:Float, y1:Float, x2:Float, y2:Float, x3:Float, y3:Float):Void;
+	@:cffi private static function lime_cairo_destroy (handle:Float):Void;
+	@:cffi private static function lime_cairo_fill (handle:Float):Void;
+	@:cffi private static function lime_cairo_fill_extents (handle:Float, x1:Float, y1:Float, x2:Float, y2:Float):Void;
+	@:cffi private static function lime_cairo_fill_preserve (handle:Float):Void;
+	@:cffi private static function lime_cairo_get_antialias (handle:Float):Int;
+	@:cffi private static function lime_cairo_get_current_point (handle:Float):Dynamic;
+	@:cffi private static function lime_cairo_get_dash (handle:Float):Dynamic;
+	@:cffi private static function lime_cairo_get_dash_count (handle:Float):Int;
+	@:cffi private static function lime_cairo_get_fill_rule (handle:Float):Int;
+	@:cffi private static function lime_cairo_get_font_face (handle:Float):Float;
+	@:cffi private static function lime_cairo_get_font_options (handle:Float):Float;
+	@:cffi private static function lime_cairo_get_group_target (handle:Float):Float;
+	@:cffi private static function lime_cairo_get_line_cap (handle:Float):Int;
+	@:cffi private static function lime_cairo_get_line_join (handle:Float):Int;
+	@:cffi private static function lime_cairo_get_line_width (handle:Float):Float;
+	@:cffi private static function lime_cairo_get_matrix (handle:Float):Dynamic;
+	@:cffi private static function lime_cairo_get_miter_limit (handle:Float):Float;
+	@:cffi private static function lime_cairo_get_operator (handle:Float):Int;
+	@:cffi private static function lime_cairo_get_reference_count (handle:Float):Int;
+	@:cffi private static function lime_cairo_get_source (handle:Float):Float;
+	@:cffi private static function lime_cairo_get_target (handle:Float):Float;
+	@:cffi private static function lime_cairo_get_tolerance (handle:Float):Float;
+	@:cffi private static function lime_cairo_has_current_point (handle:Float):Bool;
+	@:cffi private static function lime_cairo_identity_matrix (handle:Float):Void;
+	@:cffi private static function lime_cairo_in_clip (handle:Float, x:Float, y:Float):Bool;
+	@:cffi private static function lime_cairo_in_fill (handle:Float, x:Float, y:Float):Bool;
+	@:cffi private static function lime_cairo_in_stroke (handle:Float, x:Float, y:Float):Bool;
+	@:cffi private static function lime_cairo_line_to (handle:Float, x:Float, y:Float):Void;
+	@:cffi private static function lime_cairo_mask (handle:Float, pattern:Float):Void;
+	@:cffi private static function lime_cairo_mask_surface (handle:Float, surface:Float, x:Float, y:Float):Void;
+	@:cffi private static function lime_cairo_move_to (handle:Float, x:Float, y:Float):Void;
+	@:cffi private static function lime_cairo_new_path (handle:Float):Void;
+	@:cffi private static function lime_cairo_paint (handle:Float):Void;
+	@:cffi private static function lime_cairo_paint_with_alpha (handle:Float, alpha:Float):Void;
+	@:cffi private static function lime_cairo_pop_group (handle:Float):Float;
+	@:cffi private static function lime_cairo_pop_group_to_source (handle:Float):Void;
+	@:cffi private static function lime_cairo_push_group (handle:Float):Void;
+	@:cffi private static function lime_cairo_push_group_with_content (handle:Float, content:Int):Void;
+	@:cffi private static function lime_cairo_rectangle (handle:Float, x:Float, y:Float, width:Float, height:Float):Void;
+	@:cffi private static function lime_cairo_reference (handle:Float):Void;
+	@:cffi private static function lime_cairo_rel_curve_to (handle:Float, dx1:Float, dy1:Float, dx2:Float, dy2:Float, dx3:Float, dy3:Float):Void;
+	@:cffi private static function lime_cairo_rel_line_to (handle:Float, dx:Float, dy:Float):Void;
+	@:cffi private static function lime_cairo_rel_move_to (handle:Float, dx:Float, dy:Float):Void;
+	@:cffi private static function lime_cairo_reset_clip (handle:Float):Void;
+	@:cffi private static function lime_cairo_restore (handle:Float):Void;
+	@:cffi private static function lime_cairo_rotate (handle:Float, amount:Float):Void;
+	@:cffi private static function lime_cairo_save (handle:Float):Void;
+	@:cffi private static function lime_cairo_scale (handle:Float, x:Float, y:Float):Void;
+	@:cffi private static function lime_cairo_set_antialias (handle:Float, cap:Int):Void;
+	@:cffi private static function lime_cairo_set_dash (handle:Float, dash:Dynamic):Void;
+	@:cffi private static function lime_cairo_set_fill_rule (handle:Float, cap:Int):Void;
+	@:cffi private static function lime_cairo_set_font_face (handle:Float, face:Float):Void;
+	@:cffi private static function lime_cairo_set_font_options (handle:Float, options:Float):Void;
+	@:cffi private static function lime_cairo_set_font_size (handle:Float, size:Float):Void;
+	@:cffi private static function lime_cairo_set_line_cap (handle:Float, cap:Int):Void;
+	@:cffi private static function lime_cairo_set_line_join (handle:Float, join:Int):Void;
+	@:cffi private static function lime_cairo_set_line_width (handle:Float, width:Float):Void;
+	@:cffi private static function lime_cairo_set_matrix (handle:Float, matrix:Dynamic):Void;
+	@:cffi private static function lime_cairo_set_miter_limit (handle:Float, miterLimit:Float):Void;
+	@:cffi private static function lime_cairo_set_operator (handle:Float, op:Int):Void;
+	@:cffi private static function lime_cairo_set_source (handle:Float, pattern:Float):Void;
+	@:cffi private static function lime_cairo_set_source_rgb (handle:Float, r:Float, g:Float, b:Float):Void;
+	@:cffi private static function lime_cairo_set_source_rgba (handle:Float, r:Float, g:Float, b:Float, a:Float):Void;
+	@:cffi private static function lime_cairo_set_source_surface (handle:Float, surface:Float, x:Float, y:Float):Void;
+	@:cffi private static function lime_cairo_set_tolerance (handle:Float, tolerance:Float):Void;
+	@:cffi private static function lime_cairo_show_page (handle:Float):Void;
+	@:cffi private static function lime_cairo_show_text (handle:Float, text:String):Void;
+	@:cffi private static function lime_cairo_status (handle:Float):Int;
+	@:cffi private static function lime_cairo_stroke (handle:Float):Void;
+	@:cffi private static function lime_cairo_stroke_extents (handle:Float, x1:Float, y1:Float, x2:Float, y2:Float):Void;
+	@:cffi private static function lime_cairo_stroke_preserve (handle:Float):Void;
+	@:cffi private static function lime_cairo_transform (handle:Float, matrix:Dynamic):Void;
+	@:cffi private static function lime_cairo_translate (handle:Float, x:Float, y:Float):Void;
+	@:cffi private static function lime_cairo_version ():Int;
+	@:cffi private static function lime_cairo_version_string ():String;
 	#end
 	
 	

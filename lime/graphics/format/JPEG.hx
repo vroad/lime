@@ -4,8 +4,12 @@ package lime.graphics.format;
 import haxe.io.Bytes;
 import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
-import lime.system.System;
+import lime.system.CFFI;
 import lime.utils.ByteArray;
+
+#if !macro
+@:build(lime.system.CFFI.build())
+#end
 
 
 class JPEG {
@@ -15,7 +19,7 @@ class JPEG {
 		
 		#if (cpp || neko || nodejs)
 		
-		var bufferData = lime_jpeg_decode_bytes (bytes, decodeData);
+		var bufferData:Dynamic = lime_jpeg_decode_bytes (bytes, decodeData);
 		
 		if (bufferData != null) {
 			
@@ -36,7 +40,7 @@ class JPEG {
 		
 		#if (cpp || neko || nodejs)
 		
-		var bufferData = lime_jpeg_decode_file (path, decodeData);
+		var bufferData:Dynamic = lime_jpeg_decode_file (path, decodeData);
 		
 		if (bufferData != null) {
 			
@@ -88,9 +92,9 @@ class JPEG {
 	
 	
 	#if (cpp || neko || nodejs)
-	private static var lime_jpeg_decode_bytes:ByteArray -> Bool -> Dynamic = System.load ("lime", "lime_jpeg_decode_bytes", 2);
-	private static var lime_jpeg_decode_file:String -> Bool -> Dynamic = System.load ("lime", "lime_jpeg_decode_file", 2);
-	private static var lime_image_encode = System.load ("lime", "lime_image_encode", 3);
+	@:cffi private static function lime_jpeg_decode_bytes (data:Dynamic, decodeData:Bool):Dynamic;
+	@:cffi private static function lime_jpeg_decode_file (path:String, decodeData:Bool):Dynamic;
+	@:cffi private static function lime_image_encode (data:Dynamic, type:Int, quality:Int):Dynamic;
 	#end
 	
 	

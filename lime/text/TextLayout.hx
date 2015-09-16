@@ -5,6 +5,10 @@ import lime.math.Vector2;
 import lime.system.System;
 import lime.utils.ByteArray;
 
+#if !macro
+@:build(lime.system.CFFI.build())
+#end
+
 @:access(lime.text.Font)
 
 
@@ -236,11 +240,11 @@ class TextLayout {
 	
 	
 	#if (cpp || neko || nodejs)
-	private static var lime_text_layout_create = System.load ("lime", "lime_text_layout_create", 3);
-	private static var lime_text_layout_position = System.load ("lime", "lime_text_layout_position", 5);
-	private static var lime_text_layout_set_direction = System.load ("lime", "lime_text_layout_set_direction", 2);
-	private static var lime_text_layout_set_language = System.load ("lime", "lime_text_layout_set_language", 2);
-	private static var lime_text_layout_set_script = System.load ("lime", "lime_text_layout_set_script", 2);
+	@:cffi private static function lime_text_layout_create (direction:Int, script:String, language:String):Dynamic;
+	@:cffi private static function lime_text_layout_position (textHandle:Float, fontHandle:Float, size:Int, textString:String, data:Dynamic):Dynamic;
+	@:cffi private static function lime_text_layout_set_direction (textHandle:Float, direction:Int):Void;
+	@:cffi private static function lime_text_layout_set_language (textHandle:Float, language:String):Void;
+	@:cffi private static function lime_text_layout_set_script (textHandle:Float, script:String):Void;
 	#end
 	
 	

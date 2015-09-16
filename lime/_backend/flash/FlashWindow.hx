@@ -28,6 +28,13 @@ class FlashWindow {
 	}
 	
 	
+	public function alert (message:String, title:String):Void {
+		
+		
+		
+	}
+	
+	
 	public function close ():Void {
 		
 		parent.application.removeWindow (parent);

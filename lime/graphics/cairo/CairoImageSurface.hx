@@ -1,8 +1,10 @@
 package lime.graphics.cairo;
 
-
-import lime.system.System;
 import lime.utils.BytesUtil;
+
+#if !macro
+@:build(lime.system.CFFI.build())
+#end
 
 @:forward abstract CairoImageSurface(CairoSurface) from CairoSurface to CairoSurface {
 	
@@ -117,14 +119,14 @@ import lime.utils.BytesUtil;
 	
 	
 	#if lime_cairo
-	private static var lime_bytes_get_data_pointer = System.load ("lime", "lime_bytes_get_data_pointer", 1);
-	private static var lime_cairo_image_surface_create = System.load ("lime", "lime_cairo_image_surface_create", 3);
-	private static var lime_cairo_image_surface_create_for_data = System.load ("lime", "lime_cairo_image_surface_create_for_data", 5);
-	private static var lime_cairo_image_surface_get_data = System.load ("lime", "lime_cairo_image_surface_get_data", 1);
-	private static var lime_cairo_image_surface_get_format = System.load ("lime", "lime_cairo_image_surface_get_format", 1);
-	private static var lime_cairo_image_surface_get_height = System.load ("lime", "lime_cairo_image_surface_get_height", 1);
-	private static var lime_cairo_image_surface_get_stride = System.load ("lime", "lime_cairo_image_surface_get_stride", 1);
-	private static var lime_cairo_image_surface_get_width = System.load ("lime", "lime_cairo_image_surface_get_width", 1);
+	@:cffi private static function lime_bytes_get_data_pointer (handle:Dynamic):Float;
+	@:cffi private static function lime_cairo_image_surface_create (format:Int, width:Int, height:Int):Float;
+	@:cffi private static function lime_cairo_image_surface_create_for_data (data:Float, format:Int, width:Int, height:Int, stride:Int):Float;
+	@:cffi private static function lime_cairo_image_surface_get_data (handle:Float):Float;
+	@:cffi private static function lime_cairo_image_surface_get_format (handle:Float):Int;
+	@:cffi private static function lime_cairo_image_surface_get_height (handle:Float):Int;
+	@:cffi private static function lime_cairo_image_surface_get_stride (handle:Float):Int;
+	@:cffi private static function lime_cairo_image_surface_get_width (handle:Float):Int;
 	#end
 	
 	

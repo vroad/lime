@@ -3,11 +3,14 @@ package lime.ui;
 
 import lime.app.Event;
 import lime.system.BackgroundWorker;
-import lime.system.System;
 import lime.utils.Resource;
 
 #if sys
 import sys.io.File;
+#end
+
+#if !macro
+@:build(lime.system.CFFI.build())
 #end
 
 
@@ -199,9 +202,9 @@ class FileDialog {
 	
 	
 	#if (cpp || neko || nodejs)
-	private static var lime_file_dialog_open_file = System.load ("lime", "lime_file_dialog_open_file", 2);
-	private static var lime_file_dialog_open_files = System.load ("lime", "lime_file_dialog_open_files", 2);
-	private static var lime_file_dialog_save_file = System.load ("lime", "lime_file_dialog_save_file", 2);
+	@:cffi private static function lime_file_dialog_open_file (filter:String, defaultPath:String):String;
+	@:cffi private static function lime_file_dialog_open_files (filter:String, defaultPath:String):Dynamic;
+	@:cffi private static function lime_file_dialog_save_file (filter:String, defaultPath:String):String;
 	#end
 	
 	

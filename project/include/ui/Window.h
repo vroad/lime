@@ -21,6 +21,7 @@ namespace lime {
 
 			virtual ~Window() {};
 			
+			virtual void Alert (const char* message, const char* title) = 0;
 			virtual void Close () = 0;
 			virtual void Focus () = 0;
 			virtual bool GetEnableTextEvents () = 0;

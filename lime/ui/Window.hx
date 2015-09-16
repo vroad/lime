@@ -93,6 +93,13 @@ class Window {
 	}
 	
 	
+	public function alert (message:String = null, title:String = null):Void {
+		
+		backend.alert (message, title);
+		
+	}
+	
+	
 	public function close ():Void {
 		
 		backend.close ();
