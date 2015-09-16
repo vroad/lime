@@ -81,12 +81,12 @@ class AL {
 	public static inline var EXPONENT_DISTANCE_CLAMPED:Int = 0xD006;
 	
 	#if nodejs
-	@:noCompletion private static function createBytes(ba:ByteArray):Dynamic {
+	@:noCompletion private static function createBytes(view:ArrayBufferView):Dynamic {
 		
-		return ba != null ? {
+		return view != null ? {
 			
-			b: ba.byteView,
-			length: ba.byteView.byteLength
+			b: view,
+			length: view.byteLength
 			
 		} : null;
 		

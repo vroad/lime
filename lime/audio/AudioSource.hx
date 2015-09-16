@@ -1,11 +1,12 @@
 package lime.audio;
 
 
+import haxe.io.Bytes;
 import haxe.Timer;
 import lime.app.Event;
 import lime.audio.openal.AL;
 import lime.system.System;
-import lime.utils.ByteArray;
+import lime.utils.BytesUtil;
 
 #if flash
 import flash.media.SoundChannel;
@@ -455,7 +456,7 @@ class AudioSource {
 				
 			}
 			
-			var data:Array<ByteArray> = lime_audio_stream_decode (buffer.handle, 65536, bufferCount);
+			var data:Array<Dynamic> = lime_audio_stream_decode (buffer.handle, 65536, bufferCount);
 			
 			if (data == null) {
 				
@@ -467,8 +468,8 @@ class AudioSource {
 					
 					for (i in 0 ... data.length) {
 						
-						var ba:ByteArray = data[i];
-						AL.bufferData (streamBuffers[i], format, ba, ba.length, buffer.sampleRate);
+						var bytes:Dynamic = data[i];
+						AL.bufferData (streamBuffers[i], format, BytesUtil.getUInt8ArrayFromAnonStructure (bytes), bytes.length, buffer.sampleRate);
 						
 					}
 					
