@@ -1,4 +1,7 @@
 package lime;
+
+import lime.app.Event;
+import lime.app.Future;
 import lime.audio.AudioBuffer;
 import lime.graphics.Image;
 import lime.text.Font;
@@ -7,7 +10,7 @@ import lime.utils.ByteArray;
 class AssetLibrary {
 	
 	
-	public var eventCallback:Dynamic;
+	public var onChange = new Event<Void->Void> ();
 	
 	
 	public function new () {
@@ -50,13 +53,6 @@ class AssetLibrary {
 		return null;
 		
 	}
-	
-	
-	//public function getMusic (id:String):Dynamic /*Sound*/ {
-		
-	//	return getSound (id);
-		
-	//}
 	
 	
 	public function getPath (id:String):String {
@@ -105,73 +101,60 @@ class AssetLibrary {
 	}
 	
 	
-	private function load (handler:AssetLibrary -> Void):Void {
+	private function load ():Future<AssetLibrary> {
 		
-		handler (this);
-		
-	}
-	
-	
-	public function loadAudioBuffer (id:String, handler:AudioBuffer -> Void):Void {
-		
-		handler (getAudioBuffer (id));
+		return new Future<AssetLibrary> (function () return this);
 		
 	}
 	
 	
-	public function loadBytes (id:String, handler:ByteArray -> Void):Void {
+	public function loadAudioBuffer (id:String):Future<AudioBuffer> {
 		
-		handler (getBytes (id));
-		
-	}
-	
-	
-	public function loadFont (id:String, handler:Font -> Void):Void {
-		
-		handler (getFont (id));
+		return new Future<AudioBuffer> (function () return getAudioBuffer (id));
 		
 	}
 	
 	
-	public function loadImage (id:String, handler:Image -> Void):Void {
+	public function loadBytes (id:String):Future<ByteArray> {
 		
-		handler (getImage (id));
+		return new Future<ByteArray> (function () return getBytes (id));
 		
 	}
 	
 	
-	//public function loadMusic (id:String, handler:Dynamic /*Sound*/ -> Void):Void {
+	public function loadFont (id:String):Future<Font> {
 		
-	//	handler (getMusic (id));
+		return new Future<Font> (function () return getFont (id));
 		
-	//}
+	}
 	
 	
-	public function loadText (id:String, handler:String -> Void):Void {
+	public function loadImage (id:String):Future<Image> {
 		
-		#if (tools && !display)
+		return new Future<Image> (function () return getImage (id));
 		
-		var callback = function (bytes:ByteArray):Void {
+	}
+	
+	
+	public function loadText (id:String):Future<String> {
+		
+		return loadBytes (id).then (function (bytes) {
 			
-			if (bytes == null) {
+			return new Future<String> (function () {
 				
-				handler (null);
+				if (bytes == null) {
+					
+					return null;
+					
+				} else {
+					
+					return bytes.readUTFBytes (bytes.length);
+					
+				}
 				
-			} else {
-				
-				handler (bytes.readUTFBytes (bytes.length));
-				
-			}
+			});
 			
-		}
-		
-		loadBytes (id, callback);
-		
-		#else
-		
-		handler (null);
-		
-		#end
+		});
 		
 	}
 	

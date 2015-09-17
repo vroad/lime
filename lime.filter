@@ -1,5 +1,6 @@
 +lime
 -lime.app.Config
+-lime.app.Event
 -lime.app.WindowConfig
 -lime.AssetType
 -lime.audio.openal.ALContext
@@ -24,6 +25,7 @@
 -lime.graphics.cairo.CairoSubpixelOrder
 -lime.graphics.cairo.CairoSurface
 -lime.graphics.opengl.GL
+-lime.graphics.opengl.Float32
 -lime.graphics.opengl.GLActiveInfo
 -lime.graphics.opengl.GLContextAttributes
 -lime.graphics.opengl.GLUniformLocation
@@ -41,6 +43,7 @@
 -lime.net.oauth.OAuthSignatureMethod
 -lime.net.oauth.OAuthVersion
 -lime.net.URLRequestMethod
+-lime.system.CFFI
 -lime.text.TextDirection
 -lime.text.TextScript
 -lime.ui.GamepadAxis
