@@ -205,7 +205,7 @@ class JNI {
 	@:cffi private static function lime_jni_call_static (jniMethod:Dynamic, args:Dynamic):Dynamic;
 	@:cffi private static function lime_jni_create_field (className:String, field:String, signature:String, isStatic:Bool):Dynamic;
 	@:cffi private static function lime_jni_create_method (className:String, method:String, signature:String, isStatic:Bool, quiet:Bool):Dynamic;
-	@:cffi private static function lime_jni_get_env ():Float;
+	@:cffi private static function lime_jni_get_env ():Dynamic;
 	@:cffi private static function lime_jni_post_ui_callback (callback:Dynamic):Void;
 	#end
 	

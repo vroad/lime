@@ -7,6 +7,7 @@ import lime.graphics.ImageBuffer;
 import lime.math.Vector2;
 import lime.system.System;
 import lime.utils.ByteArray;
+import lime.utils.BytesUtil;
 import lime.utils.UInt8Array;
 
 #if (js && html5)
@@ -169,7 +170,7 @@ class Font {
 		
 		var bytes = new ByteArray (16);
 		bytes.endian = (System.endianness == BIG_ENDIAN ? "bigEndian" : "littleEndian");
-		var data:Bytes = lime_font_render_glyph (src, glyph, getBytes(bytes));
+		var data:Dynamic = lime_font_render_glyph (src, glyph, getBytes(bytes));
 		
 		if (data != null) {
 			
@@ -178,7 +179,7 @@ class Font {
 			var x = bytes.readInt ();
 			var y = bytes.readInt ();
 			
-			var buffer = new ImageBuffer (getUInt8ArrayFromBytes (data), width, height, 1);
+			var buffer = new ImageBuffer (BytesUtil.getUInt8ArrayFromAnonStructure (data), width, height, 1);
 			var image = new Image (buffer, 0, 0, width, height);
 			image.x = x;
 			image.y = y;
@@ -215,12 +216,12 @@ class Font {
 				var x = bytes.readInt ();
 				var y = bytes.readInt ();
 				
-				var rawImage:Bytes = rawImages[i];
+				var rawImage:Dynamic = rawImages[i];
                 var buffer, image = null;
                 if (rawImage != null)
                 {
                     
-				    buffer = new ImageBuffer (getUInt8ArrayFromBytes (rawImage), width, height, 1);
+				    buffer = new ImageBuffer (BytesUtil.getUInt8ArrayFromAnonStructure (rawImage), width, height, 1);
 				    image = new Image (buffer, 0, 0, width, height);
 				    image.x = x;
 				    image.y = y;
@@ -360,15 +361,6 @@ class Font {
 		
 	}
 	
-	private inline function getUInt8ArrayFromBytes(bytes:Dynamic):UInt8Array
-	{
-		#if js
-		return bytes.b;
-		#else
-		return new UInt8Array (@:privateAccess new Bytes (bytes.length, bytes.b));
-		#end
-	}
-	
 	
 	// Native Methods
 	
@@ -376,22 +368,22 @@ class Font {
 	
 	
 	#if (cpp || neko || nodejs)
-	@:cffi private static function lime_font_get_ascender (handle:Float):Int;
-	@:cffi private static function lime_font_get_descender (handle:Float):Int;
-	@:cffi private static function lime_font_get_family_name (handle:Float):Dynamic;
-	@:cffi private static function lime_font_get_glyph_index (handle:Float, character:String):Int;
-	@:cffi private static function lime_font_get_glyph_indices (handle:Float, characters:String):Dynamic;
-	@:cffi private static function lime_font_get_glyph_metrics (handle:Float, index:Int):Dynamic;
-	@:cffi private static function lime_font_get_height (handle:Float):Int;
-	@:cffi private static function lime_font_get_num_glyphs (handle:Float):Int;
-	@:cffi private static function lime_font_get_underline_position (handle:Float):Int;
-	@:cffi private static function lime_font_get_underline_thickness (handle:Float):Int;
-	@:cffi private static function lime_font_get_units_per_em (handle:Float):Int;
+	@:cffi private static function lime_font_get_ascender (handle:Dynamic):Int;
+	@:cffi private static function lime_font_get_descender (handle:Dynamic):Int;
+	@:cffi private static function lime_font_get_family_name (handle:Dynamic):Dynamic;
+	@:cffi private static function lime_font_get_glyph_index (handle:Dynamic, character:String):Int;
+	@:cffi private static function lime_font_get_glyph_indices (handle:Dynamic, characters:String):Dynamic;
+	@:cffi private static function lime_font_get_glyph_metrics (handle:Dynamic, index:Int):Dynamic;
+	@:cffi private static function lime_font_get_height (handle:Dynamic):Int;
+	@:cffi private static function lime_font_get_num_glyphs (handle:Dynamic):Int;
+	@:cffi private static function lime_font_get_underline_position (handle:Dynamic):Int;
+	@:cffi private static function lime_font_get_underline_thickness (handle:Dynamic):Int;
+	@:cffi private static function lime_font_get_units_per_em (handle:Dynamic):Int;
 	@:cffi private static function lime_font_load (data:Dynamic):Dynamic;
-	@:cffi private static function lime_font_outline_decompose (handle:Float, size:Int):Dynamic;
-	@:cffi private static function lime_font_render_glyph (handle:Float, index:Int, data:Dynamic):Dynamic;
-	@:cffi private static function lime_font_render_glyphs (handle:Float, indices:Dynamic, data:Dynamic):Dynamic;
-	@:cffi private static function lime_font_set_size (handle:Float, size:Int):Void;
+	@:cffi private static function lime_font_outline_decompose (handle:Dynamic, size:Int):Dynamic;
+	@:cffi private static function lime_font_render_glyph (handle:Dynamic, index:Int, data:Dynamic):Dynamic;
+	@:cffi private static function lime_font_render_glyphs (handle:Dynamic, indices:Dynamic, data:Dynamic):Dynamic;
+	@:cffi private static function lime_font_set_size (handle:Dynamic, size:Int):Void;
 	#end
 	
 	

@@ -6,6 +6,7 @@ import haxe.io.BytesBuffer;
 import haxe.io.BytesData;
 import haxe.io.Input;
 import haxe.zip.Compress;
+import lime.system.CFFI;
 //import haxe.zip.Flush;
 import haxe.zip.Uncompress;
 import lime.utils.ArrayBuffer;
@@ -1113,7 +1114,7 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	@:cffi private static function lime_bytes_overwrite_file (path:String, bytes:Bytes):Dynamic;
 	#end
 	@:cffi private static function lime_bytes_from_data_pointer (data:Float, length:Int):Dynamic;
-	@:cffi private static function lime_bytes_get_data_pointer (data:Dynamic):Float;
+	private var lime_bytes_get_data_pointer:Dynamic->Dynamic = CFFI.load("lime", "lime_bytes_get_data_pointer", 1);
 	@:cffi private static function lime_bytes_read_file (path:String):Dynamic;
 	#end
 	

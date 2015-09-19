@@ -35,8 +35,8 @@ abstract CairoSurface(Dynamic) from Float to Float {
 	
 	
 	#if (lime_cairo && !macro)
-	@:cffi private static function lime_cairo_surface_destroy (surface:Float):Void;
-	@:cffi private static function lime_cairo_surface_flush (surface:Float):Void;
+	@:cffi private static function lime_cairo_surface_destroy (surface:Dynamic):Void;
+	@:cffi private static function lime_cairo_surface_flush (surface:Dynamic):Void;
 	#end
 	
 	

@@ -46,7 +46,7 @@ class ALC {
 	public static function createContext (device:ALDevice, attrlist:Array<Int> = null):ALContext {
 		
 		#if ((cpp || neko || nodejs) && lime_openal)
-		var handle:Float = lime_alc_create_context (device, attrlist);
+		var handle:Dynamic = lime_alc_create_context (device, attrlist);
 		
 		if (handle != 0) {
 			
@@ -72,7 +72,7 @@ class ALC {
 	public static function getContextsDevice (context:ALContext):ALDevice {
 		
 		#if ((cpp || neko || nodejs) && lime_openal)
-		var handle:Float = lime_alc_get_contexts_device (context);
+		var handle:Dynamic = lime_alc_get_contexts_device (context);
 		
 		if (handle != 0) {
 			
@@ -89,7 +89,7 @@ class ALC {
 	public static function getCurrentContext ():ALContext {
 		
 		#if ((cpp || neko || nodejs) && lime_openal)
-		var handle:Float = lime_alc_get_current_context ();
+		var handle:Dynamic = lime_alc_get_current_context ();
 		
 		if (handle != 0) {
 			
@@ -166,7 +166,7 @@ class ALC {
 	public static function openDevice (deviceName:String = null):ALDevice {
 		
 		#if ((cpp || neko || nodejs) && lime_openal)
-		var handle:Float = lime_alc_open_device (deviceName);
+		var handle:Dynamic = lime_alc_open_device (deviceName);
 		
 		if (handle != 0) {
 			
@@ -199,18 +199,18 @@ class ALC {
 	
 	
 	#if ((cpp || neko || nodejs) && lime_openal)
-	@:cffi private static function lime_alc_close_device (device:Float):Bool;
-	@:cffi private static function lime_alc_create_context (device:Float, attrlist:Dynamic):Float;
-	@:cffi private static function lime_alc_destroy_context (context:Float):Void;
-	@:cffi private static function lime_alc_get_contexts_device (context:Float):Float;
-	@:cffi private static function lime_alc_get_current_context ():Float;
-	@:cffi private static function lime_alc_get_error (device:Float):Int;
-	@:cffi private static function lime_alc_get_integerv (device:Float, param:Int, size:Int):Dynamic;
-	@:cffi private static function lime_alc_get_string (device:Float, param:Int):String;
-	@:cffi private static function lime_alc_make_context_current (context:Float):Bool;
-	@:cffi private static function lime_alc_open_device (devicename:String):Float;
-	@:cffi private static function lime_alc_process_context (context:Float):Void;
-	@:cffi private static function lime_alc_suspend_context (context:Float):Void;
+	@:cffi private static function lime_alc_close_device (device:Dynamic):Bool;
+	@:cffi private static function lime_alc_create_context (device:Dynamic, attrlist:Dynamic):Dynamic;
+	@:cffi private static function lime_alc_destroy_context (context:Dynamic):Void;
+	@:cffi private static function lime_alc_get_contexts_device (context:Dynamic):Dynamic;
+	@:cffi private static function lime_alc_get_current_context ():Dynamic;
+	@:cffi private static function lime_alc_get_error (device:Dynamic):Int;
+	@:cffi private static function lime_alc_get_integerv (device:Dynamic, param:Int, size:Int):Dynamic;
+	@:cffi private static function lime_alc_get_string (device:Dynamic, param:Int):String;
+	@:cffi private static function lime_alc_make_context_current (context:Dynamic):Bool;
+	@:cffi private static function lime_alc_open_device (devicename:String):Dynamic;
+	@:cffi private static function lime_alc_process_context (context:Dynamic):Void;
+	@:cffi private static function lime_alc_suspend_context (context:Dynamic):Void;
 	#end
 	
 	

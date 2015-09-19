@@ -8,7 +8,7 @@ package lime.audio.openal;
 abstract ALDevice(Null<Float>) from Null<Float> to Null<Float> {
 	
 	
-	private function new (handle:Float) {
+	private function new (handle:Dynamic) {
 		
 		this = handle;
 		

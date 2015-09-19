@@ -72,7 +72,7 @@ namespace lime {
 	
 	int lime_application_exec (value application) {
 		
-		Application* app = (Application*)(intptr_t)application;
+		Application* app = GetNativePointer<Application> (application);
 		return app->Exec ();
 		
 	}
@@ -112,7 +112,7 @@ namespace lime {
 	}
 	
 	
-	value lime_audio_load (value data, value stream) {
+	value lime_audio_load (value data, bool stream) {
 		
 		AudioBuffer audioBuffer;
 		Resource resource;
@@ -135,7 +135,7 @@ namespace lime {
 		}
 		
 		#ifdef LIME_OGG
-		if (OGG::Decode (&resource, &audioBuffer, val_bool (stream))) {
+		if (OGG::Decode (&resource, &audioBuffer, stream)) {
 			
 			return audioBuffer.Value ();
 			
@@ -178,10 +178,10 @@ namespace lime {
 	}
 	
 	
-	double lime_bytes_get_data_pointer (value bytes) {
+	value lime_bytes_get_data_pointer (value bytes) {
 		
 		Bytes data = Bytes (bytes);
-		return (intptr_t)data.Data ();
+		return alloc_float ((intptr_t)data.Data ());
 		
 	}
 	

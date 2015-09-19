@@ -8,7 +8,7 @@
 
 #include <hx/CFFIPrime.h>
 #include <utils/Bytes.h>
-
+#include <utils/NativePointer.h>
 
 namespace lime {
 	
@@ -875,7 +875,7 @@ namespace lime {
 	}
 	
 	
-	bool lime_alc_close_device (double device) {
+	bool lime_alc_close_device (value device) {
 		
 		ALCdevice* alcDevice = (ALCdevice*)(intptr_t)device;
 		return alcCloseDevice (alcDevice);
@@ -883,19 +883,19 @@ namespace lime {
 	}
 	
 	
-	double lime_alc_create_context (double device, value attrlist) {
+	value lime_alc_create_context (value device, value attrlist) {
 		
 		ALCdevice* alcDevice = (ALCdevice*)(intptr_t)device;
 		int* list = val_array_int (attrlist);
 		
 		ALCcontext* alcContext = alcCreateContext (alcDevice, list);
 		
-		return (intptr_t)alcContext;
+		return CreateNativePointer<ALCcontext> (alcContext, false);
 		
 	}
 	
 	
-	void lime_alc_destroy_context (double context) {
+	void lime_alc_destroy_context (value context) {
 		
 		ALCcontext* alcContext = (ALCcontext*)(intptr_t)context;
 		alcDestroyContext (alcContext);
@@ -903,24 +903,24 @@ namespace lime {
 	}
 	
 	
-	double lime_alc_get_contexts_device (double context) {
+	value lime_alc_get_contexts_device (value context) {
 		
 		ALCcontext* alcContext = (ALCcontext*)(intptr_t)context;
 		ALCdevice* alcDevice = alcGetContextsDevice (alcContext);
-		return (intptr_t)alcDevice;
+		return CreateNativePointer<ALCdevice> (alcDevice, false);
 		
 	}
 	
 	
-	double lime_alc_get_current_context () {
+	value lime_alc_get_current_context () {
 		
 		ALCcontext* alcContext = alcGetCurrentContext ();
-		return (intptr_t)alcContext;
+		return CreateNativePointer<ALCcontext> (alcContext, false);
 		
 	}
 	
 	
-	int lime_alc_get_error (double device) {
+	int lime_alc_get_error (value device) {
 		
 		ALCdevice* alcDevice = (ALCdevice*)(intptr_t)device;
 		return alcGetError (alcDevice);
@@ -928,7 +928,7 @@ namespace lime {
 	}
 	
 	
-	value lime_alc_get_integerv (double device, int param, int size) {
+	value lime_alc_get_integerv (value device, int param, int size) {
 		
 		ALCdevice* alcDevice = (ALCdevice*)(intptr_t)device;
 		
@@ -949,7 +949,7 @@ namespace lime {
 	}
 	
 	
-	HxString lime_alc_get_string (double device, int param) {
+	HxString lime_alc_get_string (value device, int param) {
 		
 		ALCdevice* alcDevice = (ALCdevice*)(intptr_t)device;
 		return HxString (alcGetString (alcDevice, param));
@@ -957,7 +957,7 @@ namespace lime {
 	}
 	
 	
-	bool lime_alc_make_context_current (double context) {
+	bool lime_alc_make_context_current (value context) {
 		
 		ALCcontext* alcContext = (ALCcontext*)(intptr_t)context;
 		return alcMakeContextCurrent (alcContext);
@@ -965,16 +965,16 @@ namespace lime {
 	}
 	
 	
-	double lime_alc_open_device (HxString devicename) {
+	value lime_alc_open_device (HxString devicename) {
 		
 		ALCdevice* alcDevice = alcOpenDevice (devicename.__s);
 		atexit (lime_al_cleanup);
-		return (intptr_t)alcDevice;
+		return CreateNativePointer<ALCdevice> (alcDevice, false);
 		
 	}
 	
 	
-	void lime_alc_process_context (double context) {
+	void lime_alc_process_context (value context) {
 		
 		ALCcontext* alcContext = (ALCcontext*)(intptr_t)context;
 		alcProcessContext (alcContext);
@@ -982,7 +982,7 @@ namespace lime {
 	}
 	
 	
-	void lime_alc_suspend_context (double context) {
+	void lime_alc_suspend_context (value context) {
 		
 		ALCcontext* alcContext = (ALCcontext*)(intptr_t)context;
 		alcSuspendContext (alcContext);
