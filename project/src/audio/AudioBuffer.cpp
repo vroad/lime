@@ -41,6 +41,7 @@ namespace lime {
 		
 		delete sourceData;
 		delete data;
+		delete handle;
 		
 	}
 	

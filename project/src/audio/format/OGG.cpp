@@ -1,5 +1,5 @@
 #include <audio/format/OGG.h>
-#include <audio/AudioStream.h>
+#include <audio/OggAudioStream.h>
 #include <system/System.h>
 #include <vorbis/vorbisfile.h>
 
@@ -113,14 +113,16 @@ namespace lime {
 	};
 	
 	
-	bool OGG::Decode (Resource *resource, AudioBuffer *audioBuffer, OggVorbis_File *oggFile, bool stream) {
+	bool OGG::Decode (Resource *resource, AudioBuffer *audioBuffer, bool stream) {
 		
+		OggVorbis_File *oggFile = new OggVorbis_File ();
 		if (resource->path) {
 			
 			FILE_HANDLE *file = lime::fopen (resource->path, "rb");
 			
 			if (!file) {
 				
+				ov_clear (oggFile);
 				return false;
 				
 			}
@@ -129,6 +131,7 @@ namespace lime {
 				
 				if (ov_open (file->getFile (), oggFile, NULL, file->getLength ()) != 0) {
 					
+					ov_clear (oggFile);
 					lime::fclose (file);
 					return false;
 					
@@ -143,6 +146,7 @@ namespace lime {
 				
 				if (ov_open_callbacks (&fakeFile, oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
 					
+					ov_clear (oggFile);
 					delete audioBuffer->sourceData;
 					return false;
 					
@@ -157,6 +161,7 @@ namespace lime {
 			
 			if (ov_open_callbacks (&fakeFile, oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
 				
+				ov_clear (oggFile);
 				delete audioBuffer->sourceData;
 				return false;
 				
@@ -212,7 +217,7 @@ namespace lime {
 		}
 		else {
 			
-			audioBuffer->handle = new AudioStream (OggFormat, oggFile);
+			audioBuffer->handle = new OggAudioStream (oggFile);
 			
 		}
 		

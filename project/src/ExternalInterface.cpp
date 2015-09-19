@@ -43,7 +43,7 @@
 #endif
 #include <vm/NekoVM.h>
 #ifdef LIME_OGG
-#include <vorbis/vorbisfile.h>
+#include <audio/OggAudioStream.h>
 #endif
 #ifdef LIME_VIDEO
 #include <video/VideoLib.h>
@@ -135,14 +135,9 @@ namespace lime {
 		}
 		
 		#ifdef LIME_OGG
-		OggVorbis_File *oggFile = new OggVorbis_File ();
-		if (OGG::Decode (&resource, &audioBuffer, oggFile, val_bool (stream))) {
+		if (OGG::Decode (&resource, &audioBuffer, val_bool (stream))) {
 			
 			return audioBuffer.Value ();
-			
-		} else {
-			
-			delete oggFile;
 			
 		}
 		#endif
@@ -157,8 +152,10 @@ namespace lime {
 		AudioStream *stream = GetNativePointer<AudioStream> (handle);
 		
 		#ifdef LIME_OGG
-		if (stream->format == OggFormat)
-			return OGG::DecodeStream ((OggVorbis_File*)stream->handle, val_int (sizeInBytes), val_int (bufferCount));
+		if (stream->format == OggFormat) {
+			OggAudioStream *oggStream = (OggAudioStream*)stream;
+			return OGG::DecodeStream (oggStream->file, val_int (sizeInBytes), val_int (bufferCount));
+		}
 		#endif 
 		
 		return alloc_null ();

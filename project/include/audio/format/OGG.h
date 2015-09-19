@@ -15,7 +15,7 @@ namespace lime {
 		
 		public:
 			
-			static bool Decode (Resource *resource, AudioBuffer *audioBuffer, OggVorbis_File *oggFile, bool stream);
+			static bool Decode (Resource *resource, AudioBuffer *audioBuffer, bool stream);
 			static value DecodeStream (OggVorbis_File *oggFile, int sizeInBytes, int bufferCount);
 		
 		
