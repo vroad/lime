@@ -221,14 +221,6 @@ namespace lime {
 		
 		if (file) {
 			
-			if (!file)
-			{
-				
-				jpeg_destroy_decompress(&cinfo);
-				return false;
-				
-			}
-			
 			if (file->isFile ()) {
 				
 				jpeg_stdio_src (&cinfo, file->getFile ());
