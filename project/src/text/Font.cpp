@@ -598,11 +598,11 @@ namespace lime {
 			
 			value neko_kerning = alloc_array (kern.size ());
 			
-			for (i = 0; i < kern.size(); i++) {
+			for (i = 0; i < kern.size (); i++) {
 				
 				kerning *k = &kern[i];
 				
-				value item = alloc_empty_object();
+				value item = alloc_empty_object ();
 				val_array_set_i (neko_kerning,i,item);
 				alloc_field (item, val_id ("left_glyph"), alloc_int (k->l_glyph));
 				alloc_field (item, val_id ("right_glyph"), alloc_int (k->r_glyph));
@@ -792,7 +792,7 @@ namespace lime {
 			data->height = 0;
 			data->x = 0;
 			data->y = 0;
-			return alloc_null();
+			return alloc_null ();
 			
 		}
 		else
@@ -806,11 +806,10 @@ namespace lime {
 			data->y = ((FT_Face)face)->glyph->bitmap_top;
 			
 			if (bitmap.width == 0 || bitmap.rows == 0)
-				return alloc_null();
+				return alloc_null ();
 			
 			int width = bitmap.width;
 			int height = bitmap.rows;
-			int pitch = bitmap.pitch;
 			Bytes image (bitmap.width * bitmap.rows);
 			unsigned char* position = image.Data ();
 			memcpy (position, bitmap.buffer, image.Length ());

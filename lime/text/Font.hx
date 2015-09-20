@@ -42,22 +42,6 @@ class Font {
 	@:noCompletion private var __fontPath:String;
 	
 	
-	@:noCompletion private static function getBytes(ba:ByteArray):Dynamic {
-		
-		#if nodejs
-		return {
-			
-			b: ba.byteView,
-			length: ba.byteView.byteLength
-			
-		};
-		#else
-		return ba;
-		#end
-		
-	}
-	
-	
 	public function new (name:String = null) {
 		
 		if (name != null) {
@@ -170,7 +154,7 @@ class Font {
 		
 		var bytes = new ByteArray (16);
 		bytes.endian = (System.endianness == BIG_ENDIAN ? "bigEndian" : "littleEndian");
-		var data:Dynamic = lime_font_render_glyph (src, glyph, getBytes(bytes));
+		var data:Dynamic = lime_font_render_glyph (src, glyph, BytesUtil.getBytesFromByteArray (bytes));
 		
 		if (data != null) {
 			
@@ -204,7 +188,7 @@ class Font {
 		var bytes = new ByteArray (glyphList.length * 16);
 		bytes.endian = (System.endianness == BIG_ENDIAN ? "bigEndian" : "littleEndian");
 		
-		var rawImages:Array<Bytes> = lime_font_render_glyphs (src, glyphList, getBytes(bytes));
+		var rawImages:Array<Dynamic> = lime_font_render_glyphs (src, glyphList, BytesUtil.getBytesFromByteArray (bytes));
 		
 		if (rawImages != null) {
 			
@@ -217,17 +201,17 @@ class Font {
 				var y = bytes.readInt ();
 				
 				var rawImage:Dynamic = rawImages[i];
-                var buffer, image = null;
-                if (rawImage != null)
-                {
-                    
-				    buffer = new ImageBuffer (BytesUtil.getUInt8ArrayFromAnonStructure (rawImage), width, height, 1);
-				    image = new Image (buffer, 0, 0, width, height);
-				    image.x = x;
-				    image.y = y;
-                    
-                }
-                results.push (image);
+				var buffer, image = null;
+				if (rawImage != null)
+				{
+					
+					buffer = new ImageBuffer (BytesUtil.getUInt8ArrayFromAnonStructure (rawImage), width, height, 1);
+					image = new Image (buffer, 0, 0, width, height);
+					image.x = x;
+					image.y = y;
+					
+				}
+				results.push (image);
 			}
 			
 			return results;
