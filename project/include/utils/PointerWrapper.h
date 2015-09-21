@@ -65,7 +65,10 @@ namespace lime {
 				}
 				
 				mValue = inValue;
-				mPointer = (T*)(intptr_t)val_float (val_field (inValue, id.pointer));
+				if (val_is_null (inValue))
+					mPointer = NULL;
+				else
+					mPointer = (T*)(intptr_t)val_float (val_field (inValue, id.pointer));
 				
 			}
 			
