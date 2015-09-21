@@ -94,8 +94,12 @@ class Event<T> {
 		}
 		
 		typeString += typeResult.toString ();
+		typeString = StringTools.replace (typeString, "->", "_");
+		typeString = StringTools.replace (typeString, ".", "_");
+		typeString = StringTools.replace (typeString, "<", "_");
+		typeString = StringTools.replace (typeString, ">", "_");
 		
-		var name = "Event$" + StringTools.replace (StringTools.replace (typeString, ".", "_"), "->", "__");
+		var name = "Event_" + typeString;
 		
 		try {
 			
@@ -150,12 +154,20 @@ class Event<T> {
 				
 			}
 			
-			for (field in fields) {
+			var i = 0;
+			var field;
+			
+			while (i < fields.length) {
 				
-				if (field.name == "listeners") {
+				field = fields[i];
+				
+				if (field.name == "listeners" || field.name == "dispatch") {
 					
 					fields.remove (field);
-					break;
+					
+				} else {
+					
+					i++;
 					
 				}
 				
@@ -181,6 +193,8 @@ class Event<T> {
 	}
 	#end
 	
+	
+	public var dispatch:Dynamic;
 	
 	//macro public function dispatch (ethis:Expr, args:Array<Expr>):Void {
 		//

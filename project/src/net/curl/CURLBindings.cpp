@@ -21,10 +21,10 @@ namespace lime {
 	}
 	
 	
-	HxString lime_curl_easy_escape (value curl, HxString url, int length) {
+	value lime_curl_easy_escape (value curl, HxString url, int length) {
 		
 		char* result = curl_easy_escape (GetNativePointer<CURL> (curl), url.__s, length);
-		return HxString (result);
+		return result ? alloc_string (result) : alloc_null ();
 		
 	}
 	
@@ -501,18 +501,18 @@ namespace lime {
 	}
 	
 	
-	HxString lime_curl_easy_strerror (int errornum) {
+	value lime_curl_easy_strerror (int errornum) {
 		
 		const char* result = curl_easy_strerror ((CURLcode)errornum);
-		return HxString (result);
+		return result ? alloc_string (result) : alloc_null ();
 		
 	}
 	
 	
-	HxString lime_curl_easy_unescape (value curl, HxString url, int inlength, int outlength) {
+	value lime_curl_easy_unescape (value curl, HxString url, int inlength, int outlength) {
 		
 		char* result = curl_easy_unescape (GetNativePointer<CURL> (curl), url.__s, inlength, &outlength);
-		return HxString (result);
+		return result ? alloc_string (result) : alloc_null ();
 		
 	}
 	
@@ -567,10 +567,10 @@ namespace lime {
 	//lime_curl_slist_free_all
 	
 	
-	HxString lime_curl_version () {
+	value lime_curl_version () {
 		
 		char* result = curl_version ();
-		return HxString (result);
+		return result ? alloc_string (result) : alloc_null ();
 		
 	}
 	

@@ -41,6 +41,7 @@ class NativeRenderer {
 	
 	public function create ():Void {
 		
+		#if !macro
 		handle = lime_renderer_create (parent.window.backend.handle);
 		
 		#if lime_console
@@ -50,7 +51,7 @@ class NativeRenderer {
 		
 		#else
 		
-		var type = lime_renderer_get_type (handle);
+		var type:String = lime_renderer_get_type (handle);
 		
 		switch (type) {
 			
@@ -78,6 +79,7 @@ class NativeRenderer {
 		}
 		
 		#end
+		#end
 		
 	}
 	
@@ -91,6 +93,7 @@ class NativeRenderer {
 	
 	public function flip ():Void {
 		
+		#if !macro
 		if (!useHardware) {
 			
 			#if lime_cairo
@@ -105,12 +108,14 @@ class NativeRenderer {
 		}
 		
 		lime_renderer_flip (handle);
+		#end
 		
 	}
 	
 	
 	public function render ():Void {
 		
+		#if !macro
 		lime_renderer_make_current (handle);
 		
 		if (!useHardware) {
@@ -146,6 +151,7 @@ class NativeRenderer {
 			#end
 			
 		}
+		#end
 		
 	}
 	
@@ -157,13 +163,15 @@ class NativeRenderer {
 	
 	
 	
+	#if !macro
 	@:cffi private static function lime_renderer_create (window:Dynamic):Dynamic;
 	@:cffi private static function lime_renderer_flip (handle:Dynamic):Void;
 	@:cffi private static function lime_renderer_get_context (handle:Dynamic):Dynamic;
-	@:cffi private static function lime_renderer_get_type (handle:Dynamic):String;
+	@:cffi private static function lime_renderer_get_type (handle:Dynamic):Dynamic;
 	@:cffi private static function lime_renderer_lock (handle:Dynamic):Dynamic;
 	@:cffi private static function lime_renderer_make_current (handle:Dynamic):Void;
 	@:cffi private static function lime_renderer_unlock (handle:Dynamic):Void;
+	#end
 	
 	
 }

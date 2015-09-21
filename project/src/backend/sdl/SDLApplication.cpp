@@ -15,8 +15,12 @@ namespace lime {
 	
 	AutoGCRoot* Application::callback = 0;
 	SDLApplication* SDLApplication::currentApplication = 0;
-	std::map<int, std::map<int, int> > gamepadsAxisMap;
+	
+	static SDL_Joystick* accelerometer = 0;
+	static SDL_JoystickID accelerometerID = 0;
 	const int analogAxisDeadZone = 1000;
+	std::map<int, std::map<int, int> > gamepadsAxisMap;
+	
 	
 	SDLApplication::SDLApplication () {
 		
@@ -45,9 +49,23 @@ namespace lime {
 		KeyEvent keyEvent;
 		MouseEvent mouseEvent;
 		RenderEvent renderEvent;
+		SensorEvent sensorEvent;
 		TextEvent textEvent;
 		TouchEvent touchEvent;
 		WindowEvent windowEvent;
+		
+		#if defined(IOS) || defined(ANDROID)
+		for (int i = 0; i < SDL_NumJoysticks (); i++) {
+			
+			if (strstr (SDL_JoystickNameForIndex (i), "Accelerometer")) {
+				
+				accelerometer = SDL_JoystickOpen (i);
+				accelerometerID = SDL_JoystickInstanceID (accelerometer);
+				
+			}
+			
+		}
+		#endif
 		
 		#ifdef HX_MACOS
 		CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL (CFBundleGetMainBundle ());
@@ -141,10 +159,22 @@ namespace lime {
 			case SDL_FINGERDOWN:
 			case SDL_FINGERUP:
 				
+				#ifndef HX_MACOS
 				ProcessTouchEvent (event);
+				#endif
 				break;
 			
 			case SDL_JOYAXISMOTION:
+				
+				#if defined(IOS) || defined(ANDROID)
+				if (event->jaxis.which == accelerometerID) {
+					
+					ProcessSensorEvent (event);
+					
+				}
+				#endif
+				break;
+			
 			case SDL_JOYBALLMOTION:
 			case SDL_JOYBUTTONDOWN:
 			case SDL_JOYBUTTONUP:
@@ -244,7 +274,7 @@ namespace lime {
 						gamepadsAxisMap[event->caxis.which][event->caxis.axis] = event->caxis.value;
 						
 					} else if (gamepadsAxisMap[event->caxis.which][event->caxis.axis] == event->caxis.value) {
-							
+						
 						break;
 						
 					}
@@ -268,7 +298,7 @@ namespace lime {
 					}
 					
 					gamepadsAxisMap[event->caxis.which][event->caxis.axis] = event->caxis.value;
-					gamepadEvent.axisValue = event->caxis.value / (event->caxis.value>0?32767.0:32768.0);
+					gamepadEvent.axisValue = event->caxis.value / (event->caxis.value > 0 ? 32767.0 : 32768.0);
 					
 					GamepadEvent::Dispatch (&gamepadEvent);
 					break;
@@ -386,6 +416,28 @@ namespace lime {
 			
 			mouseEvent.windowID = event->button.windowID;
 			MouseEvent::Dispatch (&mouseEvent);
+			
+		}
+		
+	}
+	
+	
+	void SDLApplication::ProcessSensorEvent (SDL_Event* event) {
+		
+		if (SensorEvent::callback) {
+			
+			double value = event->jaxis.value / 32767.0f;
+			
+			switch (event->jaxis.axis) {
+				
+				case 0: sensorEvent.x = value; break;
+				case 1: sensorEvent.y = value; break;
+				case 2: sensorEvent.z = value; break;
+				default: break;
+				
+			}
+			
+			SensorEvent::Dispatch (&sensorEvent);
 			
 		}
 		

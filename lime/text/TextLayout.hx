@@ -45,7 +45,7 @@ class TextLayout {
 		positions = [];
 		__dirty = true;
 		
-		#if (cpp || neko || nodejs)
+		#if ((cpp || neko || nodejs) && !macro)
 		__handle = lime_text_layout_create (__direction, __script, __language);
 		#end
 	}
@@ -55,7 +55,7 @@ class TextLayout {
 		
 		positions = [];
 		
-		#if (cpp || neko || nodejs)
+		#if ((cpp || neko || nodejs) && !macro)
 		
 		if (__handle != null && text != null && text != "" && font != null && font.src != null) {
 			
@@ -125,7 +125,7 @@ class TextLayout {
 		
 		__direction = value;
 		
-		#if (cpp || neko || nodejs)
+		#if ((cpp || neko || nodejs) && !macro)
 		lime_text_layout_set_direction (__handle, value);
 		#end
 		
@@ -175,7 +175,7 @@ class TextLayout {
 		
 		__language = value;
 		
-		#if (cpp || neko || nodejs)
+		#if ((cpp || neko || nodejs) && !macro)
 		lime_text_layout_set_language (__handle, value);
 		#end
 		
@@ -199,7 +199,7 @@ class TextLayout {
 		
 		__script = value;
 		
-		#if (cpp || neko || nodejs)
+		#if ((cpp || neko || nodejs) && !macro)
 		lime_text_layout_set_script (__handle, value);
 		#end
 		
@@ -239,7 +239,7 @@ class TextLayout {
 	
 	
 	
-	#if (cpp || neko || nodejs)
+	#if ((cpp || neko || nodejs) && !macro)
 	@:cffi private static function lime_text_layout_create (direction:Int, script:String, language:String):Dynamic;
 	@:cffi private static function lime_text_layout_position (textHandle:Dynamic, fontHandle:Dynamic, size:Int, textString:String, data:Dynamic):Dynamic;
 	@:cffi private static function lime_text_layout_set_direction (textHandle:Dynamic, direction:Int):Void;

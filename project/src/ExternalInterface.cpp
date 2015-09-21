@@ -23,6 +23,7 @@
 #include <graphics/RenderEvent.h>
 #include <system/Clipboard.h>
 #include <system/JNI.h>
+#include <system/SensorEvent.h>
 #include <system/System.h>
 #include <text/Font.h>
 #include <text/TextLayout.h>
@@ -49,6 +50,9 @@
 #include <video/VideoLib.h>
 #include <video/Video.h>
 #endif
+
+DEFINE_KIND (k_finalizer);
+
 
 namespace lime {
 	
@@ -194,15 +198,31 @@ namespace lime {
 	}
 	
 	
-	HxString lime_clipboard_get_text () {
+	void lime_cffi_finalizer (value abstract) {
+		
+		val_call0 ((value)val_data (abstract));
+		
+	}
+	
+	
+	value lime_cffi_set_finalizer (value callback) {
+		
+		value abstract = alloc_abstract (k_finalizer, callback);
+		val_gc (abstract, lime_cffi_finalizer);
+		return abstract;
+		
+	}
+	
+	
+	value lime_clipboard_get_text () {
 		
 		if (Clipboard::HasText ()) {
 			
-			return HxString (Clipboard::GetText ());
+			return alloc_string (Clipboard::GetText ());
 			
 		} else {
 			
-			return 0;
+			return alloc_null ();
 			
 		}
 		
@@ -216,11 +236,11 @@ namespace lime {
 	}
 	
 	
-	HxString lime_file_dialog_open_file (HxString filter, HxString defaultPath) {
+	value lime_file_dialog_open_file (HxString filter, HxString defaultPath) {
 		
 		#ifdef LIME_NFD
 		const char* path = FileDialog::OpenFile (filter.__s, defaultPath.__s);
-		return HxString (path);
+		return path ? alloc_string (path) : alloc_null ();
 		#endif
 		
 		return 0;
@@ -250,11 +270,11 @@ namespace lime {
 	}
 	
 	
-	HxString lime_file_dialog_save_file (HxString filter, HxString defaultPath) {
+	value lime_file_dialog_save_file (HxString filter, HxString defaultPath) {
 		
 		#ifdef LIME_NFD
 		const char* path = FileDialog::SaveFile (filter.__s, defaultPath.__s);
-		return HxString (path);
+		return path ? alloc_string (path) : alloc_null ();
 		#endif
 		
 		return 0;
@@ -501,16 +521,18 @@ namespace lime {
 	}
 	
 	
-	HxString lime_gamepad_get_device_guid (int id) {
+	value lime_gamepad_get_device_guid (int id) {
 		
-		return HxString (Gamepad::GetDeviceGUID (id));
+		const char* guid = Gamepad::GetDeviceGUID (id);
+		return guid ? alloc_string (guid) : alloc_null ();
 		
 	}
 	
 	
-	HxString lime_gamepad_get_device_name (int id) {
+	value lime_gamepad_get_device_name (int id) {
 		
-		return HxString (Gamepad::GetDeviceName (id));
+		const char* name = Gamepad::GetDeviceName (id);
+		return name ? alloc_string (name) : alloc_null ();
 		
 	}
 	
@@ -944,10 +966,11 @@ namespace lime {
 	}
 	
 	
-	HxString lime_renderer_get_type (value renderer) {
+	value lime_renderer_get_type (value renderer) {
 		
 		Renderer *targetRenderer = GetNativePointer<Renderer> (renderer);
-		return targetRenderer->Type ();
+		const char* type = targetRenderer->Type ();
+		return type ? alloc_string (type) : alloc_null ();
 		
 	}
 	
@@ -976,9 +999,18 @@ namespace lime {
 	}
 	
 	
-	HxString lime_system_get_directory (int type, HxString company, HxString title) {
+	void lime_sensor_event_manager_register (value callback, value eventObject) {
 		
-		return HxString (System::GetDirectory ((SystemDirectory)type, company.__s, title.__s));
+		SensorEvent::callback = new AutoGCRoot (callback);
+		SensorEvent::eventObject = new AutoGCRoot (eventObject);
+		
+	}
+	
+	
+	value lime_system_get_directory (int type, HxString company, HxString title) {
+		
+		const char* path = System::GetDirectory ((SystemDirectory)type, company.__s, title.__s);
+		return path ? alloc_string (path) : alloc_null ();
 		
 	}
 	
@@ -1291,10 +1323,11 @@ namespace lime {
 
 	}
 	
-	HxString lime_window_set_title (value window, HxString title) {
+	value lime_window_set_title (value window, HxString title) {
 		
 		Window* targetWindow = GetNativePointer<Window> (window);
-		return targetWindow->SetTitle (title.__s);
+		const char* result = targetWindow->SetTitle (title.__s);
+		return result ? alloc_string (result) : alloc_null ();
 		
 	}
 	
@@ -1311,6 +1344,7 @@ namespace lime {
 	DEFINE_PRIME2 (lime_bytes_from_data_pointer);
 	DEFINE_PRIME1 (lime_bytes_get_data_pointer);
 	DEFINE_PRIME1 (lime_bytes_read_file);
+	DEFINE_PRIME1 (lime_cffi_set_finalizer);
 	DEFINE_PRIME0 (lime_clipboard_get_text);
 	DEFINE_PRIME1v (lime_clipboard_set_text);
 	DEFINE_PRIME2 (lime_file_dialog_open_file);
@@ -1373,6 +1407,7 @@ namespace lime {
 	DEFINE_PRIME1v (lime_renderer_make_current);
 	DEFINE_PRIME1v (lime_renderer_unlock);
 	DEFINE_PRIME2v (lime_render_event_manager_register);
+	DEFINE_PRIME2v (lime_sensor_event_manager_register);
 	DEFINE_PRIME3 (lime_system_get_directory);
 	DEFINE_PRIME1 (lime_system_get_display);
 	DEFINE_PRIME0 (lime_system_get_num_displays);
