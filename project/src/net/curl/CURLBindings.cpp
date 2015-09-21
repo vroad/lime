@@ -2,28 +2,28 @@
 #include <hx/CFFIPrime.h>
 #include <string.h>
 
-#include <utils/NativePointer.h>
+#include <utils/PointerWrapper.h>
 
 namespace lime {
 	
 	
 	void lime_curl_easy_cleanup (value handle) {
 		
-		curl_easy_cleanup (GetNativePointer<CURL> (handle));
+		curl_easy_cleanup (GetPointer<CURL> (handle));
 		
 	}
 	
 	
 	value lime_curl_easy_duphandle (value handle) {
 		
-		return CreateNativePointer<CURL> (curl_easy_duphandle (GetNativePointer<CURL> (handle)), false);
+		return WrapPointer<CURL> (curl_easy_duphandle (GetPointer<CURL> (handle)));
 		
 	}
 	
 	
 	value lime_curl_easy_escape (value curl, HxString url, int length) {
 		
-		char* result = curl_easy_escape (GetNativePointer<CURL> (curl), url.__s, length);
+		char* result = curl_easy_escape (GetPointer<CURL> (curl), url.__s, length);
 		return result ? alloc_string (result) : alloc_null ();
 		
 	}
@@ -32,7 +32,7 @@ namespace lime {
 	value lime_curl_easy_getinfo (value curl, int info) {
 		
 		CURLcode code = CURLE_OK;
-		CURL* handle = GetNativePointer<CURL> (curl);
+		CURL* handle = GetPointer<CURL> (curl);
 		CURLINFO type = (CURLINFO)info;
 		
 		switch (type) {
@@ -120,14 +120,14 @@ namespace lime {
 	
 	value lime_curl_easy_init () {
 		
-		return CreateNativePointer<CURL> (curl_easy_init (), false);
+		return WrapPointer<CURL> (curl_easy_init ());
 		
 	}
 	
 	
 	int lime_curl_easy_pause (value handle, int bitmask) {
 		
-		return curl_easy_pause (GetNativePointer<CURL> (handle), bitmask);
+		return curl_easy_pause (GetPointer<CURL> (handle), bitmask);
 		
 	}
 	
@@ -150,7 +150,7 @@ namespace lime {
 	
 	void lime_curl_easy_reset (value curl) {
 		
-		curl_easy_reset (GetNativePointer<CURL> (curl));
+		curl_easy_reset (GetPointer<CURL> (curl));
 		
 	}
 	
@@ -216,7 +216,7 @@ namespace lime {
 	int lime_curl_easy_setopt (value handle, int option, value parameter) {
 		
 		CURLcode code = CURLE_OK;
-		CURL* curl = GetNativePointer<CURL> (handle);
+		CURL* curl = GetPointer<CURL> (handle);
 		CURLoption type = (CURLoption)option;
 		
 		switch (type) {
@@ -511,7 +511,7 @@ namespace lime {
 	
 	value lime_curl_easy_unescape (value curl, HxString url, int inlength, int outlength) {
 		
-		char* result = curl_easy_unescape (GetNativePointer<CURL> (curl), url.__s, inlength, &outlength);
+		char* result = curl_easy_unescape (GetPointer<CURL> (curl), url.__s, inlength, &outlength);
 		return result ? alloc_string (result) : alloc_null ();
 		
 	}

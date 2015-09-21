@@ -1,5 +1,5 @@
 #include <audio/AudioBuffer.h>
-#include <utils/NativePointer.h>
+#include <utils/PointerWrapper.h>
 #include <utils/ThreadLocalStorage.h>
 
 namespace lime {
@@ -65,7 +65,7 @@ namespace lime {
 		value handleValue;
 		if (handle != NULL) {
 			
-			handleValue = CreateNativePointer<AudioStream> (handle);
+			handleValue = WrapPointer<AudioStream> (handle);
 			
 		} else {
 			

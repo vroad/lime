@@ -1,17 +1,17 @@
-#ifndef LIME_UTILS_NATIVE_POINTER_H
-#define LIME_UTILS_NATIVE_POINTER_H
+#ifndef LIME_UTILS_POINTER_WRAPPER_H
+#define LIME_UTILS_POINTER_WRAPPER_H
 
 #include <hx/CFFI.h>
 #include <utils/ThreadLocalStorage.h>
 
 namespace lime {
-	
+
 	template <class T>
 	void lime_pointer_destroy (value handle);
 	
-	struct NativePointerId {
+	struct PointerWrapperId {
 			
-		NativePointerId () {
+		PointerWrapperId () {
 			
 			init = false;
 			
@@ -22,9 +22,9 @@ namespace lime {
 		
 	};
 	
-	static ThreadLocalStorage<NativePointerId> gNativePointerId;
-			
-	static void initializeNativePointerId (NativePointerId &id) {
+	static ThreadLocalStorage<PointerWrapperId> gPointerWrapperId;
+	
+	static void initializePointerWrapperId (PointerWrapperId &id) {
 		
 		id.pointer = val_id ("pointer");
 		id.init = true;
@@ -32,41 +32,35 @@ namespace lime {
 	}
 	
 	template <class T>
-	class NativePointer {
+	class PointerWrapper {
 		
 		public:
 			
-			NativePointer (T *pointer, bool setGC) {
+			PointerWrapper (T *pointer) {
 				
 				mPointer = pointer;
 				mValue = alloc_empty_object ();
-				NativePointerId id = gNativePointerId.Get ();
+				PointerWrapperId id = gPointerWrapperId.Get ();
 				
 				if (id.init == false) {
 					
-					initializeNativePointerId (id);
-					gNativePointerId.Set (id);
+					initializePointerWrapperId (id);
+					gPointerWrapperId.Set (id);
 					
 				}
 				
 				alloc_field (mValue, id.pointer, alloc_float ((intptr_t)pointer));
 				
-				if (setGC) {
-					
-					val_gc (mValue, lime_pointer_destroy<T>);
-					
-				}
-				
 			}
 			
-			NativePointer (value inValue) {
+			PointerWrapper (value inValue) {
 				
-				NativePointerId id = gNativePointerId.Get ();
+				PointerWrapperId id = gPointerWrapperId.Get ();
 				
 				if (id.init == false) {
 					
-					initializeNativePointerId (id);
-					gNativePointerId.Set (id);
+					initializePointerWrapperId (id);
+					gPointerWrapperId.Set (id);
 					
 				}
 				
@@ -75,7 +69,7 @@ namespace lime {
 				
 			}
 			
-			NativePointer () {
+			PointerWrapper () {
 				
 				mPointer = NULL;
 				mValue = NULL;
@@ -88,25 +82,34 @@ namespace lime {
 	};
 	
 	template <class T>
-	T *GetNativePointer (value handle) {
+	T *GetPointer (value handle) {
 		
-		NativePointer<T> ptr (handle);
+		PointerWrapper<T> ptr (handle);
 		return ptr.mPointer;
 		
 	}
 
 	template <class T>
-	value CreateNativePointer (T *pointer, bool setGC = true) {
+	value WrapPointer (T *pointer) {
 		
-		NativePointer<T> ptr (pointer, setGC);
+		PointerWrapper<T> ptr (pointer);
 		return ptr.mValue;
 		
 	}
-	
+
+	template <class T>
+	value WrapPointerWithGC (T *pointer) {
+		
+		PointerWrapper<T> ptr (pointer);
+		val_gc (ptr.mValue, lime_pointer_destroy<T>);
+		return ptr.mValue;
+		
+	}
+
 	template <class T>
 	void lime_pointer_destroy (value handle) {
 		
-		NativePointer<T> ptr (handle);
+		PointerWrapper<T> ptr (handle);
 		delete ptr.mPointer;
 		
 	}

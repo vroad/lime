@@ -8,7 +8,7 @@
 
 #include <hx/CFFIPrime.h>
 #include <utils/Bytes.h>
-#include <utils/NativePointer.h>
+#include <utils/PointerWrapper.h>
 
 namespace lime {
 	
@@ -891,7 +891,7 @@ namespace lime {
 		
 		ALCcontext* alcContext = alcCreateContext (alcDevice, list);
 		
-		return CreateNativePointer<ALCcontext> (alcContext, false);
+		return WrapPointer<ALCcontext> (alcContext);
 		
 	}
 	
@@ -908,7 +908,7 @@ namespace lime {
 		
 		ALCcontext* alcContext = (ALCcontext*)(intptr_t)context;
 		ALCdevice* alcDevice = alcGetContextsDevice (alcContext);
-		return CreateNativePointer<ALCdevice> (alcDevice, false);
+		return WrapPointer<ALCdevice> (alcDevice);
 		
 	}
 	
@@ -916,7 +916,7 @@ namespace lime {
 	value lime_alc_get_current_context () {
 		
 		ALCcontext* alcContext = alcGetCurrentContext ();
-		return CreateNativePointer<ALCcontext> (alcContext, false);
+		return WrapPointer<ALCcontext> (alcContext);
 		
 	}
 	
@@ -971,7 +971,7 @@ namespace lime {
 		
 		ALCdevice* alcDevice = alcOpenDevice (devicename.__s);
 		atexit (lime_al_cleanup);
-		return CreateNativePointer<ALCdevice> (alcDevice, false);
+		return WrapPointer<ALCdevice> (alcDevice);
 		
 	}
 	
