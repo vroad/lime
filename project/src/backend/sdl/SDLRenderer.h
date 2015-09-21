@@ -29,14 +29,6 @@ namespace lime {
 			
 		private:
 			
-			#ifdef HX_WINDOWS
-			void SetDwmFlushEnabled (bool enabled);
-			
-			bool isDwmFlushEnabled;
-			bool isVsyncForced;
-			#endif
-			int originalFlags;
-			
 			SDL_GLContext context;
 			int width;
 			int height;

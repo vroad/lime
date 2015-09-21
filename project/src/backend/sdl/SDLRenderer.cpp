@@ -1,9 +1,7 @@
 #include "SDLWindow.h"
 #include "SDLRenderer.h"
 #include "../../graphics/opengl/OpenGLBindings.h"
-#ifdef HX_WINDOWS
-#include <Dwmapi.h>
-#endif
+
 
 namespace lime {
 	
@@ -11,7 +9,6 @@ namespace lime {
 	SDLRenderer::SDLRenderer (Window* window) {
 		
 		currentWindow = window;
-		originalFlags = window->flags;
 		sdlWindow = ((SDLWindow*)window)->sdlWindow;
 		sdlTexture = 0;
 		context = 0;
@@ -37,23 +34,12 @@ namespace lime {
 			
 		}
 		
-		if (window->flags & WINDOW_FLAG_VSYNC) {
-			
-			#ifdef HX_WINDOWS
-			if (!(window->flags & WINDOW_FLAG_HARDWARE))
-				sdlFlags |= SDL_RENDERER_PRESENTVSYNC;
-			#else
-			sdlFlags |= SDL_RENDERER_PRESENTVSYNC;
-			#endif
-			
-		}
-		
 		sdlRenderer = SDL_CreateRenderer (sdlWindow, -1, sdlFlags);
 		
 		if (!sdlRenderer && (sdlFlags & SDL_RENDERER_ACCELERATED)) {
 			
 			sdlFlags &= ~SDL_RENDERER_ACCELERATED;
-			// sdlFlags &= ~SDL_RENDERER_PRESENTVSYNC;
+			sdlFlags &= ~SDL_RENDERER_PRESENTVSYNC;
 			
 			sdlFlags |= SDL_RENDERER_SOFTWARE;
 			
@@ -64,32 +50,6 @@ namespace lime {
 		if (!sdlRenderer) {
 			
 			printf ("Could not create SDL renderer: %s.\n", SDL_GetError ());
-			
-		} else {
-			
-			#if HX_WINDOWS
-			
-			isDwmFlushEnabled = false;
-			isVsyncForced = false;
-			if (window->flags & WINDOW_FLAG_HARDWARE && window->flags & WINDOW_FLAG_VSYNC) {
-				
-				bool useDwmFlush;
-				isVsyncForced = SDL_GL_GetSwapInterval() != 0;
-				if (!isVsyncForced) {
-					
-					useDwmFlush = (window->flags & WINDOW_FLAG_FULLSCREEN) ? false : true;
-					
-				}
-				else {
-					
-					useDwmFlush = false;
-					
-				}
-				
-				SetDwmFlushEnabled (useDwmFlush);
-				
-			}
-			#endif
 			
 		}
 		
@@ -114,39 +74,6 @@ namespace lime {
 	void SDLRenderer::Flip () {
 		
 		SDL_RenderPresent (sdlRenderer);
-		#ifdef HX_WINDOWS
-		BOOL isCompositionEnabled;
-		if (currentWindow->flags & WINDOW_FLAG_HARDWARE && currentWindow->flags & WINDOW_FLAG_VSYNC) {
-			
-			if (isDwmFlushEnabled) {
-				
-				DwmIsCompositionEnabled (&isCompositionEnabled);
-				if (isCompositionEnabled)
-				{
-					
-					DwmFlush ();
-					
-				} else {
-					
-					SetDwmFlushEnabled (false);
-					
-				
-				}
-			
-			} else if (!isVsyncForced && !(currentWindow->flags & WINDOW_FLAG_FULLSCREEN)) {
-				
-				SetDwmFlushEnabled(true);
-				
-				
-			}
-			
-		} else if (currentWindow->flags & WINDOW_FLAG_HARDWARE && !(currentWindow->flags & WINDOW_FLAG_VSYNC) && originalFlags & WINDOW_FLAG_VSYNC && !(currentWindow->flags & WINDOW_FLAG_FULLSCREEN))
-		{
-			
-			SetDwmFlushEnabled (true);
-			
-		}
-		#endif
 		
 	}
 	
@@ -243,48 +170,7 @@ namespace lime {
 		
 	}
 	
-	#ifdef HX_WINDOWS
-	void SDLRenderer::SetDwmFlushEnabled (bool enabled) {
-		
-		BOOL isCompositionEnabled;
-		if (enabled) {
-			
-			DwmIsCompositionEnabled (&isCompositionEnabled);
-			if (isCompositionEnabled) {
-				
-				SDL_GL_SetSwapInterval (0);
-				if (SDL_GL_GetSwapInterval () == 0) {
-					
-					isDwmFlushEnabled = true;
-					
-				}
-				
-			} else {
-				
-				isDwmFlushEnabled = false;
-				currentWindow->flags &= ~WINDOW_FLAG_VSYNC;
-				
-			}
-			
-		} else {
-			
-			SDL_GL_SetSwapInterval (1);
-			isDwmFlushEnabled = false;
-			if (SDL_GL_GetSwapInterval () == 0) {
-				
-				currentWindow->flags &= ~WINDOW_FLAG_VSYNC;
-				
-			} else {
-				
-				currentWindow->flags |= WINDOW_FLAG_VSYNC;
-				
-			}
-			
-		}
-		
-	}
-	#endif
-
+	
 	Renderer* CreateRenderer (Window* window) {
 		
 		return new SDLRenderer (window);
