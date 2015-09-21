@@ -8,6 +8,8 @@
 #include <map>
 #include <string>
 
+#include <utils/PointerWrapper.h>
+
 #define ELOG(args...) __android_log_print (ANDROID_LOG_ERROR, "Lime", args)
 
 #ifdef __GNUC__
@@ -1954,10 +1956,10 @@ namespace lime {
 	DEFINE_PRIME3 (lime_jni_call_member);
 	
 	
-	double lime_jni_get_env () {
+	value lime_jni_get_env () {
 		
 		JNIEnv *env = (JNIEnv*)JNI::GetEnv ();
-		return (intptr_t)env;
+		return WrapPointer<JNIEnv> (env);
 		
 	}
 	

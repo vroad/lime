@@ -153,7 +153,7 @@ class CURLEasy {
 	#if ((cpp || neko || nodejs) && lime_curl && !macro)
 	@:cffi private static function lime_curl_easy_cleanup (handle:Dynamic):Void;
 	@:cffi private static function lime_curl_easy_duphandle (handle:Dynamic):Dynamic;
-	@:cffi private static function lime_curl_easy_escape (curl:Dynamic, url:String, length:Int):String;
+	@:cffi private static function lime_curl_easy_escape (curl:Dynamic, url:String, length:Int):Dynamic;
 	@:cffi private static function lime_curl_easy_getinfo (curl:Dynamic, info:Int):Dynamic;
 	@:cffi private static function lime_curl_easy_init ():Dynamic;
 	@:cffi private static function lime_curl_easy_pause (handle:Dynamic, bitmask:Int):Int;
