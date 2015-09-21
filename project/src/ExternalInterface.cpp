@@ -197,13 +197,16 @@ namespace lime {
 	}
 	
 	
+	#if 0
 	void lime_cffi_finalizer (value abstract) {
 		
 		val_call0 ((value)val_data (abstract));
 		
 	}
+	#endif
 	
 	
+	#if 0
 	value lime_cffi_set_finalizer (value callback) {
 		
 		value abstract = alloc_abstract (k_finalizer, callback);
@@ -211,6 +214,7 @@ namespace lime {
 		return abstract;
 		
 	}
+	#endif
 	
 	
 	value lime_clipboard_get_text () {
@@ -1343,7 +1347,9 @@ namespace lime {
 	DEFINE_PRIME2 (lime_bytes_from_data_pointer);
 	DEFINE_PRIME1 (lime_bytes_get_data_pointer);
 	DEFINE_PRIME1 (lime_bytes_read_file);
+	#if 0
 	DEFINE_PRIME1 (lime_cffi_set_finalizer);
+	#endif
 	DEFINE_PRIME0 (lime_clipboard_get_text);
 	DEFINE_PRIME1v (lime_clipboard_set_text);
 	DEFINE_PRIME2 (lime_file_dialog_open_file);
