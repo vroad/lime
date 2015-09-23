@@ -1728,10 +1728,22 @@ namespace lime {
 	DEFINE_PRIME2 (lime_window_set_title);
 	
 	
+	
 }
 
 
+extern "C" int lime_cairo_register_prims ();
+extern "C" int lime_curl_register_prims ();
+extern "C" int lime_openal_register_prims ();
+extern "C" int lime_opengl_register_prims ();
+
+
 extern "C" int lime_register_prims () {
+	
+	lime_cairo_register_prims ();
+	lime_curl_register_prims ();
+	lime_openal_register_prims ();
+	lime_opengl_register_prims ();
 	
 	return 0;
 	
