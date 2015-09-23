@@ -9,9 +9,34 @@
 #include <hx/CFFIPrime.h>
 #include <utils/Bytes.h>
 #include <utils/PointerWrapper.h>
+#include <utils/Kinds.h>
 
 namespace lime {
 	
+	ALCcontext *val_to_ALCcontext (value handle) {
+		
+		return (ALCcontext*)val_to_kind (handle, GetKinds ().ALCcontext);
+		
+	}
+	
+	ALCdevice *val_to_ALCdevice (value handle) {
+		
+		return (ALCdevice*)val_to_kind (handle, GetKinds ().ALCdevice);
+		
+	}
+	
+	value ALCcontext_to_value (ALCcontext *context) {
+		
+		return WrapPointerInternal<ALCcontext> (context, GetKinds ().ALCcontext);
+		
+	}
+	
+	
+	value ALCdevice_to_value (ALCdevice *device) {
+		
+		return WrapPointerInternal<ALCdevice> (device, GetKinds ().ALCdevice);
+		
+	}
 	
 	void lime_al_buffer_data (int buffer, int format, value data, int size, int freq) {
 		
@@ -878,7 +903,8 @@ namespace lime {
 	
 	bool lime_alc_close_device (value device) {
 		
-		ALCdevice* alcDevice = GetPointer<ALCdevice> (device);
+		ALCdevice* alcDevice = val_to_ALCdevice (device);
+		if (alcDevice == NULL) return false;
 		return alcCloseDevice (alcDevice);
 		
 	}
@@ -886,19 +912,22 @@ namespace lime {
 	
 	value lime_alc_create_context (value device, value attrlist) {
 		
-		ALCdevice* alcDevice = GetPointer<ALCdevice> (device);
+		ALCdevice* alcDevice = val_to_ALCdevice (device);
+		if (alcDevice == NULL) return false;
 		int* list = val_array_int (attrlist);
 		
 		ALCcontext* alcContext = alcCreateContext (alcDevice, list);
 		
-		return WrapPointer<ALCcontext> (alcContext);
+		return ALCcontext_to_value (alcContext);
 		
 	}
 	
 	
 	void lime_alc_destroy_context (value context) {
 		
-		ALCcontext* alcContext = GetPointer<ALCcontext> (context);
+		ALCcontext* alcContext = val_to_ALCcontext (context);
+		if (alcContext == NULL) return;
+		free_abstract (context);
 		alcDestroyContext (alcContext);
 		
 	}
@@ -906,9 +935,10 @@ namespace lime {
 	
 	value lime_alc_get_contexts_device (value context) {
 		
-		ALCcontext* alcContext = GetPointer<ALCcontext> (context);
+		ALCcontext* alcContext = val_to_ALCcontext (context);
+		if (alcContext == NULL) return alloc_null ();
 		ALCdevice* alcDevice = alcGetContextsDevice (alcContext);
-		return WrapPointer<ALCdevice> (alcDevice);
+		return ALCdevice_to_value (alcDevice);
 		
 	}
 	
@@ -916,14 +946,16 @@ namespace lime {
 	value lime_alc_get_current_context () {
 		
 		ALCcontext* alcContext = alcGetCurrentContext ();
-		return WrapPointer<ALCcontext> (alcContext);
+		if (alcContext == NULL) return alloc_null ();
+		return ALCcontext_to_value (alcContext);
 		
 	}
 	
 	
 	int lime_alc_get_error (value device) {
 		
-		ALCdevice* alcDevice = GetPointer<ALCdevice> (device);
+		ALCdevice* alcDevice = val_to_ALCdevice (device);
+		if (alcDevice == NULL) return 0;
 		return alcGetError (alcDevice);
 		
 	}
@@ -931,7 +963,8 @@ namespace lime {
 	
 	value lime_alc_get_integerv (value device, int param, int size) {
 		
-		ALCdevice* alcDevice = GetPointer<ALCdevice> (device);
+		ALCdevice* alcDevice = val_to_ALCdevice (device);
+		if (alcDevice == NULL) return alloc_null ();
 		
 		ALCint* values = new ALCint[size];
 		alcGetIntegerv (alcDevice, param, size, values);
@@ -952,7 +985,8 @@ namespace lime {
 	
 	value lime_alc_get_string (value device, int param) {
 		
-		ALCdevice* alcDevice = GetPointer<ALCdevice> (device);
+		ALCdevice* alcDevice = val_to_ALCdevice (device);
+		if (alcDevice == NULL) return alloc_null ();
 		const char* result = alcGetString (alcDevice, param);
 		return result ? alloc_string (result) : alloc_null ();
 		
@@ -961,7 +995,8 @@ namespace lime {
 	
 	bool lime_alc_make_context_current (value context) {
 		
-		ALCcontext* alcContext = GetPointer<ALCcontext> (context);
+		ALCcontext* alcContext = val_to_ALCcontext (context);
+		if (alcContext == NULL) return false;
 		return alcMakeContextCurrent (alcContext);
 		
 	}
@@ -971,14 +1006,15 @@ namespace lime {
 		
 		ALCdevice* alcDevice = alcOpenDevice (devicename.__s);
 		atexit (lime_al_cleanup);
-		return WrapPointer<ALCdevice> (alcDevice);
+		return ALCdevice_to_value (alcDevice);
 		
 	}
 	
 	
 	void lime_alc_process_context (value context) {
 		
-		ALCcontext* alcContext = GetPointer<ALCcontext> (context);
+		ALCcontext* alcContext = val_to_ALCcontext (context);
+		if (alcContext == NULL) return;
 		alcProcessContext (alcContext);
 		
 	}
@@ -986,7 +1022,8 @@ namespace lime {
 	
 	void lime_alc_suspend_context (value context) {
 		
-		ALCcontext* alcContext = GetPointer<ALCcontext> (context);
+		ALCcontext* alcContext = val_to_ALCcontext (context);
+		if (alcContext == NULL) return;
 		alcSuspendContext (alcContext);
 		
 	}

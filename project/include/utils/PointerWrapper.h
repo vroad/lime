@@ -2,118 +2,50 @@
 #define LIME_UTILS_POINTER_WRAPPER_H
 
 #include <hx/CFFI.h>
-#include <utils/ThreadLocalStorage.h>
 
 namespace lime {
-
+	
 	template <class T>
 	void lime_pointer_destroy (value handle);
 	
-	struct PointerWrapperId {
-			
-		PointerWrapperId () {
-			
-			init = false;
-			
-		}
-		
-		int pointer;
-		bool init;
-		
-	};
-	
-	static ThreadLocalStorage<PointerWrapperId> gPointerWrapperId;
-	
-	static void initializePointerWrapperId (PointerWrapperId &id) {
-		
-		id.pointer = val_id ("pointer");
-		id.init = true;
-		
-	}
-	
 	template <class T>
-	class PointerWrapper {
+	value WrapPointerInternal (T *pointer, vkind kind) {
 		
-		public:
-			
-			PointerWrapper (T *pointer) {
-				
-				mPointer = pointer;
-				mValue = alloc_empty_object ();
-				PointerWrapperId id = gPointerWrapperId.Get ();
-				
-				if (id.init == false) {
-					
-					initializePointerWrapperId (id);
-					gPointerWrapperId.Set (id);
-					
-				}
-				
-				alloc_field (mValue, id.pointer, alloc_float ((intptr_t)pointer));
-				
-			}
-			
-			PointerWrapper (value inValue) {
-				
-				PointerWrapperId id = gPointerWrapperId.Get ();
-				
-				if (id.init == false) {
-					
-					initializePointerWrapperId (id);
-					gPointerWrapperId.Set (id);
-					
-				}
-				
-				mValue = inValue;
-				if (val_is_null (inValue))
-					mPointer = NULL;
-				else
-					mPointer = (T*)(intptr_t)val_float (val_field (inValue, id.pointer));
-				
-			}
-			
-			PointerWrapper () {
-				
-				mPointer = NULL;
-				mValue = NULL;
-				
-			}
-			
-			T *mPointer;
-			value mValue;
-			
-	};
-	
-	template <class T>
-	T *GetPointer (value handle) {
-		
-		PointerWrapper<T> ptr (handle);
-		return ptr.mPointer;
+		if (pointer == NULL)
+			return alloc_null ();
+		return alloc_abstract (kind, pointer);
 		
 	}
 
 	template <class T>
+	T *GetPointer (value handle) {
+		
+		T::unimplemented ();
+		
+	}
+	
+	template <class T>
 	value WrapPointer (T *pointer) {
 		
-		PointerWrapper<T> ptr (pointer);
-		return ptr.mValue;
+		T::unimplemented ();
 		
 	}
 
 	template <class T>
 	value WrapPointerWithGC (T *pointer) {
 		
-		PointerWrapper<T> ptr (pointer);
-		val_gc (ptr.mValue, lime_pointer_destroy<T>);
-		return ptr.mValue;
+		value outValue = WrapPointer<T> (pointer);
+		val_gc (outValue, lime_pointer_destroy<T>);
+		return outValue;
 		
 	}
 
 	template <class T>
 	void lime_pointer_destroy (value handle) {
 		
-		PointerWrapper<T> ptr (handle);
-		delete ptr.mPointer;
+		T *ptr = (T*)val_data (handle);
+		delete ptr;
+		free_abstract (handle);
 		
 	}
 	

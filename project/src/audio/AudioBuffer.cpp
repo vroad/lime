@@ -1,29 +1,46 @@
 #include <audio/AudioBuffer.h>
 #include <utils/PointerWrapper.h>
 #include <utils/ThreadLocalStorage.h>
+#include <utils/Kinds.h>
 
 namespace lime {
 	
-	
-	struct AudioBufferId {
-
-		AudioBufferId () {
-
-			init = false;
-
-		}
-
-		int bitsPerSample;
-		int channels;
-		int handle;
-		int sourceData;
-		int data;
-		int sampleRate;
-		bool init;
-	
-	};
-
 	static ThreadLocalStorage<AudioBufferId> stringId;
+	
+	AudioBufferId GetAudioBufferId () {
+		
+		AudioBufferId id = stringId.Get ();
+		if (!id.init) {
+			
+			id.bitsPerSample = val_id ("bitsPerSample");
+			id.channels = val_id ("channels");
+			id.handle = val_id ("handle");
+			id.sourceData = val_id ("sourceData");
+			id.data = val_id ("data");
+			id.sampleRate = val_id ("sampleRate");
+			id.init = true;
+			stringId.Set (id);
+			
+		}
+		
+		return id;
+		
+	}
+	
+	template <>
+	value WrapPointer<AudioBuffer> (AudioBuffer *pointer) {
+		
+		return WrapPointerInternal<AudioBuffer> (pointer, GetKinds ().AudioBuffer);
+		
+	}
+
+	template <>
+	value WrapPointer<AudioStream> (AudioStream *pointer) {
+		
+		AudioBufferId id = GetAudioBufferId ();
+		return WrapPointerInternal<AudioStream> (pointer, GetKinds ().AudioStream);
+		
+	}
 
 	AudioBuffer::AudioBuffer () {
 		
@@ -48,19 +65,6 @@ namespace lime {
 	
 	value AudioBuffer::Value () {
 		
-		AudioBufferId id = stringId.Get ();
-		if (!id.init) {
-			
-			id.bitsPerSample = val_id ("bitsPerSample");
-			id.channels = val_id ("channels");
-			id.handle = val_id ("handle");
-			id.sourceData = val_id ("sourceData");
-			id.data = val_id ("data");
-			id.sampleRate = val_id ("sampleRate");
-			id.init = true;
-			stringId.Set (id);
-			
-		}
 		
 		value handleValue;
 		if (handle != NULL) {
@@ -74,6 +78,7 @@ namespace lime {
 		}
 		
 		mValue = alloc_empty_object ();
+		AudioBufferId id = GetAudioBufferId ();
 		alloc_field (mValue, id.bitsPerSample, alloc_int (bitsPerSample));
 		alloc_field (mValue, id.channels, alloc_int (channels));
 		alloc_field (mValue, id.handle, handleValue);

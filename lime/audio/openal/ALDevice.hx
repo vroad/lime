@@ -5,7 +5,7 @@ package lime.audio.openal;
 @:allow(lime.audio.openal.ALC)
 
 
-abstract ALDevice(Null<Float>) from Null<Float> to Null<Float> {
+abstract ALDevice(Dynamic) {
 	
 	
 	private function new (handle:Dynamic) {

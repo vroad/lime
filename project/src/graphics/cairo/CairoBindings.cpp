@@ -6,194 +6,314 @@
 #include <text/Font.h>
 
 #include <utils/PointerWrapper.h>
+#include <utils/Kinds.h>
 
 namespace lime {
 	
+	cairo_t *val_to_cairo_t (value handle) {
+		
+		return (cairo_t*)val_to_kind (handle, GetKinds ().cairo_t);
+		
+	}
+	
+	cairo_surface_t *val_to_cairo_surface_t (value handle) {
+		
+		return (cairo_surface_t*)val_to_kind (handle, GetKinds ().cairo_surface_t);
+		
+	}
+	
+	cairo_font_face_t *val_to_cairo_font_face_t (value handle) {
+		
+		return (cairo_font_face_t*)val_to_kind (handle, GetKinds ().cairo_font_face_t);
+		
+	}
+	
+	cairo_pattern_t *val_to_cairo_pattern_t (value handle) {
+		
+		return (cairo_pattern_t*)val_to_kind (handle, GetKinds ().cairo_pattern_t);
+		
+	}
+	
+	cairo_font_options_t *val_to_cairo_font_options_t (value handle) {
+		
+		return (cairo_font_options_t*)val_to_kind (handle, GetKinds ().cairo_font_options_t);
+		
+	}
+	
+	Font *val_to_Font (value handle) {
+		
+		return (Font*)val_to_kind (handle, GetKinds ().Font);
+		
+	}
+
+	value cairo_t_to_value (cairo_t *cairo) {
+		
+		return WrapPointerInternal<cairo_t> (cairo, GetKinds ().cairo_t);
+		
+	}
+	
+	value cairo_surface_t_to_value (cairo_surface_t *surface) {
+		
+		return WrapPointerInternal<cairo_surface_t> (surface, GetKinds ().cairo_surface_t);
+		
+	}
+	
+	value cairo_font_options_t_to_value (cairo_font_options_t *options) {
+		
+		return WrapPointerInternal<cairo_font_options_t> (options, GetKinds ().cairo_font_options_t);
+		
+	}
+	
+	value cairo_font_face_t_to_value (cairo_font_face_t *font_face) {
+		
+		return WrapPointerInternal<cairo_font_face_t> (font_face, GetKinds ().cairo_font_face_t);
+		
+	}
+	
+	value cairo_pattern_t_to_value (cairo_pattern_t *pattern) {
+		
+		return WrapPointerInternal<cairo_pattern_t> (pattern, GetKinds ().cairo_pattern_t);
+		
+	}
 	
 	void lime_cairo_arc (value handle, double xc, double yc, double radius, double angle1, double angle2) {
 		
-		cairo_arc (GetPointer<cairo_t> (handle), xc, yc, radius, angle1, angle2);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_arc (cairo, xc, yc, radius, angle1, angle2);
 		
 	}
 	
 	
 	void lime_cairo_arc_negative (value handle, double xc, double yc, double radius, double angle1, double angle2) {
 		
-		cairo_arc_negative (GetPointer<cairo_t> (handle), xc, yc, radius, angle1, angle2);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_arc_negative (cairo, xc, yc, radius, angle1, angle2);
 		
 	}
 	
 	
 	void lime_cairo_clip (value handle) {
 		
-		cairo_clip (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_clip (cairo);
 		
 	}
 	
 	
 	void lime_cairo_clip_extents (value handle, double x1, double y1, double x2, double y2) {
 		
-		cairo_clip_extents (GetPointer<cairo_t> (handle), &x1, &y1, &x2, &y2);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_clip_extents (cairo, &x1, &y1, &x2, &y2);
 		
 	}
 	
 	
 	void lime_cairo_clip_preserve (value handle) {
 		
-		cairo_clip_preserve (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_clip_preserve (cairo);
 		
 	}
 	
 	
 	void lime_cairo_close_path (value handle) {
 		
-		cairo_close_path (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_close_path (cairo);
 		
 	}
 	
 	
 	void lime_cairo_copy_page (value handle) {
 		
-		cairo_copy_page (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_copy_page (cairo);
 		
 	}
 	
 	
-	value lime_cairo_create (value surface) {
+	value lime_cairo_create (value inSurface) {
 		
-		return WrapPointer<cairo_t>(cairo_create (GetPointer<cairo_surface_t> (surface)));
+		cairo_surface_t *surface = val_to_cairo_surface_t (inSurface);
+		return cairo_t_to_value (cairo_create (surface));
 		
 	}
 	
 	
 	void lime_cairo_curve_to (value handle, double x1, double y1, double x2, double y2, double x3, double y3) {
 		
-		cairo_curve_to (GetPointer<cairo_t> (handle), x1, y1, x2, y2, x3, y3);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_curve_to (cairo, x1, y1, x2, y2, x3, y3);
 		
 	}
 	
 	
 	void lime_cairo_destroy (value handle) {
 		
-		cairo_destroy (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_destroy (cairo);
+		free_abstract (handle);
 		
 	}
 	
 	
 	void lime_cairo_fill (value handle) {
 		
-		cairo_fill (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_fill (cairo);
 		
 	}
 	
 	
 	void lime_cairo_fill_extents (value handle, double x1, double y1, double x2, double y2) {
 		
-		cairo_fill_extents (GetPointer<cairo_t> (handle), &x1, &y1, &x2, &y2);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_fill_extents (cairo, &x1, &y1, &x2, &y2);
 		
 	}
 	
 	
 	void lime_cairo_fill_preserve (value handle) {
 		
-		cairo_fill_preserve (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_fill_preserve (cairo);
 		
 	}
 	
 	void lime_cairo_font_face_destroy (value handle) {
 		
-		cairo_font_face_destroy (GetPointer<cairo_font_face_t> (handle));
+		cairo_font_face_t *font_face = val_to_cairo_font_face_t (handle);
+		if (font_face == NULL) return;
+		cairo_font_face_destroy (font_face);
+		free_abstract (handle);
 		
 	}
 	
 	
 	int lime_cairo_font_face_get_reference_count (value handle) {
 		
-		return cairo_font_face_get_reference_count (GetPointer<cairo_font_face_t> (handle));
+		cairo_font_face_t *font_face = val_to_cairo_font_face_t (handle);
+		if (font_face == NULL) return 0;
+		return cairo_font_face_get_reference_count (font_face);
 		
 	}
 	
 	
 	void lime_cairo_font_face_reference (value handle) {
 		
-		cairo_font_face_reference (GetPointer<cairo_font_face_t> (handle));
+		cairo_font_face_t *font_face = val_to_cairo_font_face_t (handle);
+		if (font_face == NULL) return;
+		cairo_font_face_reference (font_face);
 		
 	}
 	
 	
 	int lime_cairo_font_face_status (value handle) {
 		
-		return cairo_font_face_status (GetPointer<cairo_font_face_t> (handle));
+		cairo_font_face_t *font_face = val_to_cairo_font_face_t (handle);
+		if (font_face == NULL) return 0;
+		return cairo_font_face_status (font_face);
 		
 	}
 	
 	
 	value lime_cairo_font_options_create () {
 		
-		return WrapPointer<cairo_font_options_t>(cairo_font_options_create ());
+		return cairo_font_options_t_to_value (cairo_font_options_create ());
 		
 	}
 	
 	
 	void lime_cairo_font_options_destroy (value handle) {
 		
-		cairo_font_options_destroy (GetPointer<cairo_font_options_t> (handle));
+		cairo_font_options_t *options = val_to_cairo_font_options_t (handle);
+		if (options == NULL) return;
+		cairo_font_options_destroy (options);
+		free_abstract (handle);
 		
 	}
 	
 	
 	int lime_cairo_font_options_get_antialias (value handle) {
 		
-		return cairo_font_options_get_antialias (GetPointer<cairo_font_options_t> (handle));
+		cairo_font_options_t *options = val_to_cairo_font_options_t (handle);
+		if (options == NULL) return 0;
+		return cairo_font_options_get_antialias (options);
 		
 	}
 	
 	
 	int lime_cairo_font_options_get_hint_metrics (value handle) {
 		
-		return cairo_font_options_get_hint_metrics (GetPointer<cairo_font_options_t> (handle));
+		cairo_font_options_t *options = val_to_cairo_font_options_t (handle);
+		if (options == NULL) return 0;
+		return cairo_font_options_get_hint_metrics (options);
 		
 	}
 	
 	
 	int lime_cairo_font_options_get_hint_style (value handle) {
 		
-		return cairo_font_options_get_hint_style (GetPointer<cairo_font_options_t> (handle));
+		cairo_font_options_t *options = val_to_cairo_font_options_t (handle);
+		if (options == NULL) return 0;
+		return cairo_font_options_get_hint_style (options);
 		
 	}
 	
 	
 	int lime_cairo_font_options_get_subpixel_order (value handle) {
 		
-		return cairo_font_options_get_subpixel_order (GetPointer<cairo_font_options_t> (handle));
+		cairo_font_options_t *options = val_to_cairo_font_options_t (handle);
+		if (options == NULL) return 0;
+		return cairo_font_options_get_subpixel_order (options);
 		
 	}
 	
 	
 	void lime_cairo_font_options_set_antialias (value handle, int v) {
 		
-		cairo_font_options_set_antialias (GetPointer<cairo_font_options_t> (handle), (cairo_antialias_t)v);
+		cairo_font_options_t *options = val_to_cairo_font_options_t (handle);
+		if (options == NULL) return;
+		cairo_font_options_set_antialias (options, (cairo_antialias_t)v);
 		
 	}
 	
 	
 	void lime_cairo_font_options_set_hint_metrics (value handle, int v) {
 		
-		cairo_font_options_set_hint_metrics (GetPointer<cairo_font_options_t> (handle), (cairo_hint_metrics_t)v);
+		cairo_font_options_t *options = val_to_cairo_font_options_t (handle);
+		if (options == NULL) return;
+		cairo_font_options_set_hint_metrics (options, (cairo_hint_metrics_t)v);
 		
 	}
 	
 	
 	void lime_cairo_font_options_set_hint_style (value handle, int v) {
 		
-		cairo_font_options_set_hint_style (GetPointer<cairo_font_options_t> (handle), (cairo_hint_style_t)v);
+		cairo_font_options_t *options = val_to_cairo_font_options_t (handle);
+		if (options == NULL) return;
+		cairo_font_options_set_hint_style (options, (cairo_hint_style_t)v);
 		
 	}
 	
 	
 	void lime_cairo_font_options_set_subpixel_order (value handle, int v) {
 		
-		cairo_font_options_set_subpixel_order (GetPointer<cairo_font_options_t> (handle), (cairo_subpixel_order_t)v);
+		cairo_font_options_t *options = val_to_cairo_font_options_t (handle);
+		if (options == NULL) return;
+		cairo_font_options_set_subpixel_order (options, (cairo_subpixel_order_t)v);
 		
 	}
 	
@@ -201,8 +321,9 @@ namespace lime {
 	value lime_cairo_ft_font_face_create (value face, int flags) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (face);
-		return WrapPointer<cairo_font_face_t>(cairo_ft_font_face_create_for_ft_face ((FT_Face)font->face, flags));
+		Font *font = val_to_Font (face);
+		if (font == NULL) return alloc_null ();
+		return cairo_font_face_t_to_value (cairo_ft_font_face_create_for_ft_face ((FT_Face)font->face, flags));
 		#else
 		return 0;
 		#endif
@@ -212,15 +333,20 @@ namespace lime {
 	
 	int lime_cairo_get_antialias (value handle) {
 		
-		return cairo_get_antialias (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return 0;
+		return cairo_get_antialias (cairo);
 		
 	}
 	
 	
 	value lime_cairo_get_current_point (value handle) {
 		
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return alloc_null ();
+		
 		double x, y;
-		cairo_get_current_point (GetPointer<cairo_t> (handle), &x, &y);
+		cairo_get_current_point (cairo, &x, &y);
 		Vector2 vec2 = Vector2 (x, y);
 		return vec2.Value ();
 		
@@ -229,12 +355,15 @@ namespace lime {
 	
 	value lime_cairo_get_dash (value handle) {
 		
-		int length = cairo_get_dash_count (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return alloc_null ();
+
+		int length = cairo_get_dash_count (cairo);
 		
 		double* dashes = new double[length];
 		double offset;
 		
-		cairo_get_dash (GetPointer<cairo_t> (handle), dashes, &offset);
+		cairo_get_dash (cairo, dashes, &offset);
 		
 		value result = alloc_array (length);
 		
@@ -252,66 +381,85 @@ namespace lime {
 	
 	int lime_cairo_get_dash_count (value handle) {
 		
-		return cairo_get_dash_count (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return 0;
+		return cairo_get_dash_count (cairo);
 		
 	}
 	
 	
 	int lime_cairo_get_fill_rule (value handle) {
 		
-		return cairo_get_fill_rule (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return 0;
+		return cairo_get_fill_rule (cairo);
 		
 	}
 	
 	
 	value lime_cairo_get_font_face (value handle) {
 		
-		return WrapPointer<cairo_font_face_t>(cairo_get_font_face (GetPointer<cairo_t> (handle)));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return alloc_null ();
+		return cairo_font_face_t_to_value (cairo_get_font_face (cairo));
 		
 	}
 	
 	
 	value lime_cairo_get_font_options (value handle) {
 		
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return alloc_null ();
 		cairo_font_options_t *options = 0;
-		cairo_get_font_options (GetPointer<cairo_t> (handle), options);
-		return WrapPointer<cairo_font_options_t>(options);
+		cairo_get_font_options (cairo, options);
+		return cairo_font_options_t_to_value (options);
 		
 	}
 	
 	
 	value lime_cairo_get_group_target (value handle) {
 		
-		return WrapPointer<cairo_surface_t>(cairo_get_group_target (GetPointer<cairo_t> (handle)));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return alloc_null ();
+		return cairo_surface_t_to_value (cairo_get_group_target (cairo));
 		
 	}
 	
 	
 	int lime_cairo_get_line_cap (value handle) {
 		
-		return cairo_get_line_cap (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return 0;
+		return cairo_get_line_cap (cairo);
 		
 	}
 	
 	
 	int lime_cairo_get_line_join (value handle) {
 		
-		return cairo_get_line_join (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return 0;
+		return cairo_get_line_join (cairo);
 		
 	}
 	
 	
 	double lime_cairo_get_line_width (value handle) {
 		
-		return cairo_get_line_width (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return 0;
+		return cairo_get_line_width (cairo);
 		
 	}
 	
 	
 	value lime_cairo_get_matrix (value handle) {
 		
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return alloc_null ();
+
 		cairo_matrix_t cm;
-		cairo_get_matrix (GetPointer<cairo_t> (handle), &cm);
+		cairo_get_matrix (cairo, &cm);
 		Matrix3 mat3 = Matrix3 (cm.xx, cm.yx, cm.xy, cm.yy, cm.x0, cm.y0);
 		return mat3.Value ();
 		
@@ -320,239 +468,301 @@ namespace lime {
 	
 	double lime_cairo_get_miter_limit (value handle) {
 		
-		return cairo_get_miter_limit (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return 0;
+		return cairo_get_miter_limit (cairo);
 		
 	}
 	
 	
 	int lime_cairo_get_operator (value handle) {
 		
-		return cairo_get_operator (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return 0;
+		return cairo_get_operator (cairo);
 		
 	}
 	
 	
 	int lime_cairo_get_reference_count (value handle) {
 		
-		return cairo_get_reference_count (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return 0;
+		return cairo_get_reference_count (cairo);
 		
 	}
 	
 	
 	value lime_cairo_get_source (value handle) {
 		
-		return WrapPointer<cairo_pattern_t>(cairo_get_source (GetPointer<cairo_t> (handle)));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return alloc_null ();
+		return cairo_pattern_t_to_value (cairo_get_source (cairo));
 		
 	}
 	
 	
 	value lime_cairo_get_target (value handle) {
 		
-		return WrapPointer<cairo_surface_t>(cairo_get_target (GetPointer<cairo_t> (handle)));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return alloc_null ();
+		return cairo_surface_t_to_value (cairo_get_target (cairo));
 		
 	}
 	
 	
 	double lime_cairo_get_tolerance (value handle) {
 		
-		return cairo_get_tolerance (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return 0;
+		return cairo_get_tolerance (cairo);
 		
 	}
 	
 	
 	bool lime_cairo_has_current_point (value handle) {
 		
-		return cairo_has_current_point (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return false;
+		return cairo_has_current_point (cairo);
 		
 	}
 	
 	
 	void lime_cairo_identity_matrix (value handle) {
 		
-		cairo_identity_matrix (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_identity_matrix (cairo);
 		
 	}
 	
 	
 	value lime_cairo_image_surface_create (int format, int width, int height) {
 		
-		return WrapPointer<cairo_surface_t>(cairo_image_surface_create ((cairo_format_t)format, width, height));
+		return cairo_surface_t_to_value (cairo_image_surface_create ((cairo_format_t)format, width, height));
 		
 	}
 	
 	
 	value lime_cairo_image_surface_create_for_data (double data, int format, int width, int height, int stride) {
 		
-		return WrapPointer<cairo_surface_t>(cairo_image_surface_create_for_data ((unsigned char*)(intptr_t)data, (cairo_format_t)format, width, height, stride));
+		return cairo_surface_t_to_value (cairo_image_surface_create_for_data ((unsigned char*)(intptr_t)data, (cairo_format_t)format, width, height, stride));
 		
 	}
 	
 	
 	double lime_cairo_image_surface_get_data (value handle) {
 		
-		return (intptr_t)cairo_image_surface_get_data (GetPointer<cairo_surface_t> (handle));
+		cairo_surface_t *surface = val_to_cairo_surface_t (handle);
+		if (surface == NULL) return 0;
+		return (intptr_t)cairo_image_surface_get_data (surface);
 		
 	}
 	
 	
 	int lime_cairo_image_surface_get_format (value handle) {
 		
-		return (int)cairo_image_surface_get_format (GetPointer<cairo_surface_t> (handle));
+		cairo_surface_t *surface = val_to_cairo_surface_t (handle);
+		if (surface == NULL) return 0;
+		return (int)cairo_image_surface_get_format (surface);
 		
 	}
 	
 	
 	int lime_cairo_image_surface_get_height (value handle) {
 		
-		return cairo_image_surface_get_height (GetPointer<cairo_surface_t> (handle));
+		cairo_surface_t *surface = val_to_cairo_surface_t (handle);
+		if (surface == NULL) return 0;
+		return cairo_image_surface_get_height (surface);
 		
 	}
 	
 	
 	int lime_cairo_image_surface_get_stride (value handle) {
 		
-		return cairo_image_surface_get_stride (GetPointer<cairo_surface_t> (handle));
+		cairo_surface_t *surface = val_to_cairo_surface_t (handle);
+		if (surface == NULL) return 0;
+		return cairo_image_surface_get_stride (surface);
 		
 	}
 	
 	
 	int lime_cairo_image_surface_get_width (value handle) {
 		
-		return cairo_image_surface_get_width (GetPointer<cairo_surface_t> (handle));
+		cairo_surface_t *surface = val_to_cairo_surface_t (handle);
+		if (surface == NULL) return 0;
+		return cairo_image_surface_get_width (surface);
 		
 	}
 	
 	
 	bool lime_cairo_in_clip (value handle, double x, double y) {
 		
-		return cairo_in_clip (GetPointer<cairo_t> (handle), x, y);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return false;
+		return cairo_in_clip (cairo, x, y);
 		
 	}
 	
 	
 	bool lime_cairo_in_fill (value handle, double x, double y) {
 		
-		return cairo_in_fill (GetPointer<cairo_t> (handle), x, y);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return false;
+		return cairo_in_fill (cairo, x, y);
 		
 	}
 	
 	
 	bool lime_cairo_in_stroke (value handle, double x, double y) {
 		
-		return cairo_in_stroke (GetPointer<cairo_t> (handle), x, y);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return false;
+		return cairo_in_stroke (cairo, x, y);
 		
 	}
 	
 	
 	void lime_cairo_line_to (value handle, double x, double y) {
 		
-		cairo_line_to (GetPointer<cairo_t> (handle), x, y);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_line_to (cairo, x, y);
 		
 	}
 	
 	
-	void lime_cairo_mask (value handle, value pattern) {
+	void lime_cairo_mask (value handle, value inPattern) {
 		
-		cairo_mask (GetPointer<cairo_t> (handle), GetPointer<cairo_pattern_t> (pattern));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_pattern_t *pattern = val_to_cairo_pattern_t (inPattern);
+		if (pattern == NULL) return;
+		cairo_mask (cairo, pattern);
 		
 	}
 	
 	
-	void lime_cairo_mask_surface (value handle, value surface, double x, double y) {
+	void lime_cairo_mask_surface (value handle, value inSurface, double x, double y) {
 		
-		cairo_mask_surface (GetPointer<cairo_t> (handle), GetPointer<cairo_surface_t> (surface), x, y);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_surface_t *surface = val_to_cairo_surface_t (inSurface);
+		if (surface == NULL) return;
+		cairo_mask_surface (cairo, surface, x, y);
 		
 	}
 	
 	
 	void lime_cairo_move_to (value handle, double x, double y) {
 		
-		cairo_move_to (GetPointer<cairo_t> (handle), x, y);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_move_to (cairo, x, y);
 		
 	}
 	
 	
 	void lime_cairo_new_path (value handle) {
 		
-		cairo_new_path (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_new_path (cairo);
 		
 	}
 	
 	
 	void lime_cairo_paint (value handle) {
 		
-		cairo_paint (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_paint (cairo);
 		
 	}
 	
 	
 	void lime_cairo_paint_with_alpha (value handle, double alpha) {
 		
-		cairo_paint_with_alpha (GetPointer<cairo_t> (handle), alpha);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_paint_with_alpha (cairo, alpha);
 		
 	}
 	
 	
 	void lime_cairo_pattern_add_color_stop_rgb (value handle, double offset, double red, double green, double blue) {
 		
-		cairo_pattern_add_color_stop_rgb (GetPointer<cairo_pattern_t> (handle), offset, red, green, blue);
+		cairo_pattern_t *pattern = val_to_cairo_pattern_t (handle);
+		if (pattern == NULL) return;
+		cairo_pattern_add_color_stop_rgb (pattern, offset, red, green, blue);
 		
 	}
 	
 	
 	void lime_cairo_pattern_add_color_stop_rgba (value handle, double offset, double red, double green, double blue, double alpha) {
 		
-		cairo_pattern_add_color_stop_rgba (GetPointer<cairo_pattern_t> (handle), offset, red, green, blue, alpha);
+		cairo_pattern_t *pattern = val_to_cairo_pattern_t (handle);
+		if (pattern == NULL) return;
+		cairo_pattern_add_color_stop_rgba (pattern, offset, red, green, blue, alpha);
 		
 	}
 	
 	
-	value lime_cairo_pattern_create_for_surface (value surface) {
+	value lime_cairo_pattern_create_for_surface (value inSurface) {
 		
-		return WrapPointer<cairo_pattern_t>(cairo_pattern_create_for_surface (GetPointer<cairo_surface_t> (surface)));
+		cairo_surface_t *surface = val_to_cairo_surface_t (inSurface);
+		if (surface == NULL) return alloc_null ();
+		return cairo_pattern_t_to_value (cairo_pattern_create_for_surface (surface));
 		
 	}
 	
 	
 	value lime_cairo_pattern_create_linear (double x0, double y0, double x1, double y1) {
 		
-		return WrapPointer<cairo_pattern_t>(cairo_pattern_create_linear (x0, y0, x1, y1));
+		return cairo_pattern_t_to_value (cairo_pattern_create_linear (x0, y0, x1, y1));
 		
 	}
 	
 	
 	value lime_cairo_pattern_create_radial (double cx0, double cy0, double radius0, double cx1, double cy1, double radius1) {
 		
-		return WrapPointer<cairo_pattern_t>(cairo_pattern_create_radial (cx0, cy0, radius0, cx1, cy1, radius1));
+		return cairo_pattern_t_to_value (cairo_pattern_create_radial (cx0, cy0, radius0, cx1, cy1, radius1));
 		
 	}
 	
 	
 	value lime_cairo_pattern_create_rgb (double r, double g, double b) {
 		
-		return WrapPointer<cairo_pattern_t>(cairo_pattern_create_rgb (r, g, b));
+		return cairo_pattern_t_to_value (cairo_pattern_create_rgb (r, g, b));
 		
 	}
 	
 	
 	value lime_cairo_pattern_create_rgba (double r, double g, double b, double a) {
 		
-		return WrapPointer<cairo_pattern_t>(cairo_pattern_create_rgba (r, g, b, a));
+		return cairo_pattern_t_to_value (cairo_pattern_create_rgba (r, g, b, a));
 		
 	}
 	
 	
 	void lime_cairo_pattern_destroy (value handle) {
 		
-		cairo_pattern_destroy (GetPointer<cairo_pattern_t> (handle));
+		cairo_pattern_t *pattern = val_to_cairo_pattern_t (handle);
+		if (pattern == NULL) return;
+		cairo_pattern_destroy (pattern);
+		free_abstract (handle);
 		
 	}
 	
 	
 	int lime_cairo_pattern_get_color_stop_count (value handle) {
 		
+		cairo_pattern_t *pattern = val_to_cairo_pattern_t (handle);
+		if (pattern == NULL) return 0;
+		
 		int count;
-		return cairo_pattern_get_color_stop_count (GetPointer<cairo_pattern_t> (handle), &count);
+		cairo_pattern_get_color_stop_count (pattern, &count);
 		return count;
 		
 	}
@@ -560,22 +770,29 @@ namespace lime {
 	
 	int lime_cairo_pattern_get_extend (value handle) {
 		
-		return cairo_pattern_get_extend (GetPointer<cairo_pattern_t> (handle));
+		cairo_pattern_t *pattern = val_to_cairo_pattern_t (handle);
+		if (pattern == NULL) return 0;
+		return cairo_pattern_get_extend (pattern);
 		
 	}
 	
 	
 	int lime_cairo_pattern_get_filter (value handle) {
 		
-		return cairo_pattern_get_filter (GetPointer<cairo_pattern_t> (handle));
+		cairo_pattern_t *pattern = val_to_cairo_pattern_t (handle);
+		if (pattern == NULL) return 0;
+		return cairo_pattern_get_filter (pattern);
 		
 	}
 	
 	
 	value lime_cairo_pattern_get_matrix (value handle) {
 		
+		cairo_pattern_t *pattern = val_to_cairo_pattern_t (handle);
+		if (pattern == NULL) return alloc_null ();
+
 		cairo_matrix_t cm;
-		cairo_pattern_get_matrix (GetPointer<cairo_pattern_t> (handle), &cm);
+		cairo_pattern_get_matrix (pattern, &cm);
 		Matrix3 mat3 = Matrix3 (cm.xx, cm.yx, cm.xy, cm.yy, cm.x0, cm.y0);
 		return mat3.Value ();
 		
@@ -584,136 +801,176 @@ namespace lime {
 	
 	void lime_cairo_pattern_set_extend (value handle, int extend) {
 		
-		cairo_pattern_set_extend (GetPointer<cairo_pattern_t> (handle), (cairo_extend_t)extend);
+		cairo_pattern_t *pattern = val_to_cairo_pattern_t (handle);
+		if (pattern == NULL) return;
+		cairo_pattern_set_extend (pattern, (cairo_extend_t)extend);
 		
 	}
 	
 	
 	void lime_cairo_pattern_set_filter (value handle, int filter) {
 		
-		cairo_pattern_set_filter (GetPointer<cairo_pattern_t> (handle), (cairo_filter_t)filter);
+		cairo_pattern_t *pattern = val_to_cairo_pattern_t (handle);
+		if (pattern == NULL) return;
+		cairo_pattern_set_filter (pattern, (cairo_filter_t)filter);
 		
 	}
 	
 	
 	void lime_cairo_pattern_set_matrix (value handle, value matrix) {
+
+		cairo_pattern_t *pattern = val_to_cairo_pattern_t (handle);
+		if (pattern == NULL) return;
 		
 		Matrix3 mat3 = Matrix3 (matrix);
 		
 		cairo_matrix_t cm;
 		cairo_matrix_init (&cm, mat3.a, mat3.b, mat3.c, mat3.d, mat3.tx, mat3.ty);
 		
-		cairo_pattern_set_matrix (GetPointer<cairo_pattern_t> (handle), &cm);
+		cairo_pattern_set_matrix (pattern, &cm);
 		
 	}
 	
 	
 	value lime_cairo_pop_group (value handle) {
 		
-		return WrapPointer<cairo_pattern_t>(cairo_pop_group (GetPointer<cairo_t> (handle)));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return alloc_null ();
+		return cairo_pattern_t_to_value (cairo_pop_group (cairo));
 		
 	}
 	
 	
 	void lime_cairo_pop_group_to_source (value handle) {
 		
-		cairo_pop_group_to_source (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_pop_group_to_source (cairo);
 		
 	}
 	
 	
 	void lime_cairo_push_group (value handle) {
 		
-		cairo_push_group (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_push_group (cairo);
 		
 	}
 	
 	
 	void lime_cairo_push_group_with_content (value handle, int content) {
 		
-		cairo_push_group_with_content (GetPointer<cairo_t> (handle), (cairo_content_t)content);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_push_group_with_content (cairo, (cairo_content_t)content);
 		
 	}
 	
 	
 	void lime_cairo_rectangle (value handle, double x, double y, double width, double height) {
 		
-		cairo_rectangle (GetPointer<cairo_t> (handle), x, y, width, height);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_rectangle (cairo, x, y, width, height);
 		
 	}
 	
 	
 	void lime_cairo_reference (value handle) {
 		
-		cairo_reference (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_reference (cairo);
 		
 	}
 	
 	
 	void lime_cairo_rel_curve_to (value handle, double dx1, double dy1, double dx2, double dy2, double dx3, double dy3) {
 		
-		cairo_rel_curve_to (GetPointer<cairo_t> (handle), dx1, dy1, dx2, dy2, dx3, dy3);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_rel_curve_to (cairo, dx1, dy1, dx2, dy2, dx3, dy3);
 		
 	}
 	
 	
 	void lime_cairo_rel_line_to (value handle, double dx, double dy) {
 		
-		cairo_rel_line_to (GetPointer<cairo_t> (handle), dx, dy);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_rel_line_to (cairo, dx, dy);
 		
 	}
 	
 	
 	void lime_cairo_rel_move_to (value handle, double dx, double dy) {
 		
-		cairo_rel_move_to (GetPointer<cairo_t> (handle), dx, dy);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_rel_move_to (cairo, dx, dy);
 		
 	}
 	
 	
 	void lime_cairo_reset_clip (value handle) {
 		
-		cairo_reset_clip (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_reset_clip (cairo);
 		
 	}
 	
 	
 	void lime_cairo_restore (value handle) {
 		
-		cairo_restore (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_restore (cairo);
 		
 	}
 	
 	
 	void lime_cairo_rotate (value handle, double amount) {
 		
-		cairo_rotate (GetPointer<cairo_t> (handle), amount);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_rotate (cairo, amount);
 		
 	}
 	
 	
 	void lime_cairo_save (value handle) {
 		
-		cairo_save (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_save (cairo);
 		
 	}
 	
 	
 	void lime_cairo_scale (value handle, double x, double y) {
 		
-		cairo_scale (GetPointer<cairo_t> (handle), x, y);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_scale (cairo, x, y);
 		
 	}
 	
 	
 	void lime_cairo_set_antialias (value handle, int cap) {
 		
-		cairo_set_antialias (GetPointer<cairo_t> (handle), (cairo_antialias_t)cap);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_set_antialias (cairo, (cairo_antialias_t)cap);
 		
 	}
 	
 	
 	void lime_cairo_set_dash (value handle, value dash) {
+		
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
 		
 		int length = val_array_size (dash);
 		
@@ -725,7 +982,7 @@ namespace lime {
 			
 		}
 		
-		cairo_set_dash (GetPointer<cairo_t> (handle), dashPattern, length, 0);
+		cairo_set_dash (cairo, dashPattern, length, 0);
 		delete dashPattern;
 		
 	}
@@ -733,185 +990,246 @@ namespace lime {
 	
 	void lime_cairo_set_fill_rule (value handle, int cap) {
 		
-		cairo_set_fill_rule (GetPointer<cairo_t> (handle), (cairo_fill_rule_t)cap);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_set_fill_rule (cairo, (cairo_fill_rule_t)cap);
 		
 	}
 	
 	
-	void lime_cairo_set_font_face (value handle, value face) {
+	void lime_cairo_set_font_face (value handle, value inFace) {
 		
-		cairo_set_font_face (GetPointer<cairo_t> (handle), GetPointer<cairo_font_face_t> (face));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_font_face_t *face = val_to_cairo_font_face_t (inFace);
+		if (face == NULL) return;
+		cairo_set_font_face (cairo, face);
 		
 	}
 	
 	
-	void lime_cairo_set_font_options (value handle, value options) {
+	void lime_cairo_set_font_options (value handle, value inOptions) {
 		
-		cairo_set_font_options (GetPointer<cairo_t> (handle), GetPointer<cairo_font_options_t> (options));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_font_options_t *options = val_to_cairo_font_options_t (inOptions);
+		if (options == NULL) return;
+		cairo_set_font_options (cairo, options);
 		
 	}
 	
 	
 	void lime_cairo_set_font_size (value handle, double size) {
 		
-		cairo_set_font_size (GetPointer<cairo_t> (handle), size);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_set_font_size (cairo, size);
 		
 	}
 	
 	
 	void lime_cairo_set_line_cap (value handle, int cap) {
 		
-		cairo_set_line_cap (GetPointer<cairo_t> (handle), (cairo_line_cap_t)cap);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_set_line_cap (cairo, (cairo_line_cap_t)cap);
 		
 	}
 	
 	
 	void lime_cairo_set_line_join (value handle, int join) {
 		
-		cairo_set_line_join (GetPointer<cairo_t> (handle), (cairo_line_join_t)join);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_set_line_join (cairo, (cairo_line_join_t)join);
 		
 	}
 	
 	
 	void lime_cairo_set_line_width (value handle, double width) {
 		
-		cairo_set_line_width (GetPointer<cairo_t> (handle), width);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_set_line_width (cairo, width);
 		
 	}
 	
 	
 	void lime_cairo_set_matrix (value handle, value matrix) {
+
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
 		
 		Matrix3 mat3 = Matrix3 (matrix);
 		
 		cairo_matrix_t cm;
 		cairo_matrix_init (&cm, mat3.a, mat3.b, mat3.c, mat3.d, mat3.tx, mat3.ty);
 		
-		cairo_set_matrix (GetPointer<cairo_t> (handle), &cm);
+		cairo_set_matrix (cairo, &cm);
 		
 	}
 	
 	
 	void lime_cairo_set_miter_limit (value handle, double miterLimit) {
 		
-		cairo_set_miter_limit (GetPointer<cairo_t> (handle), miterLimit);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_set_miter_limit (cairo, miterLimit);
 		
 	}
 	
 	
 	void lime_cairo_set_operator (value handle, int op) {
 		
-		cairo_set_operator (GetPointer<cairo_t> (handle), (cairo_operator_t)op);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_set_operator (cairo, (cairo_operator_t)op);
 		
 	}
 	
 	
-	void lime_cairo_set_source (value handle, value pattern) {
+	void lime_cairo_set_source (value handle, value inPattern) {
 		
-		cairo_set_source (GetPointer<cairo_t> (handle), GetPointer<cairo_pattern_t> (pattern));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_pattern_t *pattern = val_to_cairo_pattern_t (inPattern);
+		if (pattern == NULL) return;
+		cairo_set_source (cairo, pattern);
 		
 	}
 	
 	
 	void lime_cairo_set_source_rgb (value handle, double r, double g, double b) {
 		
-		cairo_set_source_rgb (GetPointer<cairo_t> (handle), r, g, b);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_set_source_rgb (cairo, r, g, b);
 		
 	}
 	
 	
 	void lime_cairo_set_source_rgba (value handle, double r, double g, double b, double a) {
 		
-		cairo_set_source_rgba (GetPointer<cairo_t> (handle), r, g, b, a);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_set_source_rgba (cairo, r, g, b, a);
 		
 	}
 	
 	
-	void lime_cairo_set_source_surface (value handle, value surface, double x, double y) {
+	void lime_cairo_set_source_surface (value handle, value inSurface, double x, double y) {
 		
-		cairo_set_source_surface (GetPointer<cairo_t> (handle), GetPointer<cairo_surface_t> (surface), x, y);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_surface_t *surface = val_to_cairo_surface_t (inSurface);
+		if (surface == NULL) return;
+		cairo_set_source_surface (cairo, surface, x, y);
 		
 	}
 	
 	
 	void lime_cairo_set_tolerance (value handle, double tolerance) {
 		
-		cairo_set_tolerance (GetPointer<cairo_t> (handle), tolerance);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_set_tolerance (cairo, tolerance);
 		
 	}
 	
 	
 	void lime_cairo_show_page (value handle) {
 		
-		cairo_show_page (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_show_page (cairo);
 		
 	}
 	
 	
 	void lime_cairo_show_text (value handle, HxString text) {
 		
-		cairo_show_text (GetPointer<cairo_t> (handle), (char*)text.__s);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_show_text (cairo, (char*)text.__s);
 		
 	}
 	
 	
 	int lime_cairo_status (value handle) {
 		
-		return cairo_status (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return 0;
+		return cairo_status (cairo);
 		
 	}
 	
 	
 	void lime_cairo_stroke (value handle) {
 		
-		cairo_stroke (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_stroke (cairo);
 		
 	}
 	
 	
 	void lime_cairo_stroke_extents (value handle, double x1, double y1, double x2, double y2) {
 		
-		cairo_stroke_extents (GetPointer<cairo_t> (handle), &x1, &y1, &x2, &y2);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_stroke_extents (cairo, &x1, &y1, &x2, &y2);
 		
 	}
 	
 	
 	void lime_cairo_stroke_preserve (value handle) {
 		
-		cairo_stroke_preserve (GetPointer<cairo_t> (handle));
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_stroke_preserve (cairo);
 		
 	}
 	
 	
 	void lime_cairo_surface_destroy (value handle) {
 		
-		cairo_surface_destroy (GetPointer<cairo_surface_t> (handle));
+		cairo_surface_t *surface = val_to_cairo_surface_t (handle);
+		if (surface == NULL) return;
+		cairo_surface_destroy (surface);
+		free_abstract (handle);
 		
 	}
 	
 	
 	void lime_cairo_surface_flush (value handle) {
 		
-		cairo_surface_flush (GetPointer<cairo_surface_t> (handle));
+		cairo_surface_t *surface = val_to_cairo_surface_t (handle);
+		if (surface == NULL) return;
+		cairo_surface_flush (surface);
 		
 	}
 	
 	
 	void lime_cairo_transform (value handle, value matrix) {
+
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
 		
 		Matrix3 mat3 = Matrix3 (matrix);
 		
 		cairo_matrix_t cm;
 		cairo_matrix_init (&cm, mat3.a, mat3.b, mat3.c, mat3.d, mat3.tx, mat3.ty);
 		
-		cairo_transform (GetPointer<cairo_t> (handle), &cm);
+		cairo_transform (cairo, &cm);
 		
 	}
 	
 	
 	void lime_cairo_translate (value handle, double x, double y) {
 		
-		cairo_translate (GetPointer<cairo_t> (handle), x, y);
+		cairo_t *cairo = val_to_cairo_t (handle);
+		if (cairo == NULL) return;
+		cairo_translate (cairo, x, y);
 		
 	}
 	

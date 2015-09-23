@@ -48,7 +48,7 @@ class ALC {
 		#if ((cpp || neko || nodejs) && lime_openal && !macro)
 		var handle:Dynamic = lime_alc_create_context (device, attrlist);
 		
-		if (handle != 0) {
+		if (handle != null) {
 			
 			return new ALContext (handle);
 			
@@ -74,7 +74,7 @@ class ALC {
 		#if ((cpp || neko || nodejs) && lime_openal && !macro)
 		var handle:Dynamic = lime_alc_get_contexts_device (context);
 		
-		if (handle != 0) {
+		if (handle != null) {
 			
 			return new ALDevice (handle);
 			
@@ -91,7 +91,7 @@ class ALC {
 		#if ((cpp || neko || nodejs) && lime_openal && !macro)
 		var handle:Dynamic = lime_alc_get_current_context ();
 		
-		if (handle != 0) {
+		if (handle != null) {
 			
 			return new ALContext (handle);
 			
@@ -168,7 +168,7 @@ class ALC {
 		#if ((cpp || neko || nodejs) && lime_openal && !macro)
 		var handle:Dynamic = lime_alc_open_device (deviceName);
 		
-		if (handle != 0) {
+		if (handle != null) {
 			
 			return new ALDevice (handle);
 			

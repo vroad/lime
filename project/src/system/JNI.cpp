@@ -9,6 +9,7 @@
 #include <string>
 
 #include <utils/PointerWrapper.h>
+#include <utils/Kinds.h>
 
 #define ELOG(args...) __android_log_print (ANDROID_LOG_ERROR, "Lime", args)
 
@@ -20,6 +21,14 @@
 
 
 namespace lime {
+
+
+	template <>
+	value WrapPointer<JNIEnv> (JNIEnv *env) {
+		
+		return WrapPointerInternal<JNIEnv> (env, GetKinds ().JNIEnv);
+		
+	}
 	
 	
 	vkind gObjectKind;
