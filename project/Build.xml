@@ -42,6 +42,8 @@
 		<set name="LIME_WMF" value="1" if="windows"/>
 
 	</section>
+
+	<set name="LIME_NO_RAW_POINTER_ACESS" value="1" />
 	
 	<files id="lime">
 		
@@ -233,6 +235,12 @@
 			
 			<file name="${HXCPP}/project/libs/zlib/ZLib.cpp" if="emscripten || ios || static_link" />
 			
+		</section>
+
+		<section if="LIME_NO_RAW_POINTER_ACESS">
+
+			<compilerflag value="-DLIME_NO_RAW_POINTER_ACESS" />
+
 		</section>
 		
 		<file name="src/app/ApplicationEvent.cpp" />

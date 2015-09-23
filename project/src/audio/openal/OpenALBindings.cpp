@@ -547,7 +547,11 @@ namespace lime {
 	
 	double lime_al_get_proc_address (HxString fname) {
 		
+		#ifndef LIME_NO_RAW_POINTER_ACESS
 		return (intptr_t)alGetProcAddress (fname.__s);
+		#else
+		return 0;
+		#endif
 		
 	}
 	

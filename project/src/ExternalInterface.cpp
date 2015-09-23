@@ -292,6 +292,7 @@ namespace lime {
 	
 	value lime_bytes_from_data_pointer (double data, int length) {
 		
+		#ifndef LIME_NO_RAW_POINTER_ACESS
 		intptr_t ptr = (intptr_t)data;
 		Bytes bytes = Bytes (length);
 		
@@ -302,14 +303,21 @@ namespace lime {
 		}
 		
 		return bytes.Value ();
+		#else
+		return alloc_null ();
+		#endif
 		
 	}
 	
 	
 	value lime_bytes_get_data_pointer (value bytes) {
 		
+		#ifndef LIME_NO_RAW_POINTER_ACESS
 		Bytes data = Bytes (bytes);
 		return alloc_float ((intptr_t)data.Data ());
+		#else
+		return alloc_null ();
+		#endif
 		
 	}
 	
@@ -1093,9 +1101,13 @@ namespace lime {
 	
 	value lime_renderer_get_context (value renderer) {
 		
+		#ifndef LIME_NO_RAW_POINTER_ACESS
 		Renderer* targetRenderer = GetPointer<Renderer> (renderer);
 		if (targetRenderer == NULL) return alloc_null ();
 		return RendererContext_to_value (targetRenderer->GetContext ());
+		#else
+		return alloc_null ();
+		#endif
 		
 	}
 	

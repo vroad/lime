@@ -547,16 +547,24 @@ namespace lime {
 	
 	value lime_cairo_image_surface_create_for_data (double data, int format, int width, int height, int stride) {
 		
+		#ifndef LIME_NO_RAW_POINTER_ACESS
 		return cairo_surface_t_to_value (cairo_image_surface_create_for_data ((unsigned char*)(intptr_t)data, (cairo_format_t)format, width, height, stride));
+		#else
+		return alloc_null ();
+		#endif
 		
 	}
 	
 	
 	double lime_cairo_image_surface_get_data (value handle) {
 		
+		#ifndef LIME_NO_RAW_POINTER_ACESS
 		cairo_surface_t *surface = val_to_cairo_surface_t (handle);
 		if (surface == NULL) return 0;
 		return (intptr_t)cairo_image_surface_get_data (surface);
+		#else
+		return 0;
+		#endif
 		
 	}
 	

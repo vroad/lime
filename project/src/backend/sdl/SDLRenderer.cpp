@@ -113,7 +113,11 @@ namespace lime {
 			
 			alloc_field (result, val_id ("width"), alloc_int (width));
 			alloc_field (result, val_id ("height"), alloc_int (height));
+			#ifndef LIME_NO_RAW_POINTER_ACESS
 			alloc_field (result, val_id ("pixels"), alloc_float ((intptr_t)pixels));
+			#else
+			alloc_field (result, val_id ("pixels"), alloc_null ());
+			#endif
 			alloc_field (result, val_id ("pitch"), alloc_int (pitch));
 			
 		}
