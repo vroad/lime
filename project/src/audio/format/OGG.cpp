@@ -127,7 +127,7 @@ namespace lime {
 				
 			}
 			
-			if (file->isFile ()) {
+			if (true) {
 				
 				if (ov_open (file->getFile (), oggFile, NULL, file->getLength ()) != 0) {
 					
