@@ -4,6 +4,7 @@
 
 #include <utils/PointerWrapper.h>
 #include <utils/Kinds.h>
+#include <utils/GCRootUtils.h>
 
 namespace lime {
 	
@@ -473,28 +474,28 @@ namespace lime {
 			
 			case CURLOPT_READFUNCTION:
 			{
-				AutoGCRoot* callback = new AutoGCRoot (parameter);
+				AutoGCRoot* callback = createGCRoot (parameter);
 				code = curl_easy_setopt (curl, type, read_callback);
 				curl_easy_setopt (curl, CURLOPT_READDATA, callback);
 				break;
 			}
 			case CURLOPT_WRITEFUNCTION:
 			{
-				AutoGCRoot* callback = new AutoGCRoot (parameter);
+				AutoGCRoot* callback = createGCRoot (parameter);
 				code = curl_easy_setopt (curl, type, write_callback);
 				curl_easy_setopt (curl, CURLOPT_WRITEDATA, callback);
 				break;
 			}
 			case CURLOPT_HEADERFUNCTION:
 			{
-				AutoGCRoot* callback = new AutoGCRoot (parameter);
+				AutoGCRoot* callback = createGCRoot (parameter);
 				code = curl_easy_setopt (curl, type, write_callback);
 				curl_easy_setopt (curl, CURLOPT_HEADERDATA, callback);
 				break;
 			}
 			case CURLOPT_PROGRESSFUNCTION:
 			{
-				AutoGCRoot* callback = new AutoGCRoot (parameter);
+				AutoGCRoot* callback = createGCRoot (parameter);
 				code = curl_easy_setopt (curl, type, progress_callback);
 				curl_easy_setopt (curl, CURLOPT_PROGRESSDATA, callback);
 				curl_easy_setopt (curl, CURLOPT_NOPROGRESS, false);

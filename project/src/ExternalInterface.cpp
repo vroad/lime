@@ -52,10 +52,14 @@
 #endif
 
 #include <utils/Kinds.h>
+#include <utils/SafeDelete.h>
+#include <utils/GCRootUtils.h>
 
 //DEFINE_KIND (k_finalizer);
 
 namespace lime {
+	
+	static bool gQuit = false;
 	
 	template <>
 	value WrapPointer<Application> (Application *app) {
@@ -178,8 +182,13 @@ namespace lime {
 
 	value lime_application_create (value callback) {
 		
+		if (gQuit) return alloc_null ();
+		
 		Application* app = CreateApplication ();
-		Application::callback = new AutoGCRoot (callback);
+		if (Application::callback == NULL)
+			Application::callback = new AutoGCRoot (callback);
+		else
+			Application::callback->set (callback);
 		return WrapPointerWithGC (app);
 		
 	}
@@ -187,8 +196,17 @@ namespace lime {
 	
 	void lime_application_event_manager_register (value callback, value eventObject) {
 		
-		ApplicationEvent::callback = new AutoGCRoot (callback);
-		ApplicationEvent::eventObject = new AutoGCRoot (eventObject);
+		if (gQuit) return;
+		
+		if (ApplicationEvent::callback == NULL)
+			ApplicationEvent::callback = new AutoGCRoot (callback);
+		else
+			ApplicationEvent::callback->set (callback);
+		
+		if (ApplicationEvent::eventObject == NULL)
+			ApplicationEvent::eventObject = new AutoGCRoot (eventObject);
+		else
+			ApplicationEvent::eventObject->set (eventObject);
 		
 	}
 	
@@ -216,6 +234,30 @@ namespace lime {
 		Application* app = GetPointer<Application> (application);
 		if (app == NULL) return 0;
 		int result = app->Quit ();
+		gQuit = true;
+		
+		SafeDelete (Application::callback);
+		SafeDelete (ApplicationEvent::callback);
+		SafeDelete (ApplicationEvent::eventObject);
+		SafeDelete (GamepadEvent::callback);
+		SafeDelete (GamepadEvent::eventObject);
+		SafeDelete (KeyEvent::callback);
+		SafeDelete (KeyEvent::eventObject);
+		SafeDelete (MouseEvent::callback);
+		SafeDelete (MouseEvent::eventObject);
+		SafeDelete (RenderEvent::callback);
+		SafeDelete (RenderEvent::eventObject);
+		SafeDelete (SensorEvent::callback);
+		SafeDelete (SensorEvent::eventObject);
+		SafeDelete (TextEvent::callback);
+		SafeDelete (TextEvent::eventObject);
+		SafeDelete (TouchEvent::callback);
+		SafeDelete (TouchEvent::eventObject);
+		SafeDelete (WindowEvent::callback);
+		SafeDelete (WindowEvent::eventObject);
+		
+		removeAllGCRoot ();
+		
 		return result;
 		
 	}
@@ -666,8 +708,17 @@ namespace lime {
 	
 	void lime_gamepad_event_manager_register (value callback, value eventObject) {
 		
-		GamepadEvent::callback = new AutoGCRoot (callback);
-		GamepadEvent::eventObject = new AutoGCRoot (eventObject);
+		if (gQuit) return;
+		
+		if (GamepadEvent::callback == NULL)
+			GamepadEvent::callback = new AutoGCRoot (callback);
+		else
+			GamepadEvent::callback->set (callback);
+		
+		if (GamepadEvent::eventObject == NULL)
+			GamepadEvent::eventObject = new AutoGCRoot (eventObject);
+		else
+			GamepadEvent::eventObject->set (eventObject);
 		
 	}
 	
@@ -936,8 +987,17 @@ namespace lime {
 	
 	void lime_key_event_manager_register (value callback, value eventObject) {
 		
-		KeyEvent::callback = new AutoGCRoot (callback);
-		KeyEvent::eventObject = new AutoGCRoot (eventObject);
+		if (gQuit) return;
+		
+		if (KeyEvent::callback == NULL)
+			KeyEvent::callback = new AutoGCRoot (callback);
+		else
+			KeyEvent::callback->set (callback);
+		
+		if (KeyEvent::eventObject == NULL)
+			KeyEvent::eventObject = new AutoGCRoot (eventObject);
+		else
+			KeyEvent::eventObject->set (eventObject);
 		
 	}
 	
@@ -976,8 +1036,17 @@ namespace lime {
 	
 	void lime_mouse_event_manager_register (value callback, value eventObject) {
 		
-		MouseEvent::callback = new AutoGCRoot (callback);
-		MouseEvent::eventObject = new AutoGCRoot (eventObject);
+		if (gQuit) return;
+		
+		if (MouseEvent::callback == NULL)
+			MouseEvent::callback = new AutoGCRoot (callback);
+		else
+			MouseEvent::callback->set (callback);
+		
+		if (MouseEvent::eventObject == NULL)
+			MouseEvent::eventObject = new AutoGCRoot (eventObject);
+		else
+			MouseEvent::eventObject->set (eventObject);
 		
 	}
 	
@@ -1074,8 +1143,17 @@ namespace lime {
 	
 	void lime_render_event_manager_register (value callback, value eventObject) {
 		
-		RenderEvent::callback = new AutoGCRoot (callback);
-		RenderEvent::eventObject = new AutoGCRoot (eventObject);
+		if (gQuit) return;
+		
+		if (RenderEvent::callback == NULL)
+			RenderEvent::callback = new AutoGCRoot (callback);
+		else
+			RenderEvent::callback->set (callback);
+		
+		if (RenderEvent::eventObject == NULL)
+			RenderEvent::eventObject = new AutoGCRoot (eventObject);
+		else
+			RenderEvent::eventObject->set (eventObject);
 		
 	}
 	
@@ -1151,8 +1229,17 @@ namespace lime {
 	
 	void lime_sensor_event_manager_register (value callback, value eventObject) {
 		
-		SensorEvent::callback = new AutoGCRoot (callback);
-		SensorEvent::eventObject = new AutoGCRoot (eventObject);
+		if (gQuit) return;
+		
+		if (SensorEvent::callback == NULL)
+			SensorEvent::callback = new AutoGCRoot (callback);
+		else
+			SensorEvent::callback->set (callback);
+		
+		if (SensorEvent::eventObject == NULL)
+			SensorEvent::eventObject = new AutoGCRoot (eventObject);
+		else
+			SensorEvent::eventObject->set (eventObject);
 		
 	}
 	
@@ -1188,8 +1275,17 @@ namespace lime {
 	
 	void lime_text_event_manager_register (value callback, value eventObject) {
 		
-		TextEvent::callback = new AutoGCRoot (callback);
-		TextEvent::eventObject = new AutoGCRoot (eventObject);
+		if (gQuit) return;
+		
+		if (TextEvent::callback == NULL)
+			TextEvent::callback = new AutoGCRoot (callback);
+		else
+			TextEvent::callback->set (callback);
+		
+		if (TextEvent::eventObject == NULL)
+			TextEvent::eventObject = new AutoGCRoot (eventObject);
+		else
+			TextEvent::eventObject->set (eventObject);
 		
 	}
 	
@@ -1263,8 +1359,17 @@ namespace lime {
 	
 	void lime_touch_event_manager_register (value callback, value eventObject) {
 		
-		TouchEvent::callback = new AutoGCRoot (callback);
-		TouchEvent::eventObject = new AutoGCRoot (eventObject);
+		if (gQuit) return;
+		
+		if (TouchEvent::callback == NULL)
+			TouchEvent::callback = new AutoGCRoot (callback);
+		else
+			TouchEvent::callback->set (callback);
+		
+		if (TouchEvent::eventObject == NULL)
+			TouchEvent::eventObject = new AutoGCRoot (eventObject);
+		else
+			TouchEvent::eventObject->set (eventObject);
 		
 	}
 	
@@ -1298,8 +1403,17 @@ namespace lime {
 	
 	void lime_window_event_manager_register (value callback, value eventObject) {
 		
-		WindowEvent::callback = new AutoGCRoot (callback);
-		WindowEvent::eventObject = new AutoGCRoot (eventObject);
+		if (gQuit) return;
+		
+		if (WindowEvent::callback == NULL)
+			WindowEvent::callback = new AutoGCRoot (callback);
+		else
+			WindowEvent::callback->set (callback);
+		
+		if (WindowEvent::eventObject == NULL)
+			WindowEvent::eventObject = new AutoGCRoot (eventObject);
+		else
+			WindowEvent::eventObject->set (eventObject);
 		
 	}
 	

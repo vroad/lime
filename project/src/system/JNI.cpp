@@ -10,6 +10,7 @@
 
 #include <utils/PointerWrapper.h>
 #include <utils/Kinds.h>
+#include <utils/GCRootUtils.h>
 
 #define ELOG(args...) __android_log_print (ANDROID_LOG_ERROR, "Lime", args)
 
@@ -473,7 +474,7 @@ namespace lime {
 		
 		if (!gCallback) {
 			
-			gCallback = new AutoGCRoot (inCallback);
+			gCallback = createGCRoot (inCallback);
 			
 		}
 		
@@ -1997,7 +1998,7 @@ namespace lime {
 		JNIEnv *env = (JNIEnv*)JNI::GetEnv ();
 		JNIInit (env);
 		
-		AutoGCRoot *root = new AutoGCRoot (inCallback);
+		AutoGCRoot *root = createGCRoot (inCallback);
 		ELOG ("Lime set onCallback %p",root);
 		env->CallStaticVoidMethod (GameActivity, postUICallback, (jlong)root);
 		jthrowable exc = env->ExceptionOccurred ();
@@ -2006,7 +2007,7 @@ namespace lime {
 			
 			env->ExceptionDescribe ();
 			env->ExceptionClear ();
-			delete root;
+			removeGCRoot (root);
 			val_throw (alloc_string ("JNI Exception"));
 			
 		}
