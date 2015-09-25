@@ -2,8 +2,8 @@
 #include <cairo-ft.h>
 #include <math/Matrix3.h>
 #include <math/Vector2.h>
-#include <hx/CFFIPrimePatch.h>
-//#include <hx/CFFIPrime.h>
+//#include <hx/CFFIPrimePatch.h>
+#include <hx/CFFIPrime.h>
 #include <system/CFFIPointer.h>
 #include <text/Font.h>
 
@@ -109,7 +109,7 @@ namespace lime {
 			
 			cairo_t* cairo = (cairo_t*)val_data (handle);
 			cairo_destroy (cairo);
-			free_abstract (handle);
+			//free_abstract (handle);
 			
 		}
 		
@@ -122,7 +122,7 @@ namespace lime {
 			
 			cairo_font_face_t* face = (cairo_font_face_t*)val_data (handle);
 			cairo_font_face_destroy (face);
-			free_abstract (handle);
+			//free_abstract (handle);
 			
 		}
 		
@@ -135,7 +135,7 @@ namespace lime {
 			
 			cairo_font_options_t* options = (cairo_font_options_t*)val_data (handle);
 			cairo_font_options_destroy (options);
-			free_abstract (handle);
+			//free_abstract (handle);
 			
 		}
 		
@@ -148,7 +148,7 @@ namespace lime {
 			
 			cairo_pattern_t* pattern = (cairo_pattern_t*)val_data (handle);
 			cairo_pattern_destroy (pattern);
-			free_abstract (handle);
+			//free_abstract (handle);
 			
 		}
 		
@@ -161,7 +161,7 @@ namespace lime {
 			
 			cairo_surface_t* surface = (cairo_surface_t*)val_data (handle);
 			cairo_surface_destroy (surface);
-			free_abstract (handle);
+			//free_abstract (handle);
 			
 		}
 		

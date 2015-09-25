@@ -375,8 +375,8 @@ class Font {
 	@:cffi private static function lime_font_get_units_per_em (handle:Dynamic):Int;
 	@:cffi private static function lime_font_load (data:Dynamic):Dynamic;
 	@:cffi private static function lime_font_outline_decompose (handle:Dynamic, size:Int):Dynamic;
-	@:cffi private static function lime_font_render_glyph (handle:Dynamic, index:Int, data:Dynamic):Bool;
-	@:cffi private static function lime_font_render_glyphs (handle:Dynamic, indices:Dynamic, data:Dynamic):Bool;
+	@:cffi private static function lime_font_render_glyph (handle:Dynamic, index:Int, data:Dynamic):Dynamic;
+	@:cffi private static function lime_font_render_glyphs (handle:Dynamic, indices:Dynamic, data:Dynamic):Array<Dynamic>;
 	@:cffi private static function lime_font_set_size (handle:Dynamic, size:Int):Void;
 	#end
 	

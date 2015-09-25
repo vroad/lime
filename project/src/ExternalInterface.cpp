@@ -7,8 +7,8 @@
 #endif
 
 
-#include <hx/CFFIPrimePatch.h>
-//#include <hx/CFFIPrime.h>
+//#include <hx/CFFIPrimePatch.h>
+#include <hx/CFFIPrime.h>
 #include <app/Application.h>
 #include <app/ApplicationEvent.h>
 #include <audio/format/OGG.h>
@@ -352,13 +352,13 @@ namespace lime {
 	}
 	
 	
-	value lime_bytes_get_data_pointer (value bytes) {
+	double lime_bytes_get_data_pointer (value bytes) {
 		
 		#ifndef LIME_NO_RAW_POINTER_ACESS
 		Bytes data = Bytes (bytes);
-		return alloc_float ((intptr_t)data.Data ());
+		return (intptr_t)data.Data ();
 		#else
-		return alloc_null ();
+		return 0;
 		#endif
 		
 	}
@@ -374,7 +374,11 @@ namespace lime {
 	
 	double lime_cffi_get_native_pointer (value handle) {
 		
+		#ifndef LIME_NO_RAW_POINTER_ACESS
 		return (intptr_t)val_data (handle);
+		#else
+		return 0;
+		#endif
 		
 	}
 	
@@ -663,11 +667,11 @@ namespace lime {
 	}
 	
 	
-	bool lime_font_render_glyph (value fontHandle, int index, value data) {
+	value lime_font_render_glyph (value fontHandle, int index, value data) {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return false;
+		if (font == NULL) return alloc_null ();
 		Bytes bytes = Bytes (data);
 		return font->RenderGlyph (index, &bytes);
 		#else
@@ -677,7 +681,7 @@ namespace lime {
 	}
 	
 	
-	bool lime_font_render_glyphs (value fontHandle, value indices, value data) {
+	value lime_font_render_glyphs (value fontHandle, value indices, value data) {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = GetPointer<Font> (fontHandle);
@@ -1637,6 +1641,7 @@ namespace lime {
 	DEFINE_PRIME2 (lime_bytes_from_data_pointer);
 	DEFINE_PRIME1 (lime_bytes_get_data_pointer);
 	DEFINE_PRIME1 (lime_bytes_read_file);
+	DEFINE_PRIME1 (lime_cffi_get_native_pointer);
 	#if 0
 	DEFINE_PRIME1 (lime_cffi_set_finalizer);
 	#endif

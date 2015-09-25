@@ -45,7 +45,7 @@ namespace lime {
 		
 		T *ptr = (T*)val_data (handle);
 		delete ptr;
-		free_abstract (handle);
+		//free_abstract (handle);
 		
 	}
 	
