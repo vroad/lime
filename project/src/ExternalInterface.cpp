@@ -2,7 +2,7 @@
 #define IMPLEMENT_API
 #endif
 
-#if defined(HX_WINDOWS) || defined(HX_MACOS) || defined(HX_LINUX)
+#if defined(HX_WINDOWS) || defined(HX_MACOS) || defined(HX_LINUX) || defined (HX_ANDROID)
 #define NEKO_COMPATIBLE
 #endif
 
