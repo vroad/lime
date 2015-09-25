@@ -685,11 +685,11 @@ namespace lime {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return false;
+		if (font == NULL) return alloc_null ();
 		Bytes bytes = Bytes (data);
 		return font->RenderGlyphs (indices, &bytes);
 		#else
-		return false;
+		return alloc_null ();
 		#endif
 		
 	}

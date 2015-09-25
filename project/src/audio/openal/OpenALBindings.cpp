@@ -919,7 +919,7 @@ namespace lime {
 	value lime_alc_create_context (value device, value attrlist) {
 		
 		ALCdevice* alcDevice = val_to_ALCdevice (device);
-		if (alcDevice == NULL) return false;
+		if (alcDevice == NULL) return alloc_null ();
 		int* list = val_array_int (attrlist);
 		
 		ALCcontext* alcContext = alcCreateContext (alcDevice, list);
