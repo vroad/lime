@@ -40,7 +40,6 @@ namespace lime {
 		
 		public:
 			
-			Font (void* face = 0);
 			Font (Resource *resource, int faceIndex = 0);
 			~Font ();
 			
@@ -60,7 +59,9 @@ namespace lime {
 			value RenderGlyphs (value indices, Bytes *imageData);
 			void SetSize (size_t size);
 			
+			void* library;
 			void* face;
+			void* faceMemory;
 			
 		private:
 			

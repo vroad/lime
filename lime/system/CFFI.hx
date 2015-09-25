@@ -649,7 +649,7 @@ class CFFI {
 					}
 					
 					typeSignature += "v";
-					
+				
 				default:
 					
 					if (useCPPTypes) {

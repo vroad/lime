@@ -7,7 +7,8 @@
 #endif
 
 
-#include <hx/CFFIPrime.h>
+#include <hx/CFFIPrimePatch.h>
+//#include <hx/CFFIPrime.h>
 #include <app/Application.h>
 #include <app/ApplicationEvent.h>
 #include <audio/format/OGG.h>
@@ -179,17 +180,16 @@ namespace lime {
 		return WrapPointerInternal<void> (context, GetKinds ().RendererContext);
 		
 	}
-
+	
+	
 	value lime_application_create (value callback) {
 		
-		if (gQuit) return alloc_null ();
-		
-		Application* app = CreateApplication ();
+		Application* application = CreateApplication ();
 		if (Application::callback == NULL)
 			Application::callback = new AutoGCRoot (callback);
 		else
 			Application::callback->set (callback);
-		return WrapPointerWithGC (app);
+		return WrapPointerWithGC (application);
 		
 	}
 	
@@ -372,6 +372,13 @@ namespace lime {
 	}
 	
 	
+	double lime_cffi_get_native_pointer (value handle) {
+		
+		return (intptr_t)val_data (handle);
+		
+	}
+	
+	
 	#if 0
 	void lime_cffi_finalizer (value abstract) {
 		
@@ -459,7 +466,7 @@ namespace lime {
 		
 	}
 	
-
+	
 	int lime_font_get_ascender (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
@@ -490,8 +497,10 @@ namespace lime {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return 0;
-		return alloc_wstring (font->GetFamilyName ());
+		wchar_t *name = font->GetFamilyName ();
+		value result = alloc_wstring (name);
+		delete name;
+		return result;
 		#else
 		return 0;
 		#endif
@@ -625,7 +634,7 @@ namespace lime {
 			
 			if (font->face) {
 				
-				return WrapPointer<Font> (font);
+				return WrapPointerWithGC (font);
 				
 			} else {
 				
@@ -654,11 +663,11 @@ namespace lime {
 	}
 	
 	
-	value lime_font_render_glyph (value fontHandle, int index, value data) {
+	bool lime_font_render_glyph (value fontHandle, int index, value data) {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return alloc_null ();
+		if (font == NULL) return false;
 		Bytes bytes = Bytes (data);
 		return font->RenderGlyph (index, &bytes);
 		#else
@@ -668,11 +677,11 @@ namespace lime {
 	}
 	
 	
-	value lime_font_render_glyphs (value fontHandle, value indices, value data) {
+	bool lime_font_render_glyphs (value fontHandle, value indices, value data) {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return alloc_null ();
+		if (font == NULL) return false;
 		Bytes bytes = Bytes (data);
 		return font->RenderGlyphs (indices, &bytes);
 		#else
@@ -1161,6 +1170,7 @@ namespace lime {
 	value lime_renderer_create (value window) {
 		
 		Window *windowPtr = GetPointer<Window> (window);
+		if (windowPtr == NULL) return alloc_null ();
 		Renderer* renderer = CreateRenderer (windowPtr);
 		return WrapPointerWithGC<Renderer> (renderer);
 		
@@ -1172,7 +1182,6 @@ namespace lime {
 		Renderer *ptr = GetPointer<Renderer> (renderer);
 		if (ptr == NULL) return;
 		ptr->Flip ();
-		return;
 		
 	}
 	
@@ -1282,20 +1291,14 @@ namespace lime {
 		else
 			TextEvent::callback->set (callback);
 		
-		if (TextEvent::eventObject == NULL)
-			TextEvent::eventObject = new AutoGCRoot (eventObject);
-		else
-			TextEvent::eventObject->set (eventObject);
-		
 	}
-	
 	
 	value lime_text_layout_create (int direction, HxString script, HxString language) {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
 		
 		TextLayout *text = new TextLayout (direction, script.__s, language.__s);
-		return WrapPointerWithGC<TextLayout> (text);
+		return WrapPointerWithGC (text);
 		
 		#else
 		
@@ -1391,12 +1394,14 @@ namespace lime {
 		
 	}
 	
-
+	
 	value lime_window_create (value application, int width, int height, int flags, HxString title) {
 		
 		Application *appPtr = GetPointer<Application> (application);
+		if (appPtr == NULL)
+			return alloc_null ();
 		Window* window = CreateWindow (appPtr, width, height, flags, title.__s);
-		return WrapPointerWithGC<Window> (window);
+		return WrapPointerWithGC (window);
 		
 	}
 	

@@ -6,7 +6,9 @@
 #include "AL/alc.h"
 #endif
 
-#include <hx/CFFIPrime.h>
+#include <hx/CFFIPrimePatch.h>
+//#include <hx/CFFIPrime.h>
+#include <system/CFFIPointer.h>
 #include <utils/Bytes.h>
 #include <utils/PointerWrapper.h>
 #include <utils/Kinds.h>
@@ -931,8 +933,8 @@ namespace lime {
 		
 		ALCcontext* alcContext = val_to_ALCcontext (context);
 		if (alcContext == NULL) return;
-		free_abstract (context);
 		alcDestroyContext (alcContext);
+		free_abstract (context);
 		
 	}
 	

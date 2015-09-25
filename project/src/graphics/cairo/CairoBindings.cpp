@@ -2,13 +2,21 @@
 #include <cairo-ft.h>
 #include <math/Matrix3.h>
 #include <math/Vector2.h>
-#include <hx/CFFIPrime.h>
+#include <hx/CFFIPrimePatch.h>
+//#include <hx/CFFIPrime.h>
+#include <system/CFFIPointer.h>
 #include <text/Font.h>
 
 #include <utils/PointerWrapper.h>
 #include <utils/Kinds.h>
 
 namespace lime {
+	
+	void gc_cairo (value handle);
+	void gc_cairo_font_face (value handle);
+	void gc_cairo_pattern (value handle);
+	void gc_cairo_font_options (value handle);
+	void gc_cairo_surface (value handle);
 	
 	cairo_t *val_to_cairo_t (value handle) {
 		
@@ -46,35 +54,127 @@ namespace lime {
 		
 	}
 
-	value cairo_t_to_value (cairo_t *cairo) {
+	value cairo_t_to_value (cairo_t *cairo, bool setFinalizer = false) {
 		
-		return WrapPointerInternal<cairo_t> (cairo, GetKinds ().cairo_t);
-		
-	}
-	
-	value cairo_surface_t_to_value (cairo_surface_t *surface) {
-		
-		return WrapPointerInternal<cairo_surface_t> (surface, GetKinds ().cairo_surface_t);
+		value outValue = WrapPointerInternal<cairo_t> (cairo, GetKinds ().cairo_t);
+		if (setFinalizer)
+			val_gc (outValue, gc_cairo);
+		return outValue;
 		
 	}
 	
-	value cairo_font_options_t_to_value (cairo_font_options_t *options) {
+	value cairo_surface_t_to_value (cairo_surface_t *surface, bool setFinalizer = false) {
 		
-		return WrapPointerInternal<cairo_font_options_t> (options, GetKinds ().cairo_font_options_t);
-		
-	}
-	
-	value cairo_font_face_t_to_value (cairo_font_face_t *font_face) {
-		
-		return WrapPointerInternal<cairo_font_face_t> (font_face, GetKinds ().cairo_font_face_t);
+		value outValue = WrapPointerInternal<cairo_surface_t> (surface, GetKinds ().cairo_surface_t);
+		if (setFinalizer)
+			val_gc (outValue, gc_cairo_surface);
+		return outValue;
 		
 	}
 	
-	value cairo_pattern_t_to_value (cairo_pattern_t *pattern) {
+	value cairo_font_options_t_to_value (cairo_font_options_t *options, bool setFinalizer = false) {
 		
-		return WrapPointerInternal<cairo_pattern_t> (pattern, GetKinds ().cairo_pattern_t);
+		value outValue = WrapPointerInternal<cairo_font_options_t> (options, GetKinds ().cairo_font_options_t);
+		if (setFinalizer)
+			val_gc (outValue, gc_cairo_font_options);
+		return outValue;
 		
 	}
+	
+	value cairo_font_face_t_to_value (cairo_font_face_t *font_face, bool setFinalizer = false) {
+		
+		value outValue = WrapPointerInternal<cairo_font_face_t> (font_face, GetKinds ().cairo_font_face_t);
+		if (setFinalizer)
+			val_gc (outValue, gc_cairo_font_face);
+		return outValue;
+		
+	}
+	
+	value cairo_pattern_t_to_value (cairo_pattern_t *pattern, bool setFinalizer = false) {
+		
+		value outValue = WrapPointerInternal<cairo_pattern_t> (pattern, GetKinds ().cairo_pattern_t);
+		if (setFinalizer)
+			val_gc (outValue, gc_cairo_pattern);
+		return outValue;
+		
+	}
+	
+	
+	cairo_user_data_key_t userData;
+	
+	
+	void gc_cairo (value handle) {
+		
+		if (!val_is_null (handle)) {
+			
+			cairo_t* cairo = (cairo_t*)val_data (handle);
+			cairo_destroy (cairo);
+			free_abstract (handle);
+			
+		}
+		
+	}
+	
+	
+	void gc_cairo_font_face (value handle) {
+		
+		if (!val_is_null (handle)) {
+			
+			cairo_font_face_t* face = (cairo_font_face_t*)val_data (handle);
+			cairo_font_face_destroy (face);
+			free_abstract (handle);
+			
+		}
+		
+	}
+	
+	
+	void gc_cairo_font_options (value handle) {
+		
+		if (!val_is_null (handle)) {
+			
+			cairo_font_options_t* options = (cairo_font_options_t*)val_data (handle);
+			cairo_font_options_destroy (options);
+			free_abstract (handle);
+			
+		}
+		
+	}
+	
+	
+	void gc_cairo_pattern (value handle) {
+		
+		if (!val_is_null (handle)) {
+			
+			cairo_pattern_t* pattern = (cairo_pattern_t*)val_data (handle);
+			cairo_pattern_destroy (pattern);
+			free_abstract (handle);
+			
+		}
+		
+	}
+	
+	
+	void gc_cairo_surface (value handle) {
+		
+		if (!val_is_null (handle)) {
+			
+			cairo_surface_t* surface = (cairo_surface_t*)val_data (handle);
+			cairo_surface_destroy (surface);
+			free_abstract (handle);
+			
+		}
+		
+	}
+	
+	
+	void gc_user_data (void* data) {
+		
+		AutoGCRoot* reference = (AutoGCRoot*)data;
+		delete reference;
+		
+	}
+	
 	
 	void lime_cairo_arc (value handle, double xc, double yc, double radius, double angle1, double angle2) {
 		
@@ -142,7 +242,7 @@ namespace lime {
 	value lime_cairo_create (value inSurface) {
 		
 		cairo_surface_t *surface = val_to_cairo_surface_t (inSurface);
-		return cairo_t_to_value (cairo_create (surface));
+		return cairo_t_to_value (cairo_create (surface), true);
 		
 	}
 	
@@ -192,15 +292,6 @@ namespace lime {
 		
 	}
 	
-	void lime_cairo_font_face_destroy (value handle) {
-		
-		cairo_font_face_t *font_face = val_to_cairo_font_face_t (handle);
-		if (font_face == NULL) return;
-		cairo_font_face_destroy (font_face);
-		free_abstract (handle);
-		
-	}
-	
 	
 	int lime_cairo_font_face_get_reference_count (value handle) {
 		
@@ -231,7 +322,7 @@ namespace lime {
 	
 	value lime_cairo_font_options_create () {
 		
-		return cairo_font_options_t_to_value (cairo_font_options_create ());
+		return cairo_font_options_t_to_value (cairo_font_options_create (), true);
 		
 	}
 	
@@ -323,7 +414,12 @@ namespace lime {
 		#ifdef LIME_FREETYPE
 		Font *font = val_to_Font (face);
 		if (font == NULL) return alloc_null ();
-		return cairo_font_face_t_to_value (cairo_ft_font_face_create_for_ft_face ((FT_Face)font->face, flags));
+		cairo_font_face_t* cairoFont = cairo_ft_font_face_create_for_ft_face ((FT_Face)font->face, flags);
+		
+		AutoGCRoot* fontReference = new AutoGCRoot (face);
+		cairo_font_face_set_user_data (cairoFont, &userData, fontReference, gc_user_data);
+		
+		return cairo_font_face_t_to_value (cairoFont, true);
 		#else
 		return 0;
 		#endif
@@ -540,7 +636,7 @@ namespace lime {
 	
 	value lime_cairo_image_surface_create (int format, int width, int height) {
 		
-		return cairo_surface_t_to_value (cairo_image_surface_create ((cairo_format_t)format, width, height));
+		return cairo_surface_t_to_value (cairo_image_surface_create ((cairo_format_t)format, width, height), true);
 		
 	}
 	
@@ -548,7 +644,7 @@ namespace lime {
 	value lime_cairo_image_surface_create_for_data (double data, int format, int width, int height, int stride) {
 		
 		#ifndef LIME_NO_RAW_POINTER_ACESS
-		return cairo_surface_t_to_value (cairo_image_surface_create_for_data ((unsigned char*)(intptr_t)data, (cairo_format_t)format, width, height, stride));
+		return cairo_surface_t_to_value (cairo_image_surface_create_for_data ((unsigned char*)(intptr_t)data, (cairo_format_t)format, width, height, stride), true);
 		#else
 		return alloc_null ();
 		#endif
@@ -721,35 +817,35 @@ namespace lime {
 		
 		cairo_surface_t *surface = val_to_cairo_surface_t (inSurface);
 		if (surface == NULL) return alloc_null ();
-		return cairo_pattern_t_to_value (cairo_pattern_create_for_surface (surface));
+		return cairo_pattern_t_to_value (cairo_pattern_create_for_surface (surface), true);
 		
 	}
 	
 	
 	value lime_cairo_pattern_create_linear (double x0, double y0, double x1, double y1) {
 		
-		return cairo_pattern_t_to_value (cairo_pattern_create_linear (x0, y0, x1, y1));
+		return cairo_pattern_t_to_value (cairo_pattern_create_linear (x0, y0, x1, y1), true);
 		
 	}
 	
 	
 	value lime_cairo_pattern_create_radial (double cx0, double cy0, double radius0, double cx1, double cy1, double radius1) {
 		
-		return cairo_pattern_t_to_value (cairo_pattern_create_radial (cx0, cy0, radius0, cx1, cy1, radius1));
+		return cairo_pattern_t_to_value (cairo_pattern_create_radial (cx0, cy0, radius0, cx1, cy1, radius1), true);
 		
 	}
 	
 	
 	value lime_cairo_pattern_create_rgb (double r, double g, double b) {
 		
-		return cairo_pattern_t_to_value (cairo_pattern_create_rgb (r, g, b));
+		return cairo_pattern_t_to_value (cairo_pattern_create_rgb (r, g, b), true);
 		
 	}
 	
 	
 	value lime_cairo_pattern_create_rgba (double r, double g, double b, double a) {
 		
-		return cairo_pattern_t_to_value (cairo_pattern_create_rgba (r, g, b, a));
+		return cairo_pattern_t_to_value (cairo_pattern_create_rgba (r, g, b, a), true);
 		
 	}
 	
@@ -1271,7 +1367,6 @@ namespace lime {
 	DEFINE_PRIME5v (lime_cairo_fill_extents);
 	DEFINE_PRIME1v (lime_cairo_fill_preserve);
 	DEFINE_PRIME2 (lime_cairo_ft_font_face_create);
-	DEFINE_PRIME1v (lime_cairo_font_face_destroy);
 	DEFINE_PRIME1 (lime_cairo_font_face_get_reference_count);
 	DEFINE_PRIME1v (lime_cairo_font_face_reference);
 	DEFINE_PRIME1 (lime_cairo_font_face_status);
