@@ -221,7 +221,7 @@ namespace lime {
 		
 		if (file) {
 			
-			if (file->isFile ()) {
+			if (true) {
 				
 				jpeg_stdio_src (&cinfo, file->getFile ());
 				
