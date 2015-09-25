@@ -6,8 +6,8 @@
 #include "AL/alc.h"
 #endif
 
-//#include <hx/CFFIPrimePatch.h>
-#include <hx/CFFIPrime.h>
+#include <hx/CFFIPrimePatch.h>
+//#include <hx/CFFIPrime.h>
 #include <system/CFFIPointer.h>
 #include <utils/Bytes.h>
 #include <utils/PointerWrapper.h>
