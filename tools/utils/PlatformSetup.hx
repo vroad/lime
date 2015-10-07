@@ -475,6 +475,14 @@ class PlatformSetup {
 					
 					setupOpenFL ();
 				
+				case "tvos":
+					
+					if (PlatformHelper.hostPlatform == Platform.MAC) {
+						
+						setupMac ();
+						
+					}
+
 				case "":
 					
 					switch (CommandLineTools.defaultLibrary) {
@@ -1596,7 +1604,7 @@ class PlatformSetup {
 			}
 			
 			createPath (path + "/lib");
-			var libs = [ "android", "bada-wac", "bada", "blackberry", "ios", "mac", "qt", "tizen", "webos", "wp7" ];
+			var libs = [ "android", "bada-wac", "bada", "blackberry", "ios", "mac", "qt", "tizen", "tvos", "webos", "wp7" ];
 			
 			for (archive in childArchives) {
 				
@@ -1761,7 +1769,7 @@ class PlatformSetup {
 			var lsbId = ProcessHelper.runProcess ("", "lsb_release", ["-si"], true, true, true);
 			var lsbRelease = ProcessHelper.runProcess ("", "lsb_release", ["-sr"], true, true, true);
 			var arch = ProcessHelper.runProcess ("", "uname", ["-m"], true, true, true);
-			var isSaucy = lsbId == "Ubuntu\n" &&  lsbRelease == "13.10\n" && arch == "x86_64\n";
+			var isSaucy = lsbId == "Ubuntu\n" &&  lsbRelease >= "13.10\n" && arch == "x86_64\n";
 			
 			var packages = isSaucy ? linuxUbuntuSaucyPackages : linuxAptPackages;
 			

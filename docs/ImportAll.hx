@@ -185,6 +185,7 @@ import lime.tools.platforms.IOSPlatform;
 import lime.tools.platforms.LinuxPlatform;
 import lime.tools.platforms.MacPlatform;
 import lime.tools.platforms.TizenPlatform;
+import lime.tools.platforms.TVOSPlatform;
 import lime.tools.platforms.WebOSPlatform;
 import lime.tools.platforms.WindowsPlatform;
 #end

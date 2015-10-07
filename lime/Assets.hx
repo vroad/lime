@@ -1,4 +1,5 @@
-package lime;
+package lime; #if (!lime_legacy || lime_hybrid)
+
 
 #if !macro
 
@@ -1340,3 +1341,17 @@ class Assets {
 
 
 #end
+#end
+
+
+@:enum abstract AssetType(String) {
+	
+	var BINARY = "BINARY";
+	var FONT = "FONT";
+	var IMAGE = "IMAGE";
+	var MUSIC = "MUSIC";
+	var SOUND = "SOUND";
+	var TEMPLATE = "TEMPLATE";
+	var TEXT = "TEXT";
+	
+}

@@ -49,6 +49,7 @@ class Window {
 	public var onTextEdit = new Event<String->Int->Int->Void> ();
 	public var onTextInput = new Event<String->Void> ();
 	public var renderer:Renderer;
+	public var scale (get, null):Float;
 	public var stage:Stage;
 	public var title (get, set):String;
 	public var width (get, set):Int;
@@ -59,6 +60,7 @@ class Window {
 	@:noCompletion private var __fullscreen:Bool;
 	@:noCompletion private var __height:Int;
 	@:noCompletion private var __minimized:Bool;
+	@:noCompletion private var __scale:Float;
 	@:noCompletion private var __title:String;
 	@:noCompletion private var __width:Int;
 	@:noCompletion private var __x:Int;
@@ -72,6 +74,7 @@ class Window {
 		__width = 0;
 		__height = 0;
 		__fullscreen = false;
+		__scale = 1;
 		__x = 0;
 		__y = 0;
 		__title = "";
@@ -225,6 +228,18 @@ class Window {
 		];
 		
 		Gamepad.addMappings (mappings);
+
+		#elseif (ios || tvos)
+		
+		var mappings = [
+			
+		    "4d466947616d65706164010000000000,MFi Extended Gamepad,a:b0,b:b1,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,leftshoulder:b4,lefttrigger:a2,leftx:a0,lefty:a1,rightshoulder:b5,righttrigger:a5,rightx:a3,righty:a4,start:b6,x:b2,y:b3,",
+		    "4d466947616d65706164020000000000,MFi Gamepad,a:b0,b:b1,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,leftshoulder:b4,rightshoulder:b5,start:b6,x:b2,y:b3,",
+		    "4d466947616d65706164030000000000,MFi Apple TV Remote,a:b0,b:b1,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,leftshoulder:b4,rightshoulder:b5,start:b6,x:b2,y:b3,",
+			
+		];
+		
+		Gamepad.addMappings (mappings);
 		
 		#end
 		
@@ -351,6 +366,13 @@ class Window {
 	@:noCompletion private function set_minimized (value:Bool):Bool {
 		
 		return __minimized = backend.setMinimized (value);
+		
+	}
+	
+	
+	@:noCompletion private inline function get_scale ():Float {
+		
+		return __scale;
 		
 	}
 	

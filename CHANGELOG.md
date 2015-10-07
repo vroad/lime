@@ -1,3 +1,24 @@
+2.6.8 (10/05/2015)
+------------------
+
+* Updated to a new SDL development version
+* Added window.scale, window size and mouse events are in points
+* Added Lime Joystick events (alongside Gamepad events)
+* Added JPEG and PNG encode support for HTML5
+* Improved tooling support for tvOS builds
+
+
+2.6.7 (10/02/2015)
+------------------
+
+* Added initial changes to support Apple tvOS
+* Added System.allowScreenTimeout to allow screensaver/sleep
+* Updated CFFI to fix "hx_register_prim" issue on Android
+* Improved "lime setup linux"
+* Fixed preload when the same asset is listed twice
+* Fixed an issue with importing lime.Assets in legacy builds
+
+
 2.6.6 (09/24/2015)
 ------------------
 
