@@ -44,7 +44,7 @@ import lime.system.CFFIPointer;
 	public static function fromImage (image:Image):CairoSurface {
 		
 		#if (lime_cairo && !macro)
-		return create (lime_bytes_get_data_pointer (BytesUtil.getBytesFromUInt8Array (image.data)), CairoFormat.ARGB32, image.width, image.height, image.buffer.stride);
+		return create (lime_bytes_get_data_pointer (BytesUtil.getAnonBytesFromTypedArray (image.data)), CairoFormat.ARGB32, image.width, image.height, image.buffer.stride);
 		#else
 		return null;
 		#end

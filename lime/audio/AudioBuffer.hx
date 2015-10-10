@@ -92,14 +92,14 @@ class AudioBuffer {
 		
 		#elseif ((cpp || neko || nodejs) && !macro)
 		
-		var data:Dynamic = lime_audio_load (BytesUtil.getBytesFromByteArray(bytes), stream);
+		var data:Dynamic = lime_audio_load (bytes, stream);
 		
 		if (data != null) {
 			
 			var audioBuffer = new AudioBuffer ();
 			audioBuffer.bitsPerSample = data.bitsPerSample;
 			audioBuffer.channels = data.channels;
-			audioBuffer.data = BytesUtil.getUInt8ArrayFromAnonStructure (data.data);
+			audioBuffer.data = BytesUtil.getUInt8ArrayFromAnonBytes (data.data);
 			audioBuffer.sampleRate = data.sampleRate;
 			return audioBuffer;
 			
@@ -139,7 +139,7 @@ class AudioBuffer {
 			var audioBuffer = new AudioBuffer ();
 			audioBuffer.bitsPerSample = data.bitsPerSample;
 			audioBuffer.channels = data.channels;
-			audioBuffer.data = BytesUtil.getUInt8ArrayFromAnonStructure (data.data);
+			audioBuffer.data = BytesUtil.getUInt8ArrayFromAnonBytes (data.data);
 			audioBuffer.sampleRate = data.sampleRate;
 			return audioBuffer;
 			

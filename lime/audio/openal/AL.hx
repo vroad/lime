@@ -2,6 +2,7 @@ package lime.audio.openal;
 
 
 import lime.utils.ArrayBufferView;
+import lime.utils.BytesUtil;
 
 #if ((haxe_ver >= 3.2) && cpp)
 import cpp.Float32;
@@ -80,27 +81,13 @@ class AL {
 	public static inline var EXPONENT_DISTANCE:Int = 0xD005;
 	public static inline var EXPONENT_DISTANCE_CLAMPED:Int = 0xD006;
 	
-	#if nodejs
-	@:noCompletion private static function createBytes(view:ArrayBufferView):Dynamic {
-		
-		return view != null ? {
-			
-			b: view,
-			length: view.byteLength
-			
-		} : null;
-		
-	}
-	#end
 	
 	public static function bufferData (buffer:Int, format:Int, data:ArrayBufferView, size:Int, freq:Int):Void {
 		
 		#if ((cpp || neko) && lime_openal && !macro)
 		lime_al_buffer_data (buffer, format, data.buffer, size, freq);
 		#elseif (nodejs && lime_openal && !macro)
-		lime_al_buffer_data (buffer, format, data, size, freq);
-		#elseif (nodejs && lime_openal && !macro)
-		lime_al_buffer_data (buffer, format, createBytes (data), size, freq);
+		lime_al_buffer_data (buffer, format, BytesUtil.getAnonBytesFromTypedArray (data), size, freq);
 		#end
 		
 	}

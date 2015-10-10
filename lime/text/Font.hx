@@ -6,6 +6,7 @@ import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
 import lime.math.Vector2;
 import lime.system.System;
+import lime.utils.AnonBytes;
 import lime.utils.ByteArray;
 import lime.utils.BytesUtil;
 import lime.utils.UInt8Array;
@@ -160,7 +161,7 @@ class Font {
 		
 		var bytes = new ByteArray (16);
 		bytes.endian = (System.endianness == BIG_ENDIAN ? "bigEndian" : "littleEndian");
-		var data:Dynamic = lime_font_render_glyph (src, glyph, BytesUtil.getBytesFromByteArray (bytes));
+		var data:Dynamic = lime_font_render_glyph (src, glyph, bytes);
 		
 		if (data != null) {
 			
@@ -169,7 +170,7 @@ class Font {
 			var x = bytes.readInt ();
 			var y = bytes.readInt ();
 			
-			var buffer = new ImageBuffer (BytesUtil.getUInt8ArrayFromAnonStructure (data), width, height, 1);
+			var buffer = new ImageBuffer (BytesUtil.getUInt8ArrayFromAnonBytes (data), width, height, 1);
 			var image = new Image (buffer, 0, 0, width, height);
 			image.x = x;
 			image.y = y;
@@ -194,7 +195,7 @@ class Font {
 		var bytes = new ByteArray (glyphList.length * 16);
 		bytes.endian = (System.endianness == BIG_ENDIAN ? "bigEndian" : "littleEndian");
 		
-		var rawImages:Array<Dynamic> = lime_font_render_glyphs (src, glyphList, BytesUtil.getBytesFromByteArray (bytes));
+		var rawImages:Array<Dynamic> = lime_font_render_glyphs (src, glyphList, bytes);
 		
 		if (rawImages != null) {
 			
@@ -206,12 +207,12 @@ class Font {
 				var x = bytes.readInt ();
 				var y = bytes.readInt ();
 				
-				var rawImage:Dynamic = rawImages[i];
+				var rawImage:AnonBytes = rawImages[i];
 				var buffer, image = null;
 				if (rawImage != null)
 				{
 					
-					buffer = new ImageBuffer (BytesUtil.getUInt8ArrayFromAnonStructure (rawImage), width, height, 1);
+					buffer = new ImageBuffer (BytesUtil.getUInt8ArrayFromAnonBytes (rawImage), width, height, 1);
 					image = new Image (buffer, 0, 0, width, height);
 					image.x = x;
 					image.y = y;

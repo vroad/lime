@@ -1,6 +1,8 @@
 #include <system/System.h>
 #include <utils/Bytes.h>
 #include <utils/ThreadLocalStorage.h>
+#include <hx/CFFIPrimePatch.h>
+
 
 namespace lime {
 	
@@ -186,7 +188,7 @@ namespace lime {
 					
 					*_root = _value;
 					
-				}	
+				}
 				
 			}
 
@@ -340,18 +342,17 @@ namespace lime {
 	}
 	
 	
-	value lime_bytes_overwrite_file (value inFilename, value inBytes) {
+	void lime_bytes_overwrite_file (HxString inFilename, value inBytes) {
 		
 		// file is created if it doesn't exist,
 		// if it exists, it is truncated to zero
-		FILE_HANDLE *file = lime::fopen (val_string (inFilename), "wb");
+		FILE_HANDLE *file = lime::fopen (inFilename.__s, "wb");
 		
 		if (!file) {
 			
 			#ifdef ANDROID
 			// [todo]
 			#endif
-			return alloc_null();
 			
 		}
 		
@@ -364,12 +365,11 @@ namespace lime {
 		lime::fwrite (bytes.Data (), 1, bytes.Length (), file);
 		
 		lime::fclose (file);
-		return alloc_null ();
 		
 	}
 	
 	
-	DEFINE_PRIM (lime_bytes_overwrite_file, 2);
+	DEFINE_PRIME2v (lime_bytes_overwrite_file);
 	
 	
 }

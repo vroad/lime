@@ -4,6 +4,7 @@ import haxe.io.Bytes;
 import lime.math.Vector2;
 import lime.system.System;
 import lime.utils.ByteArray;
+import lime.utils.BytesUtil;
 
 #if !macro
 @:build(lime.system.CFFI.build())
@@ -61,7 +62,7 @@ class TextLayout {
 			
 			__bytes = lime_text_layout_position (__handle, font.src, size, text, __bytes);
 			
-			var __buffer = ByteArray.fromBytes (@:privateAccess new Bytes (__bytes.length, #if nodejs __bytes.b.buffer #else __bytes.b #end));
+			var __buffer = ByteArray.fromBytes (BytesUtil.createBytes (__bytes.length, __bytes.b));
 			__buffer.endian = "littleEndian";
 			
 			if (__buffer.length > 4) {

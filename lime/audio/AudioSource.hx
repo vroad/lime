@@ -6,6 +6,7 @@ import haxe.Timer;
 import lime.app.Event;
 import lime.audio.openal.AL;
 import lime.system.System;
+import lime.utils.AnonBytes;
 import lime.utils.BytesUtil;
 
 #if flash
@@ -468,8 +469,8 @@ class AudioSource {
 					
 					for (i in 0 ... data.length) {
 						
-						var bytes:Dynamic = data[i];
-						AL.bufferData (streamBuffers[i], format, BytesUtil.getUInt8ArrayFromAnonStructure (bytes), bytes.length, buffer.sampleRate);
+						var bytes:AnonBytes = data[i];
+						AL.bufferData (streamBuffers[i], format, BytesUtil.getUInt8ArrayFromAnonBytes (bytes), bytes.length, buffer.sampleRate);
 						
 					}
 					

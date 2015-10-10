@@ -962,7 +962,7 @@ class Image {
 				
 			}
 			
-			return __base64Encoder.encodeBytes (Bytes.ofData (cast bytes.byteView)).toString () + extension;
+			return __base64Encoder.encodeBytes (Bytes.ofData (cast bytes.b)).toString () + extension;
 			
 		#else
 		
@@ -1078,16 +1078,11 @@ class Image {
 			
 		#elseif ((cpp || neko || nodejs) && !macro)
 			
-			var data:Dynamic = lime_image_load (BytesUtil.getBytesFromByteArray(bytes));
+			var data:Dynamic = lime_image_load (bytes);
 			
 			if (data != null) {
 				
-				#if nodejs
-				var u8a = data.data.b;
-				#else
-				var u8a = new UInt8Array (@:privateAccess new Bytes (data.data.length, data.data.b));
-				#end
-				__fromImageBuffer (new ImageBuffer (u8a, data.width, data.height, data.bitsPerPixel));
+				__fromImageBuffer (new ImageBuffer (BytesUtil.getUInt8ArrayFromAnonBytes (data.data), data.width, data.height, data.bitsPerPixel));
 				
 				if (onload != null) {
 					
@@ -1206,11 +1201,7 @@ class Image {
 				
 				if (data != null) {
 					
-					#if nodejs
-					var u8a = data.data.b;
-					#else
-					var u8a = new UInt8Array (@:privateAccess new Bytes (data.data.length, data.data.b));
-					#end
+					var u8a = BytesUtil.getUInt8ArrayFromAnonBytes (data.data);
 					buffer = new ImageBuffer (u8a, data.width, data.height, data.bitsPerPixel, data.format);
 					
 				}
