@@ -5,7 +5,6 @@ import haxe.CallStack;
 import haxe.crypto.Hmac;
 import haxe.crypto.Sha256;
 import haxe.Timer;
-import js.Boot;
 import lime.ui.FileDialog;
 import lime.ui.FileDialogType;
 #end

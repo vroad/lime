@@ -3,7 +3,6 @@
 +haxe.CallStack
 +haxe.StackItem
 +haxe.Timer
-+js.Boot
 +lime
 -lime.app.Config
 -lime.app.Event
