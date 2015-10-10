@@ -60,7 +60,7 @@ class Boot {
 		return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
 	}
 
-	private static function __trace(v,i : haxe.PosInfos) {
+	private static function __trace(v:Dynamic,i : haxe.PosInfos):Void {
 		untyped {
 			var msg = if( i != null ) i.fileName+":"+i.lineNumber+": " else "";
 			#if jsfl
@@ -119,7 +119,7 @@ class Boot {
 	#else
 	@:ifFeature("may_print_enum")
 	#end
-	private static function __string_rec(o,s:String) {
+	private static function __string_rec(o:Dynamic,s:String):Dynamic {
 		untyped {
 			if( o == null )
 			    return "null";
@@ -250,7 +250,7 @@ class Boot {
 		else throw "Cannot cast " +Std.string(o) + " to " +Std.string(t);
 	}
 
-	static var __toStr = untyped __js__("{}.toString");
+	static var __toStr:Dynamic = untyped __js__("{}.toString");
 	// get native JS [[Class]]
 	static function __nativeClassName(o:Dynamic):String {
 		var name = untyped __toStr.call(o).slice(8, -1);

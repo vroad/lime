@@ -1,10 +1,18 @@
 package;
 
 #if codegen
-import haxe.crypto.HashMethod;
+import haxe.CallStack;
+import haxe.crypto.Hmac;
 import haxe.crypto.Sha256;
 import haxe.Timer;
+import js.Boot;
+import lime.ui.FileDialog;
+import lime.ui.FileDialogType;
 #end
+
+import lime.video.PlayerState;
+import lime.video.Video;
+import lime.video.VideoLib;
 
 import lime.app.Application;
 import lime.app.Config;
@@ -136,8 +144,6 @@ import lime.system.Endian;
 import lime.system.JNI;
 import lime.system.System;
 import lime.system.ThreadPool;
-import lime.system.ThreadPoolMessage;
-import lime.system.ThreadPoolMessageType;
 import lime.text.Font;
 import lime.text.Glyph;
 import lime.text.GlyphMetrics;

@@ -207,3 +207,32 @@ class ThreadPool {
 	
 	
 }
+
+
+private enum ThreadPoolMessageType {
+	
+	COMPLETE;
+	ERROR;
+	EXIT;
+	PROGRESS;
+	WORK;
+	
+}
+
+
+private class ThreadPoolMessage {
+	
+	
+	public var state:Dynamic;
+	public var type:ThreadPoolMessageType;
+	
+	
+	public function new (type:ThreadPoolMessageType, state:Dynamic) {
+		
+		this.type = type;
+		this.state = state;
+		
+	}
+	
+	
+}

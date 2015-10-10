@@ -210,9 +210,7 @@ class BMP {
 	
 }
 
-#if lime_shared
-@:jsRequire("lime", "lime_graphics_format_BMPType") extern
-#end
+
 enum BMPType {
 	
 	RGB;
