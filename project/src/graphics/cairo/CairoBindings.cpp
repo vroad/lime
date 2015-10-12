@@ -109,7 +109,6 @@ namespace lime {
 			
 			cairo_t* cairo = (cairo_t*)val_data (handle);
 			cairo_destroy (cairo);
-			//free_abstract (handle);
 			
 		}
 		
@@ -122,7 +121,6 @@ namespace lime {
 			
 			cairo_font_face_t* face = (cairo_font_face_t*)val_data (handle);
 			cairo_font_face_destroy (face);
-			//free_abstract (handle);
 			
 		}
 		
@@ -135,7 +133,6 @@ namespace lime {
 			
 			cairo_font_options_t* options = (cairo_font_options_t*)val_data (handle);
 			cairo_font_options_destroy (options);
-			//free_abstract (handle);
 			
 		}
 		
@@ -148,7 +145,6 @@ namespace lime {
 			
 			cairo_pattern_t* pattern = (cairo_pattern_t*)val_data (handle);
 			cairo_pattern_destroy (pattern);
-			//free_abstract (handle);
 			
 		}
 		
@@ -161,7 +157,6 @@ namespace lime {
 			
 			cairo_surface_t* surface = (cairo_surface_t*)val_data (handle);
 			cairo_surface_destroy (surface);
-			//free_abstract (handle);
 			
 		}
 		
@@ -256,16 +251,6 @@ namespace lime {
 	}
 	
 	
-	void lime_cairo_destroy (value handle) {
-		
-		cairo_t *cairo = val_to_cairo_t (handle);
-		if (cairo == NULL) return;
-		cairo_destroy (cairo);
-		free_abstract (handle);
-		
-	}
-	
-	
 	void lime_cairo_fill (value handle) {
 		
 		cairo_t *cairo = val_to_cairo_t (handle);
@@ -293,24 +278,6 @@ namespace lime {
 	}
 	
 	
-	int lime_cairo_font_face_get_reference_count (value handle) {
-		
-		cairo_font_face_t *font_face = val_to_cairo_font_face_t (handle);
-		if (font_face == NULL) return 0;
-		return cairo_font_face_get_reference_count (font_face);
-		
-	}
-	
-	
-	void lime_cairo_font_face_reference (value handle) {
-		
-		cairo_font_face_t *font_face = val_to_cairo_font_face_t (handle);
-		if (font_face == NULL) return;
-		cairo_font_face_reference (font_face);
-		
-	}
-	
-	
 	int lime_cairo_font_face_status (value handle) {
 		
 		cairo_font_face_t *font_face = val_to_cairo_font_face_t (handle);
@@ -323,16 +290,6 @@ namespace lime {
 	value lime_cairo_font_options_create () {
 		
 		return cairo_font_options_t_to_value (cairo_font_options_create (), true);
-		
-	}
-	
-	
-	void lime_cairo_font_options_destroy (value handle) {
-		
-		cairo_font_options_t *options = val_to_cairo_font_options_t (handle);
-		if (options == NULL) return;
-		cairo_font_options_destroy (options);
-		free_abstract (handle);
 		
 	}
 	
@@ -576,15 +533,6 @@ namespace lime {
 		cairo_t *cairo = val_to_cairo_t (handle);
 		if (cairo == NULL) return 0;
 		return cairo_get_operator (cairo);
-		
-	}
-	
-	
-	int lime_cairo_get_reference_count (value handle) {
-		
-		cairo_t *cairo = val_to_cairo_t (handle);
-		if (cairo == NULL) return 0;
-		return cairo_get_reference_count (cairo);
 		
 	}
 	
@@ -850,16 +798,6 @@ namespace lime {
 	}
 	
 	
-	void lime_cairo_pattern_destroy (value handle) {
-		
-		cairo_pattern_t *pattern = val_to_cairo_pattern_t (handle);
-		if (pattern == NULL) return;
-		cairo_pattern_destroy (pattern);
-		free_abstract (handle);
-		
-	}
-	
-	
 	int lime_cairo_pattern_get_color_stop_count (value handle) {
 		
 		cairo_pattern_t *pattern = val_to_cairo_pattern_t (handle);
@@ -977,15 +915,6 @@ namespace lime {
 		cairo_t *cairo = val_to_cairo_t (handle);
 		if (cairo == NULL) return;
 		cairo_rectangle (cairo, x, y, width, height);
-		
-	}
-	
-	
-	void lime_cairo_reference (value handle) {
-		
-		cairo_t *cairo = val_to_cairo_t (handle);
-		if (cairo == NULL) return;
-		cairo_reference (cairo);
 		
 	}
 	
@@ -1295,16 +1224,6 @@ namespace lime {
 	}
 	
 	
-	void lime_cairo_surface_destroy (value handle) {
-		
-		cairo_surface_t *surface = val_to_cairo_surface_t (handle);
-		if (surface == NULL) return;
-		cairo_surface_destroy (surface);
-		free_abstract (handle);
-		
-	}
-	
-	
 	void lime_cairo_surface_flush (value handle) {
 		
 		cairo_surface_t *surface = val_to_cairo_surface_t (handle);
@@ -1362,16 +1281,12 @@ namespace lime {
 	DEFINE_PRIME1v (lime_cairo_copy_page);
 	DEFINE_PRIME1 (lime_cairo_create);
 	DEFINE_PRIME7v (lime_cairo_curve_to);
-	DEFINE_PRIME1v (lime_cairo_destroy);
 	DEFINE_PRIME1v (lime_cairo_fill);
 	DEFINE_PRIME5v (lime_cairo_fill_extents);
 	DEFINE_PRIME1v (lime_cairo_fill_preserve);
 	DEFINE_PRIME2 (lime_cairo_ft_font_face_create);
-	DEFINE_PRIME1 (lime_cairo_font_face_get_reference_count);
-	DEFINE_PRIME1v (lime_cairo_font_face_reference);
 	DEFINE_PRIME1 (lime_cairo_font_face_status);
 	DEFINE_PRIME0 (lime_cairo_font_options_create);
-	DEFINE_PRIME1v (lime_cairo_font_options_destroy);
 	DEFINE_PRIME1 (lime_cairo_font_options_get_antialias);
 	DEFINE_PRIME1 (lime_cairo_font_options_get_subpixel_order);
 	DEFINE_PRIME1 (lime_cairo_font_options_get_hint_style);
@@ -1394,7 +1309,6 @@ namespace lime {
 	DEFINE_PRIME1 (lime_cairo_get_matrix);
 	DEFINE_PRIME1 (lime_cairo_get_miter_limit);
 	DEFINE_PRIME1 (lime_cairo_get_operator);
-	DEFINE_PRIME1 (lime_cairo_get_reference_count);
 	DEFINE_PRIME1 (lime_cairo_get_source);
 	DEFINE_PRIME1 (lime_cairo_get_target);
 	DEFINE_PRIME1 (lime_cairo_get_tolerance);
@@ -1424,7 +1338,6 @@ namespace lime {
 	DEFINE_PRIME6 (lime_cairo_pattern_create_radial);
 	DEFINE_PRIME3 (lime_cairo_pattern_create_rgb);
 	DEFINE_PRIME4 (lime_cairo_pattern_create_rgba);
-	DEFINE_PRIME1v (lime_cairo_pattern_destroy);
 	DEFINE_PRIME1 (lime_cairo_pattern_get_color_stop_count);
 	DEFINE_PRIME1 (lime_cairo_pattern_get_extend);
 	DEFINE_PRIME1 (lime_cairo_pattern_get_filter);
@@ -1437,7 +1350,6 @@ namespace lime {
 	DEFINE_PRIME1v (lime_cairo_push_group);
 	DEFINE_PRIME2v (lime_cairo_push_group_with_content);
 	DEFINE_PRIME5v (lime_cairo_rectangle);
-	DEFINE_PRIME1v (lime_cairo_reference);
 	DEFINE_PRIME7v (lime_cairo_rel_curve_to);
 	DEFINE_PRIME3v (lime_cairo_rel_line_to);
 	DEFINE_PRIME3v (lime_cairo_rel_move_to);
@@ -1469,7 +1381,6 @@ namespace lime {
 	DEFINE_PRIME1v (lime_cairo_stroke);
 	DEFINE_PRIME5v (lime_cairo_stroke_extents);
 	DEFINE_PRIME1v (lime_cairo_stroke_preserve);
-	DEFINE_PRIME1v (lime_cairo_surface_destroy);
 	DEFINE_PRIME1v (lime_cairo_surface_flush);
 	DEFINE_PRIME2v (lime_cairo_transform);
 	DEFINE_PRIME3v (lime_cairo_translate);
