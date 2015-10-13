@@ -1516,7 +1516,7 @@ namespace lime {
 		
 		Window* targetWindow = GetPointer<Window> (window);
 		if (targetWindow == NULL) return false;
-		return alloc_bool (targetWindow->GetEnableTextEvents ());
+		return targetWindow->GetEnableTextEvents ();
 		
 	}
 	
