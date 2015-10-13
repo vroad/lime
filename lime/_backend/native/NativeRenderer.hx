@@ -164,7 +164,7 @@ class NativeRenderer {
 	@:cffi private static function lime_renderer_create (window:Dynamic):Dynamic;
 	@:cffi private static function lime_renderer_flip (handle:Dynamic):Void;
 	@:cffi private static function lime_renderer_get_context (handle:Dynamic):Dynamic;
-	@:cffi private static function lime_renderer_get_scale (handle:Dynamic):Dynamic;
+	@:cffi private static function lime_renderer_get_scale (handle:Dynamic):Float;
 	@:cffi private static function lime_renderer_get_type (handle:Dynamic):Dynamic;
 	@:cffi private static function lime_renderer_lock (handle:Dynamic):Dynamic;
 	@:cffi private static function lime_renderer_make_current (handle:Dynamic):Void;
