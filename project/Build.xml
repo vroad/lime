@@ -44,7 +44,7 @@
 
 	</section>
 
-	<set name="LIME_NO_RAW_POINTER_ACCESS" value="1" />
+	<!-- <set name="LIME_NO_RAW_POINTER_ACCESS" value="1" /> -->
 	
 	<files id="lime">
 		
