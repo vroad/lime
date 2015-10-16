@@ -336,7 +336,7 @@ namespace lime {
 	
 	value lime_bytes_from_data_pointer (double data, int length) {
 		
-		#ifndef LIME_NO_RAW_POINTER_ACESS
+		#ifndef LIME_NO_RAW_POINTER_ACCESS
 		intptr_t ptr = (intptr_t)data;
 		Bytes bytes = Bytes (length);
 		
@@ -356,7 +356,7 @@ namespace lime {
 	
 	double lime_bytes_get_data_pointer (value bytes) {
 		
-		#ifndef LIME_NO_RAW_POINTER_ACESS
+		#ifndef LIME_NO_RAW_POINTER_ACCESS
 		Bytes data = Bytes (bytes);
 		return (intptr_t)data.Data ();
 		#else
@@ -376,7 +376,7 @@ namespace lime {
 	
 	double lime_cffi_get_native_pointer (value handle) {
 		
-		#ifndef LIME_NO_RAW_POINTER_ACESS
+		#ifndef LIME_NO_RAW_POINTER_ACCESS
 		return (intptr_t)val_data (handle);
 		#else
 		return 0;
@@ -1246,7 +1246,7 @@ namespace lime {
 	
 	value lime_renderer_get_context (value renderer) {
 		
-		#ifndef LIME_NO_RAW_POINTER_ACESS
+		#ifndef LIME_NO_RAW_POINTER_ACCESS
 		Renderer* targetRenderer = GetPointer<Renderer> (renderer);
 		if (targetRenderer == NULL) return alloc_null ();
 		return RendererContext_to_value (targetRenderer->GetContext ());
