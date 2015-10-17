@@ -43,7 +43,17 @@ namespace lime {
 	struct MySrcManager {
 		
 		
-		MySrcManager (const JOCTET *inData, int inLen) : mData (inData), mLen (inLen) {
+		MySrcManager () : mData (NULL), mLen (0) {
+			
+			
+			
+		}
+		
+		
+		void Set (const JOCTET *inData, int inLen) {
+			
+			mData = inData;
+			mLen = inLen;
 			
 			pub.init_source = my_init_source;
 			pub.fill_input_buffer = my_fill_input_buffer;
@@ -234,6 +244,7 @@ namespace lime {
 		
 		jpeg_create_decompress (&cinfo);
 		Bytes data;
+		MySrcManager manager;
 		
 		if (file) {
 			
@@ -254,18 +265,17 @@ namespace lime {
 					
 				}
 				
-				MySrcManager manager (data.Data (), data.Length ());
-				cinfo.src = &manager.pub;
+				manager.Set (data.Data (), data.Length ());
 				
 			}
 			
 		} else {
 			
-			MySrcManager manager (resource->data->Data (), resource->data->Length ());
-			cinfo.src = &manager.pub;
+			manager.Set (resource->data->Data (), resource->data->Length ());
 			
 		}
 		
+		cinfo.src = &manager.pub;
 		bool decoded = false;
 		
 		if (jpeg_read_header (&cinfo, TRUE) == JPEG_HEADER_OK) {
