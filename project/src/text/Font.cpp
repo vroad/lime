@@ -341,7 +341,7 @@ namespace lime {
 				
 				FT_Face face;
 				FILE_HANDLE *file = NULL;
-				unsigned char *faceMemory = NULL;
+				Bytes *faceMemory = NULL;
 				
 				if (resource->path) {
 					
@@ -360,22 +360,27 @@ namespace lime {
 						
 					} else {
 						
-						Bytes data = Bytes (resource->path);
-						faceMemory = (unsigned char*)malloc (data.Length ());
-						memcpy (faceMemory, data.Data (), data.Length ());
-
+						faceMemory = new Bytes ();
+						int status = faceMemory->ReadFile (file);
 						lime::fclose (file);
 						file = 0;
+						
+						if (!status) {
+							
+							FT_Done_FreeType (library);
+							delete faceMemory;
+							return;
+							
+						}
 
-						error = FT_New_Memory_Face (library, faceMemory, data.Length (), faceIndex, &face);
+						error = FT_New_Memory_Face (library, faceMemory->Data (), faceMemory->Length (), faceIndex, &face);
 						
 					}
 					
 				} else {
 					
-					faceMemory = (unsigned char*)malloc (resource->data->Length ());
-					memcpy (faceMemory, resource->data->Data (), resource->data->Length ());
-					error = FT_New_Memory_Face (library, faceMemory, resource->data->Length (), faceIndex, &face);
+					faceMemory = new Bytes(*resource->data);
+					error = FT_New_Memory_Face (library, faceMemory->Data (), faceMemory->Length (), faceIndex, &face);
 					
 				}
 				
@@ -418,7 +423,7 @@ namespace lime {
 
 					FT_Done_FreeType (library);
 
-					free (faceMemory);
+					delete faceMemory;
 
 				}
 				
@@ -439,7 +444,7 @@ namespace lime {
 			
 		}
 
-		free (faceMemory);
+		delete faceMemory;
 		faceMemory = 0;
 		
 	}

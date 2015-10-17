@@ -22,11 +22,18 @@ namespace lime {
 	};
 	
 	
-	static void OnOutput (j_common_ptr cinfo) {}
+	static void OnOutput (j_common_ptr cinfo) {
+		
+ 		char buffer[JMSG_LENGTH_MAX];
+ 		(*cinfo->err->format_message)(cinfo,buffer);
+ 		printf("libjpeg error: %s\n", buffer);
+		
+	}
 	
 	
 	static void OnError (j_common_ptr cinfo) {
 		
+		(*cinfo->err->output_message)(cinfo);
 		ErrorData * err = (ErrorData *)cinfo->err;
 		longjmp (err->on_error, 1);
 		
@@ -191,6 +198,7 @@ namespace lime {
 		jpegError.base.output_message = OnOutput;
 		
 		FILE_HANDLE *file = NULL;
+		unsigned char *scanline = NULL;
 		
 		if (resource->path) {
 			
@@ -212,22 +220,40 @@ namespace lime {
 				
 			}
 			
+			if (scanline) {
+				
+				delete[] scanline;
+				scanline = NULL;
+				
+			}
+			
 			jpeg_destroy_decompress (&cinfo);
 			return false;
 			
 		}
 		
 		jpeg_create_decompress (&cinfo);
+		Bytes data;
 		
 		if (file) {
 			
-			if (true) {
+			if (file->isFile ()) {
 				
 				jpeg_stdio_src (&cinfo, file->getFile ());
 				
 			} else {
 				
-				Bytes data = Bytes (resource->path);
+				int status = data.ReadFile (file);
+				lime::fclose (file);
+				file = 0;
+				
+				if (!status) {
+					
+					jpeg_destroy_decompress (&cinfo);
+					return false;
+					
+				}
+				
 				MySrcManager manager (data.Data (), data.Length ());
 				cinfo.src = &manager.pub;
 				
@@ -253,7 +279,7 @@ namespace lime {
 				imageBuffer->Resize (cinfo.output_width, cinfo.output_height, 32);
 				
 				unsigned char *bytes = imageBuffer->data->Data ();
-				unsigned char *scanline = new unsigned char [imageBuffer->width * components];
+				scanline = new unsigned char [imageBuffer->width * components];
 				
 				while (cinfo.output_scanline < cinfo.output_height) {
 					
@@ -275,6 +301,7 @@ namespace lime {
 				}
 				
 				delete[] scanline;
+				scanline = 0;
 				
 				jpeg_finish_decompress (&cinfo);
 				

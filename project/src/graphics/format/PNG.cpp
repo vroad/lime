@@ -134,6 +134,7 @@ namespace lime {
 			
 		}
 		
+		Bytes data;
 		if (file) {
 			
 			if (file->isFile ()) {
@@ -143,7 +144,17 @@ namespace lime {
 				
 			} else {
 				
-				Bytes data = Bytes (resource->path);
+				int status = data.ReadFile (file);
+				lime::fclose (file);
+				file = 0;
+				
+				if (!status) {
+					
+					png_destroy_read_struct (&png_ptr, &info_ptr, (png_infopp)NULL);
+					return false;
+					
+				}
+				
 				ReadBuffer buffer (data.Data (), data.Length ());
 				png_set_read_fn (png_ptr, &buffer, user_read_data_fn);
 				

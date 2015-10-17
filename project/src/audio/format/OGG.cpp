@@ -116,6 +116,7 @@ namespace lime {
 	bool OGG::Decode (Resource *resource, AudioBuffer *audioBuffer, bool stream) {
 		
 		OggVorbis_File *oggFile = new OggVorbis_File ();
+		OAL_OggMemoryFile fakeFile;
 		if (resource->path) {
 			
 			FILE_HANDLE *file = lime::fopen (resource->path, "rb");
@@ -127,7 +128,7 @@ namespace lime {
 				
 			}
 			
-			if (true) {
+			if (file->isFile ()) {
 				
 				if (ov_open (file->getFile (), oggFile, NULL, file->getLength ()) != 0) {
 					
@@ -139,11 +140,20 @@ namespace lime {
 				
 			} else {
 				
+				audioBuffer->sourceData = new Bytes ();
+				int status = audioBuffer->sourceData->ReadFile (file);
 				lime::fclose (file);
-				audioBuffer->sourceData = new Bytes (resource->path);
+				file = 0;
 				
-				OAL_OggMemoryFile fakeFile = { audioBuffer->sourceData->Data (), audioBuffer->sourceData->Length (), 0 };
+				if (!status) {
+					
+					ov_clear (oggFile);
+					delete audioBuffer->sourceData;
+					return false;
+					
+				}
 				
+				fakeFile = { audioBuffer->sourceData->Data (), audioBuffer->sourceData->Length (), 0 };
 				if (ov_open_callbacks (&fakeFile, oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
 					
 					ov_clear (oggFile);
@@ -156,7 +166,7 @@ namespace lime {
 			
 		} else {
 			
-			OAL_OggMemoryFile fakeFile = { resource->data->Data (), resource->data->Length (), 0 };
+			fakeFile = { resource->data->Data (), resource->data->Length (), 0 };
 			audioBuffer->sourceData = new Bytes (*resource->data);
 			
 			if (ov_open_callbacks (&fakeFile, oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {

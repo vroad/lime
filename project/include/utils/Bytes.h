@@ -4,6 +4,7 @@
 
 #include <hx/CFFI.h>
 #include <utils/QuickVec.h>
+#include <system/System.h>
 
 
 namespace lime {
@@ -17,6 +18,7 @@ namespace lime {
 		Bytes (value bytes);
 		Bytes (const char* path);
 		Bytes (const QuickVec<unsigned char> data);
+		Bytes (const Bytes &other);
 		~Bytes ();
 		
 		unsigned char *Data ();
@@ -26,11 +28,11 @@ namespace lime {
 		void Set (value bytes);
 		void Set (const QuickVec<unsigned char> data);
 		value Value ();
+		int ReadFile (FILE_HANDLE *file);
 		
 		unsigned char *_data;
 		int _length;
-		value *_root;
-		value _value;
+		AutoGCRoot *_root;
 		
 		
 	};
