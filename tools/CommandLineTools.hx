@@ -223,6 +223,11 @@ class CommandLineTools {
 							target = PlatformHelper.hostPlatform;
 							targetFlags.set ("nodejs", "");
 							
+						case "android-nodejs":
+						
+							target = Platform.ANDROID;
+							targetFlags.set ("nodejs", "");
+							
 						case "iphone", "iphoneos":
 							
 							target = Platform.IOS;
@@ -1162,6 +1167,11 @@ class CommandLineTools {
 			case "nodejs":
 				
 				target = PlatformHelper.hostPlatform;
+				targetFlags.set ("nodejs", "");
+				
+			case "android-nodejs":
+			
+				target = Platform.ANDROID;
 				targetFlags.set ("nodejs", "");
 			
 			case "iphone", "iphoneos":
