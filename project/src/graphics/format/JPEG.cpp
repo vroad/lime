@@ -266,16 +266,17 @@ namespace lime {
 				}
 				
 				manager.Set (data.Data (), data.Length ());
+				cinfo.src = &manager.pub;
 				
 			}
 			
 		} else {
 			
 			manager.Set (resource->data->Data (), resource->data->Length ());
+			cinfo.src = &manager.pub;
 			
 		}
 		
-		cinfo.src = &manager.pub;
 		bool decoded = false;
 		
 		if (jpeg_read_header (&cinfo, TRUE) == JPEG_HEADER_OK) {
