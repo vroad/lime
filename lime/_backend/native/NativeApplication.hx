@@ -151,6 +151,19 @@ class NativeApplication {
 	}
 	
 	
+	private function pause ():Void {
+		
+		AudioManager.suspend ();
+		
+	}
+	
+	
+	private function resume ():Void {
+		
+		AudioManager.resume ();
+		
+	}
+	
 	private function handleApplicationEvent ():Void {
 		
 		switch (applicationEventInfo.type) {
@@ -481,6 +494,7 @@ class NativeApplication {
 				case WINDOW_ACTIVATE:
 					
 					window.onActivate.dispatch ();
+					resume ();
 				
 				case WINDOW_CLOSE:
 					
@@ -490,6 +504,7 @@ class NativeApplication {
 				case WINDOW_DEACTIVATE:
 					
 					window.onDeactivate.dispatch ();
+					pause ();
 				
 				case WINDOW_ENTER:
 					

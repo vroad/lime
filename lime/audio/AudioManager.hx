@@ -77,7 +77,15 @@ class AudioManager {
 					
 					#if (cpp || neko || nodejs)
 					
-					alc.processContext (alc.getCurrentContext ());
+					var currentContext = alc.getCurrentContext ();
+					
+					if (currentContext != null) {
+						
+						var device = alc.getContextsDevice (currentContext);
+						ALC.resumeDevice (device);
+						alc.processContext (currentContext);
+						
+					}
 					
 					#end
 				
@@ -132,7 +140,15 @@ class AudioManager {
 					
 					#if (cpp || neko || nodejs)
 					
-					alc.suspendContext (alc.getCurrentContext ());
+					var currentContext = alc.getCurrentContext ();
+					
+					if (currentContext != null) {
+						
+						alc.suspendContext (currentContext);
+						var device = alc.getContextsDevice (currentContext);
+						ALC.pauseDevice (device);
+					
+					}
 					
 					#end
 				

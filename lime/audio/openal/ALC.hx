@@ -200,6 +200,23 @@ class ALC {
 	}
 	
 	
+	public static function pauseDevice (device:ALDevice):Void {
+		
+		#if ((cpp || neko || nodejs) && lime_openal && !macro)
+		lime_alc_device_pause_soft (device);
+		#end
+		
+	}
+	
+	public static function resumeDevice (device:ALDevice):Void {
+		
+		#if ((cpp || neko || nodejs) && lime_openal && !macro)
+		lime_alc_device_resume_soft (device);
+		#end
+ 		
+	}
+	
+	
 	#if ((cpp || neko || nodejs) && lime_openal && !macro)
 	@:cffi private static function lime_alc_close_device (device:CFFIPointer):Bool;
 	@:cffi private static function lime_alc_create_context (device:CFFIPointer, attrlist:Dynamic):CFFIPointer;
@@ -213,6 +230,8 @@ class ALC {
 	@:cffi private static function lime_alc_open_device (devicename:String):CFFIPointer;
 	@:cffi private static function lime_alc_process_context (context:CFFIPointer):Void;
 	@:cffi private static function lime_alc_suspend_context (context:CFFIPointer):Void;
+	@:cffi private static function lime_alc_device_pause_soft (device:CFFIPointer):Void;
+	@:cffi private static function lime_alc_device_resume_soft (device:CFFIPointer):Void;
 	#end
 	
 	
