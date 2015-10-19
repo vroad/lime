@@ -20,7 +20,11 @@ AudioBuffer can be loaded with streaming enabled. Currently limited to Ogg Vorbi
 
 Faster font rendering
 ---------------------
-Font class renders glyphs without copying many times.
+Font class can render glyphs without copying output buffer many times.
+
+Faster font loading on Android
+------------------------------
+Font class does not make copy of file content on loading.
 
 Better handling of native pointers
 ----------------------------------
@@ -31,15 +35,22 @@ Thread safety
 -------------
 Trying to make CFFI APIs thread safe by isolating string IDs.
 
-Window-mode vsync fix on Intel HD Graphics
-------------------------------
-SDL backend uses DwmFlush for vsync when vsync is not force-enabled.
+Windows Media Foundation (WMF) support
+--------------------------------------
+You can decode video with hardware acceleration and render into an texture. Currently limited to ANGLE.
 
-Other changes
+Crash fixes for Android
+-----------------------
+Fixed JPEG/PNG/Ogg loading issues on Android.
+
+AudioMix wakelock fix for Android
+---------------------------------
+Automatically stops audio processing when your app goes to background.
+
+Vsync is enabled on ANGLE
+---------------------
+SDL_GL_SetSwapInterval is enabled as it doesn't seem to have problems.
+
+Other notable changes
 -------------
-- Only call OpenAL functions on native
-- Do not use process.exit() on nodejs as it force closes the app
-- Do no load cairo functions if cairo is disabled
-- Cairo is disabled by default
-- Avoid crashing when opening a JPEG file fails
-- Do not define DYNAMIC_OGL when ANGLE is not enabled
+- Do not define DYNAMIC_OGL when ANGLE is not enabled, so that gDEBugger works
