@@ -88,10 +88,11 @@ class HTML5Renderer {
 				parent.context = OPENGL (cast GL.context);
 				#elseif !disable_gl_renderer
 				parent.context = OPENGL (new GLRenderContext ());
+				parent.type = OPENGL;
 				#else
 				parent.context = CUSTOM(null);
+				parent.type = null;
 				#end
-				parent.type = OPENGL;
 				
 			}
 			
