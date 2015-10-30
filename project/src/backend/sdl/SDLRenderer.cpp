@@ -1,5 +1,6 @@
 #include "SDLWindow.h"
 #include "SDLRenderer.h"
+#include "../../graphics/opengl/OpenGL.h"
 #include "../../graphics/opengl/OpenGLBindings.h"
 
 
@@ -36,14 +37,59 @@ namespace lime {
 		
 		sdlRenderer = SDL_CreateRenderer (sdlWindow, -1, sdlFlags);
 		
-		if (!sdlRenderer && (sdlFlags & SDL_RENDERER_ACCELERATED)) {
+		if (sdlFlags & SDL_RENDERER_ACCELERATED) {
 			
-			sdlFlags &= ~SDL_RENDERER_ACCELERATED;
-			sdlFlags &= ~SDL_RENDERER_PRESENTVSYNC;
+			if (sdlRenderer) {
+				
+				bool valid = false;
+				context = SDL_GL_GetCurrentContext ();
+				
+				if (context) {
+					
+					OpenGLBindings::Init ();
+					
+					#ifndef LIME_GLES
+					int version = 0;
+					glGetIntegerv (GL_MAJOR_VERSION, &version);
+					
+					if (version == 0) {
+						
+						float versionScan = 0;
+						sscanf ((const char*)glGetString (GL_VERSION), "%f", &versionScan);
+						version = versionScan;
+						
+					}
+					
+					if (version >= 2 || strstr ((const char*)glGetString (GL_VERSION), "OpenGL ES")) {
+						
+						valid = true;
+						
+					}
+					#else
+					valid = true;
+					#endif
+					
+				}
+				
+				if (!valid) {
+					
+					SDL_DestroyRenderer (sdlRenderer);
+					sdlRenderer = 0;
+					
+				}
+				
+			}
 			
-			sdlFlags |= SDL_RENDERER_SOFTWARE;
-			
-			sdlRenderer = SDL_CreateRenderer (sdlWindow, -1, sdlFlags);
+			if (!sdlRenderer) {
+				
+				sdlFlags &= ~SDL_RENDERER_ACCELERATED;
+				sdlFlags &= ~SDL_RENDERER_PRESENTVSYNC;
+				
+				sdlFlags |= SDL_RENDERER_SOFTWARE;
+				
+				sdlRenderer = SDL_CreateRenderer (sdlWindow, -1, sdlFlags);
+				
+			}
 			
 		}
 		
@@ -52,10 +98,6 @@ namespace lime {
 			printf ("Could not create SDL renderer: %s.\n", SDL_GetError ());
 			
 		}
-		
-		context = SDL_GL_GetCurrentContext ();
-		
-		OpenGLBindings::Init ();
 		
 	}
 	

@@ -115,6 +115,8 @@ namespace lime {
 				applicationEvent.deltaTime = currentUpdate - lastUpdate;
 				lastUpdate = currentUpdate;
 				
+				nextUpdate += framePeriod;
+				
 				while (nextUpdate <= currentUpdate) {
 					
 					nextUpdate += framePeriod;
@@ -722,7 +724,7 @@ namespace lime {
 		
 		#if (!defined (IPHONE) && !defined (EMSCRIPTEN))
 		
-		if (active && (firstTime || SDL_WaitEvent (&event))) {
+		if (active && (firstTime || WaitEvent (&event))) {
 			
 			firstTime = false;
 			
@@ -818,6 +820,25 @@ namespace lime {
 	void SDLApplication::UpdateFrame (void*) {
 		
 		UpdateFrame ();
+		
+	}
+	
+	
+	int SDLApplication::WaitEvent (SDL_Event *event) {
+		
+		for(;;) {
+			
+			SDL_PumpEvents ();
+			
+			switch (SDL_PeepEvents (event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT)) {
+				
+				case -1: return 0;
+				case 1: return 1;
+				default: SDL_Delay (1);
+				
+			}
+			
+		}
 		
 	}
 	
