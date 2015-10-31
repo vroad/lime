@@ -61,6 +61,18 @@ class BytesUtil
 		
 	}
 	
+	public static function getByteArrayFromAnonBytes (ab:AnonBytes):ByteArray {
+		
+		#if (js && haxe < 3.2)
+		return ByteArray.fromBytes (@:privateAccess new Bytes (ab.length, ab.b.buffer));
+		#elseif js
+		return ByteArray.fromBytes (@:privateAccess new Bytes (ab.b.buffer));
+		#else
+		return ByteArray.fromBytes (@:privateAccess new Bytes (ab.length, ab.b));
+		#end
+		
+	}
+	
 	public static function createBytes (length:Int, b:Dynamic):Bytes {
 		
 		#if ((js && haxe < 3.2) || !js)

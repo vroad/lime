@@ -62,7 +62,7 @@ class TextLayout {
 			
 			__bytes = lime_text_layout_position (__handle, font.src, size, text, __bytes);
 			
-			var __buffer = ByteArray.fromBytes (BytesUtil.createBytes (__bytes.length, __bytes.b));
+			var __buffer = BytesUtil.getByteArrayFromAnonBytes (__bytes);
 			__buffer.endian = "littleEndian";
 			
 			if (__buffer.length > 4) {
