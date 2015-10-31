@@ -900,8 +900,9 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 		
 		#if js
 		b = untyped __new__("Uint8Array", bytes.getData ());
+		allocated = b.length;
 		length = b.length;
-		allocated = length;
+		data = untyped __new__("DataView", b.buffer);
 		#else
 		b = bytes.b;
 		length = bytes.length;
@@ -1011,6 +1012,14 @@ class ByteArray #if !js extends Bytes implements ArrayAccess<Int> implements IDa
 	
 	#if js
 	private function ___resizeBuffer (len:Int):Void {
+		
+		if (len == 0) {
+			
+			this.b = null;
+			this.data = null;
+			return;
+			
+		}
 		
 		var oldByteView:Uint8Array = this.b;
 		var newByteView:Uint8Array = untyped __new__("Uint8Array", len);
