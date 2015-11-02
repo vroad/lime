@@ -34,15 +34,15 @@ import haxe.io.Path;
 class Font {
 	
 	
-	public var ascender (get, null):Int;
-	public var descender (get, null):Int;
-	public var height (get, null):Int;
+	public var ascender (get, null):Null<Int>;
+	public var descender (get, null):Null<Int>;
+	public var height (get, null):Null<Int>;
 	public var name (default, null):String;
-	public var numGlyphs (get, null):Int;
+	public var numGlyphs (get, null):Null<Int>;
 	public var src:Dynamic;
-	public var underlinePosition (get, null):Int;
-	public var underlineThickness (get, null):Int;
-	public var unitsPerEM (get, null):Int;
+	public var underlinePosition (get, null):Null<Int>;
+	public var underlineThickness (get, null):Null<Int>;
+	public var unitsPerEM (get, null):Null<Int>;
 	
 	@:noCompletion private var __fontPath:String;
 	#if (cpp || neko || nodejs)
@@ -283,7 +283,12 @@ class Font {
 	private function get_ascender ():Int {
 		
 		#if ((cpp || neko || nodejs) && !macro)
-		return lime_font_get_ascender (src);
+		if (ascender == null) {
+			
+			ascender = lime_font_get_ascender (src);
+			
+		}
+		return ascender;
 		#else
 		return 0;
 		#end
@@ -294,7 +299,12 @@ class Font {
 	private function get_descender ():Int {
 		
 		#if ((cpp || neko || nodejs) && !macro)
-		return lime_font_get_descender (src);
+		if (descender == null) {
+			
+			descender = lime_font_get_descender (src);
+			
+		}
+		return descender;
 		#else
 		return 0;
 		#end
@@ -305,7 +315,12 @@ class Font {
 	private function get_height ():Int {
 		
 		#if ((cpp || neko || nodejs) && !macro)
-		return lime_font_get_height (src);
+		if (height == null) {
+			
+			height = lime_font_get_height (src);
+			
+		}
+		return height;
 		#else
 		return 0;
 		#end
@@ -316,7 +331,12 @@ class Font {
 	private function get_numGlyphs ():Int {
 		
 		#if ((cpp || neko || nodejs) && !macro)
-		return lime_font_get_num_glyphs (src);
+		if (numGlyphs == null) {
+			
+			numGlyphs = lime_font_get_num_glyphs (src);
+			
+		}
+		return numGlyphs;
 		#else
 		return 0;
 		#end
@@ -327,7 +347,12 @@ class Font {
 	private function get_underlinePosition ():Int {
 		
 		#if ((cpp || neko || nodejs) && !macro)
-		return lime_font_get_underline_position (src);
+		if (underlinePosition == null) {
+			
+			return lime_font_get_underline_position (src);
+			
+		}
+		return underlinePosition;
 		#else
 		return 0;
 		#end
@@ -338,7 +363,12 @@ class Font {
 	private function get_underlineThickness ():Int {
 		
 		#if ((cpp || neko || nodejs) && !macro)
-		return lime_font_get_underline_thickness (src);
+		if (underlineThickness == null) {
+			
+			underlineThickness = lime_font_get_underline_thickness (src);
+			
+		}
+		return underlineThickness;
 		#else
 		return 0;
 		#end
@@ -349,7 +379,12 @@ class Font {
 	private function get_unitsPerEM ():Int {
 		
 		#if ((cpp || neko || nodejs) && !macro)
-		return lime_font_get_units_per_em (src);
+		if (unitsPerEM == null) {
+			
+			unitsPerEM = lime_font_get_units_per_em (src);
+			
+		}
+		return unitsPerEM;
 		#else
 		return 0;
 		#end
