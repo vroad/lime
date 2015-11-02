@@ -48,7 +48,6 @@ namespace lime {
 		font->SetSize (size);
 		
 		// reset buffer
-		hb_buffer_reset ((hb_buffer_t*)mBuffer);
 		hb_buffer_set_direction ((hb_buffer_t*)mBuffer, (hb_direction_t)mDirection);
 		hb_buffer_set_script ((hb_buffer_t*)mBuffer, (hb_script_t)mScript);
 		hb_buffer_set_language ((hb_buffer_t*)mBuffer, (hb_language_t)mLanguage);
@@ -96,6 +95,8 @@ namespace lime {
 			bytesPosition += glyphSize;
 			
 		}
+
+		hb_buffer_clear_contents ((hb_buffer_t*)mBuffer);
 		
 	}
 	
