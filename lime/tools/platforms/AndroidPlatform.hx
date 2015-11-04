@@ -228,7 +228,7 @@ class AndroidPlatform extends PlatformTarget {
 		
 		var context = project.templateContext;
 		context.CPP_DIR = targetDirectory + "/obj";
-		context.NODE_DIR = targetDirectory + "/bin/assets/ApplicationMain.js";
+		context.NODE_FILE = targetDirectory + "/bin/assets/ApplicationMain.js";
 		
 		var template = new Template (File.getContent (hxml));
 		
