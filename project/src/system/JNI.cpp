@@ -75,7 +75,6 @@ namespace lime {
 		}
 		
 		Object* obj = (Object*)val_to_kind (inValue, gObjectKind);
-		outObj = dynamic_cast<OBJ*> (obj);
 		return outObj;
 		
 	}
