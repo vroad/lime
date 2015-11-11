@@ -1,5 +1,6 @@
 package lime.graphics.cairo;
 
+import lime.utils.AnonBytes;
 import lime.utils.BytesUtil;
 
 import lime.system.CFFIPointer;
@@ -30,7 +31,7 @@ import lime.system.CFFIPointer;
 	}
 	
 	
-	public static function create (data:Dynamic, format:CairoFormat, width:Int, height:Int, stride:Int):CairoSurface {
+	public static function create (data:AnonBytes, format:CairoFormat, width:Int, height:Int, stride:Int):CairoSurface {
 		
 		#if (lime_cairo && !macro)
 		return lime_cairo_image_surface_create_for_data (data, format, width, height, stride);
@@ -44,7 +45,7 @@ import lime.system.CFFIPointer;
 	public static function fromImage (image:Image):CairoSurface {
 		
 		#if (lime_cairo && !macro)
-		return create (lime_bytes_get_data_pointer (BytesUtil.getAnonBytesFromTypedArray (image.data)), CairoFormat.ARGB32, image.width, image.height, image.buffer.stride);
+		return create (BytesUtil.getAnonBytesFromTypedArray (image.data), CairoFormat.ARGB32, image.width, image.height, image.buffer.stride);
 		#else
 		return null;
 		#end
@@ -122,9 +123,8 @@ import lime.system.CFFIPointer;
 	
 	
 	#if (lime_cairo && !macro)
-	@:cffi private static function lime_bytes_get_data_pointer (handle:Dynamic):Float;
 	@:cffi private static function lime_cairo_image_surface_create (format:Int, width:Int, height:Int):CFFIPointer;
-	@:cffi private static function lime_cairo_image_surface_create_for_data (data:Float, format:Int, width:Int, height:Int, stride:Int):CFFIPointer;
+	@:cffi private static function lime_cairo_image_surface_create_for_data (data:Dynamic, format:Int, width:Int, height:Int, stride:Int):CFFIPointer;
 	@:cffi private static function lime_cairo_image_surface_get_data (handle:CFFIPointer):Float;
 	@:cffi private static function lime_cairo_image_surface_get_format (handle:CFFIPointer):Int;
 	@:cffi private static function lime_cairo_image_surface_get_height (handle:CFFIPointer):Int;

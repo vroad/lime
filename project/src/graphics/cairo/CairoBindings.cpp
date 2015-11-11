@@ -589,13 +589,21 @@ namespace lime {
 	}
 	
 	
-	value lime_cairo_image_surface_create_for_data (double data, int format, int width, int height, int stride) {
+	value lime_cairo_image_surface_create_for_data (value inData, int format, int width, int height, int stride) {
 		
-		#ifndef LIME_NO_RAW_POINTER_ACCESS
-		return cairo_surface_t_to_value (cairo_image_surface_create_for_data ((unsigned char*)(intptr_t)data, (cairo_format_t)format, width, height, stride), true);
-		#else
-		return alloc_null ();
-		#endif
+		Bytes data (inData);
+		cairo_surface_t *surface = cairo_image_surface_create_for_data (data.Data (), (cairo_format_t)format, width, height, stride);
+		
+		if (!surface) {
+			
+			return alloc_null ();
+			
+		}
+		
+		AutoGCRoot *reference = new AutoGCRoot (inData);
+		cairo_surface_set_user_data (surface, &userData, reference, gc_user_data);
+		
+		return cairo_surface_t_to_value (surface, true);
 		
 	}
 	
