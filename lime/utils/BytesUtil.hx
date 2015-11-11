@@ -21,7 +21,7 @@ class BytesUtil
 		#if js
 		return {length:array.byteLength, b:array};
 		#else
-		return cast array;
+		return cast array.buffer;
 		#end
 		
 	}
