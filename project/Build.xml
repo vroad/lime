@@ -50,8 +50,6 @@
 		
 		<compilerflag value="-DUNICODE" if="windows"/>
 		
-		<compilerflag value="-std=c++11" if="android" />
-		
 		<compilerflag value="-Iinclude" />
 		
 		<file name="src/ExternalInterface.cpp" />
