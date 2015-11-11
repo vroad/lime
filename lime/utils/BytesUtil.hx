@@ -31,6 +31,8 @@ class BytesUtil
 		#if js
 		var u8a:UInt8Array = cast byteArray.b;
 		return u8a.toBytes ();
+		#elseif flash
+		return null;
 		#else
 		return byteArray;
 		#end
@@ -67,6 +69,8 @@ class BytesUtil
 		return ByteArray.fromBytes (@:privateAccess new Bytes (ab.length, ab.b.buffer));
 		#elseif js
 		return ByteArray.fromBytes (@:privateAccess new Bytes (ab.b.buffer));
+		#elseif flash
+		return null;
 		#else
 		return ByteArray.fromBytes (@:privateAccess new Bytes (ab.length, ab.b));
 		#end
