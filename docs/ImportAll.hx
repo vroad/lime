@@ -206,6 +206,9 @@ import lime.ui.Window;
 import lime.utils.ArrayBuffer;
 import lime.utils.ArrayBufferView;
 import lime.utils.ByteArray;
+#if codegen
+import lime.utils.BytesUtil;
+#end
 import lime.utils.DataView;
 import lime.utils.Float32Array;
 import lime.utils.Float64Array;
@@ -253,6 +256,7 @@ class ImportAll
 			exports.lime_audio_FlashAudioContext = lime_audio_FlashAudioContext;
 			exports.lime_audio_HTML5AudioContext = lime_audio_HTML5AudioContext;
 			exports.lime_audio_WebAudioContext = lime_audio_WebAudioContext;
+			exports.lime_graphics_cairo_Cairo = lime_graphics_cairo_Cairo;
 			exports.lime_graphics_format_BMP = lime_graphics_format_BMP;
 			exports.lime_graphics_format_JPEG = lime_graphics_format_JPEG;
 			exports.lime_graphics_format_PNG = lime_graphics_format_PNG;
@@ -321,6 +325,7 @@ class ImportAll
 			//exports.lime_utils_ArrayBuffer = lime_utils_ArrayBuffer;
 			//exports.lime_utils_ArrayBufferView = lime_utils_ArrayBufferView;
 			exports.lime_utils_ByteArray = lime_utils_ByteArray;
+			exports.lime_utils_BytesUtil = lime_utils_BytesUtil;
 			//exports.lime_utils_Float32Array = lime_utils_Float32Array;
 			exports.lime_utils_GLUtils = lime_utils_GLUtils;
 			exports.lime_utils_IDataInput = lime_utils_IDataInput;
