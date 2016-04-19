@@ -305,7 +305,7 @@ public class SDLActivity extends Activity {
         if (!SDLActivity.mIsPaused && SDLActivity.mIsSurfaceReady) {
             SDLActivity.mIsPaused = true;
             SDLActivity.nativePause();
-            mSurface.enableSensor(Sensor.TYPE_ACCELEROMETER, false);
+            mSurface.handlePause();
         }
     }
 
@@ -432,19 +432,11 @@ public class SDLActivity extends Activity {
     public static native void onNativeAccel(float x, float y, float z);
     public static native void onNativeSurfaceChanged();
     public static native void onNativeSurfaceDestroyed();
-    public static native void nativeFlipBuffers();
     public static native int nativeAddJoystick(int device_id, String name,
                                                int is_accelerometer, int nbuttons,
                                                int naxes, int nhats, int nballs);
     public static native int nativeRemoveJoystick(int device_id);
     public static native String nativeGetHint(String name);
-
-    /**
-     * This method is called by SDL using JNI.
-     */
-    public static void flipBuffers() {
-        SDLActivity.nativeFlipBuffers();
-    }
 
     /**
      * This method is called by SDL using JNI.
@@ -747,7 +739,7 @@ public class SDLActivity extends Activity {
 
         if (fileStream == null) {
             // calling "getInputStream" was successful but null was returned
-            throw new IOException("Could not open stream from APK expansion file");
+            throw new IOException("Could not find path in APK expansion file");
         }
 
         return fileStream;
@@ -1011,6 +1003,10 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         // Some arbitrary defaults to avoid a potential division by zero
         mWidth = 1.0f;
         mHeight = 1.0f;
+    }
+
+    public void handlePause() {
+        enableSensor(Sensor.TYPE_ACCELEROMETER, false);
     }
 
     public void handleResume() {

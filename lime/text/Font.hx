@@ -6,9 +6,6 @@ import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
 import lime.math.Vector2;
 import lime.system.System;
-import lime.utils.AnonBytes;
-import lime.utils.ByteArray;
-import lime.utils.BytesUtil;
 import lime.utils.UInt8Array;
 
 #if (js && html5)
@@ -49,6 +46,7 @@ class Font {
 	@:noCompletion private var __fontPathWithoutDirectory:String;
 	#end
 	
+	
 	public function new (name:String = null) {
 		
 		if (name != null) {
@@ -83,7 +81,7 @@ class Font {
 	}
 	
 	
-	public static function fromBytes (bytes:ByteArray):Font {
+	public static function fromBytes (bytes:Bytes):Font {
 		
 		var font = new Font ();
 		font.__fromBytes (bytes);
@@ -157,10 +155,12 @@ class Font {
 		
 		#if ((cpp || neko || nodejs) && !macro)
 		
-		lime_font_set_size (src, fontSize);
+		__setSize (fontSize);
 		
-		var bytes = new ByteArray (16);
-		bytes.endian = (System.endianness == BIG_ENDIAN ? "bigEndian" : "littleEndian");
+		var bytes = Bytes.alloc (0);
+		//bytes.endian = (System.endianness == BIG_ENDIAN ? "bigEndian" : "littleEndian");
+		
+		var dataPosition = 0;
 		var data:Dynamic = lime_font_render_glyph (src, glyph, bytes);
 		
 		if (data != null) {
@@ -188,7 +188,163 @@ class Font {
 	
 	public function renderGlyphs (glyphList:Array<Glyph>, fontSize:Int):Array<Image> {
 		
-		#if ((cpp || neko || nodejs) && !macro)
+		//#if ((cpp || neko || nodejs) && !macro)
+		//
+		//var uniqueGlyphs = new Map<Int, Bool> ();
+		//
+		//for (glyph in glyphs) {
+			//
+			//uniqueGlyphs.set (glyph, true);
+			//
+		//}
+		//
+		//var glyphList = [];
+		//
+		//for (key in uniqueGlyphs.keys ()) {
+			//
+			//glyphList.push (key);
+			//
+		//}
+		//
+		//lime_font_set_size (src, fontSize);
+		//
+		//var bytes = new ByteArray ();
+		//bytes.endian = (System.endianness == BIG_ENDIAN ? "bigEndian" : "littleEndian");
+		//
+		//if (lime_font_render_glyphs (src, glyphList, bytes)) {
+			//
+			//bytes.position = 0;
+			//
+			//var count = bytes.readUnsignedInt ();
+			//
+			//var bufferWidth = 128;
+			//var bufferHeight = 128;
+			//var offsetX = 0;
+			//var offsetY = 0;
+			//var maxRows = 0;
+			//
+			//var width, height;
+			//var i = 0;
+			//
+			//while (i < count) {
+				//
+				//bytes.position += 4;
+				//width = bytes.readUnsignedInt ();
+				//height = bytes.readUnsignedInt ();
+				//bytes.position += (4 * 2) + width * height;
+				//
+				//if (offsetX + width > bufferWidth) {
+					//
+					//offsetY += maxRows + 1;
+					//offsetX = 0;
+					//maxRows = 0;
+					//
+				//}
+				//
+				//if (offsetY + height > bufferHeight) {
+					//
+					//if (bufferWidth < bufferHeight) {
+						//
+						//bufferWidth *= 2;
+						//
+					//} else {
+						//
+						//bufferHeight *= 2;
+						//
+					//}
+					//
+					//offsetX = 0;
+					//offsetY = 0;
+					//maxRows = 0;
+					//
+					//// TODO: make this better
+					//
+					//bytes.position = 4;
+					//i = 0;
+					//continue;
+					//
+				//}
+				//
+				//offsetX += width + 1;
+				//
+				//if (height > maxRows) {
+					//
+					//maxRows = height;
+					//
+				//}
+				//
+				//i++;
+				//
+			//}
+			//
+			//var map = new Map<Int, Image> ();
+			//var buffer = new ImageBuffer (null, bufferWidth, bufferHeight, 8);
+			//var data = new ByteArray (bufferWidth * bufferHeight);
+			//
+			//bytes.position = 4;
+			//offsetX = 0;
+			//offsetY = 0;
+			//maxRows = 0;
+			//
+			//var index, x, y, image;
+			//
+			//for (i in 0...count) {
+				//
+				//index = bytes.readUnsignedInt ();
+				//width = bytes.readUnsignedInt ();
+				//height = bytes.readUnsignedInt ();
+				//x = bytes.readUnsignedInt ();
+				//y = bytes.readUnsignedInt ();
+				//
+				//if (offsetX + width > bufferWidth) {
+					//
+					//offsetY += maxRows + 1;
+					//offsetX = 0;
+					//maxRows = 0;
+					//
+				//}
+				//
+				//for (i in 0...height) {
+					//
+					//data.position = ((i + offsetY) * bufferWidth) + offsetX;
+					////bytes.readBytes (data, 0, width);
+					//
+					//for (x in 0...width) {
+						//
+						//var byte = bytes.readUnsignedByte ();
+						//data.writeByte (byte);
+						//
+					//}
+					//
+				//}
+				//
+				//image = new Image (buffer, offsetX, offsetY, width, height);
+				//image.x = x;
+				//image.y = y;
+				//
+				//map.set (index, image);
+				//
+				//offsetX += width + 1;
+				//
+				//if (height > maxRows) {
+					//
+					//maxRows = height;
+					//
+				//}
+				//
+			//}
+			//
+			//#if js
+			//buffer.data = data.byteView;
+			//#else
+			//buffer.data = new UInt8Array (data);
+			//#end
+			//
+			//return map;
+			//
+		//}
+		//
+		//#end
 		
 		lime_font_set_size (src, fontSize);
 		
@@ -231,7 +387,7 @@ class Font {
 		
 	}
 		
-	@:noCompletion private function __fromBytes (bytes:ByteArray):Void {
+	@:noCompletion private function __fromBytes (bytes:Bytes):Void {
 		
 		__fontPath = null;
 		
@@ -268,6 +424,15 @@ class Font {
 			
 		}
 		
+		#end
+		
+	}
+	
+	
+	@:noCompletion private function __setSize (size:Int):Void {
+		
+		#if ((cpp || neko || nodejs) && !macro)
+		lime_font_set_size (src, size);
 		#end
 		
 	}

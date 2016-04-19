@@ -293,7 +293,20 @@ class AndroidPlatform extends PlatformTarget {
 	
 	public override function update ():Void {
 		
-		//project = project.clone ();
+		project = project.clone ();
+		
+		for (asset in project.assets) {
+			
+			if (asset.embed && asset.sourcePath == "") {
+				
+				var path = PathHelper.combine (targetDirectory + "/obj/tmp", asset.targetPath);
+				PathHelper.mkdir (Path.directory (path));
+				FileHelper.copyAsset (asset, path);
+				asset.sourcePath = path;
+				
+			}
+			
+		}
 		
 		//initialize (project);
 		
@@ -349,7 +362,7 @@ class AndroidPlatform extends PlatformTarget {
 		context.NODE_FILE = targetDirectory + "/bin/assets/ApplicationMain.js";
 		context.ANDROID_INSTALL_LOCATION = project.config.getString ("android.install-location", "auto");
 		context.ANDROID_MINIMUM_SDK_VERSION = project.config.getInt ("android.minimum-sdk-version", 9);
-		context.ANDROID_TARGET_SDK_VERSION = project.config.getInt ("android.target-sdk-version", 16);
+		context.ANDROID_TARGET_SDK_VERSION = project.config.getInt ("android.target-sdk-version", 19);
 		context.ANDROID_EXTENSIONS = project.config.getArrayString ("android.extension");
 		context.ANDROID_PERMISSIONS = project.config.getArrayString ("android.permission", [ "android.permission.WAKE_LOCK", "android.permission.INTERNET", "android.permission.VIBRATE", "android.permission.ACCESS_NETWORK_STATE" ]);
 		context.ANDROID_LIBRARY_PROJECTS = [];

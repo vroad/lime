@@ -12,7 +12,7 @@ import lime.app.Future;
 import lime.audio.AudioBuffer;
 import lime.graphics.Image;
 import lime.text.Font;
-import lime.utils.ByteArray;
+import lime.utils.Bytes;
 
 /**
  * <p>The Assets class provides a cross-platform interface to access 
@@ -146,9 +146,9 @@ class Assets {
 	 * Gets an instance of an embedded binary asset
 	 * @usage		var bytes = Assets.getBytes("file.zip");
 	 * @param	id		The ID or asset path for the file
-	 * @return		A new ByteArray object
+	 * @return		A new Bytes object
 	 */
-	public static function getBytes (id:String):ByteArray {
+	public static function getBytes (id:String):Bytes {
 		
 		initialize ();
 		
@@ -168,13 +168,13 @@ class Assets {
 					
 				} else {
 					
-					trace ("[Assets] String or ByteArray asset \"" + id + "\" exists, but only asynchronously");
+					trace ("[Assets] String or Bytes asset \"" + id + "\" exists, but only asynchronously");
 					
 				}
 				
 			} else {
 				
-				trace ("[Assets] There is no String or ByteArray asset with an ID of \"" + id + "\"");
+				trace ("[Assets] There is no String or Bytes asset with an ID of \"" + id + "\"");
 				
 			}
 			
@@ -619,11 +619,11 @@ class Assets {
 	}
 	
 	
-	public static function loadBytes (id:String):Future<ByteArray> {
+	public static function loadBytes (id:String):Future<Bytes> {
 		
 		initialize ();
 		
-		var promise = new Promise<ByteArray> ();
+		var promise = new Promise<Bytes> ();
 		
 		#if (tools && !display)
 		
@@ -639,7 +639,7 @@ class Assets {
 				
 			} else {
 				
-				promise.error ("[Assets] There is no String or ByteArray asset with an ID of \"" + id + "\"");
+				promise.error ("[Assets] There is no String or Bytes asset with an ID of \"" + id + "\"");
 				
 			}
 			
@@ -914,7 +914,7 @@ class AssetLibrary {
 	}
 	
 	
-	public function getBytes (id:String):ByteArray {
+	public function getBytes (id:String):Bytes {
 		
 		return null;
 		
@@ -954,7 +954,7 @@ class AssetLibrary {
 			
 		} else {
 			
-			return bytes.readUTFBytes (bytes.length);
+			return bytes.getString (0, bytes.length);
 			
 		}
 		
@@ -995,9 +995,9 @@ class AssetLibrary {
 	}
 	
 	
-	public function loadBytes (id:String):Future<ByteArray> {
+	public function loadBytes (id:String):Future<Bytes> {
 		
-		return new Future<ByteArray> (function () return getBytes (id));
+		return new Future<Bytes> (function () return getBytes (id));
 		
 	}
 	
@@ -1028,7 +1028,7 @@ class AssetLibrary {
 					
 				} else {
 					
-					return bytes.readUTFBytes (bytes.length);
+					return bytes.getString (0, bytes.length);
 					
 				}
 				
@@ -1056,6 +1056,7 @@ class AssetCache {
 	public var enabled:Bool = true;
 	public var image:Map<String, Image>;
 	public var font:Map<String, Dynamic /*Font*/>;
+	public var version:Int;
 	
 	
 	public function new () {
@@ -1063,6 +1064,7 @@ class AssetCache {
 		audio = new Map<String, AudioBuffer> ();
 		font = new Map<String, Dynamic /*Font*/> ();
 		image = new Map<String, Image> ();
+		version = Std.int (Math.random () * 1000000);
 		
 	}
 	
@@ -1160,6 +1162,64 @@ class Assets {
 		return base64Encoder.encodeBytes (bytes).toString () + extension;
 		
 	}
+	
+	
+	macro public static function embedBytes ():Array<Field> {
+		
+		var fields = embedData (":file");
+		
+		#if lime_console
+		if (false) {
+		#else
+		if (fields != null) {
+		#end
+			
+			var constructor = macro {
+				
+				var bytes = haxe.Resource.getBytes (resourceName);
+				
+				super (bytes.length, bytes.b);
+				
+			};
+			
+			var args = [ { name: "length", opt: false, type: macro :Int }, { name: "bytesData", opt: false, type: macro :haxe.io.BytesData } ];
+			fields.push ({ name: "new", access: [ APublic ], kind: FFun({ args: args, expr: constructor, params: [], ret: null }), pos: Context.currentPos () });
+			
+		}
+		
+		return fields;
+		
+	}
+	
+	
+	macro public static function embedByteArray ():Array<Field> {
+		
+		var fields = embedData (":file");
+		
+		#if lime_console
+		if (false) {
+		#else
+		if (fields != null) {
+		#end
+			
+			var constructor = macro {
+				
+				super ();
+				
+				var bytes = haxe.Resource.getBytes (resourceName);
+				__fromBytes (bytes);
+				
+			};
+			
+			var args = [ { name: "length", opt: true, type: macro :Int, value: macro 0 } ];
+			fields.push ({ name: "new", access: [ APublic ], kind: FFun({ args: args, expr: constructor, params: [], ret: null }), pos: Context.currentPos () });
+			
+		}
+		
+		return fields;
+		
+	}
+	
 	
 	#if lime_console
 	
@@ -1277,34 +1337,6 @@ class Assets {
 	#end
 	
 	
-	macro public static function embedFile ():Array<Field> {
-		
-		var fields = embedData (":file");
-		
-		if (fields != null) {
-			
-			var constructor = macro { 
-				
-				super();
-				
-				#if lime_console
-				throw "not implemented";
-				#else
-				__fromBytes (haxe.Resource.getBytes (resourceName));
-				#end
-				
-			};
-			
-			var args = [ { name: "size", opt: true, type: macro :Int, value: macro 0 } ];
-			fields.push ({ name: "new", access: [ APublic ], kind: FFun({ args: args, expr: constructor, params: [], ret: null }), pos: Context.currentPos() });
-			
-		}
-		
-		return fields;
-		
-	}
-	
-	
 	macro public static function embedFont ():Array<Field> {
 		
 		var fields = null;
@@ -1375,7 +1407,7 @@ class Assets {
 				
 				super ();
 				
-				__fromBytes (lime.utils.ByteArray.fromBytes (haxe.Resource.getBytes (resourceName)));
+				__fromBytes (haxe.Resource.getBytes (resourceName));
 				
 			};
 			
@@ -1442,8 +1474,7 @@ class Assets {
 				#if lime_console
 				throw "not implemented";
 				#else
-				var byteArray = lime.utils.ByteArray.fromBytes (haxe.Resource.getBytes (resourceName));
-				__fromBytes (byteArray, null);
+				__fromBytes (haxe.Resource.getBytes (resourceName), null);
 				#end
 				
 				#end

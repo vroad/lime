@@ -33,6 +33,18 @@ class BlackBerryPlatform extends PlatformTarget {
 		
 		super (command, _project, targetFlags);
 		
+		if (!project.targetFlags.exists ("html5")) {
+			
+			targetDirectory = project.app.path + "/blackberry/cpp";
+			outputFile = targetDirectory + "/bin/" + PathHelper.safeFileName (project.app.file);
+			
+		} else {
+			
+			targetDirectory = project.app.path + "/blackberry/html5";
+			outputFile = targetDirectory + "/src/" + project.app.file + ".js";
+			
+		}
+		
 		if (command != "display" && command != "clean") {
 			
 			project = project.clone ();
@@ -40,18 +52,6 @@ class BlackBerryPlatform extends PlatformTarget {
 			if (!project.environment.exists ("BLACKBERRY_SETUP")) {
 				
 				LogHelper.error ("You need to run \"lime setup blackberry\" before you can use the BlackBerry target");
-				
-			}
-			
-			if (!project.targetFlags.exists ("html5")) {
-				
-				targetDirectory = project.app.path + "/blackberry/cpp";
-				outputFile = targetDirectory + "/bin/" + PathHelper.safeFileName (project.app.file);
-				
-			} else {
-				
-				targetDirectory = project.app.path + "/blackberry/html5";
-				outputFile = targetDirectory + "/src/" + project.app.file + ".js";
 				
 			}
 			
@@ -259,8 +259,21 @@ class BlackBerryPlatform extends PlatformTarget {
 	
 	public override function update ():Void {
 		
-		//project = project.clone ();
+		project = project.clone ();
 		//initialize (project);
+		
+		for (asset in project.assets) {
+			
+			if (asset.embed && asset.sourcePath == "") {
+				
+				var path = PathHelper.combine (targetDirectory + "/obj/tmp", asset.targetPath);
+				PathHelper.mkdir (Path.directory (path));
+				FileHelper.copyAsset (asset, path);
+				asset.sourcePath = path;
+				
+			}
+			
+		}
 		
 		if (!project.targetFlags.exists ("html5")) {
 			

@@ -438,6 +438,20 @@ class CommandLineTools {
 			
 		}
 		
+		if (path == "") {
+			
+			if (FileSystem.exists ("tools.n")) {
+				
+				path = PathHelper.combine (Sys.getCwd (), "../");
+				
+			} else if (FileSystem.exists ("run.n")) {
+				
+				path = Sys.getCwd ();
+				
+			}
+			
+		}
+		
 		process.close ();
 		path += "/ndll/";
 		
@@ -525,15 +539,15 @@ class CommandLineTools {
 				args = args.concat (additionalArguments);
 				
 			}
-
-			if (exeExists) {
-
-				ProcessHelper.runCommand ("", exePath, args);
-
-			} else {
 			
+			if (exeExists) {
+				
+				ProcessHelper.runCommand ("", exePath, args);
+				
+			} else {
+				
 				ProcessHelper.runCommand ("", "haxelib", ["run", handler].concat (args));
-
+				
 			}
 			
 			try {
@@ -606,6 +620,7 @@ class CommandLineTools {
 			
 			if (platform != null) {
 				
+				platform.traceEnabled = traceEnabled;
 				platform.execute (additionalArguments);
 				
 			} else {
@@ -1295,7 +1310,7 @@ class CommandLineTools {
 			
 		}
 		
-		if (project == null || (command != "rebuild" && project.sources.length == 0)) {
+		if (project == null || (command != "rebuild" && project.sources.length == 0 && !FileSystem.exists (project.app.main + ".hx"))) {
 			
 			LogHelper.error ("You must have a \"project.xml\" file or specify another valid project file when using the '" + command + "' command");
 			return null;
@@ -1422,12 +1437,13 @@ class CommandLineTools {
 	private function processArguments ():Void {
 		
 		var arguments = Sys.args ();
+		var runFromHaxelib = false;
 		
 		if (arguments.length > 0) {
 			
 			// When the command-line tools are called from haxelib, 
 			// the last argument is the project directory and the
-			// path to NME is the current working directory 
+			// path to Lime is the current working directory 
 			
 			var lastArgument = "";
 			
@@ -1449,6 +1465,25 @@ class CommandLineTools {
 			if (FileSystem.exists (lastArgument) && FileSystem.isDirectory (lastArgument)) {
 				
 				Sys.setCwd (lastArgument);
+				runFromHaxelib = true;
+				
+			} else {
+				
+				arguments.push (lastArgument);
+				
+			}
+			
+		}
+		
+		if (!runFromHaxelib) {
+			
+			if (FileSystem.exists ("tools.n")) {
+				
+				PathHelper.haxelibOverrides.set ("lime", PathHelper.combine (Sys.getCwd (), "../"));
+				
+			} else if (FileSystem.exists ("run.n")) {
+				
+				PathHelper.haxelibOverrides.set ("lime", Sys.getCwd ());
 				
 			}
 			
@@ -1633,14 +1668,18 @@ class CommandLineTools {
 					
 					if (argument.substr (0, 4) == "-arm") {
 						
-						var name = argument.substr (1).toUpperCase ();
-						var value = Type.createEnum (Architecture, name);
-						
-						if (value != null) {
+						try {
 							
-							overrides.architectures.push (value);
+							var name = argument.substr (1).toUpperCase ();
+							var value = Type.createEnum (Architecture, name);
 							
-						}
+							if (value != null) {
+								
+								overrides.architectures.push (value);
+								
+							}
+							
+						} catch (e:Dynamic) {}
 						
 					} else if (argument == "-64") {
 						
@@ -1702,15 +1741,15 @@ class CommandLineTools {
 				
 				LogHelper.info ("", LogHelper.accentColor + "Using publishing target: FIREFOX MARKETPLACE" + LogHelper.resetColor);
 				
-				if (FirefoxMarketplace.isValid (project)) {
-					
-					buildProject (project, "build");
-					
-					LogHelper.info ("", "\n" + LogHelper.accentColor + "Running command: PUBLISH" + LogHelper.resetColor);
-					
-					FirefoxMarketplace.publish (project);
-					
-				}
+				//if (FirefoxMarketplace.isValid (project)) {
+					//
+					//buildProject (project, "build");
+					//
+					//LogHelper.info ("", "\n" + LogHelper.accentColor + "Running command: PUBLISH" + LogHelper.resetColor);
+					//
+					//FirefoxMarketplace.publish (project);
+					//
+				//}
 			
 		}
 		

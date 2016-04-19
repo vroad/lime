@@ -59,7 +59,11 @@ class Module implements IModule {
 	 * Called when a gamepad is connected
 	 * @param	gamepad	The gamepad that was connected
 	 */
-	public function onGamepadConnect (gamepad:Gamepad):Void { }
+	public function onGamepadConnect (gamepad:Gamepad):Void {
+		
+		trace ("onGamepadConnect (module)");
+		
+	}
 	
 	
 	/**
@@ -293,6 +297,13 @@ class Module implements IModule {
 	 * @param	window	The window dispatching the event
 	 */
 	public function onWindowDeactivate (window:Window):Void { }
+	
+	
+	/**
+	 * Called when a window drop file event is fired
+	 * @param	window	The window dispatching the event
+	 */
+	public function onWindowDropFile (window:Window, file:String):Void { }
 	
 	
 	/**

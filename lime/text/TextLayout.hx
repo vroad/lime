@@ -3,7 +3,6 @@ package lime.text;
 import haxe.io.Bytes;
 import lime.math.Vector2;
 import lime.system.System;
-import lime.utils.ByteArray;
 import lime.utils.BytesUtil;
 
 #if !macro
@@ -27,7 +26,7 @@ class TextLayout {
 	
 	private var __dirty:Bool;
 	
-	@:noCompletion private var __bytes:Dynamic;
+	@:noCompletion private var __bytes:Bytes;
 	@:noCompletion private var __direction:TextDirection;
 	@:noCompletion private var __handle:Dynamic;
 	@:noCompletion private var __language:String;
@@ -62,23 +61,20 @@ class TextLayout {
 			
 			__bytes = lime_text_layout_position (__handle, font.src, size, text, __bytes);
 			
-			var __buffer = BytesUtil.getByteArrayFromAnonBytes (__bytes);
-			__buffer.endian = "littleEndian";
+			var __buffer = BytesUtil.getBytesFromAnonBytes (__bytes);
 			
 			if (__buffer.length > 4) {
 				
-				__buffer.position = 0;
-				
-				var count = __buffer.readUnsignedInt ();
+				var count = __buffer.getInt32 (position); position += 4;
 				var index, advanceX, advanceY, offsetX, offsetY;
 				
 				for (i in 0...count) {
 					
-					index = __buffer.readUnsignedInt ();
-					advanceX = __buffer.readFloat ();
-					advanceY = __buffer.readFloat ();
-					offsetX = __buffer.readFloat ();
-					offsetY = __buffer.readFloat ();
+					index = __buffer.getInt32 (position); position += 4;
+					advanceX = __buffer.getFloat (position); position += 4;
+					advanceY = __buffer.getFloat (position); position += 4;
+					offsetX = __buffer.getFloat (position); position += 4;
+					offsetY = __buffer.getFloat (position); position += 4;
 					
 					positions.push (new GlyphPosition (index, new Vector2 (advanceX, advanceY), new Vector2 (offsetX, offsetY)));
 					

@@ -20,7 +20,6 @@ import lime.math.Rectangle;
 import lime.math.Vector2;
 import lime.system.CFFI;
 import lime.utils.ArrayBuffer;
-import lime.utils.ByteArray;
 import lime.utils.BytesUtil;
 import lime.utils.UInt8Array;
 
@@ -32,6 +31,7 @@ import js.Browser;
 #elseif flash
 import flash.display.BitmapData;
 import flash.geom.Matrix;
+import flash.utils.ByteArray;
 #end
 
 #if format
@@ -346,7 +346,7 @@ class Image {
 	}
 	
 	
-	public function encode (format:String = "png", quality:Int = 90):ByteArray {
+	public function encode (format:String = "png", quality:Int = 90):Bytes {
 		
 		switch (format) {
 			
@@ -460,7 +460,11 @@ class Image {
 	}
 	
 	
-	public static function fromBitmapData (bitmapData:#if flash BitmapData #else Dynamic #end):Image {
+	#if flash
+	public static function fromBitmapData (bitmapData:BitmapData):Image {
+	#else
+	public static function fromBitmapData (bitmapData:Dynamic):Image {
+	#end
 		
 		if (bitmapData == null) return null;
 		#if flash
@@ -474,7 +478,7 @@ class Image {
 	}
 	
 	
-	public static function fromBytes (bytes:ByteArray, onload:Image -> Void = null):Image {
+	public static function fromBytes (bytes:Bytes, onload:Image -> Void = null):Image {
 		
 		if (bytes == null) return null;
 		var image = new Image ();
@@ -484,7 +488,11 @@ class Image {
 	}
 	
 	
-	public static function fromCanvas (canvas:#if (js && html5) CanvasElement #else Dynamic #end):Image {
+	#if (js && html5)
+	public static function fromCanvas (canvas:CanvasElement):Image {
+	#else
+	public static function fromCanvas (canvas:Dynamic):Image {
+	#end
 		
 		if (canvas == null) return null;
 		var buffer = new ImageBuffer (null, canvas.width, canvas.height);
@@ -503,7 +511,11 @@ class Image {
 	}
 	
 	
-	public static function fromImageElement (image:#if (js && html5) ImageElement #else Dynamic #end):Image {
+	#if (js && html5)
+	public static function fromImageElement (image:ImageElement):Image {
+	#else
+	public static function fromImageElement (image:Dynamic):Image {
+	#end
 		
 		if (image == null) return null;
 		var buffer = new ImageBuffer (null, image.width, image.height);
@@ -620,7 +632,7 @@ class Image {
 	}
 	
 	
-	public function getPixels (rect:Rectangle, format:PixelFormat = null):ByteArray {
+	public function getPixels (rect:Rectangle, format:PixelFormat = null):Bytes {
 		
 		if (buffer == null) return null;
 		
@@ -640,8 +652,9 @@ class Image {
 			
 			case FLASH:
 				
+				#if flash
 				rect.offset (offsetX, offsetY);
-				var byteArray = buffer.__srcBitmapData.getPixels (rect.__toFlashRectangle ());
+				var byteArray:ByteArray = buffer.__srcBitmapData.getPixels (rect.__toFlashRectangle ());
 				
 				switch (format) {
 					
@@ -678,7 +691,10 @@ class Image {
 					
 				}
 				
-				return cast byteArray;
+				return Bytes.ofData (byteArray);
+				#else
+				return null;
+				#end
 			
 			default:
 				
@@ -865,7 +881,7 @@ class Image {
 	}
 	
 	
-	public function setPixels (rect:Rectangle, byteArray:ByteArray, format:PixelFormat = null):Void {
+	public function setPixels (rect:Rectangle, bytes:Bytes, format:PixelFormat = null):Void {
 		
 		rect = __clipRect (rect);
 		if (buffer == null || rect == null) return;
@@ -874,7 +890,7 @@ class Image {
 			
 			case CANVAS:
 				
-				ImageCanvasUtil.setPixels (this, rect, byteArray, format);
+				ImageCanvasUtil.setPixels (this, rect, bytes, format);
 			
 			case DATA:
 				
@@ -882,18 +898,20 @@ class Image {
 				ImageCanvasUtil.convertToData (this);
 				#end
 				
-				ImageDataUtil.setPixels (this, rect, byteArray, format);
+				ImageDataUtil.setPixels (this, rect, bytes, format);
 			
 			case FLASH:
 				
+				#if flash
 				rect.offset (offsetX, offsetY);
+				var byteArray = new ByteArray ();
 				
 				switch (format) {
 					
 					case ARGB32: // do nothing
 					case BGRA32:
 						
-						var srcData = byteArray;
+						var srcData:ByteArray = bytes.getData ();
 						byteArray = new ByteArray ();
 						#if flash
 						byteArray.length = srcData.length;
@@ -914,7 +932,7 @@ class Image {
 					
 					default:
 						
-						var srcData = byteArray;
+						var srcData = bytes.getData ();
 						byteArray = new ByteArray ();
 						#if flash
 						byteArray.length = srcData.length;
@@ -936,6 +954,7 @@ class Image {
 				}
 				
 				buffer.__srcBitmapData.setPixels (rect.__toFlashRectangle (), byteArray);
+				#end
 			
 			default:
 			
@@ -944,7 +963,53 @@ class Image {
 	}
 	
 	
-	private static function __base64Encode (bytes:ByteArray):String {
+	public function threshold (sourceImage:Image, sourceRect:Rectangle, destPoint:Vector2, operation:String, threshold:Int, color:Int = 0x00000000, mask:Int = 0xFFFFFFFF, copySource:Bool = false, format:PixelFormat = null):Int {
+		
+		if (buffer == null || sourceImage == null || sourceRect == null) return 0;
+		
+		switch (type) {
+			
+			case CANVAS, DATA:
+				
+				#if (js && html5)
+				ImageCanvasUtil.convertToData (this);
+				#end
+				
+				return ImageDataUtil.threshold (this, sourceImage, sourceRect, destPoint, operation, threshold, color, mask, copySource, format);
+			
+			case FLASH:
+				
+				var _color:ARGB = switch (format) {
+					
+					case ARGB32: color;
+					case BGRA32: (color:BGRA);
+					default: (color:RGBA);
+					
+				}
+				
+				var _mask:ARGB = switch (format) {
+					
+					case ARGB32: mask;
+					case BGRA32: (mask:BGRA);
+					default: (mask:RGBA);
+					
+				}
+				
+				sourceRect.offset (sourceImage.offsetX, sourceImage.offsetY);
+				destPoint.offset (offsetX, offsetY);
+				
+				return buffer.__srcBitmapData.threshold (sourceImage.buffer.src, sourceRect.__toFlashRectangle (), destPoint.__toFlashPoint (), operation, threshold, _color, _mask, copySource);
+				
+			default:
+			
+		}
+		
+		return 0;
+		
+	}
+	
+	
+	private static function __base64Encode (bytes:Bytes):String {
 		
 		#if (js && html5)
 			
@@ -962,7 +1027,7 @@ class Image {
 				
 			}
 			
-			return __base64Encoder.encodeBytes (Bytes.ofData (cast bytes.b)).toString () + extension;
+			return __base64Encoder.encodeBytes (bytes).toString () + extension;
 			
 		#else
 		
@@ -1020,6 +1085,7 @@ class Image {
 		
 		#if (js && html5)
 		var image = new JSImage ();
+		image.crossOrigin = "Anonymous";
 		
 		var image_onLoaded = function (event) {
 			
@@ -1046,7 +1112,7 @@ class Image {
 	}
 	
 	
-	private function __fromBytes (bytes:ByteArray, onload:Image -> Void):Void {
+	private function __fromBytes (bytes:Bytes, onload:Image -> Void):Void {
 		
 		#if (js && html5)
 			
@@ -1066,7 +1132,7 @@ class Image {
 				
 			} else {
 				
-				throw "Image tried to read a PNG/JPG ByteArray, but found an invalid header.";
+				throw "Image tried to read PNG/JPG Bytes, but found an invalid header.";
 				
 			}
 			
@@ -1106,6 +1172,7 @@ class Image {
 		#if (js && html5)
 			
 			var image = new JSImage ();
+			image.crossOrigin = "Anonymous";
 			
 			image.onload = function (_) {
 				
@@ -1184,7 +1251,7 @@ class Image {
 				
 				#end
 				
-				var array = new UInt8Array (ByteArray.fromBytes (Bytes.ofData (cast data)));
+				var array = new UInt8Array (Bytes.ofData (cast data));
 				buffer = new ImageBuffer (array, w, h);
 				buffer.format = BGRA32;
 				
@@ -1293,29 +1360,25 @@ class Image {
 	}
 	
 	
-	private static function __isJPG (bytes:ByteArray) {
+	private static function __isJPG (bytes:Bytes) {
 		
-		bytes.position = 0;
-		return bytes.readUnsignedByte () == 0xFF && bytes.readUnsignedByte () == 0xD8;
-		
-	}
-	
-	
-	private static function __isPNG (bytes:ByteArray) {
-		
-		bytes.position = 0;
-		return (bytes.readUnsignedByte () == 0x89 && bytes.readUnsignedByte () == 0x50 && bytes.readUnsignedByte () == 0x4E && bytes.readUnsignedByte () == 0x47 && bytes.readUnsignedByte () == 0x0D && bytes.readUnsignedByte () == 0x0A && bytes.readUnsignedByte () == 0x1A && bytes.readUnsignedByte () == 0x0A);
+		return bytes.get (0) == 0xFF && bytes.get (1) == 0xD8;
 		
 	}
 	
-	private static function __isGIF (bytes:ByteArray) {
+	
+	private static function __isPNG (bytes:Bytes) {
 		
-		bytes.position = 0;
+		return (bytes.get (0) == 0x89 && bytes.get (1) == 0x50 && bytes.get (2) == 0x4E && bytes.get (3) == 0x47 && bytes.get (4) == 0x0D && bytes.get (5) == 0x0A && bytes.get (6) == 0x1A && bytes.get (7) == 0x0A);
 		
-		if (bytes.readUnsignedByte () == 0x47 && bytes.readUnsignedByte () == 0x49 && bytes.readUnsignedByte () == 0x46 && bytes.readUnsignedByte () == 0x38) {
+	}
+	
+	private static function __isGIF (bytes:Bytes) {
+		
+		if (bytes.get (0) == 0x47 && bytes.get (1) == 0x49 && bytes.get (2) == 0x46 && bytes.get (3) == 0x38) {
 			
-			var b = bytes.readUnsignedByte ();
-			return ((b == 0x37 || b == 0x39) && bytes.readUnsignedByte () == 0x61);
+			var b = bytes.get (4);
+			return ((b == 0x37 || b == 0x39) && bytes.get (5) == 0x61);
 			
 		}
 		
@@ -1553,7 +1616,6 @@ class Image {
 	
 	
 	#if ((cpp || neko || nodejs) && !macro)
-	@:cffi private static function lime_image_encode (buffer:Dynamic, Type:Int, quality:Int):Dynamic;
 	@:cffi private static function lime_image_load (data:Dynamic):Dynamic;
 	#end
 	

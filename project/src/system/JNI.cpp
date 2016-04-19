@@ -1726,6 +1726,7 @@ namespace lime {
 		value CallStatic (value inArgs) {
 			
 			JNIEnv *env = (JNIEnv*)JNI::GetEnv ();
+			env->PushLocalFrame(128);
 			jvalue jargs[MAX];
 			
 			if (!HaxeToJNIArgs (env, inArgs, jargs)) {
@@ -1803,6 +1804,7 @@ namespace lime {
 			
 			CleanStringArgs ();
 			CheckException (env);
+			env->PopLocalFrame(NULL);
 			return result;
 			
 		}

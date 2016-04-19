@@ -1,9 +1,6 @@
 package lime.tools.helpers;
 
 
-#if lime
-import lime.utils.ByteArray;
-#end
 import haxe.crypto.BaseCode;
 import haxe.io.Bytes;
 
@@ -18,9 +15,7 @@ class StringHelper {
 	private static var uuidChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	
 	
-	#if lime
-	
-	public static function base64Decode (base64:String):ByteArray {
+	public static function base64Decode (base64:String):Bytes {
 		
 		base64 = StringTools.trim (base64);
 		base64 = StringTools.replace (base64, "=", "");
@@ -32,12 +27,12 @@ class StringHelper {
 		}
 		
 		var bytes = base64Encoder.decodeBytes (Bytes.ofString (base64));
-		return ByteArray.fromBytes (bytes);
+		return bytes;
 		
 	}
 	
 	
-	public static function base64Encode (bytes:ByteArray):String {
+	public static function base64Encode (bytes:Bytes):String {
 		
 		var extension = switch (bytes.length % 3) {
 			
@@ -56,23 +51,6 @@ class StringHelper {
 		return base64Encoder.encodeBytes (bytes).toString () + extension;
 		
 	}
-	
-	#else
-	
-	public static function base64Decode (base64:String):haxe.io.Bytes {
-		
-		return null;
-		
-	}
-	
-	
-	public static function base64Encode (bytes:haxe.io.Bytes):String {
-		
-		return null;
-		
-	}
-	
-	#end
 	
 	
 	public static function formatArray (array:Array <Dynamic>):String {
@@ -114,6 +92,7 @@ class StringHelper {
 		var isAlpha = ~/[A-Z0-9]/i;
 		var variableName = "";
 		var lastWasUpperCase = false;
+		var lastWasAlpha = true;
 		
 		for (i in 0...name.length) {
 			
@@ -123,6 +102,7 @@ class StringHelper {
 				
 				variableName += "_";
 				lastWasUpperCase = false;
+				lastWasAlpha = false;
 				
 			} else {
 				
@@ -140,9 +120,13 @@ class StringHelper {
 							
 						}
 						
-					} else {
+					} else if (lastWasAlpha) {
 						
 						variableName += "_" + char;
+						
+					} else {
+						
+						variableName += char;
 						
 					}
 					
@@ -151,9 +135,11 @@ class StringHelper {
 				} else {
 					
 					variableName += char.toUpperCase ();
-					lastWasUpperCase = false;
+					lastWasUpperCase = i == 0 && char == char.toUpperCase ();
 					
 				}
+				
+				lastWasAlpha = true;
 				
 			}
 			

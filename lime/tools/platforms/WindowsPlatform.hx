@@ -133,6 +133,8 @@ class WindowsPlatform extends PlatformTarget {
 			var haxeArgs = [ hxml ];
 			var flags = [];
 			
+			flags.push ("-DHXCPP_M32");
+			
 			if (!project.environment.exists ("SHOW_CONSOLE")) {
 				
 				haxeArgs.push ("-D");
@@ -272,6 +274,19 @@ class WindowsPlatform extends PlatformTarget {
 		if (project.targetFlags.exists ("xml")) {
 			
 			project.haxeflags.push ("-xml " + targetDirectory + "/types.xml");
+			
+		}
+		
+		for (asset in project.assets) {
+			
+			if (asset.embed && asset.sourcePath == "") {
+				
+				var path = PathHelper.combine (targetDirectory + "/obj/tmp", asset.targetPath);
+				PathHelper.mkdir (Path.directory (path));
+				FileHelper.copyAsset (asset, path);
+				asset.sourcePath = path;
+				
+			}
 			
 		}
 		

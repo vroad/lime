@@ -28,6 +28,7 @@
 #include <system/System.h>
 #include <text/Font.h>
 #include <text/TextLayout.h>
+#include <ui/DropEvent.h>
 #include <ui/FileDialog.h>
 #include <ui/Gamepad.h>
 #include <ui/GamepadEvent.h>
@@ -287,6 +288,7 @@ namespace lime {
 		
 		AudioBuffer audioBuffer;
 		Resource resource;
+		Bytes bytes;
 		
 		if (val_is_string (data)) {
 			
@@ -294,7 +296,7 @@ namespace lime {
 			
 		} else {
 			
-			Bytes bytes (data);
+			bytes = Bytes (data);
 			resource = Resource (&bytes);
 			
 		}
@@ -409,7 +411,13 @@ namespace lime {
 		
 		if (Clipboard::HasText ()) {
 			
-			return alloc_string (Clipboard::GetText ());
+			const char* text = Clipboard::GetText ();
+			value _text = alloc_string (text);
+			
+			// TODO: Should we free for all backends? (SDL requires it)
+			
+			free ((char*)text);
+			return _text;
 			
 		} else {
 			
@@ -427,11 +435,52 @@ namespace lime {
 	}
 	
 	
+	void lime_drop_event_manager_register (value callback, value eventObject) {
+		
+		DropEvent::callback = new AutoGCRoot (callback);
+		DropEvent::eventObject = new AutoGCRoot (eventObject);
+		
+	}
+	
+	
+	value lime_file_dialog_open_directory (HxString filter, HxString defaultPath) {
+		
+		#ifdef LIME_NFD
+		const char* path = FileDialog::OpenDirectory (filter.__s, defaultPath.__s);
+		
+		if (path) {
+			
+			value _path = alloc_string (path);
+			free ((char*) path);
+			return _path;
+			
+		} else {
+			
+			return alloc_null ();
+			
+		}
+		#endif
+		
+		return 0;
+		
+	}
+	
 	value lime_file_dialog_open_file (HxString filter, HxString defaultPath) {
 		
 		#ifdef LIME_NFD
 		const char* path = FileDialog::OpenFile (filter.__s, defaultPath.__s);
-		return path ? alloc_string (path) : alloc_null ();
+		
+		if (path) {
+			
+			value _path = alloc_string (path);
+			free ((char*) path);
+			return _path;
+			
+		} else {
+			
+			return alloc_null ();
+			
+		}
 		#endif
 		
 		return 0;
@@ -450,6 +499,7 @@ namespace lime {
 		for (int i = 0; i < files.size (); i++) {
 			
 			val_array_set_i (result, i, alloc_string (files[i]));
+			free ((char*)files[i]);
 			
 		}
 		#else
@@ -465,7 +515,18 @@ namespace lime {
 		
 		#ifdef LIME_NFD
 		const char* path = FileDialog::SaveFile (filter.__s, defaultPath.__s);
-		return path ? alloc_string (path) : alloc_null ();
+		
+		if (path) {
+			
+			value _path = alloc_string (path);
+			free ((char*) path);
+			return _path;
+			
+		} else {
+			
+			return alloc_null ();
+			
+		}
 		#endif
 		
 		return 0;
@@ -622,6 +683,7 @@ namespace lime {
 		
 		#ifdef LIME_FREETYPE
 		Resource resource;
+		Bytes bytes;
 		
 		if (val_is_string (data)) {
 			
@@ -629,7 +691,7 @@ namespace lime {
 			
 		} else {
 			
-			Bytes bytes (data);
+			bytes.Set (data);
 			resource = Resource (&bytes);
 			
 		}
@@ -799,6 +861,7 @@ namespace lime {
 		
 		ImageBuffer buffer;
 		Resource resource;
+		Bytes bytes;
 		
 		if (val_is_string (data)) {
 			
@@ -806,7 +869,7 @@ namespace lime {
 			
 		} else {
 			
-			Bytes bytes (data);
+			bytes.Set (data);
 			resource = Resource (&bytes);
 			
 		}
@@ -953,6 +1016,18 @@ namespace lime {
 		
 	}
 	
+	int lime_image_data_util_threshold (value image, value sourceImage, value sourceRect, value destPoint, int operation, int thresholdRG, int thresholdBA, int colorRG, int colorBA, int maskRG, int maskBA, bool copySource) {
+		
+		Image _image = Image (image);
+		Image _sourceImage = Image (sourceImage);
+		Rectangle _sourceRect = Rectangle (sourceRect);
+		Vector2 _destPoint = Vector2 (destPoint);
+		int32_t threshold = (thresholdRG << 16) | thresholdBA;
+		int32_t color = (colorRG << 16) | colorBA;
+		int32_t mask = (maskRG << 16) | maskBA;
+		return ImageDataUtil::Threshold (&_image, &_sourceImage, &_sourceRect, &_destPoint, operation, threshold, color, mask, copySource);
+		
+	}
 	
 	void lime_image_data_util_unmultiply_alpha (value image) {
 		
@@ -1293,6 +1368,27 @@ namespace lime {
 	}
 	
 	
+	value lime_renderer_read_pixels (value renderer, value rect) {
+		
+		Renderer* targetRenderer = (Renderer*)val_data (renderer);
+		ImageBuffer buffer;
+		
+		if (!val_is_null (rect)) {
+			
+			Rectangle _rect = Rectangle (rect);
+			targetRenderer->ReadPixels (&buffer, &_rect);
+			
+		} else {
+			
+			targetRenderer->ReadPixels (&buffer, NULL);
+			
+		}
+		
+		return buffer.Value ();
+		
+	}
+	
+	
 	void lime_renderer_unlock (value renderer) {
 		
 		Renderer *ptr = GetPointer<Renderer> (renderer);
@@ -1329,7 +1425,18 @@ namespace lime {
 	value lime_system_get_directory (int type, HxString company, HxString title) {
 		
 		const char* path = System::GetDirectory ((SystemDirectory)type, company.__s, title.__s);
-		return path ? alloc_string (path) : alloc_null ();
+		
+		if (path) {
+			
+			value _path = alloc_string (path);
+			free ((char*) path);
+			return _path;
+			
+		} else {
+			
+			return alloc_null ();
+			
+		}
 		
 	}
 	
@@ -1512,6 +1619,14 @@ namespace lime {
 	}
 	
 	
+	int lime_window_get_display (value window) {
+		
+		Window* targetWindow = (Window*)val_data (window);
+		return targetWindow->GetDisplay ();
+		
+	}
+	
+	
 	bool lime_window_get_enable_text_events (value window) {
 		
 		Window* targetWindow = GetPointer<Window> (window);
@@ -1584,6 +1699,14 @@ namespace lime {
 	}
 	
 	
+	bool lime_window_set_borderless (value window, bool borderless) {
+		
+		Window* targetWindow = (Window*)val_data (window);
+		return targetWindow->SetBorderless (borderless);
+		
+	}
+	
+	
 	void lime_window_set_enable_text_events (value window, bool enabled) {
 		
 		Window* targetWindow = GetPointer<Window> (window);
@@ -1612,11 +1735,26 @@ namespace lime {
 	}
 	
 	
-	bool lime_window_set_minimized (value window, bool fullscreen) {
+	bool lime_window_set_maximized (value window, bool maximized) {
 		
 		Window* targetWindow = GetPointer<Window> (window);
 		if (targetWindow == NULL) return false;
-		return targetWindow->SetMinimized (fullscreen);
+		return targetWindow->SetMaximized (maximized);
+		
+	}
+	
+	
+	bool lime_window_set_minimized (value window, bool minimized) {
+		
+		Window* targetWindow = GetPointer<Window> (window);
+		return targetWindow->SetMinimized (minimized);
+		
+	}
+	
+	
+	bool lime_window_set_resizable (value window, bool resizable) {
+		
+		return targetWindow->SetResizable (resizable);
 		
 	}
 
@@ -1700,7 +1838,18 @@ namespace lime {
 		Window* targetWindow = GetPointer<Window> (window);
 		if (targetWindow == NULL) return alloc_null ();
 		const char* result = targetWindow->SetTitle (title.__s);
-		return result ? alloc_string (result) : alloc_null ();
+		
+		if (result) {
+			
+			value _result = alloc_string (result);
+			free ((char*) result);
+			return _result;
+			
+		} else {
+			
+			return alloc_null ();
+			
+		}
 		
 	}
 	
@@ -1723,6 +1872,8 @@ namespace lime {
 	#endif
 	DEFINE_PRIME0 (lime_clipboard_get_text);
 	DEFINE_PRIME1v (lime_clipboard_set_text);
+	DEFINE_PRIME2v (lime_drop_event_manager_register);
+	DEFINE_PRIME2 (lime_file_dialog_open_directory);
 	DEFINE_PRIME2 (lime_file_dialog_open_file);
 	DEFINE_PRIME2 (lime_file_dialog_open_files);
 	DEFINE_PRIME2 (lime_file_dialog_save_file);
@@ -1757,6 +1908,7 @@ namespace lime {
 	DEFINE_PRIME4v (lime_image_data_util_resize);
 	DEFINE_PRIME2v (lime_image_data_util_set_format);
 	DEFINE_PRIME4v (lime_image_data_util_set_pixels);
+	DEFINE_PRIME12 (lime_image_data_util_threshold);
 	DEFINE_PRIME1v (lime_image_data_util_unmultiply_alpha);
 	DEFINE_PRIME3 (lime_image_encode);
 	DEFINE_PRIME1 (lime_image_load);
@@ -1788,6 +1940,7 @@ namespace lime {
 	DEFINE_PRIME1 (lime_renderer_get_type);
 	DEFINE_PRIME1 (lime_renderer_lock);
 	DEFINE_PRIME1v (lime_renderer_make_current);
+	DEFINE_PRIME2 (lime_renderer_read_pixels);
 	DEFINE_PRIME1v (lime_renderer_unlock);
 	DEFINE_PRIME2v (lime_render_event_manager_register);
 	DEFINE_PRIME2v (lime_sensor_event_manager_register);
@@ -1809,6 +1962,7 @@ namespace lime {
 	DEFINE_PRIME5 (lime_window_create);
 	DEFINE_PRIME2v (lime_window_event_manager_register);
 	DEFINE_PRIME1v (lime_window_focus);
+	DEFINE_PRIME1 (lime_window_get_display);
 	DEFINE_PRIME1 (lime_window_get_enable_text_events);
 	DEFINE_PRIME1 (lime_window_get_height);
 	DEFINE_PRIME1 (lime_window_get_id);
@@ -1817,22 +1971,42 @@ namespace lime {
 	DEFINE_PRIME1 (lime_window_get_y);
 	DEFINE_PRIME3v (lime_window_move);
 	DEFINE_PRIME3v (lime_window_resize);
+	DEFINE_PRIME2 (lime_window_set_borderless);
 	DEFINE_PRIME2v (lime_window_set_enable_text_events);
 	DEFINE_PRIME2 (lime_window_set_fullscreen);
 	DEFINE_PRIME2v (lime_window_set_icon);
+	DEFINE_PRIME2 (lime_window_set_maximized);
 	DEFINE_PRIME2 (lime_window_set_minimized);
+	DEFINE_PRIME2 (lime_window_set_resizable);
 	DEFINE_PRIME2 (lime_window_set_title);
-	
 	
 	
 }
 
 #ifdef LIME_CAIRO
 extern "C" int lime_cairo_register_prims ();
+#else
+extern "C" int lime_cairo_register_prims () { return 0; }
+#endif
+
+#ifdef LIME_CURL
 #endif
 extern "C" int lime_curl_register_prims ();
+#else
+extern "C" int lime_curl_register_prims () { return 0; }
+#endif
+
+#ifdef LIME_OPENAL
 extern "C" int lime_openal_register_prims ();
+#else
+extern "C" int lime_openal_register_prims () { return 0; }
+#endif
+
+#ifdef LIME_OPENGL
 extern "C" int lime_opengl_register_prims ();
+#else
+extern "C" int lime_opengl_register_prims () { return 0; }
+#endif
 
 
 extern "C" int lime_register_prims () {

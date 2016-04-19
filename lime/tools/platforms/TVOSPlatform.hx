@@ -211,7 +211,6 @@ class TVOSPlatform extends PlatformTarget {
 			
 		}
 		
-		context.ENABLE_BITCODE = project.config.getBool ("tvos.enable-bitcode", true);
 		context.IOS_COMPILER = project.config.getString ("tvos.compiler", "clang");
 		context.CPP_BUILD_LIBRARY = project.config.getString ("cpp.buildLibrary", "hxcpp");
 		
@@ -334,6 +333,19 @@ class TVOSPlatform extends PlatformTarget {
 	public override function update ():Void {
 		
 		project = project.clone ();
+		
+		for (asset in project.assets) {
+			
+			if (asset.embed && asset.sourcePath == "") {
+				
+				var path = PathHelper.combine (targetDirectory + "/" + project.app.file + "/obj/tmp", asset.targetPath);
+				PathHelper.mkdir (Path.directory (path));
+				FileHelper.copyAsset (asset, path);
+				asset.sourcePath = path;
+				
+			}
+			
+		}
 		
 		var manifest = new Asset ();
 		manifest.id = "__manifest__";

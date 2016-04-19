@@ -31,6 +31,8 @@ namespace lime {
 			
 		}
 		
+		SDL_LogSetPriority (SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_WARN);
+		
 		currentApplication = this;
 		
 		framePeriod = 1000.0 / 60.0;
@@ -46,6 +48,7 @@ namespace lime {
 		nextUpdate = 0;
 		
 		ApplicationEvent applicationEvent;
+		DropEvent dropEvent;
 		GamepadEvent gamepadEvent;
 		JoystickEvent joystickEvent;
 		KeyEvent keyEvent;
@@ -56,6 +59,7 @@ namespace lime {
 		TouchEvent touchEvent;
 		WindowEvent windowEvent;
 		
+		SDL_EventState (SDL_DROPFILE, SDL_ENABLE);
 		SDLJoystick::Init ();
 		
 		#ifdef HX_MACOS
@@ -146,6 +150,11 @@ namespace lime {
 			case SDL_CONTROLLERDEVICEREMOVED:
 				
 				ProcessGamepadEvent (event);
+				break;
+			
+			case SDL_DROPFILE:
+				
+				ProcessDropEvent (event);
 				break;
 			
 			case SDL_FINGERMOTION:
@@ -253,6 +262,21 @@ namespace lime {
 		active = true;
 		lastUpdate = SDL_GetTicks ();
 		nextUpdate = lastUpdate;
+		
+	}
+	
+	
+	void SDLApplication::ProcessDropEvent (SDL_Event* event) {
+		
+		if (DropEvent::callback) {
+			
+			dropEvent.type = DROP_FILE;
+			dropEvent.file = event->drop.file;
+			
+			DropEvent::Dispatch (&dropEvent);
+			SDL_free (dropEvent.file);
+			
+		}
 		
 	}
 	
@@ -428,7 +452,7 @@ namespace lime {
 					if (SDLJoystick::Connect (event->jdevice.which)) {
 						
 						joystickEvent.type = JOYSTICK_CONNECT;
-						joystickEvent.id = event->jdevice.which;
+						joystickEvent.id = SDLJoystick::GetInstanceID (event->jdevice.which);
 						
 						JoystickEvent::Dispatch (&joystickEvent);
 						
@@ -494,6 +518,8 @@ namespace lime {
 				
 				case SDL_MOUSEBUTTONDOWN:
 					
+					SDL_CaptureMouse (SDL_TRUE);
+					
 					mouseEvent.type = MOUSE_DOWN;
 					mouseEvent.button = event->button.button - 1;
 					mouseEvent.x = event->button.x;
@@ -501,6 +527,8 @@ namespace lime {
 					break;
 				
 				case SDL_MOUSEBUTTONUP:
+					
+					SDL_CaptureMouse (SDL_FALSE);
 					
 					mouseEvent.type = MOUSE_UP;
 					mouseEvent.button = event->button.button - 1;

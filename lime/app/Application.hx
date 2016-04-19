@@ -64,8 +64,8 @@ class Application extends Module {
 		onExit.add (onModuleExit);
 		onUpdate.add (update);
 		
-		Gamepad.onConnect.add (onGamepadConnect);
-		Joystick.onConnect.add (onJoystickConnect);
+		Gamepad.onConnect.add (__onGamepadConnect);
+		Joystick.onConnect.add (__onJoystickConnect);
 		Touch.onStart.add (onTouchStart);
 		Touch.onMove.add (onTouchMove);
 		Touch.onEnd.add (onTouchEnd);
@@ -173,6 +173,7 @@ class Application extends Module {
 		window.onClose.add (onWindowClose.bind (window));
 		window.onCreate.add (onWindowCreate.bind (window));
 		window.onDeactivate.add (onWindowDeactivate.bind (window));
+		window.onDropFile.add (onWindowDropFile.bind (window));
 		window.onEnter.add (onWindowEnter.bind (window));
 		window.onFocusIn.add (onWindowFocusIn.bind (window));
 		window.onFocusOut.add (onWindowFocusOut.bind (window));
@@ -264,11 +265,6 @@ class Application extends Module {
 			
 		}
 		
-		gamepad.onAxisMove.add (onGamepadAxisMove.bind (gamepad));
-		gamepad.onButtonDown.add (onGamepadButtonDown.bind (gamepad));
-		gamepad.onButtonUp.add (onGamepadButtonUp.bind (gamepad));
-		gamepad.onDisconnect.add (onGamepadDisconnect.bind (gamepad));
-		
 	}
 	
 	
@@ -323,13 +319,6 @@ class Application extends Module {
 			module.onJoystickConnect (joystick);
 			
 		}
-		
-		joystick.onAxisMove.add (onJoystickAxisMove.bind (joystick));
-		joystick.onButtonDown.add (onJoystickButtonDown.bind (joystick));
-		joystick.onButtonUp.add (onJoystickButtonUp.bind (joystick));
-		joystick.onDisconnect.add (onJoystickDisconnect.bind (joystick));
-		joystick.onHatMove.add (onJoystickHatMove.bind (joystick));
-		joystick.onTrackballMove.add (onJoystickTrackballMove.bind (joystick));
 		
 	}
 	
@@ -602,6 +591,17 @@ class Application extends Module {
 	}
 	
 	
+	public override function onWindowDropFile (window:Window, file:String):Void {
+		
+		for (module in modules) {
+			
+			module.onWindowDropFile (window, file);
+			
+		}
+		
+	}
+	
+	
 	public override function onWindowEnter (window:Window):Void {
 		
 		for (module in modules) {
@@ -798,6 +798,32 @@ class Application extends Module {
 			module.update (deltaTime);
 			
 		}
+		
+	}
+	
+	
+	@:noCompletion private function __onGamepadConnect (gamepad:Gamepad):Void {
+		
+		onGamepadConnect (gamepad);
+		
+		gamepad.onAxisMove.add (onGamepadAxisMove.bind (gamepad));
+		gamepad.onButtonDown.add (onGamepadButtonDown.bind (gamepad));
+		gamepad.onButtonUp.add (onGamepadButtonUp.bind (gamepad));
+		gamepad.onDisconnect.add (onGamepadDisconnect.bind (gamepad));
+		
+	}
+	
+	
+	@:noCompletion private function __onJoystickConnect (joystick:Joystick):Void {
+		
+		onJoystickConnect (joystick);
+		
+		joystick.onAxisMove.add (onJoystickAxisMove.bind (joystick));
+		joystick.onButtonDown.add (onJoystickButtonDown.bind (joystick));
+		joystick.onButtonUp.add (onJoystickButtonUp.bind (joystick));
+		joystick.onDisconnect.add (onJoystickDisconnect.bind (joystick));
+		joystick.onHatMove.add (onJoystickHatMove.bind (joystick));
+		joystick.onTrackballMove.add (onJoystickTrackballMove.bind (joystick));
 		
 	}
 	

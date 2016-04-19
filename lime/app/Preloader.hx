@@ -8,8 +8,7 @@ import lime.Assets;
 import js.html.Image;
 import js.html.SpanElement;
 import js.Browser;
-import lime.net.URLLoader;
-import lime.net.URLRequest;
+import lime.net.HTTPRequest;
 #elseif flash
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
@@ -27,7 +26,7 @@ class Preloader #if flash extends Sprite #end {
 	
 	#if (js && html5)
 	public static var images = new Map<String, Image> ();
-	public static var loaders = new Map<String, URLLoader> ();
+	public static var loaders = new Map<String, HTTPRequest> ();
 	private var loaded = 0;
 	private var total = 0;
 	#end
@@ -36,9 +35,7 @@ class Preloader #if flash extends Sprite #end {
 	public function new () {
 		
 		#if flash
-			
-			super ();
-			
+		super ();
 		#end
 		
 		onProgress.add (update);
@@ -49,20 +46,16 @@ class Preloader #if flash extends Sprite #end {
 	public function create (config:Config):Void {
 		
 		#if flash
-			
-			Lib.current.addChild (this);
-			
-			Lib.current.loaderInfo.addEventListener (flash.events.Event.COMPLETE, loaderInfo_onComplete);
-			Lib.current.loaderInfo.addEventListener (flash.events.Event.INIT, loaderInfo_onInit);
-			Lib.current.loaderInfo.addEventListener (ProgressEvent.PROGRESS, loaderInfo_onProgress);
-			Lib.current.addEventListener (flash.events.Event.ENTER_FRAME, current_onEnter);
-			
+		Lib.current.addChild (this);
+		
+		Lib.current.loaderInfo.addEventListener (flash.events.Event.COMPLETE, loaderInfo_onComplete);
+		Lib.current.loaderInfo.addEventListener (flash.events.Event.INIT, loaderInfo_onInit);
+		Lib.current.loaderInfo.addEventListener (ProgressEvent.PROGRESS, loaderInfo_onProgress);
+		Lib.current.addEventListener (flash.events.Event.ENTER_FRAME, current_onEnter);
 		#end
 		
 		#if (!flash && !html5)
-			
-			start ();
-			
+		start ();
 		#end
 		
 	}
@@ -71,73 +64,73 @@ class Preloader #if flash extends Sprite #end {
 	public function load (urls:Array<String>, types:Array<AssetType>):Void {
 		
 		#if (js && html5)
+		
+		var url = null;
+		var cacheVersion = Assets.cache.version;
+		
+		for (i in 0...urls.length) {
 			
-			var url = null;
+			url = urls[i];
 			
-			for (i in 0...urls.length) {
+			switch (types[i]) {
 				
-				url = urls[i];
-				
-				switch (types[i]) {
+				case IMAGE:
 					
-					case IMAGE:
+					if (!images.exists (url)) {
 						
-						if (!images.exists (url)) {
-							
-							var image = new Image ();
-							images.set (url, image);
-							image.onload = image_onLoad;
-							image.src = url;
-							total++;
-							
-						}
-					
-					case BINARY:
-						
-						if (!loaders.exists (url)) {
-							
-							var loader = new URLLoader ();
-							loader.dataFormat = BINARY;
-							loaders.set (url, loader);
-							total++;
-							
-						}
-					
-					case TEXT:
-						
-						if (!loaders.exists (url)) {
-							
-							var loader = new URLLoader ();
-							loaders.set (url, loader);
-							total++;
-							
-						}
-					
-					case FONT:
-						
+						var image = new Image ();
+						images.set (url, image);
+						image.onload = image_onLoad;
+						image.src = url + "?" + cacheVersion;
 						total++;
-						loadFont (url);
+						
+					}
+				
+				case BINARY:
 					
-					default:
+					if (!loaders.exists (url)) {
+						
+						var loader = new HTTPRequest ();
+						loaders.set (url, loader);
+						total++;
+						
+					}
+				
+				case TEXT:
 					
-				}
+					if (!loaders.exists (url)) {
+						
+						var loader = new HTTPRequest ();
+						loaders.set (url, loader);
+						total++;
+						
+					}
+				
+				case FONT:
+					
+					total++;
+					loadFont (url);
+				
+				default:
 				
 			}
 			
-			for (url in loaders.keys ()) {
-				
-				var loader = loaders.get (url);
-				loader.onComplete.add (loader_onComplete);
-				loader.load (new URLRequest (url));
-				
-			}
+		}
+		
+		for (url in loaders.keys ()) {
 			
-			if (total == 0) {
-				
-				start ();
-				
-			}
+			var loader = loaders.get (url);
+			var future = loader.load (url + "?" + cacheVersion);
+			future.onComplete (loader_onComplete);
 			
+		}
+		
+		if (total == 0) {
+			
+			start ();
+			
+		}
+		
 		#end
 		
 	}
@@ -281,7 +274,7 @@ class Preloader #if flash extends Sprite #end {
 	}
 	
 	
-	private function loader_onComplete (loader:URLLoader):Void {
+	private function loader_onComplete (_):Void {
 		
 		loaded++;
 		

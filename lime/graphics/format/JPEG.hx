@@ -6,7 +6,6 @@ import lime.graphics.utils.ImageCanvasUtil;
 import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
 import lime.system.CFFI;
-import lime.utils.ByteArray;
 import lime.utils.BytesUtil;
 
 #if (js && html5)
@@ -23,7 +22,7 @@ import js.Browser;
 class JPEG {
 	
 	
-	public static function decodeBytes (bytes:ByteArray, decodeData:Bool = true):Image {
+	public static function decodeBytes (bytes:Bytes, decodeData:Bool = true):Image {
 		
 		#if ((cpp || neko || nodejs) && !macro)
 		
@@ -65,7 +64,7 @@ class JPEG {
 	}
 	
 	
-	public static function encode (image:Image, quality:Int):ByteArray {
+	public static function encode (image:Image, quality:Int):Bytes {
 		
 		if (image.premultiplied || image.format != RGBA32) {
 			
@@ -82,8 +81,7 @@ class JPEG {
 		#elseif (sys && (!disable_cffi || !format) && !macro)
 			
 			var data:Dynamic = lime_image_encode (image.buffer, 1, quality);
-			var bytes = BytesUtil.createBytes (data.length, data.b);
-			return ByteArray.fromBytes (bytes);
+			return BytesUtil.createBytes (data.length, data.b);
 			
 		#elseif (js && html5)
 		
@@ -97,15 +95,15 @@ class JPEG {
 			var data = image.buffer.__srcCanvas.toDataURL ("image/jpeg");
 			#end
 			var buffer = Browser.window.atob (data.split (";base64,")[1]);
-			var byteArray = new ByteArray (buffer.length);
+			var bytes = Bytes.alloc (buffer.length);
 			
 			for (i in 0...buffer.length) {
 				
-				byteArray.b[i] = buffer.charCodeAt (i);
+				bytes.set (i, buffer.charCodeAt (i));
 				
 			}
 			
-			return byteArray;
+			return bytes;
 			
 		}
 		
