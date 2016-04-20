@@ -3,6 +3,7 @@ package lime.audio;
 
 import haxe.io.Bytes;
 import lime.audio.openal.AL;
+import lime.utils.BytesUtil;
 //import lime.net.URLLoader;
 //import lime.net.URLRequest;
 import lime.utils.UInt8Array;
@@ -26,7 +27,7 @@ class AudioBuffer {
 	public var bitsPerSample:Int;
 	public var channels:Int;
 	public var handle:Dynamic;
-	public var sourceData:ByteArray;
+	public var sourceData:Bytes;
 	public var data:UInt8Array;
 	public var id:UInt;
 	public var stream(get, never):Bool;
@@ -79,7 +80,7 @@ class AudioBuffer {
 	#end
 	
 	
-	public static function fromBytes (bytes:Bytes):AudioBuffer {
+	public static function fromBytes (bytes:Bytes, stream:Bool = false):AudioBuffer {
 		
 		#if lime_console
 		
@@ -92,7 +93,7 @@ class AudioBuffer {
 		if (data != null) {
 			
 			var audioBuffer = new AudioBuffer ();
-			audioBuffer.bitsPerSample = data.bitsPerSample;
+			audioBuffer.bitsPerSample 	= data.bitsPerSample;
 			audioBuffer.channels = data.channels;
 			audioBuffer.data = BytesUtil.getUInt8ArrayFromAnonBytes (data.data);
 			audioBuffer.sampleRate = data.sampleRate;

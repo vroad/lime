@@ -1754,6 +1754,7 @@ namespace lime {
 	
 	bool lime_window_set_resizable (value window, bool resizable) {
 		
+		Window* targetWindow = GetPointer<Window> (window);
 		return targetWindow->SetResizable (resizable);
 		
 	}
@@ -1990,7 +1991,6 @@ extern "C" int lime_cairo_register_prims () { return 0; }
 #endif
 
 #ifdef LIME_CURL
-#endif
 extern "C" int lime_curl_register_prims ();
 #else
 extern "C" int lime_curl_register_prims () { return 0; }

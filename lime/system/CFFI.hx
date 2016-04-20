@@ -390,6 +390,7 @@ class CFFI {
 		
 	}
 	
+	
 }
 
 
@@ -551,10 +552,6 @@ class CFFI {
 							fun.expr = Context.parse (expr, field.pos);
 							
 						}
-						#if 0 
-						else if (m.name == ":finalizer") {
-						}
-						#end
 						
 					}
 				

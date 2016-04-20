@@ -1,5 +1,6 @@
 package lime.text;
 
+
 import haxe.io.Bytes;
 import lime.math.Vector2;
 import lime.system.System;
