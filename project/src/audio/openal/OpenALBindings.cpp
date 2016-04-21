@@ -935,7 +935,7 @@ namespace lime {
 		ALCcontext* alcContext = val_to_ALCcontext (context);
 		if (alcContext == NULL) return;
 		alcDestroyContext (alcContext);
-		free_abstract (context);
+		//free_abstract (context);
 		
 	}
 	
