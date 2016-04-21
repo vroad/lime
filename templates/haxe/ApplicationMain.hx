@@ -15,12 +15,6 @@ class ApplicationMain {
 	
 	
 	public static function create ():Void {
-
-		#if (tools && !display)
-			
-		lime.Assets.registerLibrary ("default", new DefaultAssetLibrary ());
-			
-		#end
 		
 		preloader = new ::if (PRELOADER_NAME != "")::::PRELOADER_NAME::::else::lime.app.Preloader::end:: ();
 		

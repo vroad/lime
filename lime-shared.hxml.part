@@ -1,4 +1,0 @@
---no-output
--lib codegen
---macro "CodeImport.generate()"
---macro "CodeGen.haxeExtern('hxclasses', null, null, 'lime.filter', null, 'lime')"
