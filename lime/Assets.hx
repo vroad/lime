@@ -429,7 +429,6 @@ class Assets {
 	
 	private static function initialize ():Void {
 		
-		#if 0
 		if (!initialized) {
 			
 			#if (tools && !display)
@@ -441,9 +440,6 @@ class Assets {
 			initialized = true;
 			
 		}
-		#else
-		initialized = true;
-		#end
 		
 	}
 	
