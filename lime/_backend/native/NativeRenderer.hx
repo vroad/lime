@@ -13,6 +13,7 @@ import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
 import lime.graphics.Renderer;
 import lime.math.Rectangle;
+import lime.utils.BytesUtil;
 import lime.utils.UInt8Array;
 
 #if !macro
@@ -128,7 +129,7 @@ class NativeRenderer {
 		
 		if (data != null) {
 			
-			var buffer = new ImageBuffer (new UInt8Array (@:privateAccess new Bytes (data.data.length, data.data.b)), data.width, data.height, data.bitsPerPixel);
+			var buffer = new ImageBuffer (BytesUtil.getUInt8ArrayFromAnonBytes (data.data), data.width, data.height, data.bitsPerPixel);
 			buffer.format = RGBA32;
 			
 			return new Image (buffer);
