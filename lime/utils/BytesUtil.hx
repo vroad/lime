@@ -25,6 +25,16 @@ class BytesUtil
 		
 	}
 	
+	public static function getBytesFromAnonBytes (ab:AnonBytes):Bytes {
+		
+		#if js
+		return Bytes.ofData ((ab.b : UInt8Array).buffer);
+		#else
+		return Bytes.ofData (ab.b);
+		#end
+		
+	}
+	
 	public static function createBytes (length:Int, b:Dynamic):Bytes {
 		
 		#if ((js && haxe < 3.2) || !js)

@@ -4,6 +4,7 @@ package lime.text;
 import haxe.io.Bytes;
 import lime.math.Vector2;
 import lime.system.System;
+import lime.utils.AnonBytes;
 import lime.utils.BytesUtil;
 
 #if !macro
@@ -27,7 +28,7 @@ class TextLayout {
 	
 	private var __dirty:Bool;
 	
-	@:noCompletion private var __bytes:Bytes;
+	@:noCompletion private var __bytes:AnonBytes;
 	@:noCompletion private var __direction:TextDirection;
 	@:noCompletion private var __handle:Dynamic;
 	@:noCompletion private var __language:String;
@@ -63,6 +64,7 @@ class TextLayout {
 			__bytes = lime_text_layout_position (__handle, font.src, size, text, __bytes);
 			
 			var __buffer = BytesUtil.getBytesFromAnonBytes (__bytes);
+			var position = 0;
 			
 			if (__buffer.length > 4) {
 				
