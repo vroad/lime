@@ -189,6 +189,7 @@ namespace lime {
 			
 			//LOG_SOUND("FAILED TO READ OGG SOUND INFO, IS THIS EVEN AN OGG FILE?\n");
 			ov_clear (oggFile);
+			delete audioBuffer->sourceData;
 			return false;
 			
 		}
