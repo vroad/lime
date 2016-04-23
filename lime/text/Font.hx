@@ -289,7 +289,7 @@ class Font {
 	
 	
 	
-	private function get_ascender ():Int {
+	private function get_ascender ():Null<Int> {
 		
 		#if ((cpp || neko || nodejs) && !macro)
 		if (ascender == null) {
@@ -305,7 +305,7 @@ class Font {
 	}
 	
 	
-	private function get_descender ():Int {
+	private function get_descender ():Null<Int> {
 		
 		#if ((cpp || neko || nodejs) && !macro)
 		if (descender == null) {
@@ -321,7 +321,7 @@ class Font {
 	}
 	
 	
-	private function get_height ():Int {
+	private function get_height ():Null<Int> {
 		
 		#if ((cpp || neko || nodejs) && !macro)
 		if (height == null) {
@@ -337,7 +337,7 @@ class Font {
 	}
 	
 	
-	private function get_numGlyphs ():Int {
+	private function get_numGlyphs ():Null<Int> {
 		
 		#if ((cpp || neko || nodejs) && !macro)
 		if (numGlyphs == null) {
@@ -353,7 +353,7 @@ class Font {
 	}
 	
 	
-	private function get_underlinePosition ():Int {
+	private function get_underlinePosition ():Null<Int> {
 		
 		#if ((cpp || neko || nodejs) && !macro)
 		if (underlinePosition == null) {
@@ -369,7 +369,7 @@ class Font {
 	}
 	
 	
-	private function get_underlineThickness ():Int {
+	private function get_underlineThickness ():Null<Int> {
 		
 		#if ((cpp || neko || nodejs) && !macro)
 		if (underlineThickness == null) {
@@ -385,7 +385,7 @@ class Font {
 	}
 	
 	
-	private function get_unitsPerEM ():Int {
+	private function get_unitsPerEM ():Null<Int> {
 		
 		#if ((cpp || neko || nodejs) && !macro)
 		if (unitsPerEM == null) {
