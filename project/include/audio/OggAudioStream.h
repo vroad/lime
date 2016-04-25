@@ -6,20 +6,30 @@
 
 namespace lime {
 	
+	typedef struct {
+		
+		unsigned char* data;
+		ogg_int64_t size;
+		ogg_int64_t pos;
+		
+	} OAL_OggMemoryFile;
+	
 	class OggAudioStream : public AudioStream {
 		
 		
 		public:
 			
-			~OggAudioStream()
+			~OggAudioStream ()
 			{
 				delete file;
+				delete fakeFile;
 			}
 			
-			OggAudioStream(OggVorbis_File *file)
-				: AudioStream(OggFormat), file(file) {}
+			OggAudioStream (OggVorbis_File *file, OAL_OggMemoryFile *fakeFile)
+				: AudioStream (OggFormat), file (file), fakeFile (fakeFile) {}
 			
 			OggVorbis_File *file;
+			OAL_OggMemoryFile *fakeFile;
 			
 	};
 	

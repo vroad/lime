@@ -125,7 +125,8 @@ namespace lime {
 				
 			}
 			
-			audioBuffer->data->Resize (wave_data.subChunkSize);
+			audioBuffer->data = new Bytes (wave_data.subChunkSize);
+			audioBuffer->length = wave_data.subChunkSize;
 			
 			if (!lime::fread (audioBuffer->data->Data (), wave_data.subChunkSize, 1, file)) {
 				

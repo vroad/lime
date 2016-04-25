@@ -18,6 +18,7 @@ namespace lime {
 			id.sourceData = val_id ("sourceData");
 			id.data = val_id ("data");
 			id.sampleRate = val_id ("sampleRate");
+			id.length = val_id ("length");
 			id.init = true;
 			stringId.Set (id);
 			
@@ -48,8 +49,9 @@ namespace lime {
 		channels = 0;
 		handle = NULL;
 		sourceData = NULL;
-		data = new Bytes ();
+		data = NULL;
 		sampleRate = 0;
+		length = 0;
 		
 	}
 	
@@ -58,7 +60,6 @@ namespace lime {
 		
 		delete sourceData;
 		delete data;
-		delete handle;
 		
 	}
 	
@@ -69,7 +70,7 @@ namespace lime {
 		value handleValue;
 		if (handle != NULL) {
 			
-			handleValue = WrapPointer<AudioStream> (handle);
+			handleValue = WrapPointerWithGC<AudioStream> (handle);
 			
 		} else {
 			
@@ -83,8 +84,9 @@ namespace lime {
 		alloc_field (mValue, id.channels, alloc_int (channels));
 		alloc_field (mValue, id.handle, handleValue);
 		alloc_field (mValue, id.sourceData, sourceData != NULL ? sourceData->Value () : alloc_null ());
-		alloc_field (mValue, id.data, data->Value ());
+		alloc_field (mValue, id.data, data != NULL ? data->Value () : alloc_null ());
 		alloc_field (mValue, id.sampleRate, alloc_int (sampleRate));
+		alloc_field (mValue, id.length, alloc_int (length));
 		return mValue;
 		
 	}

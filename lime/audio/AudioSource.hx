@@ -8,6 +8,7 @@ import lime.audio.openal.AL;
 import lime.system.System;
 import lime.utils.AnonBytes;
 import lime.utils.BytesUtil;
+import lime.utils.UInt8Array;
 
 #if flash
 import flash.media.SoundChannel;
@@ -25,6 +26,10 @@ void haxe_staticfunc_onFmodChannelEnd (ConsoleFmodChannel c) {
 	AudioSource_obj::onFmodChannelEnd (c);
 }
 ")
+#end
+
+#if !macro
+@:build(lime.system.CFFI.build())
 #end
 
 
@@ -53,12 +58,16 @@ class AudioSource {
 	#end
 	
 	#if (cpp || neko || nodejs)
-	private var timer:Timer;
 	private var queueTimer:Timer;
 	private var format:Int;
-
-	inline private static var initialBufferCount = 2;
+	
 	private var streamBuffers:Array<Int>;
+	private var audioSamples:UInt8Array;
+	private var bufferTime:Int;
+	private var finishedDecoding:Bool;
+	
+	inline private static var initialBufferCount = 2;
+	inline private static var minimumBufferTime:Int = 500;
 	#end
 	
 	
@@ -75,6 +84,9 @@ class AudioSource {
 		
 		this.loops = loops;
 		id = 0;
+		playing = false;
+		bufferTime = 1000;
+		finishedDecoding = false;
 		
 		if (buffer != null) {
 			
@@ -162,11 +174,6 @@ class AudioSource {
 				}
 				
 				id = al.genSource ();
-				if (!buffer.stream) {
-					
-					al.sourcei (id, al.BUFFER, buffer.id);
-					
-				}
 				
 				#end
 			
@@ -198,21 +205,6 @@ class AudioSource {
 			
 			var old = setFmodActive (channel, this);
 			
-			if (queueTimer != null) {
-				
-				queueTimer.stop ();
-				
-			}
-			
-			if (buffer.stream) {
-				
-				queueTimer = new Timer (300);
-				queueTimer.run = queueTimer_onRun;
-				queueTimer_onRun ();
-				
-			}
-			
-			
 			if (old != this) {
 				
 				old.channel = FMODChannel.INVALID;
@@ -229,20 +221,29 @@ class AudioSource {
 			
 		}
 		
-		if (!buffer.stream) {
-				
-			timer = new Timer (length - currentTime);
-			timer.run = timer_onRun;
+		if (queueTimer != null) {
+			
+			queueTimer.stop ();
+			queueTimer = null;
 			
 		}
 		
 		playing = true;
+		queueTimer = new Timer (1);
 		
-		var time = currentTime;
+		if (!buffer.stream) {
+			
+			queueTimer.run = timer_onRun;
+			timer_onRun ();
+			
+		} else {
+			
+			queueTimer.run = streamTimer_onRun;
+			streamTimer_onRun ();
+			
+		}
 		
 		AL.sourcePlay (id);
-		
-		currentTime = time;
 		
 		#end
 		
@@ -274,12 +275,6 @@ class AudioSource {
 		playing = false;
 		AL.sourcePause (id);
 		
-		if (timer != null) {
-			
-			timer.stop ();
-			
-		}
-		
 		#end
 		
 	}
@@ -310,12 +305,6 @@ class AudioSource {
 		
 		playing = false;
 		AL.sourceStop (id);
-		
-		if (timer != null) {
-			
-			timer.stop ();
-			
-		}
 		
 		#end
 		
@@ -411,96 +400,52 @@ class AudioSource {
 	
 	
 	
-	private function timer_onRun () {
+	private function timer_onRun ():Void {
 		
 		#if (cpp || neko || nodejs)
 		
-		playing = false;
-		
-		if (loops > 0) {
+		var sourceState:Int = AL.getSourcei (id, AL.SOURCE_STATE);
+		if (playing && !finishedDecoding)  {
 			
-			loops--;
-			currentTime = 0;
-			play ();
-			return;
-			
-		} else {
-			
-			AL.sourceStop (id);
-			timer.stop ();
-			
-		}
-		
-		onComplete.dispatch ();
-		
-		#end
-		
-	}
-	
-	
-	private function queueTimer_onRun () {
-		
-		#if (cpp || neko || nodejs)
-		
-		var shouldStop:Bool = false;
-		if (playing) {
-			
+			var buffers:Array<Int>;
 			var bufferCount:Int;
-			
 			if (streamBuffers == null) {
 				
-				bufferCount = initialBufferCount;
-				streamBuffers = AL.genBuffers (bufferCount);
+				var minimalBufferCount:Int = getMinimalBufferCountForLoop ();
+				bufferCount = (loops + 1) < minimalBufferCount ? (loops + 1) : minimalBufferCount;
+				buffers = streamBuffers = AL.genBuffers (bufferCount);
 				
 			} else {
 				
-				bufferCount = AL.getSourcei ( id, AL.BUFFERS_PROCESSED );
+				bufferCount = AL.getSourcei (id, AL.BUFFERS_PROCESSED);
+				
 				if (bufferCount == 0) {
 					
 					return;
 					
 				}
-				streamBuffers = AL.sourceUnqueueBuffers (id, bufferCount);
+				
+				buffers = AL.sourceUnqueueBuffers (id, bufferCount);
 				
 			}
 			
-			var data:Array<Dynamic> = lime_audio_stream_decode (buffer.handle, 65536, bufferCount);
-			
-			if (data == null) {
+			for (i in 0 ... bufferCount) {
 				
-				shouldStop = true;
-				
-			} else {
-				
-				if (data.length != 0) {
-					
-					for (i in 0 ... data.length) {
-						
-						var bytes:AnonBytes = data[i];
-						AL.bufferData (streamBuffers[i], format, BytesUtil.getUInt8ArrayFromAnonBytes (bytes), bytes.length, buffer.sampleRate);
-						
-					}
-					
-					AL.sourceQueueBuffers (id, data.length, streamBuffers);
-					
-					var state = AL.getSourcei (id, AL.SOURCE_STATE);
-					if (state != AL.PLAYING)
-						AL.sourcePlay (id);
-					
-				} else {
-					
-					shouldStop = true;
-					
-				}
+				buffers[i] = buffer.id;
 				
 			}
-		} else  {
 			
-			shouldStop = true;
+			AL.sourceQueueBuffers (id, bufferCount, buffers);
+			loops -= bufferCount;
 			
-		}
-		
-		if (shouldStop) {
+			if (loops < 0) {
+				
+				finishedDecoding = true;
+				loops = 0;
+				
+			}
+			
+		} else if (!playing || sourceState == AL.STOPPED) {
 			
 			if (streamBuffers != null) {
 				
@@ -510,7 +455,8 @@ class AudioSource {
 			}
 			
 			queueTimer.stop ();
-			stop ();
+			queueTimer = null;
+			playing = false;
 			
 		}
 		
@@ -518,6 +464,130 @@ class AudioSource {
 		
 	}
 	
+	
+	private function streamTimer_onRun () {
+		
+		#if (cpp || neko || nodejs)
+		
+		var sourceState:Int = AL.getSourcei (id, AL.SOURCE_STATE);
+		if (playing && !finishedDecoding) {
+			
+			var bufferCount:Int;
+			var buffers:Array<Int>;
+			
+			if (streamBuffers == null) {
+				
+				bufferCount = length < minimumBufferTime ? 1 : initialBufferCount;
+				buffers = streamBuffers = AL.genBuffers (bufferCount);
+				
+			} else {
+				
+				bufferCount = AL.getSourcei (id, AL.BUFFERS_PROCESSED);
+				
+				if (bufferCount == 0) {
+					
+					return;
+					
+				}
+				
+				buffers = AL.sourceUnqueueBuffers (id, bufferCount);
+				
+			}
+			
+			var bufferSize:Int = getBufferSize ();
+			
+			if (audioSamples == null) {
+				
+				audioSamples = new UInt8Array (bufferSize);
+				
+			}
+			
+			var validBufferCount:Int = 0;
+			
+			var i:Int = 0;
+			var writeOffset:Int = 0;
+			while (i < bufferCount) {
+				
+				var numSamples:Int = lime_audio_stream_decode (buffer.handle, BytesUtil.getAnonBytesFromTypedArray (audioSamples), bufferSize, writeOffset);
+				
+				if (numSamples != 0) {
+					
+					AL.bufferData (buffers[i], format, audioSamples, numSamples, buffer.sampleRate);
+					++validBufferCount;
+					
+					if (numSamples < bufferSize) {
+						
+						if (loops >= 1) {
+							
+							currentTime = 0;
+							--loops;
+							writeOffset = numSamples;
+							continue;
+							
+						}
+						
+					} else {
+						
+						writeOffset = 0;
+						
+					}
+					
+				} else {
+					
+					if (loops >= 1) {
+						
+						currentTime = 0;
+						--loops;
+						continue;
+						
+					} else {
+						
+						finishedDecoding = true;
+						
+					}
+					
+					break;
+					
+				}
+				
+				++i;
+			
+			}
+			
+			if (validBufferCount != 0) {
+				
+				AL.sourceQueueBuffers (id, validBufferCount, buffers);
+				
+			} else {
+				
+				finishedDecoding = true;
+				
+			}
+			
+			if (sourceState == AL.STOPPED) {
+				
+				AL.sourcePlay (id);
+				
+			}
+			
+		} else if (!playing || sourceState == AL.STOPPED)  {
+			
+			if (streamBuffers != null) {
+				
+				AL.deleteBuffers (streamBuffers);
+				streamBuffers = null;
+				
+			}
+			
+			queueTimer.stop ();
+			queueTimer = null;
+			playing = false;
+			
+		}
+		
+		#end
+		
+	}
 	
 	
 	// Get & Set Methods
@@ -570,28 +640,16 @@ class AudioSource {
 		
 		#else
 		
+		finishedDecoding = false;
 		if (buffer != null) {
 			
-			AL.sourceRewind (id);
-			if (playing) AL.sourcePlay (id);
-			AL.sourcef (id, AL.SEC_OFFSET, (value + offset) / 1000);
-			
-		}
-		
-		if (playing) {
-			
-			if (timer != null) {
+			if (!buffer.stream) {
 				
-				timer.stop ();
+				AL.sourcef (id, AL.SEC_OFFSET, (value + offset) / 1000);
 				
-			}
-			
-			var timeRemaining = length - (value + offset);
-			
-			if (timeRemaining > 0) {
+			} else {
 				
-				timer = new Timer (timeRemaining);
-				timer.run = timer_onRun;
+				lime_audio_stream_seek (buffer.handle, value / 1000);
 				
 			}
 			
@@ -679,7 +737,7 @@ class AudioSource {
 		
 		#else
 		
-		var samples = (buffer.data.length * 8) / (buffer.channels * buffer.bitsPerSample);
+		var samples = (buffer.length * 8) / (buffer.channels * buffer.bitsPerSample);
 		return Std.int (samples / buffer.sampleRate * 1000) - offset;
 		
 		#end
@@ -695,26 +753,6 @@ class AudioSource {
 		return value;
 
 		#elseif (!flash && !html5)
-		
-		if (playing && __length != value) {
-			
-			if (timer != null) {
-				
-				timer.stop ();
-				
-			}
-			
-			var timeRemaining = value - currentTime;
-			
-			if (timeRemaining > 0) {
-				
-				timer = new Timer (value - currentTime);
-				timer.run = timer_onRun;
-				
-			}
-			
-		}
-		
 		#end
 		
 		return __length = value;
@@ -755,7 +793,20 @@ class AudioSource {
 		
 	}
 	
+	private function getBufferSize ():Int {
+		
+		return Std.int (buffer.sampleRate * buffer.bitsPerSample / 8 * buffer.channels * Math.max (bufferTime, minimumBufferTime) / 1000 / streamBuffers.length);
+		
+	}
+	
+	private function getMinimalBufferCountForLoop ():Int {
+		
+		return Std.int (Math.max (Math.floor (minimumBufferTime / length), 2));
+		
+	}
+	
 	#if (cpp || neko || nodejs)
-	private static var lime_audio_stream_decode:Dynamic = System.load ("lime", "lime_audio_stream_decode", 3);
+	@:cffi private static function lime_audio_stream_decode (handle:Dynamic, data:Dynamic, readSize:Int, writeOffset:Int):Int;
+	@:cffi private static function lime_audio_stream_seek (data:Dynamic, seconds:Float):Bool;
 	#end
 }

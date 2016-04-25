@@ -179,7 +179,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 	}
 	
 	
-	public override function getAudioBuffer (id:String):AudioBuffer {
+	public override function getAudioBuffer (id:String, stream:Bool = false):AudioBuffer {
 		
 		#if flash
 		
@@ -194,8 +194,8 @@ class DefaultAssetLibrary extends AssetLibrary {
 		
 		#else
 		
-		if (className.exists(id)) return AudioBuffer.fromBytes (cast (Type.createInstance (className.get (id), []), Bytes));
-		else return AudioBuffer.fromFile (path.get (id));
+		if (className.exists(id)) return AudioBuffer.fromBytes (cast (Type.createInstance (className.get (id), []), Bytes), stream);
+		else return AudioBuffer.fromFile (path.get (id), stream);
 		
 		#end
 		
@@ -442,7 +442,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 	}
 	
 	
-	public override function loadAudioBuffer (id:String):Future<AudioBuffer> {
+	public override function loadAudioBuffer (id:String, stream:Bool = false):Future<AudioBuffer> {
 		
 		var promise = new Promise<AudioBuffer> ();
 		
@@ -476,13 +476,13 @@ class DefaultAssetLibrary extends AssetLibrary {
 			
 		} else {
 			
-			promise.complete (getAudioBuffer (id));
+			promise.complete (getAudioBuffer (id, stream));
 			
 		}
 		
 		#else
 		
-		promise.completeWith (new Future<AudioBuffer> (function () return getAudioBuffer (id)));
+		promise.completeWith (new Future<AudioBuffer> (function () return getAudioBuffer (id, stream)));
 		
 		#end
 		

@@ -79,7 +79,7 @@ class Assets {
 	 * @param	id		The ID or asset path for the sound
 	 * @return		A new Sound object
 	 */
-	public static function getAudioBuffer (id:String, useCache:Bool = true):AudioBuffer {
+	public static function getAudioBuffer (id:String, useCache:Bool = true, stream:Bool = false):AudioBuffer {
 		
 		initialize ();
 		
@@ -107,7 +107,7 @@ class Assets {
 				
 				if (library.isLocal (symbolName, cast AssetType.SOUND)) {
 					
-					var audio = library.getAudioBuffer (symbolName);
+					var audio = library.getAudioBuffer (symbolName, stream);
 					
 					if (useCache && cache.enabled) {
 						
@@ -557,7 +557,7 @@ class Assets {
 	}
 	
 	
-	public static function loadAudioBuffer (id:String, useCache:Bool = true):Future<AudioBuffer> {
+	public static function loadAudioBuffer (id:String, useCache:Bool = true, stream:Bool = false):Future<AudioBuffer> {
 		
 		initialize ();
 		
@@ -586,7 +586,7 @@ class Assets {
 			
 			if (library.exists (symbolName, cast AssetType.SOUND)) {
 				
-				var future = library.loadAudioBuffer (symbolName);
+				var future = library.loadAudioBuffer (symbolName, stream);
 				
 				if (useCache && cache.enabled) {
 					
@@ -903,7 +903,7 @@ class AssetLibrary {
 	}
 	
 	
-	public function getAudioBuffer (id:String):AudioBuffer {
+	public function getAudioBuffer (id:String, stream:Bool = false):AudioBuffer {
 		
 		return null;
 		
@@ -984,9 +984,9 @@ class AssetLibrary {
 	}
 	
 	
-	public function loadAudioBuffer (id:String):Future<AudioBuffer> {
+	public function loadAudioBuffer (id:String, stream:Bool = false):Future<AudioBuffer> {
 		
-		return new Future<AudioBuffer> (function () return getAudioBuffer (id));
+		return new Future<AudioBuffer> (function () return getAudioBuffer (id, stream));
 		
 	}
 	

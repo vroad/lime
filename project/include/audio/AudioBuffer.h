@@ -43,6 +43,7 @@ namespace lime {
 		int sourceData;
 		int data;
 		int sampleRate;
+		int length;
 		bool init;
 		
 	};
@@ -62,6 +63,7 @@ namespace lime {
 			int bitsPerSample;
 			int channels;
 			int sampleRate;
+			int length;
 			AudioStream *handle;
 			Bytes *sourceData;
 			Bytes *data;

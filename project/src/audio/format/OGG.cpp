@@ -15,15 +15,6 @@
 namespace lime {
 	
 	
-	typedef struct {
-		
-		unsigned char* data;
-		ogg_int64_t size;
-		ogg_int64_t pos;
-		
-	} OAL_OggMemoryFile;
-	
-	
 	static size_t OAL_OggBufferRead (void* dest, size_t eltSize, size_t nelts, OAL_OggMemoryFile* src) {
 		
 		size_t len = eltSize * nelts;
@@ -116,7 +107,8 @@ namespace lime {
 	bool OGG::Decode (Resource *resource, AudioBuffer *audioBuffer, bool stream) {
 		
 		OggVorbis_File *oggFile = new OggVorbis_File ();
-		OAL_OggMemoryFile fakeFile;
+		OAL_OggMemoryFile *fakeFile = NULL;
+		
 		if (resource->path) {
 			
 			FILE_HANDLE *file = lime::fopen (resource->path, "rb");
@@ -153,11 +145,16 @@ namespace lime {
 					
 				}
 				
-				fakeFile = { audioBuffer->sourceData->Data (), audioBuffer->sourceData->Length (), 0 };
-				if (ov_open_callbacks (&fakeFile, oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
+				fakeFile = new OAL_OggMemoryFile ();
+				fakeFile->data = audioBuffer->sourceData->Data ();
+				fakeFile->size = audioBuffer->sourceData->Length ();
+				fakeFile->pos = 0;
+				
+				if (ov_open_callbacks (fakeFile, oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
 					
 					ov_clear (oggFile);
 					delete audioBuffer->sourceData;
+					delete fakeFile;
 					return false;
 					
 				}
@@ -166,13 +163,17 @@ namespace lime {
 			
 		} else {
 			
-			fakeFile = { resource->data->Data (), resource->data->Length (), 0 };
 			audioBuffer->sourceData = new Bytes (*resource->data);
+			fakeFile = new OAL_OggMemoryFile ();
+			fakeFile->data = audioBuffer->sourceData->Data ();
+			fakeFile->size = audioBuffer->sourceData->Length ();
+			fakeFile->pos = 0;
 			
-			if (ov_open_callbacks (&fakeFile, oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
+			if (ov_open_callbacks (fakeFile, oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
 				
 				ov_clear (oggFile);
 				delete audioBuffer->sourceData;
+				delete fakeFile;
 				return false;
 				
 			}
@@ -190,6 +191,7 @@ namespace lime {
 			//LOG_SOUND("FAILED TO READ OGG SOUND INFO, IS THIS EVEN AN OGG FILE?\n");
 			ov_clear (oggFile);
 			delete audioBuffer->sourceData;
+			delete fakeFile;
 			return false;
 			
 		}
@@ -200,9 +202,11 @@ namespace lime {
 		audioBuffer->bitsPerSample = 16;
 		
 		int dataLength = ov_pcm_total (oggFile, -1) * audioBuffer->channels * audioBuffer->bitsPerSample / 8;
-		audioBuffer->data->Resize (dataLength);
+		audioBuffer->length = dataLength;
 		
 		if (!stream) {
+			
+			audioBuffer->data = new Bytes (dataLength);
 			
 			while (bytes > 0) {
 				
@@ -211,24 +215,25 @@ namespace lime {
 				
 			}
 			
-		}
-		
-		if (dataLength != totalBytes) {
-			
-			audioBuffer->data->Resize (totalBytes);
+			if (dataLength != totalBytes) {
+				
+				audioBuffer->data->Resize (totalBytes);
+				
+			}
 			
 		}
 		
 		if (!stream) {
 			
 			ov_clear (oggFile);
+			oggFile = NULL;
 			delete audioBuffer->sourceData;
+			delete fakeFile;
 			audioBuffer->sourceData = NULL;
 			
-		}
-		else {
+		} else {
 			
-			audioBuffer->handle = new OggAudioStream (oggFile);
+			audioBuffer->handle = new OggAudioStream (oggFile, fakeFile);
 			
 		}
 		
@@ -236,38 +241,29 @@ namespace lime {
 		
 	}
 	
-	value OGG::DecodeStream (OggVorbis_File *oggFile, int sizeInBytes, int bufferCount) {
+	bool OGG::SeekStream (OggVorbis_File *oggFile, double seconds) {
+		
+		return ov_time_seek (oggFile, seconds) == 0;
+		
+	}
+	
+	int OGG::DecodeStream (OggVorbis_File *oggFile, Bytes *data, int readSize, int writeOffset) {
 		
 		int bitStream;
-		value result = alloc_array (bufferCount);
+		int remainBytes = readSize;
+		int totalBytes = 0;
 		
-		for (int i = 0; i < bufferCount; ++i) {
+		int bytes;
+		do {
 			
-			Bytes data (sizeInBytes);
-			int remainBytes = sizeInBytes;
-			int totalBytes = 0;
+			size_t readBufferSize = READ_MAX < remainBytes ? READ_MAX : remainBytes;
+			bytes = ov_read (oggFile, ((char *)data->Data ()) + writeOffset + totalBytes, readBufferSize, BUFFER_READ_TYPE, 2, 1, &bitStream);
+			remainBytes -= bytes;
+			totalBytes += bytes;
 			
-			int bytes;
-			do {
-				
-				size_t readBufferSize = READ_MAX < remainBytes ? READ_MAX : remainBytes;
-				bytes = ov_read (oggFile, ((char *)data.Data ()) + totalBytes, readBufferSize, BUFFER_READ_TYPE, 2, 1, &bitStream);
-				remainBytes -= bytes;
-				totalBytes += bytes;
-				
-			} while (bytes > 0 && remainBytes > 0);
-			
-			if (totalBytes != sizeInBytes) {
-				
-				data.Resize (totalBytes);
-				
-			}
-			
-			val_array_set_i (result, i, data.Value ());
-			
-		}
+		} while (bytes > 0 && remainBytes > 0);
 
-		return result;
+		return totalBytes;
 	}
 	
 }

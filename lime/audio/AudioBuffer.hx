@@ -32,6 +32,7 @@ class AudioBuffer {
 	public var id:UInt;
 	public var stream(get, never):Bool;
 	public var sampleRate:Int;
+	public var length:Int;
 	
 	#if (js && html5)
 	public var src:Audio;
@@ -47,13 +48,6 @@ class AudioBuffer {
 	public function new () {
 		
 		id = 0;
-		
-	}
-	
-	
-	@:noCompletion private function get_stream():Bool {
-		
-		return handle != null || sourceData != null;
 		
 	}
 	
@@ -95,8 +89,10 @@ class AudioBuffer {
 			var audioBuffer = new AudioBuffer ();
 			audioBuffer.bitsPerSample 	= data.bitsPerSample;
 			audioBuffer.channels = data.channels;
-			audioBuffer.data = BytesUtil.getUInt8ArrayFromAnonBytes (data.data);
+			audioBuffer.data = data.data != null ? BytesUtil.getUInt8ArrayFromAnonBytes (data.data) : null;
 			audioBuffer.sampleRate = data.sampleRate;
+			audioBuffer.length = data.length;
+			audioBuffer.handle = data.handle;
 			return audioBuffer;
 			
 		}
@@ -128,6 +124,7 @@ class AudioBuffer {
 			audioBuffer.channels = 1;
 			audioBuffer.data = null;
 			audioBuffer.sampleRate = 0;
+			audioBuffer.length = 0;
 			audioBuffer.src = sound;
 			cpp.vm.Gc.setFinalizer (audioBuffer, cpp.Function.fromStaticFunction (finalize));
 			return audioBuffer;
@@ -143,8 +140,10 @@ class AudioBuffer {
 			var audioBuffer = new AudioBuffer ();
 			audioBuffer.bitsPerSample = data.bitsPerSample;
 			audioBuffer.channels = data.channels;
-			audioBuffer.data = BytesUtil.getUInt8ArrayFromAnonBytes (data.data);
+			audioBuffer.data = data.data != null ? BytesUtil.getUInt8ArrayFromAnonBytes (data.data) : null;
 			audioBuffer.sampleRate = data.sampleRate;
+			audioBuffer.length = data.length;
+			audioBuffer.handle = data.handle;
 			return audioBuffer;
 			
 		}
@@ -156,11 +155,11 @@ class AudioBuffer {
 	}
 	
 	
-	public static function fromURL (url:String, handler:AudioBuffer->Void):Void {
+	public static function fromURL (url:String, handler:AudioBuffer->Void, stream:Bool = false):Void {
 		
 		if (url != null && url.indexOf ("http://") == -1 && url.indexOf ("https://") == -1) {
 			
-			handler (AudioBuffer.fromFile (url));
+			handler (AudioBuffer.fromFile (url, stream));
 			
 		} else {
 			
@@ -192,6 +191,13 @@ class AudioBuffer {
 			#end
 			
 		}
+		
+	}
+	
+	
+	private function get_stream ():Bool {
+		
+		return handle != null;
 		
 	}
 	
