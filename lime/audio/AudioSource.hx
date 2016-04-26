@@ -111,7 +111,7 @@ class AudioSource {
 					
 				}
 				
-				if (streamBuffers != null) {
+				if (buffer.stream && streamBuffers != null) {
 					
 					AL.deleteBuffers (streamBuffers);
 					
@@ -305,6 +305,9 @@ class AudioSource {
 		
 		playing = false;
 		AL.sourceStop (id);
+		dispose ();
+		id = 0;
+		streamBuffers = null;
 		
 		#end
 		
@@ -413,7 +416,7 @@ class AudioSource {
 				
 				var minimalBufferCount:Int = getMinimalBufferCountForLoop ();
 				bufferCount = (loops + 1) < minimalBufferCount ? (loops + 1) : minimalBufferCount;
-				buffers = streamBuffers = AL.genBuffers (bufferCount);
+				buffers = [];
 				
 			} else {
 				
@@ -447,16 +450,12 @@ class AudioSource {
 			
 		} else if (!playing || sourceState == AL.STOPPED) {
 			
-			if (streamBuffers != null) {
-				
-				AL.deleteBuffers (streamBuffers);
-				streamBuffers = null;
-				
-			}
-			
 			queueTimer.stop ();
 			queueTimer = null;
 			playing = false;
+			dispose ();
+			id = 0;
+			streamBuffers = null;
 			
 		}
 		
@@ -572,16 +571,12 @@ class AudioSource {
 			
 		} else if (!playing || sourceState == AL.STOPPED)  {
 			
-			if (streamBuffers != null) {
-				
-				AL.deleteBuffers (streamBuffers);
-				streamBuffers = null;
-				
-			}
-			
 			queueTimer.stop ();
 			queueTimer = null;
 			playing = false;
+			dispose ();
+			id = 0;
+			streamBuffers = null;
 			
 		}
 		
