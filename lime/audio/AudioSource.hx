@@ -85,8 +85,10 @@ class AudioSource {
 		this.loops = loops;
 		id = 0;
 		playing = false;
+        #if (cpp || neko || nodejs)
 		bufferTime = 1000;
 		finishedDecoding = false;
+        #end
 		
 		if (buffer != null) {
 			
@@ -478,6 +480,7 @@ class AudioSource {
 				
 				bufferCount = length < minimumBufferTime ? 1 : initialBufferCount;
 				buffers = streamBuffers = AL.genBuffers (bufferCount);
+				trace(buffers[0]);
 				
 			} else {
 				
@@ -790,13 +793,21 @@ class AudioSource {
 	
 	private function getBufferSize ():Int {
 		
+        #if (cpp || neko || nodejs)
 		return Std.int (buffer.sampleRate * buffer.bitsPerSample / 8 * buffer.channels * Math.max (bufferTime, minimumBufferTime) / 1000 / streamBuffers.length);
+        #else
+        return 0;
+        #end
 		
 	}
 	
 	private function getMinimalBufferCountForLoop ():Int {
 		
+        #if (cpp || neko || nodejs)
 		return Std.int (Math.max (Math.floor (minimumBufferTime / length), 2));
+        #else
+        return 0;
+        #end
 		
 	}
 	
