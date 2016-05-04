@@ -88,7 +88,7 @@ namespace lime {
 	}
 	
 	
-	const char* System::GetDirectory (SystemDirectory type, const char* company, const char* title) {
+	std::string System::GetDirectory (SystemDirectory type, const char* company, const char* title) {
 		
 		switch (type) {
 			
@@ -109,18 +109,21 @@ namespace lime {
 				Windows::Storage::StorageFolder folder = Windows::Storage::KnownFolders::HomeGroup;
 				std::wstring resultW (folder->Begin ());
 				std::string result (resultW.begin (), resultW.end ());
-				return result.c_str ();
+				return result;
 				
 				#elif defined (HX_WINDOWS)
 				
 				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, result);
-				return WIN_StringToUTF8 (result);
+				const char *utf8Str = WIN_StringToUTF8 (result);
+				std::string utf8Result = std::string (utf8Str);
+				delete utf8Str;
+				return utf8Result;
 				
 				#else
 				
 				std::string result = std::string (getenv ("HOME")) + std::string ("/Desktop");
-				return result.c_str ();
+				return result;
 				
 				#endif
 				break;
@@ -134,18 +137,21 @@ namespace lime {
 				Windows::Storage::StorageFolder folder = Windows::Storage::KnownFolders::DocumentsLibrary;
 				std::wstring resultW (folder->Begin ());
 				std::string result (resultW.begin (), resultW.end ());
-				return result.c_str ();
+				return result;
 				
 				#elif defined (HX_WINDOWS)
 				
 				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, result);
-				return WIN_StringToUTF8 (result);
+				const char *utf8Str = WIN_StringToUTF8 (result);
+				std::string utf8Result (utf8Str);
+				delete utf8Str;
+				return utf8Result;
 				
 				#else
 				
 				std::string result = std::string (getenv ("HOME")) + std::string ("/Documents");
-				return result.c_str ();
+				return result;
 				
 				#endif
 				break;
@@ -196,18 +202,21 @@ namespace lime {
 				Windows::Storage::StorageFolder folder = Windows::Storage::ApplicationData::Current->RoamingFolder;
 				std::wstring resultW (folder->Begin ());
 				std::string result (resultW.begin (), resultW.end ());
-				return result.c_str ();
+				return result;
 				
 				#elif defined (HX_WINDOWS)
 				
 				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, result);
-				return WIN_StringToUTF8 (result);
+				const char *utf8Str = WIN_StringToUTF8 (result);
+				std::string utf8Result (utf8Str);
+				delete utf8Str;
+				return utf8Result;
 				
 				#else
 				
 				std::string result = getenv ("HOME");
-				return result.c_str ();
+				return result;
 				
 				#endif
 				break;

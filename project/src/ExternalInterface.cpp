@@ -1447,12 +1447,11 @@ namespace lime {
 	
 	value lime_system_get_directory (int type, HxString company, HxString title) {
 		
-		const char* path = System::GetDirectory ((SystemDirectory)type, company.__s, title.__s);
+		std::string path = System::GetDirectory ((SystemDirectory)type, company.__s, title.__s);
 		
-		if (path) {
+		if (!path.empty()) {
 			
-			value _path = alloc_string (path);
-			free ((char*) path);
+			value _path = alloc_string (path.c_str());
 			return _path;
 			
 		} else {
