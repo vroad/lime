@@ -217,6 +217,7 @@
 			<file name="src/backend/sdl/SDLJoystick.cpp" />
 			<file name="src/backend/sdl/SDLMouse.cpp" />
 			<file name="src/backend/sdl/SDLSystem.cpp" />
+			<file name="src/backend/sdl/SDLOpenGLContext.cpp" />
 			
 		</section>
 		

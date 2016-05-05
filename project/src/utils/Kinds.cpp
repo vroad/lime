@@ -29,6 +29,7 @@ namespace lime {
 		gKinds.ALCcontext = alloc_kind ();
 		gKinds.ALCdevice = alloc_kind ();
 		gKinds.JNIEnv = alloc_kind ();
+		gKinds.OpenGLContext = alloc_kind ();
 
 	}
 

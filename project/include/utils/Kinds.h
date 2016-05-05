@@ -34,6 +34,8 @@ namespace lime {
 		vkind ALCdevice;
 
 		vkind JNIEnv;
+		
+		vkind OpenGLContext;
 	};
 
 	Kinds GetKinds ();

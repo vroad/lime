@@ -12,6 +12,7 @@ import lime.graphics.GLRenderContext;
 import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
 import lime.graphics.Renderer;
+import lime.graphics.opengl.GLContext;
 import lime.math.Rectangle;
 import lime.utils.BytesUtil;
 import lime.utils.UInt8Array;
@@ -30,7 +31,7 @@ class NativeRenderer {
 	public var handle:Dynamic;
 	
 	private var parent:Renderer;
-	private var useHardware:Bool;
+	private var glContext:GLContext;
 	
 	#if lime_cairo
 	private var cacheLock:Dynamic;
@@ -49,42 +50,52 @@ class NativeRenderer {
 	public function create ():Void {
 		
 		#if !macro
-		handle = lime_renderer_create (parent.window.backend.handle);
 		
-		parent.window.__scale = lime_renderer_get_scale (handle);
+		glContext = GLContext.create (parent.window);
+		
+		if (glContext != null) {
+			
+			handle = null;
+			parent.window.__scale = 1;
+			
+		} else {
+			
+			handle = lime_renderer_create (parent.window.backend.handle);
+			
+			if (handle == null) {
+				
+				throw "Failed to initialize renderer";
+				
+			}
+			
+			parent.window.__scale = lime_renderer_get_scale (handle);
+			
+		}
 		
 		#if lime_console
 		
-		useHardware = true;
 		parent.context = CONSOLE (new ConsoleRenderContext ());
 		parent.type = CONSOLE;
 		
 		#else
 		
-		var type:String = lime_renderer_get_type (handle);
-		
-		switch (type) {
+		if (glContext != null) {
 			
-			case "opengl":
-				
-				useHardware = true;
-				#if !disable_gl_renderer
-				parent.context = OPENGL (new GLRenderContext ());
-				parent.type = OPENGL;
-				#else
-				parent.context = CUSTOM (null);
-				parent.type = null;
-				#end
+			#if !disable_gl_renderer
+			parent.context = OPENGL (new GLRenderContext ());
+			parent.type = OPENGL;
+			#else
+			parent.context = CUSTOM (null);
+			parent.type = null;
+			#end
 			
-			default:
-				
-				useHardware = false;
-				
-				#if lime_cairo
-				render ();
-				parent.context = CAIRO (cairo);
-				#end
-				parent.type = CAIRO;
+		} else {
+			
+			#if lime_cairo
+			render ();
+			parent.context = CAIRO (cairo);
+			#end
+			parent.type = CAIRO;
 			
 		}
 		
@@ -104,7 +115,12 @@ class NativeRenderer {
 	public function flip ():Void {
 		
 		#if !macro
-		if (!useHardware) {
+		
+		if (glContext != null) {
+			
+			lime_gl_swap_window (parent.window.backend.handle);
+			
+		} else {
 			
 			#if lime_cairo
 			if (cairo != null) {
@@ -113,11 +129,12 @@ class NativeRenderer {
 				
 			}
 			#end
+			
 			lime_renderer_unlock (handle);
+			lime_renderer_flip (handle);
 			
 		}
 		
-		lime_renderer_flip (handle);
 		#end
 		
 	}
@@ -144,9 +161,7 @@ class NativeRenderer {
 	public function render ():Void {
 		
 		#if !macro
-		lime_renderer_make_current (handle);
-		
-		if (!useHardware) {
+		if (glContext == null) {
 			
 			#if lime_cairo
 			var lock:Dynamic = lime_renderer_lock (handle);
@@ -188,13 +203,12 @@ class NativeRenderer {
 	#if !macro
 	@:cffi private static function lime_renderer_create (window:Dynamic):Dynamic;
 	@:cffi private static function lime_renderer_flip (handle:Dynamic):Void;
-	@:cffi private static function lime_renderer_get_context (handle:Dynamic):Dynamic;
 	@:cffi private static function lime_renderer_get_scale (handle:Dynamic):Float;
-	@:cffi private static function lime_renderer_get_type (handle:Dynamic):Dynamic;
 	@:cffi private static function lime_renderer_lock (handle:Dynamic):Dynamic;
-	@:cffi private static function lime_renderer_make_current (handle:Dynamic):Void;
 	@:cffi private static function lime_renderer_read_pixels (handle:Dynamic, rect:Dynamic):Dynamic;
 	@:cffi private static function lime_renderer_unlock (handle:Dynamic):Void;
+	
+	@:cffi private static function lime_gl_swap_window (window:Dynamic):Void;
 	#end
 	
 	

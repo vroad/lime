@@ -59,6 +59,9 @@
 #include <utils/SafeDelete.h>
 #include <utils/GCRootUtils.h>
 
+#include <graphics/OpenGLContext.h>
+#include "graphics/opengl/OpenGLBindings.h"
+
 //DEFINE_KIND (k_finalizer);
 
 namespace lime {
@@ -119,6 +122,13 @@ namespace lime {
 	#endif
 	
 	template <>
+	value WrapPointer<OpenGLContext> (OpenGLContext *context) {
+		
+		return WrapPointerInternal<OpenGLContext> (context, GetKinds ().OpenGLContext);
+		
+	}
+	
+	template <>
 	Application *GetPointer<Application> (value handle) {
 		
 		return (Application*)val_to_kind (handle, GetKinds ().Application);
@@ -177,6 +187,13 @@ namespace lime {
 		
 	}
 	#endif
+	
+	template <>
+	OpenGLContext *GetPointer<OpenGLContext> (value handle) {
+		
+		return (OpenGLContext*)val_to_kind (handle, GetKinds ().OpenGLContext);
+		
+	}
 	
 	value RendererContext_to_value (void *context) {
 		
@@ -1342,33 +1359,10 @@ namespace lime {
 	}
 	
 	
-	value lime_renderer_get_context (value renderer) {
-		
-		#ifndef LIME_NO_RAW_POINTER_ACCESS
-		Renderer* targetRenderer = GetPointer<Renderer> (renderer);
-		if (targetRenderer == NULL) return alloc_null ();
-		return RendererContext_to_value (targetRenderer->GetContext ());
-		#else
-		return alloc_null ();
-		#endif
-		
-	}
-	
-	
 	double lime_renderer_get_scale (value renderer) {
 		
 		Renderer* targetRenderer = (Renderer*)val_data (renderer);
 		return targetRenderer->GetScale ();
-		
-	}
-	
-	
-	value lime_renderer_get_type (value renderer) {
-		
-		Renderer *targetRenderer = GetPointer<Renderer> (renderer);
-		if (targetRenderer == NULL) return alloc_null ();
-		const char* type = targetRenderer->Type ();
-		return type ? alloc_string (type) : alloc_null ();
 		
 	}
 	
@@ -1378,15 +1372,6 @@ namespace lime {
 		Renderer *ptr = GetPointer<Renderer> (renderer);
 		if (ptr == NULL) return alloc_null ();
 		return ptr->Lock ();
-		
-	}
-	
-	
-	void lime_renderer_make_current (value renderer) {
-		
-		Renderer *ptr = GetPointer<Renderer>(renderer);
-		if (ptr == NULL) return;
-		ptr->MakeCurrent ();
 		
 	}
 	
@@ -1877,6 +1862,53 @@ namespace lime {
 	}
 	
 	
+	value lime_gl_context_create (value window) {
+		
+		Window* targetWindow = GetPointer<Window> (window);
+		if (targetWindow == NULL) return alloc_null ();
+		OpenGLContext* context = CreateOpenGLContext (targetWindow);
+		
+		if (context) {
+			
+			OpenGLBindings::Init ();
+			return WrapPointerWithGC<OpenGLContext> (context);
+			
+		} else {
+			
+			return alloc_null ();
+			
+		}
+		
+	}
+	
+	
+	bool lime_gl_context_make_current (value window, value context) {
+		
+		Window* targetWindow = GetPointer<Window> (window);
+		if (targetWindow == NULL) return false;
+		OpenGLContext *targetContext = GetPointer<OpenGLContext> (context);
+		if (targetContext == NULL) return false;
+		
+		return targetContext->MakeCurrent (targetWindow);
+		
+	}
+	
+	
+	bool lime_gl_context_clear_current () {
+		
+		return ClearCurrentOpenGLContext ();
+		
+	}
+	
+	void lime_gl_swap_window (value window) {
+		
+		Window* targetWindow = GetPointer<Window> (window);
+		if (targetWindow == NULL) return;
+		
+		SwapWindow (targetWindow);
+		
+	}
+	
 	DEFINE_PRIME1 (lime_application_create);
 	DEFINE_PRIME2v (lime_application_event_manager_register);
 	DEFINE_PRIME1 (lime_application_exec);
@@ -1959,11 +1991,8 @@ namespace lime {
 	DEFINE_PRIME2 (lime_png_decode_file);
 	DEFINE_PRIME1 (lime_renderer_create);
 	DEFINE_PRIME1v (lime_renderer_flip);
-	DEFINE_PRIME1 (lime_renderer_get_context);
 	DEFINE_PRIME1 (lime_renderer_get_scale);
-	DEFINE_PRIME1 (lime_renderer_get_type);
 	DEFINE_PRIME1 (lime_renderer_lock);
-	DEFINE_PRIME1v (lime_renderer_make_current);
 	DEFINE_PRIME2 (lime_renderer_read_pixels);
 	DEFINE_PRIME1v (lime_renderer_unlock);
 	DEFINE_PRIME2v (lime_render_event_manager_register);
@@ -2003,6 +2032,10 @@ namespace lime {
 	DEFINE_PRIME2 (lime_window_set_minimized);
 	DEFINE_PRIME2 (lime_window_set_resizable);
 	DEFINE_PRIME2 (lime_window_set_title);
+	DEFINE_PRIME1 (lime_gl_context_create);
+	DEFINE_PRIME2 (lime_gl_context_make_current);
+	DEFINE_PRIME0 (lime_gl_context_clear_current);
+	DEFINE_PRIME1v (lime_gl_swap_window);
 	
 	
 }

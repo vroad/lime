@@ -378,7 +378,7 @@ class NativeApplication {
 					
 				case RENDER_CONTEXT_LOST:
 					
-					if (renderer.backend.useHardware) {
+					if (renderer.backend.glContext != null) {
 						
 						renderer.context = null;
 						renderer.onContextLost.dispatch ();
@@ -387,7 +387,7 @@ class NativeApplication {
 				
 				case RENDER_CONTEXT_RESTORED:
 					
-					if (renderer.backend.useHardware) {
+					if (renderer.backend.glContext != null) {
 						
 						#if lime_console
 						renderer.context = CONSOLE (new ConsoleRenderContext ());
