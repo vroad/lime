@@ -15,7 +15,7 @@ class CURLEasy {
 	
 	public static function cleanup (handle:CURL):Void {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_native && lime_curl && !macro)
 		lime_curl_easy_cleanup (handle);
 		#end
 		
@@ -24,7 +24,7 @@ class CURLEasy {
 	
 	public static function duphandle (handle:CURL):CURL {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_native && lime_curl && !macro)
 		return lime_curl_easy_duphandle (handle);
 		#else
 		return 0;
@@ -35,7 +35,7 @@ class CURLEasy {
 	
 	public static function escape (handle:CURL, url:String, length:Int):String {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_native && lime_curl && !macro)
 		return lime_curl_easy_escape (handle, url, length);
 		#else
 		return null;
@@ -46,7 +46,7 @@ class CURLEasy {
 	
 	public static function getinfo (handle:CURL, info:CURLInfo):Dynamic {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_native && lime_curl && !macro)
 		return lime_curl_easy_getinfo (handle, cast (info, Int));
 		#else
 		return null;
@@ -57,7 +57,7 @@ class CURLEasy {
 	
 	public static function init ():CURL {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_native && lime_curl && !macro)
 		return lime_curl_easy_init ();
 		#else
 		return 0;
@@ -68,7 +68,7 @@ class CURLEasy {
 	
 	public static function pause (handle:CURL, bitMask:Int):CURLCode {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_native && lime_curl && !macro)
 		return cast lime_curl_easy_pause (handle, bitMask);
 		#else
 		return cast 0;
@@ -79,7 +79,7 @@ class CURLEasy {
 	
 	public static function perform (handle:CURL):CURLCode {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_native && lime_curl && !macro)
 		return cast lime_curl_easy_perform (handle);
 		#else
 		return cast 0;
@@ -101,7 +101,7 @@ class CURLEasy {
 	
 	public static function reset (handle:CURL):Void {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_native && lime_curl && !macro)
 		lime_curl_easy_reset (handle);
 		#end
 		
@@ -121,7 +121,7 @@ class CURLEasy {
 	
 	public static function setopt (handle:CURL, option:CURLOption, parameter:Dynamic):CURLCode {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_native && lime_curl && !macro)
 		if (option == CURLOption.WRITEFUNCTION || option == CURLOption.HEADERFUNCTION) {
 			
 			parameter = __writeCallback.bind (parameter);
@@ -137,7 +137,7 @@ class CURLEasy {
 	
 	public static function strerror (code:CURLCode):String {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_native && lime_curl && !macro)
 		return lime_curl_easy_strerror (cast (code, Int));
 		#else
 		return null;
@@ -148,7 +148,7 @@ class CURLEasy {
 	
 	public static function unescape (handle:CURL, url:String, inLength:Int, outLength:Int):String {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_native && lime_curl && !macro)
 		return lime_curl_easy_unescape (handle, url, inLength, outLength);
 		#else
 		return null;
@@ -159,7 +159,7 @@ class CURLEasy {
 	
 	private static function __writeCallback (callback:Dynamic, output:Dynamic, size:Int, nmemb:Int):Int {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_native && lime_curl && !macro)
 		var bytes:Bytes = null;
 		
 		if (output != null) {
@@ -179,7 +179,7 @@ class CURLEasy {
 	}
 	
 	
-	#if ((cpp || neko || nodejs) && lime_curl && !macro)
+	#if (lime_native && lime_curl && !macro)
 	@:cffi private static function lime_curl_easy_cleanup (handle:Dynamic):Void;
 	@:cffi private static function lime_curl_easy_duphandle (handle:Dynamic):Dynamic;
 	@:cffi private static function lime_curl_easy_escape (curl:Dynamic, url:String, length:Int):Dynamic;

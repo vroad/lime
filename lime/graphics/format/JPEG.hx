@@ -24,7 +24,7 @@ class JPEG {
 	
 	public static function decodeBytes (bytes:Bytes, decodeData:Bool = true):Image {
 		
-		#if ((cpp || neko || nodejs) && !macro)
+		#if (lime_native && !macro)
 		
 		var bufferData:Dynamic = lime_jpeg_decode_bytes (bytes, decodeData);
 		
@@ -45,7 +45,7 @@ class JPEG {
 	
 	public static function decodeFile (path:String, decodeData:Bool = true):Image {
 		
-		#if ((cpp || neko || nodejs) && !macro)
+		#if (lime_native && !macro)
 		
 		var bufferData:Dynamic = lime_jpeg_decode_file (path, decodeData);
 		
@@ -78,7 +78,7 @@ class JPEG {
 		
 		#if java
 		
-		#elseif (sys && (!disable_cffi || !format) && !macro)
+		#elseif (lime_native && sys && (!disable_cffi || !format) && !macro)
 			
 			var data:Dynamic = lime_image_encode (image.buffer, 1, quality);
 			return BytesUtil.createBytes (data.length, data.b);
@@ -121,7 +121,7 @@ class JPEG {
 	
 	
 	
-	#if ((cpp || neko || nodejs) && !macro)
+	#if (lime_native && !macro)
 	@:cffi private static function lime_jpeg_decode_bytes (data:Dynamic, decodeData:Bool):Dynamic;
 	@:cffi private static function lime_jpeg_decode_file (path:String, decodeData:Bool):Dynamic;
 	@:cffi private static function lime_image_encode (data:Dynamic, type:Int, quality:Int):Dynamic;

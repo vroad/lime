@@ -57,7 +57,7 @@ class AudioSource {
 	private var channel:FMODChannel;
 	#end
 	
-	#if (cpp || neko || nodejs)
+	#if lime_native
 	private var queueTimer:Timer;
 	private var format:Int;
 	
@@ -85,7 +85,7 @@ class AudioSource {
 		this.loops = loops;
 		id = 0;
 		playing = false;
-        #if (cpp || neko || nodejs)
+        #if lime_native
 		bufferTime = 1000;
 		finishedDecoding = false;
         #end
@@ -105,7 +105,7 @@ class AudioSource {
 			
 			case OPENAL (alc, al):
 						
-				#if (cpp || neko || nodejs)
+				#if lime_native
 				
 				if (id != 0) {
 					
@@ -134,7 +134,7 @@ class AudioSource {
 			
 			case OPENAL (alc, al):
 				
-				#if (cpp || neko || nodejs)
+				#if lime_native
 				
 				if (buffer.id == 0) {
 					
@@ -407,7 +407,7 @@ class AudioSource {
 	
 	private function timer_onRun ():Void {
 		
-		#if (cpp || neko || nodejs)
+		#if lime_native
 		
 		var sourceState:Int = AL.getSourcei (id, AL.SOURCE_STATE);
 		if (playing && !finishedDecoding)  {
@@ -468,7 +468,7 @@ class AudioSource {
 	
 	private function streamTimer_onRun () {
 		
-		#if (cpp || neko || nodejs)
+		#if lime_native
 		
 		var sourceState:Int = AL.getSourcei (id, AL.SOURCE_STATE);
 		if (playing && !finishedDecoding) {
@@ -793,7 +793,7 @@ class AudioSource {
 	
 	private function getBufferSize ():Int {
 		
-        #if (cpp || neko || nodejs)
+        #if lime_native
 		return Std.int (buffer.sampleRate * buffer.bitsPerSample / 8 * buffer.channels * Math.max (bufferTime, minimumBufferTime) / 1000 / streamBuffers.length);
         #else
         return 0;
@@ -803,7 +803,7 @@ class AudioSource {
 	
 	private function getMinimalBufferCountForLoop ():Int {
 		
-        #if (cpp || neko || nodejs)
+        #if lime_native
 		return Std.int (Math.max (Math.floor (minimumBufferTime / length), 2));
         #else
         return 0;
@@ -811,7 +811,7 @@ class AudioSource {
 		
 	}
 	
-	#if (cpp || neko || nodejs)
+	#if lime_native
 	@:cffi private static function lime_audio_stream_decode (handle:Dynamic, data:Dynamic, readSize:Int, writeOffset:Int):Int;
 	@:cffi private static function lime_audio_stream_seek (data:Dynamic, seconds:Float):Bool;
 	#end

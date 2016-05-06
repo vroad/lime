@@ -75,7 +75,7 @@ class AudioManager {
 				
 				case OPENAL (alc, al):
 					
-					#if (cpp || neko || nodejs)
+					#if lime_native
 					
 					var currentContext = alc.getCurrentContext ();
 					
@@ -106,7 +106,7 @@ class AudioManager {
 				
 				case OPENAL (alc, al):
 					
-					#if (cpp || neko || nodejs)
+					#if lime_native
 					
 					var currentContext = alc.getCurrentContext ();
 					
@@ -138,7 +138,7 @@ class AudioManager {
 				
 				case OPENAL (alc, al):
 					
-					#if (cpp || neko || nodejs)
+					#if lime_native
 					
 					var currentContext = alc.getCurrentContext ();
 					

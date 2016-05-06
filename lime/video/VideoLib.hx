@@ -8,7 +8,7 @@ class VideoLib {
 
 	public function new () {
 
-		#if (cpp || neko || nodejs)
+		#if lime_native
 		__handle = lime_video_lib_create ();
 		#end
 
@@ -16,7 +16,7 @@ class VideoLib {
 
 	public function createVideo ():Video {
 		
-		#if (cpp || neko || nodejs)
+		#if lime_native
 		var videoHandle = lime_video_lib_create_video (__handle);
 		if (videoHandle != null)
 			return new Video (videoHandle);
@@ -32,7 +32,7 @@ class VideoLib {
 
 
 
-	#if (cpp || neko || nodejs)
+	#if lime_native
 	private static var lime_video_lib_create = System.load ("lime", "lime_video_lib_create", 0);
 	private static var lime_video_lib_create_video = System.load ("lime", "lime_video_lib_create_video", 1);
 	#end

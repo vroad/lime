@@ -132,7 +132,7 @@ abstract CairoFontOptions(CFFIPointer) from CFFIPointer to CFFIPointer {
 	
 	
 	
-	#if (lime_cairo && (cpp || neko || nodejs) && !macro)
+	#if (lime_cairo && lime_native && !macro)
 	@:cffi private static function lime_cairo_font_options_create ():CFFIPointer;
 	@:cffi private static function lime_cairo_font_options_get_antialias (handle:CFFIPointer):Int;
 	@:cffi private static function lime_cairo_font_options_get_hint_metrics (handle:CFFIPointer):Int;

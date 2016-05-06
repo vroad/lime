@@ -80,7 +80,7 @@ class AudioBuffer {
 		
 		lime.Lib.notImplemented ("AudioBuffer.fromBytes");
 		
-		#elseif ((cpp || neko || nodejs) && !macro)
+		#elseif (lime_native && !macro)
 		
 		var data:Dynamic = lime_audio_load (bytes, stream);
 		
@@ -131,7 +131,7 @@ class AudioBuffer {
 			
 		}
 		
-		#elseif ((cpp || neko || nodejs) && !macro)
+		#elseif (lime_native && !macro)
 		
 		var data:Dynamic = lime_audio_load (path, stream);
 		
@@ -202,7 +202,7 @@ class AudioBuffer {
 	}
 	
 	
-	#if ((cpp || neko || nodejs) && !macro)
+	#if (lime_native && !macro)
 	@:cffi private static function lime_audio_load (data:Dynamic, stream:Bool):Dynamic;
 	#end
 	
