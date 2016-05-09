@@ -732,7 +732,7 @@ class Image {
 			
 			default:
 				
-				return null;
+				return;
 			
 		}
 		
