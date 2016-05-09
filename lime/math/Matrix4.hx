@@ -171,7 +171,7 @@ abstract Matrix4(Float32Array) from Float32Array to Float32Array {
 
 	}
 
-	public function copythisFrom( array:Float32Array, index:UInt = 0, transposeValues:Bool = false ) {
+	public function copythisFrom( array:Float32Array, index:Int = 0, transposeValues:Bool = false ) {
 		
 		if ( transposeValues )
 			transpose();
@@ -186,7 +186,7 @@ abstract Matrix4(Float32Array) from Float32Array to Float32Array {
 	}
 
 
-	public function copythisTo( array:Float32Array, index:UInt = 0, transposeValues:Bool = false ) {
+	public function copythisTo( array:Float32Array, index:Int = 0, transposeValues:Bool = false ) {
 
 		if ( transposeValues )
 		   transpose();
@@ -201,7 +201,7 @@ abstract Matrix4(Float32Array) from Float32Array to Float32Array {
 	}
 
 
-	public function copyRowFrom( row:UInt, vector:Vector4 ) {
+	public function copyRowFrom( row:Int, vector:Vector4 ) {
 
 		switch( row ) {
 
