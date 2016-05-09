@@ -1206,7 +1206,7 @@ class Image {
 			// (issue #1019768)
 			if (image.complete) { }
 			
-		#elseif (cpp || neko || nodejs || java)
+		#elseif lime_native
 			
 			var buffer = null;
 			
