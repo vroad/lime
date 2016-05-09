@@ -2277,10 +2277,10 @@ class GL {
 	@:cffi private static function lime_gl_get_extension (name:String):Dynamic;
 	@:cffi private static function lime_gl_get_framebuffer_attachment_parameter (target:Int, attachment:Int, pname:Int):Int;
 	@:cffi private static function lime_gl_get_parameter (pname:Int):Dynamic;
-	@:cffi private static function lime_gl_get_program_info_log (program:Int):String;
+	@:cffi private static function lime_gl_get_program_info_log (program:Int):Dynamic;
 	@:cffi private static function lime_gl_get_program_parameter (program:Int, pname:Int):Int;
 	@:cffi private static function lime_gl_get_render_buffer_parameter (target:Int, pname:Int):Int;
-	@:cffi private static function lime_gl_get_shader_info_log (shader:Int):String;
+	@:cffi private static function lime_gl_get_shader_info_log (shader:Int):Dynamic;
 	@:cffi private static function lime_gl_get_shader_parameter (shader:Int, pname:Int):Int;
 	@:cffi private static function lime_gl_get_shader_precision_format (shadertype:Int, precisiontype:Int):Dynamic;
 	@:cffi private static function lime_gl_get_shader_source (shader:Int):Dynamic;
