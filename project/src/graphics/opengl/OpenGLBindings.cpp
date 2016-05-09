@@ -765,11 +765,13 @@ namespace lime {
 	}
 	
 	
-	HxString lime_gl_get_program_info_log (int id) {
+	value lime_gl_get_program_info_log (int id) {
 		
-		char buf[1024];
-		glGetProgramInfoLog (id, 1024, 0, buf);
-		return HxString (buf);
+		GLint logSize = 0;
+		glGetShaderiv (id, GL_INFO_LOG_LENGTH, &logSize);
+		std::string buf (logSize, NULL);
+		glGetProgramInfoLog (id, logSize, NULL, &buf[0]);
+		return alloc_string_len (&buf[0], logSize);
 		
 	}
 	
@@ -792,13 +794,14 @@ namespace lime {
 	}
 	
 	
-	HxString lime_gl_get_shader_info_log (int id) {
+	value lime_gl_get_shader_info_log (int id) {
 		
-		char buf[1024] = "";
+		GLint logSize = 0;
+		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logSize);
+		std::string buf(logSize, NULL);
+		glGetShaderInfoLog (id, logSize, NULL, &buf[0]);
 		
-		glGetShaderInfoLog (id, 1024, 0, buf);
-		
-		return HxString (buf);
+		return alloc_string_len (&buf[0], logSize);
 		
 	}
 	
