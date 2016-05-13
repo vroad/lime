@@ -20,7 +20,7 @@ abstract CairoFontFace(CFFIPointer) from CFFIPointer to CFFIPointer {
 	
 	public function status ():CairoStatus {
 		
-		#if (lime_cairo && !macro)
+		#if (lime_cairo && lime_native && !macro)
 		return lime_cairo_font_face_status (this);
 		#else
 		return 0;
@@ -36,7 +36,7 @@ abstract CairoFontFace(CFFIPointer) from CFFIPointer to CFFIPointer {
 	
 	
 	
-	#if (lime_native && !macro)
+	#if (lime_cairo && lime_native && !macro)
 	@:cffi private static function lime_cairo_font_face_status (handle:CFFIPointer):Int;
 	#end
 	

@@ -20,7 +20,7 @@ abstract CairoFontOptions(CFFIPointer) from CFFIPointer to CFFIPointer {
 	
 	public function new () {
 		
-		#if (lime_cairo && !macro)
+		#if (lime_cairo && lime_native && !macro)
 		this = lime_cairo_font_options_create ();
 		#else
 		this = null;
