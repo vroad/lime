@@ -126,6 +126,21 @@ class NativeApplication {
 		untyped setImmediate (eventLoop);
 		return 0;
 		
+		#elseif cs
+		
+		lime_application_init (handle);
+		var active = true;
+		
+		do {
+			
+			active = lime_application_update (handle);
+			
+		} while (active);
+		
+		var result = lime_application_quit (handle);
+		parent.onExit.dispatch (result);
+		return result;
+		
 		#elseif (cpp || neko)
 		
 		var result = lime_application_exec (handle);

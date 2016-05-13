@@ -70,7 +70,8 @@
 		<haxedef name="lime-curl" unless="lime-console || emscripten || flash || html5" />
 		<haxedef name="lime-opengl" unless="lime-console || flash" />
 		<haxedef name="lime-openal" unless="lime-console || static_link || flash || html5" />
-		<haxedef name="lime-openal" if="emscripten" />
+		<haxedef name="lime-openal" if="emscripten" />	
+		<haxedef name="no_typedarray_inline" />
 		
 	</section>
 	
