@@ -40,7 +40,7 @@ abstract RGBA(Int) from Int to Int from UInt to UInt {
 			
 		}
 		
-		for (i in 0xFF...(0xFF + 0xFF + 1)) {
+		for (i in 0xFF...(0xFF + 0xFF)) {
 			
 			__clamp[i] = 0xFF;
 			
