@@ -1,4 +1,4 @@
-package cs;
+package cs.ndll;
 
 extern class NDLLFunction
 {

@@ -135,9 +135,9 @@ class WindowsPlatform extends PlatformTarget {
 			
 		} else if (targetType == "cs") {
 			
-			CSHelper.copyLibraries (project.templatePaths, "windows", applicationDirectory);
 			ProcessHelper.runCommand ("", "haxe", [ hxml ]);
-			CSHelper.addCSNDLLReference (targetDirectory + "/obj/hxcs_build.txt", sys.FileSystem.absolutePath(applicationDirectory + "cs-ndll.dll"));
+			CSHelper.copySourceFiles (project.templatePaths, targetDirectory + "/obj/src");
+			CSHelper.addCSNDLLReference (targetDirectory + "/obj/hxcs_build.txt");
 			CSHelper.compile (project, targetDirectory + "/obj", applicationDirectory + project.app.file, "x86");
 			
 		} else {

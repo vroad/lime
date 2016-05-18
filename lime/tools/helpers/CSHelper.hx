@@ -7,19 +7,36 @@ import sys.io.File;
 class CSHelper {
 	
 	
-	public static function copyLibraries (templatePaths:Array <String>, platformName:String, targetPath:String) {
+	public static function copySourceFiles (templatePaths:Array <String>, targetPath:String) {
 		
-		FileHelper.recursiveCopyTemplate (templatePaths, "cs/ndll/" + platformName, targetPath);
+		FileHelper.recursiveCopyTemplate (templatePaths, "cs/src", targetPath);
 		
 	}
 	
-	public static function addCSNDLLReference (txtPath:String, csNdllPath:String) {
+	public static function addCSNDLLReference (txtPath:String) {
 		
 		var content = File.getContent(txtPath);
-		content +=
-			"begin libs\n" +
-			csNdllPath + "\n" +
-			"end libs\n";
+		var files = [
+				"cs.ndll.NDLLFunction",
+				"cs.ndll.CFFICSLoader",
+				"cs.ndll.CSAbstract",
+				"cs.ndll.CSHandleContainer",
+				"cs.ndll.CSHandleScope",
+				"cs.ndll.CSPersistent",
+				"cs.ndll.DelegateConverter",
+				"cs.ndll.HandleUtils",
+				"cs.ndll.NativeMethods",
+				"cs.ndll.NDLLFunction",
+			];
+		content += "\nbegin modules\n";
+		
+		for (file in files) {
+			
+			content += 'M $file\nC $file\n';
+			
+		}
+		
+		content += "end modules\n";
 		File.saveContent (txtPath, content);
 		
 	}

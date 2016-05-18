@@ -1,5 +1,5 @@
 package lime.system;
-import cs.NDLLFunction;
+import cs.ndll.NDLLFunction;
 import cs.NativeArray;
 
 class CSFunctionLoader
@@ -8,8 +8,6 @@ class CSFunctionLoader
 		
 		#if windows
 		
-		if (!NDLLFunction.Initialized)
-			NDLLFunction.Initialize (Array, Reflect, cs.internal.Function, cs.internal.HxObject.DynamicObject);
 		var func:NDLLFunction = NDLLFunction.Load (name, func, args);
 		
 		if (func == null) {
