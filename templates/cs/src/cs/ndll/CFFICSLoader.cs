@@ -472,10 +472,9 @@ namespace cs.ndll
 
         private static IntPtr cs_alloc_string_len(IntPtr inStr, int inLen)
         {
-            byte[] bytes = new byte[inLen + 1];
+            byte[] bytes = new byte[inLen];
             Marshal.Copy(inStr, bytes, 0, inLen);
-            bytes[inLen] = 0;
-            String str = Encoding.UTF8.GetString(bytes);
+            String str = Encoding.UTF8.GetString(bytes, 0, inLen);
             return CSHandleContainer.GetCurrent().CreateGCHandle(str);
         }
 
