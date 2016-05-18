@@ -91,6 +91,9 @@ namespace cs.ndll
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
         private delegate IntPtr AllocStringLenDelegate(IntPtr inStr, int inLen);
 
+         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
+        private delegate IntPtr AllocWStringLenDelegate([MarshalAs(UnmanagedType.LPWStr)]String inStr, int inLen);
+
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
         private delegate IntPtr AllocFloatDelegate(double arg1);
 
@@ -161,6 +164,7 @@ namespace cs.ndll
         private static DelegateConverter<ValCall0Delegate> val_call0;
         private static DelegateConverter<AllocEmptyObjectDelegate> alloc_empty_object;
         private static DelegateConverter<AllocStringLenDelegate> alloc_string_len;
+        private static DelegateConverter<AllocWStringLenDelegate> alloc_wstring_len;
         private static DelegateConverter<AllocFloatDelegate> alloc_float;
         private static DelegateConverter<AllocBufferLenDelegate> alloc_buffer_len;
         private static DelegateConverter<BufferDataDelegate> buffer_data;
@@ -478,6 +482,11 @@ namespace cs.ndll
             return CSHandleContainer.GetCurrent().CreateGCHandle(str);
         }
 
+        private static IntPtr cs_alloc_wstring_len(String str, int inLen)
+        {
+            return CSHandleContainer.GetCurrent().CreateGCHandle(str.Substring(0, inLen));
+        }
+
         private static IntPtr cs_alloc_float(double arg1)
         {
             return CSHandleContainer.GetCurrent().CreateGCHandle(arg1);
@@ -548,6 +557,7 @@ namespace cs.ndll
             val_call0 = new DelegateConverter<ValCall0Delegate>(new ValCall0Delegate(cs_val_call0));
             alloc_empty_object = new DelegateConverter<AllocEmptyObjectDelegate>(new AllocEmptyObjectDelegate(cs_alloc_empty_object));
             alloc_string_len = new DelegateConverter<AllocStringLenDelegate>(new AllocStringLenDelegate(cs_alloc_string_len));
+            alloc_wstring_len = new DelegateConverter<AllocWStringLenDelegate>(new AllocWStringLenDelegate(cs_alloc_wstring_len));
             alloc_float = new DelegateConverter<AllocFloatDelegate>(new AllocFloatDelegate(cs_alloc_float));
             alloc_buffer_len = new DelegateConverter<AllocBufferLenDelegate>(new AllocBufferLenDelegate(cs_alloc_buffer_len));
             buffer_data = new DelegateConverter<BufferDataDelegate>(new BufferDataDelegate(cs_buffer_data));
@@ -618,6 +628,8 @@ namespace cs.ndll
                     return alloc_empty_object.ToPointer();
                 case "alloc_string_len":
                     return alloc_string_len.ToPointer();
+                case "alloc_wstring_len":
+                    return alloc_wstring_len.ToPointer();
                 case "alloc_float":
                     return alloc_float.ToPointer();
                 case "alloc_buffer_len":
