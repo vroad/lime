@@ -31,15 +31,15 @@ import haxe.io.Path;
 class Font {
 	
 	
-	public var ascender (get, null):Null<Int>;
-	public var descender (get, null):Null<Int>;
-	public var height (get, null):Null<Int>;
+	public var ascender (get, null):Int;
+	public var descender (get, null):Int;
+	public var height (get, null):Int;
 	public var name (default, null):String;
-	public var numGlyphs (get, null):Null<Int>;
+	public var numGlyphs (get, null):Int;
 	public var src:Dynamic;
-	public var underlinePosition (get, null):Null<Int>;
-	public var underlineThickness (get, null):Null<Int>;
-	public var unitsPerEM (get, null):Null<Int>;
+	public var underlinePosition (get, null):Int;
+	public var underlineThickness (get, null):Int;
+	public var unitsPerEM (get, null):Int;
 	
 	@:noCompletion private var __fontPath:String;
 	#if lime_native
@@ -289,15 +289,10 @@ class Font {
 	
 	
 	
-	private function get_ascender ():Null<Int> {
+	private function get_ascender ():Int {
 		
 		#if (lime_native && !macro)
-		if (ascender == null) {
-			
-			ascender = lime_font_get_ascender (src);
-			
-		}
-		return ascender;
+		return lime_font_get_ascender (src);
 		#else
 		return 0;
 		#end
@@ -305,15 +300,10 @@ class Font {
 	}
 	
 	
-	private function get_descender ():Null<Int> {
+	private function get_descender ():Int {
 		
 		#if (lime_native && !macro)
-		if (descender == null) {
-			
-			descender = lime_font_get_descender (src);
-			
-		}
-		return descender;
+		return lime_font_get_descender (src);
 		#else
 		return 0;
 		#end
@@ -321,15 +311,10 @@ class Font {
 	}
 	
 	
-	private function get_height ():Null<Int> {
+	private function get_height ():Int {
 		
 		#if (lime_native && !macro)
-		if (height == null) {
-			
-			height = lime_font_get_height (src);
-			
-		}
-		return height;
+		return lime_font_get_height (src);
 		#else
 		return 0;
 		#end
@@ -337,15 +322,10 @@ class Font {
 	}
 	
 	
-	private function get_numGlyphs ():Null<Int> {
+	private function get_numGlyphs ():Int {
 		
 		#if (lime_native && !macro)
-		if (numGlyphs == null) {
-			
-			numGlyphs = lime_font_get_num_glyphs (src);
-			
-		}
-		return numGlyphs;
+		return lime_font_get_num_glyphs (src);
 		#else
 		return 0;
 		#end
@@ -353,15 +333,10 @@ class Font {
 	}
 	
 	
-	private function get_underlinePosition ():Null<Int> {
+	private function get_underlinePosition ():Int {
 		
 		#if (lime_native && !macro)
-		if (underlinePosition == null) {
-			
-			return lime_font_get_underline_position (src);
-			
-		}
-		return underlinePosition;
+		return lime_font_get_underline_position (src);
 		#else
 		return 0;
 		#end
@@ -369,15 +344,10 @@ class Font {
 	}
 	
 	
-	private function get_underlineThickness ():Null<Int> {
+	private function get_underlineThickness ():Int {
 		
 		#if (lime_native && !macro)
-		if (underlineThickness == null) {
-			
-			underlineThickness = lime_font_get_underline_thickness (src);
-			
-		}
-		return underlineThickness;
+		return lime_font_get_underline_thickness (src);
 		#else
 		return 0;
 		#end
@@ -385,15 +355,10 @@ class Font {
 	}
 	
 	
-	private function get_unitsPerEM ():Null<Int> {
+	private function get_unitsPerEM ():Int {
 		
 		#if (lime_native && !macro)
-		if (unitsPerEM == null) {
-			
-			unitsPerEM = lime_font_get_units_per_em (src);
-			
-		}
-		return unitsPerEM;
+		return lime_font_get_units_per_em (src);
 		#else
 		return 0;
 		#end
