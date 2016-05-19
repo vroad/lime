@@ -6,8 +6,6 @@ class CSFunctionLoader
 {
 	public static function load (name:String, func:String, args:Int):Dynamic {
 		
-		#if windows
-		
 		var func:NDLLFunction = NDLLFunction.Load (name, func, args);
 		
 		if (func == null) {
@@ -78,12 +76,6 @@ class CSFunctionLoader
 		}
 		
 		return null;
-		
-		#else
-		
-		return null;
-		
-		#end
 		
 	}
 }
