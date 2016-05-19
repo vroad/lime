@@ -183,8 +183,11 @@ OGL_EXT(glBlendFunc,void, (GLenum sfactor, GLenum dfactor));
 OGL_EXT(glClear,void, (GLbitfield mask));
 OGL_EXT(glClearColor,void, (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha));
 //OGL_EXT(glClearColorx,void, (GLclampx red, GLclampx green, GLclampx blue, GLclampx alpha));
-//OGL_EXT(glClearDepth,void, (GLclampd depth));
+#ifdef !LIME_GLES
+OGL_EXT(glClearDepth,void, (GLclampd depth));
+#else
 OGL_EXT(glClearDepthf,void, (GLclampf depth));
+#endif
 //OGL_EXT(glClearDepthx,void, (GLclampx depth));
 OGL_EXT(glClearStencil,void, (GLint s));
 //OGL_EXT(glClientActiveTexture,void, (GLenum texture));
@@ -200,8 +203,9 @@ OGL_EXT(glCullFace,void, (GLenum mode));
 OGL_EXT(glDeleteTextures,void, (GLsizei n, const GLuint *textures));
 OGL_EXT(glDepthFunc,void, (GLenum func));
 OGL_EXT(glDepthMask,void, (GLboolean flag));
-//OGL_EXT(glDepthRange,void, (GLclampd zNear, GLclampd zFar));
-#ifdef LIME_GLES
+#ifdef !LIME_GLES
+OGL_EXT(glDepthRange,void, (GLclampd zNear, GLclampd zFar));
+#else
 OGL_EXT(glDepthRangef,void, (GLclampf nearVal,GLclampf farVal));
 #endif
 //OGL_EXT(glDepthRangex,void, (GLclampx zNear, GLclampx zFar));
