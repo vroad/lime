@@ -21,7 +21,7 @@
 	url = https://github.com/native-toolkit/neko
 [submodule "project/lib/png"]
 	path = project/lib/png
-	url = https://github.com/native-toolkit/png
+	url = https://github.com/vroad/png
 [submodule "project/lib/jpeg"]
 	path = project/lib/jpeg
 	url = https://github.com/vroad/jpeg
