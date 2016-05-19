@@ -10,6 +10,8 @@
 	<set name="lime-hybrid" value="1" if="hybrid || lime_hybrid" />
 	<set name="lime-legacy" value="1" if="legacy || lime_legacy" unless="lime-hybrid" />
 	
+	<set name="angle" if="windows" />
+	
 	<section if="web || display">
 		
 		<unset name="lime-legacy" />
