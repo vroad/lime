@@ -10,7 +10,7 @@ namespace cs.ndll
 #if true
             return LoadLibrary(filename + ".ndll");
 #else
-            return dlopen(filename, RTLD_NOW);
+            return dlopen(filename + ".ndll", RTLD_NOW);
 #endif
         }
 
