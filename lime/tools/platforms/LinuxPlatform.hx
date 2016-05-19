@@ -5,6 +5,7 @@ import haxe.io.Path;
 import haxe.Template;
 import lime.tools.helpers.AssetHelper;
 import lime.tools.helpers.CPPHelper;
+import lime.tools.helpers.CSHelper;
 import lime.tools.helpers.DeploymentHelper;
 import lime.tools.helpers.FileHelper;
 import lime.tools.helpers.LogHelper;
@@ -65,6 +66,10 @@ class LinuxPlatform extends PlatformTarget {
 		} else if (project.targetFlags.exists ("nodejs")) {
 			
 			targetType = "nodejs";
+			
+		} else if (project.targetFlags.exists ("cs")) {
+			
+			targetType = "cs";
 			
 		} else {
 			
@@ -136,6 +141,13 @@ class LinuxPlatform extends PlatformTarget {
 			ProcessHelper.runCommand ("", "haxe", [ hxml ]);
 			//NekoHelper.createExecutable (project.templatePaths, "linux" + (is64 ? "64" : ""), targetDirectory + "/obj/ApplicationMain.n", executablePath);
 			NekoHelper.copyLibraries (project.templatePaths, "linux" + (is64 ? "64" : ""), applicationDirectory);
+			
+		} else if (targetType == "cs") {
+			
+			ProcessHelper.runCommand ("", "haxe", [ hxml ]);
+			CSHelper.copySourceFiles (project.templatePaths, targetDirectory + "/obj/src");
+			CSHelper.addCSNDLLReference (targetDirectory + "/obj/hxcs_build.txt");
+			CSHelper.compile (project, targetDirectory + "/obj", applicationDirectory + project.app.file, "x86");
 			
 		} else {
 			
