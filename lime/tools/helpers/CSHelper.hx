@@ -43,7 +43,7 @@ class CSHelper {
 	
 	public static function compile (project:HXProject, path:String, outPath:String, arch:String, buildFile:String = "hxcs_build.txt") {
 		
-		var args = [ "run", project.config.getString ("cs.buildLibrary", "hxcs"), buildFile, "--arch", arch, "--out", outPath ];
+		var args = [ "run", project.config.getString ("cs.buildLibrary", "hxcs"), buildFile, "--arch", arch, "--out", outPath, "--unsafe" ];
 		var code = ProcessHelper.runCommand (path, "haxelib", args);
 			
 		if (code != 0) {
