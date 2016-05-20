@@ -3,37 +3,18 @@ using System.Runtime.InteropServices;
 
 namespace cs.ndll
 {
-    class CSPersistent : IDisposable
+    class CSPersistent
     {
         internal object Value { get; private set; }
-        internal GCHandle Handle { get; private set; }
-        private bool disposed;
 
         internal CSPersistent(object value)
         {
             Value = value;
-            Handle = GCHandle.Alloc(this);
-            disposed = false;
         }
 
-        public void Dispose()
+        internal void Destroy()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (disposed)
-                return;
-            
-            Handle.Free();
-            disposed = true;
-        }
-
-        ~CSPersistent()
-        {
-            Dispose(false);
+            Value = null;
         }
     }
 }

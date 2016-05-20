@@ -268,23 +268,22 @@ namespace cs.ndll
         private static IntPtr cs_create_root(IntPtr inValue)
         {
             object value = HandleUtils.GetObjectFromIntPtr(inValue);
-            return GCHandle.ToIntPtr(new CSPersistent(value).Handle);
+            GCHandle handle = GCHandle.Alloc(new CSPersistent(value));
+            return GCHandle.ToIntPtr(handle);
         }
 
         private static IntPtr cs_query_root(IntPtr inValue)
         {
             CSPersistent persistent = (CSPersistent)HandleUtils.GetObjectFromIntPtr(inValue);
-            if (persistent == null)
-                return IntPtr.Zero;
             return CSHandleContainer.GetCurrent().CreateGCHandle(persistent.Value);
         }
 
         private static void cs_destroy_root(IntPtr inValue)
         {
-            CSPersistent persistent = (CSPersistent)HandleUtils.GetObjectFromIntPtr(inValue);
-            if (persistent == null)
-                return;
-            persistent.Dispose();
+            GCHandle handle = GCHandle.FromIntPtr(inValue);
+            CSPersistent persistent = (CSPersistent)handle.Target;
+            persistent.Destroy();
+            handle.Free();
         }
 
         private static void cs_val_gc(IntPtr inArg1, CSAbstract.FinalizerDelegate arg2)
