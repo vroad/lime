@@ -25,11 +25,13 @@ namespace cs.ndll
                 finalizer = value;
             }
         }
+        private bool disposed;
 
         internal CSAbstract(int kind, IntPtr ptr)
         {
             Pointer = ptr;
             Kind = kind;
+            disposed = false;
         }
 
         public void Dispose()
@@ -40,13 +42,13 @@ namespace cs.ndll
 
         private void Dispose(bool disposing)
         {
-            if (this.Finalizer != null)
-            {
-                GCHandle handle = GCHandle.Alloc(this, GCHandleType.Normal);
-                finalizer(GCHandle.ToIntPtr(handle));
-                finalizer = null;
-                handle.Free();
-            }
+            if (disposed)
+                return;
+            disposed = true;
+
+            GCHandle handle = GCHandle.Alloc(this, GCHandleType.Normal);
+            finalizer(GCHandle.ToIntPtr(handle));
+            handle.Free();
         }
 
         ~CSAbstract()
