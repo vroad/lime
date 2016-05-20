@@ -8,12 +8,10 @@ namespace cs.ndll
         private T func;
         private IntPtr funcPtr;
         private GCHandle handle;
-        private bool initialized;
 
         internal DelegateConverter(T func)
         {
             this.func = func;
-            initialized = false;
         }
 
         ~DelegateConverter()
@@ -29,20 +27,18 @@ namespace cs.ndll
 
         private void Dispose(bool disposing)
         {
-            if (!initialized)
+            if (!handle.IsAllocated)
                 return;
 
             handle.Free();
-            initialized = false;
         }
 
         internal IntPtr ToPointer()
         {
-            if (!initialized)
+            if (!handle.IsAllocated)
             {
                 funcPtr = Marshal.GetFunctionPointerForDelegate(func as Delegate);
                 handle = GCHandle.Alloc(funcPtr, GCHandleType.Pinned);
-                initialized = true;
             }
             return (IntPtr)handle.Target;
         }
