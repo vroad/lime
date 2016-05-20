@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace cs.ndll
@@ -45,6 +45,8 @@ namespace cs.ndll
             if (disposed)
                 return;
             disposed = true;
+            if (finalizer == null)
+                return;
 
             GCHandle handle = GCHandle.Alloc(this, GCHandleType.Normal);
             finalizer(GCHandle.ToIntPtr(handle));
