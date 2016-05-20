@@ -1,25 +1,39 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace cs.ndll
 {
-    class CSPersistent
+    class CSPersistent : IDisposable
     {
         internal object Value { get; private set; }
-        internal System.Collections.Generic.LinkedListNode<CSPersistent> Node;
         internal GCHandle Handle { get; private set; }
+        private bool disposed;
 
         internal CSPersistent(object value)
         {
             Value = value;
             Handle = GCHandle.Alloc(this);
+            disposed = false;
         }
 
-        internal void Destroy()
+        public void Dispose()
         {
-            if (!Handle.IsAllocated)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposed)
                 return;
             
             Handle.Free();
+            disposed = true;
+        }
+
+        ~CSPersistent()
+        {
+            Dispose(false);
         }
     }
 }

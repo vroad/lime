@@ -8,7 +8,6 @@ namespace cs.ndll
         private bool disposed = false;
         private System.Collections.Generic.Dictionary<string, int> sgNameToID;
         private System.Collections.Generic.List<string> sgIDToName;
-        private System.Collections.Generic.LinkedList<CSPersistent> persistentHandles;
 
         internal System.Collections.Generic.List<GCHandle> handles;
         internal System.Collections.Generic.List<IntPtr> memoryList;
@@ -19,7 +18,6 @@ namespace cs.ndll
         {
             sgNameToID = new System.Collections.Generic.Dictionary<string, int>();
             sgIDToName = new System.Collections.Generic.List<string>();
-            persistentHandles = new System.Collections.Generic.LinkedList<CSPersistent>();
 
             handles = new System.Collections.Generic.List<GCHandle>();
             memoryList = new System.Collections.Generic.List<IntPtr>();
@@ -38,9 +36,6 @@ namespace cs.ndll
 
             for (int i = 0; i < handles.Count; ++i)
                 handles[i].Free();
-
-            for (System.Collections.Generic.LinkedListNode<CSPersistent> it = persistentHandles.First; it != null; it = it.Next)
-                it.Value.Destroy();
 
             for (int i = 0; i < memoryList.Count; ++i)
                 Marshal.FreeHGlobal(memoryList[i]);
@@ -74,16 +69,6 @@ namespace cs.ndll
             return GCHandle.ToIntPtr(handles[handles.Count - 1]);
         }
 
-        internal IntPtr CreatePersistentGCHandle(Object value)
-        {
-            if (value == null)
-                return IntPtr.Zero;
-            CSPersistent persistent = new CSPersistent(value);
-            System.Collections.Generic.LinkedListNode<CSPersistent> node = persistentHandles.AddLast(persistent);
-            persistent.Node = node;
-            return GCHandle.ToIntPtr(persistent.Handle);
-        }
-
         internal IntPtr CreatePinnedGCHandle(Object value)
         {
             handles.Add(GCHandle.Alloc(value, GCHandleType.Pinned));
@@ -101,12 +86,6 @@ namespace cs.ndll
             IntPtr memory = Marshal.AllocHGlobal(length);
             memoryList.Add(memory);
             return memory;
-        }
-
-        internal void DestroyPersistentHandleWrap(CSPersistent persistent)
-        {
-            persistent.Destroy();
-            persistentHandles.Remove(persistent.Node);
         }
 
         internal void ResizeHandles(int handleSize, int memoryListSize)
