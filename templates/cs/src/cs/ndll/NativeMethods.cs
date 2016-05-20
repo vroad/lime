@@ -7,47 +7,58 @@ namespace cs.ndll
     {
         public static IntPtr LoadLibraryWrap(String filename)
         {
-#if true
-            return LoadLibrary(filename + ".ndll");
-#else
-            return dlopen(filename + ".ndll", RTLD_NOW);
-#endif
+            switch(Environment.OSVersion.Platform)
+            {
+                case PlatformID.Win32NT:
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                    return LoadLibrary(filename + ".ndll");
+                default:
+                    return dlopen(filename + ".ndll", RTLD_NOW);
+            }
         }
 
         public static void FreeLibraryWrap(IntPtr handle)
         {
-#if true
-            FreeLibrary(handle);
-#else
-            dlclose(handle);
-#endif
+            switch(Environment.OSVersion.Platform)
+            {
+                case PlatformID.Win32NT:
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                    FreeLibrary(handle);
+                    break;
+                default:
+                    dlclose(handle);
+                    break;
+            }
         }
 
         public static IntPtr GetProcAddressWrap(IntPtr handle, String symbol)
         {
-#if true
-            return GetProcAddress(handle, symbol);
-#else
-            return dlsym(handle, symbol);
-#endif
+            switch(Environment.OSVersion.Platform)
+            {
+                case PlatformID.Win32NT:
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                    return GetProcAddress(handle, symbol);
+                default:
+                    return dlsym(handle, symbol);
+            }
         }
 
         internal const int RTLD_NOW = 2;
 
-#if true
         [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern IntPtr LoadLibrary(String lpFileName);
         [DllImport("kernel32", SetLastError = true)]
         private static extern bool FreeLibrary(IntPtr hModule);
         [DllImport("kernel32", SetLastError = true, ExactSpelling = false, BestFitMapping = false, ThrowOnUnmappableChar = true)]
         private static extern IntPtr GetProcAddress(IntPtr hModule, [MarshalAs(UnmanagedType.LPStr)]String lpProcName);
-#else
         [DllImport("dl", BestFitMapping = false, ThrowOnUnmappableChar = true)]
         private static extern IntPtr dlopen([MarshalAs(UnmanagedType.LPTStr)]String filename, int flags);
         [DllImport("dl")]
         private static extern int dlclose(IntPtr handle);
         [DllImport("dl", BestFitMapping = false, ThrowOnUnmappableChar = true)]
         private static extern IntPtr dlsym(IntPtr handle, [MarshalAs(UnmanagedType.LPTStr)] String symbol);
-#endif
     }
 }
