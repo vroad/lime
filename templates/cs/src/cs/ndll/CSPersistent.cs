@@ -16,6 +16,9 @@ namespace cs.ndll
 
         internal void Destroy()
         {
+            if (!Handle.IsAllocated)
+                return;
+            
             Handle.Free();
         }
     }
