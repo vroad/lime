@@ -44,6 +44,7 @@ namespace cs.ndll
             {
                 GCHandle handle = GCHandle.Alloc(this, GCHandleType.Normal);
                 finalizer(GCHandle.ToIntPtr(handle));
+                finalizer = null;
                 handle.Free();
             }
         }
