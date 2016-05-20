@@ -74,7 +74,7 @@
 		<haxedef name="lime-openal" unless="lime-console || static_link || flash || html5" />
 		<haxedef name="lime-openal" if="emscripten" />	
 		<haxedef name="no_typedarray_inline" />
-		<haxedef name="unsafe" />
+		<haxedef name="unsafe" unless="no_unsafe" />
 		
 	</section>
 	
