@@ -59,9 +59,9 @@ namespace cs.ndll
         }
 
         internal string GetStringFromId(int id)
-	    {
-		    return sgIDToName[id];
-	    }
+        {
+            return sgIDToName[id];
+        }
 
         internal IntPtr CreateGCHandle(Object value)
         {
@@ -104,12 +104,12 @@ namespace cs.ndll
         }
 
         internal static CSHandleContainer GetCurrent()
-	    {
-		    if (container == null)
-			    container = new CSHandleContainer();
-		
-		    return container;
-	    }
+        {
+            if (container == null)
+                container = new CSHandleContainer();
+        
+            return container;
+        }
     
     }
 }
