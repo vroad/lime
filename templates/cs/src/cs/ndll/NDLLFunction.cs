@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace cs.ndll
@@ -10,6 +11,9 @@ namespace cs.ndll
         private int numArgs;
         private static CFFICSLoader.CFFILoaderDelegate loaderDelegate;
         private static GCHandle pinnedLoaderFunc;
+        public static String LibraryDir = null;
+        public static String LibraryPrefix = "";
+        public static String LibrarySuffix = ".ndll";
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
         private delegate IntPtr NDLLFunctionDelegate();
@@ -65,6 +69,10 @@ namespace cs.ndll
             IntPtr module = IntPtr.Zero;
             try
             {
+                if (LibraryDir != null && (lib.StartsWith("./") || lib.StartsWith(".\\")))
+                    lib = LibraryDir + Path.DirectorySeparatorChar + LibraryPrefix + lib.Substring(2) + LibrarySuffix;
+                else
+                    lib = lib + LibrarySuffix;
                 module = NativeMethods.LoadLibraryWrap(lib);
                 if (module == IntPtr.Zero)
                     return null;

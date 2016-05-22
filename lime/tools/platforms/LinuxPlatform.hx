@@ -146,8 +146,8 @@ class LinuxPlatform extends PlatformTarget {
 			
 			ProcessHelper.runCommand ("", "haxe", [ hxml ]);
 			CSHelper.copySourceFiles (project.templatePaths, targetDirectory + "/obj/src");
-			CSHelper.addCSNDLLReference (targetDirectory + "/obj/hxcs_build.txt");
-			CSHelper.compile (project, targetDirectory + "/obj", applicationDirectory + project.app.file, "x86");
+			CSHelper.addSourceFiles (targetDirectory + "/obj/hxcs_build.txt", CSHelper.ndllSourceFiles);
+			CSHelper.compile (project, targetDirectory + "/obj", applicationDirectory + project.app.file, "x86", "desktop");
 			
 		} else {
 			

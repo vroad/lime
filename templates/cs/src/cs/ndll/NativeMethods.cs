@@ -12,9 +12,9 @@ namespace cs.ndll
                 case PlatformID.Win32NT:
                 case PlatformID.Win32S:
                 case PlatformID.Win32Windows:
-                    return LoadLibrary(filename + ".ndll");
+                    return LoadLibrary(filename);
                 default:
-                    return dlopen(filename + ".ndll", RTLD_NOW);
+                    return dlopen(filename, RTLD_NOW);
             }
         }
 

@@ -92,7 +92,7 @@ namespace cs.ndll
         private delegate IntPtr AllocStringLenDelegate(IntPtr inStr, int inLen);
 
          [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
-        private delegate IntPtr AllocWStringLenDelegate([MarshalAs(UnmanagedType.LPWStr)]String inStr, int inLen);
+        private delegate IntPtr AllocWStringLenDelegate(IntPtr inStr, int inLen);
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
         private delegate IntPtr AllocFloatDelegate(double arg1);
@@ -485,9 +485,28 @@ namespace cs.ndll
             return CSHandleContainer.GetCurrent().CreateGCHandle(str);
         }
 
-        private static IntPtr cs_alloc_wstring_len(String str, int inLen)
+        private static IntPtr cs_alloc_wstring_len(IntPtr inStr, int inLen)
         {
-            return CSHandleContainer.GetCurrent().CreateGCHandle(str.Substring(0, inLen));
+            byte[] bytes;
+            String str;
+            int totalLen;
+            switch(Environment.OSVersion.Platform)
+            {
+                case PlatformID.Win32NT:
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                    totalLen = inLen * 2;
+                    bytes = new byte[totalLen];
+                    Marshal.Copy(inStr, bytes, 0, totalLen);
+                    str = Encoding.Unicode.GetString(bytes);
+                    return CSHandleContainer.GetCurrent().CreateGCHandle(str);
+                default:
+                    totalLen = inLen * 4;
+                    bytes = new byte[totalLen];
+                    Marshal.Copy(inStr, bytes, 0, totalLen);
+                    str = Encoding.UTF32.GetString(bytes);
+                    return CSHandleContainer.GetCurrent().CreateGCHandle(str);
+            }
         }
 
         private static IntPtr cs_alloc_float(double arg1)
