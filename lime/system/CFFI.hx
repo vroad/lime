@@ -128,25 +128,7 @@ class CFFI {
 			
 			__moduleNames.set (library, library);
 			
-			#if nodejs
-			
-			if (__sysName () == "Android") {
-				
-				result = __tryLoad ("/data/data/com.demoweb/lib/liblime.so", library, method, args);
-				__loaderTrace ("Result : " + result);
-				if (result == null)
-					throw 'Failed to load $method';
-				return result;
-				
-			}
-			
-			#end
-			
-			if (result == null) {
-				
-				result = __tryLoad ("./" + library, library, method, args);
-				
-			}
+			result = __tryLoad ("./" + library, library, method, args);
 			
 			if (result == null) {
 				

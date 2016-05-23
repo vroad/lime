@@ -34,17 +34,9 @@ class AndroidPlatform extends PlatformTarget {
 		
 		super (command, _project, targetFlags);
 		
-		if (project.targetFlags.exists ("nodejs")) {
-					
-			targetType = "nodejs";
-			templateDirectory = "android-nodejs";
-			
-		} else {
-			
-			targetType = "cpp";
-			templateDirectory = "android";
-			
-		}
+		
+		targetType = "cpp";
+		templateDirectory = "android";
 		
 		if (command != "display" && command != "clean") {
 			
@@ -136,27 +128,9 @@ class AndroidPlatform extends PlatformTarget {
 				
 			}
 			
-			if (targetType == "nodejs") {
-				
-				for (ndll in project.ndlls) {
-					
-					if (ndll.name == "lime") {
-						
-						FileHelper.copyFile (ndll.extensionPath + "/ndll/Android-NodeJS/libnode" + suffix, path + "/libnode.so");
-						FileHelper.copyFile (ndll.extensionPath + "/ndll/Android-NodeJS/libndll" + suffix, path + "/libndll.so");
-						break;
-						
-					}
-					
-				}
-				
-			} else {
-				
-				ProcessHelper.runCommand ("", "haxe", haxeParams);
-				CPPHelper.compile (project, targetDirectory + "/obj", cppParams);
-				FileHelper.copyIfNewer (targetDirectory + "/obj/libApplicationMain" + (project.debug ? "-debug" : "") + suffix, path + "/libApplicationMain.so");
-				
-			}
+			ProcessHelper.runCommand ("", "haxe", haxeParams);
+			CPPHelper.compile (project, targetDirectory + "/obj", cppParams);
+			FileHelper.copyIfNewer (targetDirectory + "/obj/libApplicationMain" + (project.debug ? "-debug" : "") + suffix, path + "/libApplicationMain.so");
 			
 		}
 		
@@ -177,13 +151,6 @@ class AndroidPlatform extends PlatformTarget {
 				PathHelper.removeDirectory (targetDirectory + "/bin/libs/x86");
 				
 			}
-			
-		}
-		
-		if (targetType == "nodejs") {
-			
-			var haxeParams = [ hxml, "-D", "android-nodejs" ];
-			ProcessHelper.runCommand ("", "haxe", haxeParams);
 			
 		}
 		
@@ -228,7 +195,6 @@ class AndroidPlatform extends PlatformTarget {
 		
 		var context = project.templateContext;
 		context.CPP_DIR = targetDirectory + "/obj";
-		context.NODE_FILE = targetDirectory + "/bin/assets/ApplicationMain.js";
 		
 		var template = new Template (File.getContent (hxml));
 		
@@ -359,7 +325,6 @@ class AndroidPlatform extends PlatformTarget {
 		var context = project.templateContext;
 		
 		context.CPP_DIR = targetDirectory + "/obj";
-		context.NODE_FILE = targetDirectory + "/bin/assets/ApplicationMain.js";
 		context.ANDROID_INSTALL_LOCATION = project.config.getString ("android.install-location", "auto");
 		context.ANDROID_MINIMUM_SDK_VERSION = project.config.getInt ("android.minimum-sdk-version", 9);
 		context.ANDROID_TARGET_SDK_VERSION = project.config.getInt ("android.target-sdk-version", 19);

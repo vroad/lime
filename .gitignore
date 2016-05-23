@@ -5,8 +5,6 @@ Export/
 ndll/*/lime*
 ndll/*/liblime*
 ndll/*/nme*
-ndll/*/libnode*
-ndll/*/libndll*
 nddl/*/libnme*
 project/all_objs
 project/obj
