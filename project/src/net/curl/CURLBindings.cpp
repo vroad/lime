@@ -5,27 +5,14 @@
 #include <string.h>
 
 #include <utils/PointerWrapper.h>
-#include <utils/Kinds.h>
 #include <utils/GCRootUtils.h>
+#include <system/CFFIPointer.h>
 
 namespace lime {
 	
-	value CURL_to_value (CURL *curl) {
-		
-		return WrapPointerInternal<CURL> (curl, GetKinds ().CURL);
-		
-	}
-	
-	CURL *val_to_CURL (value handle) {
-		
-		return (CURL*)val_to_kind (handle, GetKinds ().CURL);
-		
-	}
-	
 	void lime_curl_easy_cleanup (value handle) {
 		
-		CURL *curl = val_to_CURL (handle);
-		if (curl == NULL) return;
+		CURL *curl = (CURL*)val_data (handle);
 		curl_easy_cleanup (curl);
 		
 	}
@@ -33,17 +20,15 @@ namespace lime {
 	
 	value lime_curl_easy_duphandle (value handle) {
 		
-		CURL *curl = val_to_CURL (handle);
-		if (curl == NULL) return alloc_null ();
-		return CURL_to_value (curl_easy_duphandle (curl));
+		CURL *curl = (CURL*)val_data (handle);
+		return CFFIPointer (curl_easy_duphandle (curl));
 		
 	}
 	
 	
 	value lime_curl_easy_escape (value inCurl, HxString url, int length) {
 		
-		CURL *curl = val_to_CURL (inCurl);
-		if (curl == NULL) return alloc_null ();
+		CURL *curl = (CURL*)val_data (inCurl);
 		char* result = curl_easy_escape (curl, url.__s, length);
 		return result ? alloc_string (result) : alloc_null ();
 		
@@ -53,8 +38,7 @@ namespace lime {
 	value lime_curl_easy_getinfo (value inCurl, int info) {
 		
 		CURLcode code = CURLE_OK;
-		CURL* handle = val_to_CURL (inCurl);
-		if (handle == NULL) return alloc_null ();
+		CURL* handle = (CURL*)val_data (inCurl);
 		CURLINFO type = (CURLINFO)info;
 		
 		switch (type) {
@@ -142,15 +126,14 @@ namespace lime {
 	
 	value lime_curl_easy_init () {
 		
-		return CURL_to_value (curl_easy_init ());
+		return CFFIPointer (curl_easy_init ());
 		
 	}
 	
 	
 	int lime_curl_easy_pause (value handle, int bitmask) {
 		
-		CURL *curl = val_to_CURL (handle);
-		if (curl == NULL) return 0;
+		CURL *curl = (CURL*)val_data (handle);
 		return curl_easy_pause (curl, bitmask);
 		
 	}
@@ -158,8 +141,7 @@ namespace lime {
 	
 	int lime_curl_easy_perform (value easy_handle) {
 		
-		CURL *curl = val_to_CURL (easy_handle);
-		if (curl == NULL) return 0;
+		CURL *curl = (CURL*)val_data (easy_handle);
 		return curl_easy_perform (curl);
 		
 	}
@@ -176,8 +158,7 @@ namespace lime {
 	
 	void lime_curl_easy_reset (value inCurl) {
 		
-		CURL *curl = val_to_CURL (inCurl);
-		if (curl == NULL) return;
+		CURL *curl = (CURL*)val_data (inCurl);
 		curl_easy_reset (curl);
 		
 	}
@@ -245,8 +226,7 @@ namespace lime {
 	int lime_curl_easy_setopt (value handle, int option, value parameter) {
 		
 		CURLcode code = CURLE_OK;
-		CURL* curl = val_to_CURL (handle);
-		if (curl == NULL) return 0;
+		CURL* curl = (CURL*)val_data (handle);
 		CURLoption type = (CURLoption)option;
 		
 		switch (type) {
@@ -541,8 +521,7 @@ namespace lime {
 	
 	value lime_curl_easy_unescape (value inCurl, HxString url, int inlength, int outlength) {
 		
-		CURL* curl = val_to_CURL (inCurl);
-		if (curl == NULL) return alloc_null ();
+		CURL* curl = (CURL*)val_data (inCurl);
 		char* result = curl_easy_unescape (curl, url.__s, inlength, &outlength);
 		return result ? alloc_string (result) : alloc_null ();
 		

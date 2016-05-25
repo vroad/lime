@@ -22,6 +22,7 @@
 #include <graphics/ImageBuffer.h>
 #include <graphics/Renderer.h>
 #include <graphics/RenderEvent.h>
+#include <system/CFFIPointer.h>
 #include <system/Clipboard.h>
 #include <system/JNI.h>
 #include <system/SensorEvent.h>
@@ -55,151 +56,16 @@
 #include <video/Video.h>
 #endif
 
-#include <utils/Kinds.h>
 #include <utils/SafeDelete.h>
 #include <utils/GCRootUtils.h>
 
 #include <graphics/OpenGLContext.h>
 #include "graphics/opengl/OpenGLBindings.h"
 
-//DEFINE_KIND (k_finalizer);
 
 namespace lime {
 	
 	static bool gQuit = false;
-	
-	template <>
-	value WrapPointer<Application> (Application *app) {
-		
-		return WrapPointerInternal<Application> (app, GetKinds ().Application);
-		
-	}
-	
-	template <>
-	value WrapPointer<Renderer> (Renderer *renderer) {
-		
-		return WrapPointerInternal<Renderer> (renderer, GetKinds ().Renderer);
-		
-	}
-	
-	template <>
-	value WrapPointer<Font> (Font *font) {
-		
-		return WrapPointerInternal<Font> (font, GetKinds ().Font);
-		
-	}
-	
-	template <>
-	value WrapPointer<TextLayout> (TextLayout *textLayout) {
-		
-		return WrapPointerInternal<TextLayout> (textLayout, GetKinds ().TextLayout);
-		
-	}
-
-	template <>
-	value WrapPointer<Window> (Window *window) {
-
-		return WrapPointerInternal<Window> (window, GetKinds ().Window);
-
-	}
-	
-	#ifdef LIME_VIDEO
-	template <>
-	value WrapPointer<VideoLib> (VideoLib *lib) {
-		
-		return WrapPointerInternal<VideoLib> (lib, GetKinds ().VideoLib);
-		
-	}
-	#endif
-	
-	#ifdef LIME_VIDEO
-	template <>
-	value WrapPointer<Video> (Video *video) {
-		
-		return WrapPointerInternal<Video> (video, GetKinds ().Video);
-		
-	}
-	#endif
-	
-	template <>
-	value WrapPointer<OpenGLContext> (OpenGLContext *context) {
-		
-		return WrapPointerInternal<OpenGLContext> (context, GetKinds ().OpenGLContext);
-		
-	}
-	
-	template <>
-	Application *GetPointer<Application> (value handle) {
-		
-		return (Application*)val_to_kind (handle, GetKinds ().Application);
-		
-	}
-	
-	template <>
-	AudioStream *GetPointer<AudioStream> (value handle) {
-		
-		return (AudioStream*)val_to_kind (handle, GetKinds ().AudioStream);
-		
-	}
-	
-	template <>
-	Font *GetPointer<Font> (value handle) {
-		
-		return (Font*)val_to_kind (handle, GetKinds ().Font);
-		
-	}
-	
-	template <>
-	Window *GetPointer<Window> (value handle) {
-		
-		return (Window*)val_to_kind (handle, GetKinds ().Window);
-		
-	}
-	
-	template <>
-	Renderer *GetPointer<Renderer> (value handle) {
-		
-		return (Renderer*)val_to_kind (handle, GetKinds ().Renderer);
-		
-	}
-	
-	template <>
-	TextLayout *GetPointer<TextLayout> (value handle) {
-		
-		return (TextLayout*)val_to_kind (handle, GetKinds ().TextLayout);
-		
-	}
-	
-	#ifdef LIME_VIDEO
-	template <>
-	VideoLib *GetPointer<VideoLib> (value handle) {
-		
-		return (VideoLib*)val_to_kind (handle, GetKinds ().VideoLib);
-		
-	}
-	#endif
-	
-	#ifdef LIME_VIDEO
-	template <>
-	Video *GetPointer<Video> (value handle) {
-		
-		return (Video*)val_to_kind (handle, GetKinds ().Video);
-		
-	}
-	#endif
-	
-	template <>
-	OpenGLContext *GetPointer<OpenGLContext> (value handle) {
-		
-		return (OpenGLContext*)val_to_kind (handle, GetKinds ().OpenGLContext);
-		
-	}
-	
-	value RendererContext_to_value (void *context) {
-		
-		return WrapPointerInternal<void> (context, GetKinds ().RendererContext);
-		
-	}
 	
 	
 	value lime_application_create (value callback) {
@@ -209,7 +75,7 @@ namespace lime {
 			Application::callback = new AutoGCRoot (callback);
 		else
 			Application::callback->set (callback);
-		return WrapPointerWithGC (application);
+		return CFFIPointer (application, lime_pointer_destroy<Application>);
 		
 	}
 	
@@ -233,8 +99,7 @@ namespace lime {
 	
 	int lime_application_exec (value application) {
 		
-		Application* app = GetPointer<Application> (application);
-		if (app == NULL) return 0;
+		Application* app = (Application*)val_data (application);
 		return app->Exec ();
 		
 	}
@@ -242,8 +107,7 @@ namespace lime {
 	
 	void lime_application_init (value application) {
 		
-		Application* app = GetPointer<Application> (application);
-		if (app == NULL) return;
+		Application* app = (Application*)val_data (application);
 		app->Init ();
 		
 	}
@@ -251,7 +115,7 @@ namespace lime {
 	
 	int lime_application_quit (value application) {
 		
-		Application* app = GetPointer<Application> (application);
+		Application* app = (Application*)val_data (application);
 		if (app == NULL) return 0;
 		int result = app->Quit ();
 		gQuit = true;
@@ -285,8 +149,7 @@ namespace lime {
 	
 	void lime_application_set_frame_rate (value application, double frameRate) {
 		
-		Application* app = GetPointer<Application> (application);
-		if (app == NULL) return;
+		Application* app = (Application*)val_data (application);
 		app->SetFrameRate (frameRate);
 		
 	}
@@ -294,8 +157,7 @@ namespace lime {
 	
 	bool lime_application_update (value application) {
 		
-		Application* app = GetPointer<Application> (application);
-		if (app == NULL) return false;
+		Application* app = (Application*)val_data (application);
 		return app->Update ();
 		
 	}
@@ -339,8 +201,7 @@ namespace lime {
 	
 	bool lime_audio_stream_seek (value handle, double seconds) {
 		
-		AudioStream *stream = GetPointer<AudioStream> (handle);
-		if (stream == NULL) return alloc_null ();
+		AudioStream *stream = (AudioStream*)val_data (handle);
 		
 		#ifdef LIME_OGG
 		if (stream->format == OggFormat) {
@@ -349,7 +210,7 @@ namespace lime {
 			return OGG::SeekStream (oggStream->file, seconds);
 			
 		}
-		#endif 
+		#endif
 		
 		return false;
 	}
@@ -357,8 +218,7 @@ namespace lime {
 	
 	int lime_audio_stream_decode (value handle, value data, int readSize, int writeOffset) {
 		
-		AudioStream *stream = GetPointer<AudioStream> (handle);
-		if (stream == NULL) return 0;
+		AudioStream *stream = (AudioStream*)val_data (handle);
 		
 		Bytes bytes = Bytes (data);
 		
@@ -577,8 +437,7 @@ namespace lime {
 	int lime_font_get_ascender (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return 0;
+		Font *font = (Font*)val_data (fontHandle);
 		return font->GetAscender ();
 		#else
 		return 0;
@@ -590,8 +449,7 @@ namespace lime {
 	int lime_font_get_descender (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return 0;
+		Font *font = (Font*)val_data (fontHandle);
 		return font->GetDescender ();
 		#else
 		return 0;
@@ -603,7 +461,7 @@ namespace lime {
 	value lime_font_get_family_name (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
+		Font *font = (Font*)val_data (fontHandle);
 		wchar_t *name = font->GetFamilyName ();
 		value result = alloc_wstring (name);
 		delete name;
@@ -618,8 +476,7 @@ namespace lime {
 	int lime_font_get_glyph_index (value fontHandle, HxString character) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return 0;
+		Font *font = (Font*)val_data (fontHandle);
 		return font->GetGlyphIndex ((char*)character.__s);
 		#else
 		return -1;
@@ -631,8 +488,7 @@ namespace lime {
 	value lime_font_get_glyph_indices (value fontHandle, HxString characters) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return alloc_null ();
+		Font *font = (Font*)val_data (fontHandle);
 		return font->GetGlyphIndices ((char*)characters.__s);
 		#else
 		return alloc_null ();
@@ -644,8 +500,7 @@ namespace lime {
 	value lime_font_get_glyph_metrics (value fontHandle, int index) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return alloc_null ();
+		Font *font = (Font*)val_data (fontHandle);
 		return font->GetGlyphMetrics (index);
 		#else
 		return alloc_null ();
@@ -657,8 +512,7 @@ namespace lime {
 	int lime_font_get_height (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return 0;
+		Font *font = (Font*)val_data (fontHandle);
 		return font->GetHeight ();
 		#else
 		return 0;
@@ -670,8 +524,7 @@ namespace lime {
 	int lime_font_get_num_glyphs (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return 0;
+		Font *font = (Font*)val_data (fontHandle);
 		return font->GetNumGlyphs ();
 		#else
 		return alloc_null ();
@@ -683,8 +536,7 @@ namespace lime {
 	int lime_font_get_underline_position (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return 0;
+		Font *font = (Font*)val_data (fontHandle);
 		return font->GetUnderlinePosition ();
 		#else
 		return 0;
@@ -696,8 +548,7 @@ namespace lime {
 	int lime_font_get_underline_thickness (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return 0;
+		Font *font = (Font*)val_data (fontHandle);
 		return font->GetUnderlineThickness ();
 		#else
 		return 0;
@@ -709,8 +560,7 @@ namespace lime {
 	int lime_font_get_units_per_em (value fontHandle) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return 0;
+		Font *font = (Font*)val_data (fontHandle);
 		return font->GetUnitsPerEM ();
 		#else
 		return 0;
@@ -742,7 +592,7 @@ namespace lime {
 			
 			if (font->face) {
 				
-				return WrapPointerWithGC (font);
+				return CFFIPointer (font, lime_pointer_destroy<Font>);
 				
 			} else {
 				
@@ -761,8 +611,7 @@ namespace lime {
 	value lime_font_outline_decompose (value fontHandle, int size) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return alloc_null ();
+		Font *font = (Font*)val_data (fontHandle);
 		return font->Decompose (size);
 		#else
 		return alloc_null ();
@@ -771,11 +620,10 @@ namespace lime {
 	}
 	
 	
-	value lime_font_render_glyph (value fontHandle, int index, value data) {
+	bool lime_font_render_glyph (value fontHandle, int index, value data) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return alloc_null ();
+		Font *font = (Font*)val_data (fontHandle);
 		Bytes bytes = Bytes (data);
 		return font->RenderGlyph (index, &bytes);
 		#else
@@ -785,15 +633,14 @@ namespace lime {
 	}
 	
 	
-	value lime_font_render_glyphs (value fontHandle, value indices, value data) {
+	bool lime_font_render_glyphs (value fontHandle, value indices, value data) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return alloc_null ();
+		Font *font = (Font*)val_data (fontHandle);
 		Bytes bytes = Bytes (data);
 		return font->RenderGlyphs (indices, &bytes);
 		#else
-		return alloc_null ();
+		return false;
 		#endif
 		
 	}
@@ -802,8 +649,7 @@ namespace lime {
 	void lime_font_set_size (value fontHandle, int fontSize) {
 		
 		#ifdef LIME_FREETYPE
-		Font *font = GetPointer<Font> (fontHandle);
-		if (font == NULL) return;
+		Font *font = (Font*)val_data (fontHandle);
 		font->SetSize (fontSize);
 		#endif
 		
@@ -1267,7 +1113,7 @@ namespace lime {
 		
 		if (!val_is_null (window)) {
 			
-			windowRef = GetPointer<Window> (window);
+			windowRef = (Window*)val_data (window);
 			
 		}
 		
@@ -1342,19 +1188,15 @@ namespace lime {
 	
 	value lime_renderer_create (value window) {
 		
-		Window *windowPtr = GetPointer<Window> (window);
-		if (windowPtr == NULL) return alloc_null ();
-		Renderer* renderer = CreateRenderer (windowPtr);
-		return WrapPointerWithGC<Renderer> (renderer);
+		Renderer* renderer = CreateRenderer ((Window*)val_data (window));
+		return CFFIPointer (renderer, lime_pointer_destroy<Renderer>);
 		
 	}
 	
 	
 	void lime_renderer_flip (value renderer) {
 		
-		Renderer *ptr = GetPointer<Renderer> (renderer);
-		if (ptr == NULL) return;
-		ptr->Flip ();
+		((Renderer*)val_data (renderer))->Flip ();
 		
 	}
 	
@@ -1369,9 +1211,7 @@ namespace lime {
 	
 	value lime_renderer_lock (value renderer) {
 		
-		Renderer *ptr = GetPointer<Renderer> (renderer);
-		if (ptr == NULL) return alloc_null ();
-		return ptr->Lock ();
+		return ((Renderer*)val_data (renderer))->Lock ();
 		
 	}
 	
@@ -1399,9 +1239,7 @@ namespace lime {
 	
 	void lime_renderer_unlock (value renderer) {
 		
-		Renderer *ptr = GetPointer<Renderer> (renderer);
-		if (ptr == NULL) return;
-		ptr->Unlock ();
+		((Renderer*)val_data (renderer))->Unlock ();
 		
 	}
 	
@@ -1487,12 +1325,13 @@ namespace lime {
 		
 	}
 	
+	
 	value lime_text_layout_create (int direction, HxString script, HxString language) {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
 		
 		TextLayout *text = new TextLayout (direction, script.__s, language.__s);
-		return WrapPointerWithGC (text);
+		return CFFIPointer (text, lime_pointer_destroy<TextLayout>);
 		
 		#else
 		
@@ -1507,9 +1346,8 @@ namespace lime {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
 		
-		TextLayout *text = GetPointer<TextLayout> (textHandle);
-		Font *font = GetPointer<Font> (fontHandle);
-		if (text == NULL || font == NULL) return alloc_null ();
+		TextLayout *text = (TextLayout*)val_data (textHandle);
+		Font *font = (Font*)val_data (fontHandle);
 		Bytes bytes = Bytes (data);
 		text->Position (font, size, textString.__s, &bytes);
 		return bytes.Value ();
@@ -1524,8 +1362,7 @@ namespace lime {
 	void lime_text_layout_set_direction (value textHandle, int direction) {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
-		TextLayout *text = GetPointer<TextLayout> (textHandle);
-		if (text == NULL) return;
+		TextLayout *text = (TextLayout*)val_data (textHandle);
 		text->SetDirection (direction);
 		#endif
 		
@@ -1535,8 +1372,7 @@ namespace lime {
 	void lime_text_layout_set_language (value textHandle, HxString language) {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
-		TextLayout *text = GetPointer<TextLayout> (textHandle);
-		if (text == NULL) return;
+		TextLayout *text = (TextLayout*)val_data (textHandle);
 		text->SetLanguage (language.__s);
 		#endif
 		
@@ -1546,8 +1382,7 @@ namespace lime {
 	void lime_text_layout_set_script (value textHandle, HxString script) {
 		
 		#if defined(LIME_FREETYPE) && defined(LIME_HARFBUZZ)
-		TextLayout *text = GetPointer<TextLayout> (textHandle);
-		if (text == NULL) return;
+		TextLayout *text = (TextLayout*)val_data (textHandle);
 		text->SetScript (script.__s);
 		#endif
 		
@@ -1573,8 +1408,7 @@ namespace lime {
 	
 	void lime_window_alert (value window, HxString message, HxString title) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return;
+		Window* targetWindow = (Window*)val_data (window);
 		targetWindow->Alert (message.__s, title.__s);
 		
 	}
@@ -1582,8 +1416,7 @@ namespace lime {
 	
 	void lime_window_close (value window) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return;
+		Window* targetWindow = (Window*)val_data (window);
 		targetWindow->Close ();
 		
 	}
@@ -1591,11 +1424,8 @@ namespace lime {
 	
 	value lime_window_create (value application, int width, int height, int flags, HxString title) {
 		
-		Application *appPtr = GetPointer<Application> (application);
-		if (appPtr == NULL)
-			return alloc_null ();
-		Window* window = CreateWindow (appPtr, width, height, flags, title.__s);
-		return WrapPointerWithGC (window);
+		Window* window = CreateWindow ((Application*)val_data (application), width, height, flags, title.__s);
+		return CFFIPointer (window, lime_pointer_destroy<Window>);
 		
 	}
 	
@@ -1619,8 +1449,7 @@ namespace lime {
 	
 	void lime_window_focus (value window) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return;
+		Window* targetWindow = (Window*)val_data (window);
 		targetWindow->Focus ();
 		
 	}
@@ -1636,8 +1465,7 @@ namespace lime {
 	
 	bool lime_window_get_enable_text_events (value window) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return false;
+		Window* targetWindow = (Window*)val_data (window);
 		return targetWindow->GetEnableTextEvents ();
 		
 	}
@@ -1645,8 +1473,7 @@ namespace lime {
 	
 	int lime_window_get_height (value window) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return 0;
+		Window* targetWindow = (Window*)val_data (window);
 		return targetWindow->GetHeight ();
 		
 	}
@@ -1654,8 +1481,7 @@ namespace lime {
 	
 	int32_t lime_window_get_id (value window) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return 0;
+		Window* targetWindow = (Window*)val_data (window);
 		return (int32_t)targetWindow->GetID ();
 		
 	}
@@ -1663,8 +1489,7 @@ namespace lime {
 	
 	int lime_window_get_width (value window) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return 0;
+		Window* targetWindow = (Window*)val_data (window);
 		return targetWindow->GetWidth ();
 		
 	}
@@ -1672,8 +1497,7 @@ namespace lime {
 	
 	int lime_window_get_x (value window) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return 0;
+		Window* targetWindow = (Window*)val_data (window);
 		return targetWindow->GetX ();
 		
 	}
@@ -1681,8 +1505,7 @@ namespace lime {
 	
 	int lime_window_get_y (value window) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return 0;
+		Window* targetWindow = (Window*)val_data (window);
 		return targetWindow->GetY ();
 		
 	}
@@ -1690,8 +1513,7 @@ namespace lime {
 	
 	void lime_window_move (value window, int x, int y) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return;
+		Window* targetWindow = (Window*)val_data (window);
 		targetWindow->Move (x, y);
 		
 	}
@@ -1699,8 +1521,7 @@ namespace lime {
 	
 	void lime_window_resize (value window, int width, int height) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return;
+		Window* targetWindow = (Window*)val_data (window);
 		targetWindow->Resize (width, height);
 		
 	}
@@ -1716,8 +1537,7 @@ namespace lime {
 	
 	void lime_window_set_enable_text_events (value window, bool enabled) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return;
+		Window* targetWindow = (Window*)val_data (window);
 		targetWindow->SetEnableTextEvents (enabled);
 		
 	}
@@ -1725,8 +1545,7 @@ namespace lime {
 	
 	bool lime_window_set_fullscreen (value window, bool fullscreen) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return false;
+		Window* targetWindow = (Window*)val_data (window);
 		return targetWindow->SetFullscreen (fullscreen);
 		
 	}
@@ -1734,8 +1553,7 @@ namespace lime {
 	
 	void lime_window_set_icon (value window, value buffer) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return;
+		Window* targetWindow = (Window*)val_data (window);
 		ImageBuffer imageBuffer = ImageBuffer (buffer);
 		targetWindow->SetIcon (&imageBuffer);
 		
@@ -1744,8 +1562,7 @@ namespace lime {
 	
 	bool lime_window_set_maximized (value window, bool maximized) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return false;
+		Window* targetWindow = (Window*)val_data(window);
 		return targetWindow->SetMaximized (maximized);
 		
 	}
@@ -1753,7 +1570,7 @@ namespace lime {
 	
 	bool lime_window_set_minimized (value window, bool minimized) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
+		Window* targetWindow = (Window*)val_data (window);
 		return targetWindow->SetMinimized (minimized);
 		
 	}
@@ -1761,7 +1578,7 @@ namespace lime {
 	
 	bool lime_window_set_resizable (value window, bool resizable) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
+		Window* targetWindow = (Window*)val_data (window);
 		return targetWindow->SetResizable (resizable);
 		
 	}
@@ -1770,7 +1587,7 @@ namespace lime {
 
 		#ifdef LIME_VIDEO
 		VideoLib *lib = CreateVideoLib ();
-		return WrapPointerWithGC<VideoLib> (lib);
+		return CFFIPointer (lib, lime_pointer_destroy<VideoLib>);
 		#else
 		return alloc_null ();
 		#endif
@@ -1781,8 +1598,8 @@ namespace lime {
 	value lime_video_lib_create_video (value videoLib) {
 
 		#ifdef LIME_VIDEO
-		VideoLib *lib = GetPointer<VideoLib> (videoLib);
-		return WrapPointerWithGC<Video> (lib->CreateVideo ());
+		VideoLib *lib = (VideoLib*)val_data (videoLib);
+		return CFFIPointer (lib->CreateVideo (), lime_pointer_destroy<VideoLib>);
 		#else
 		return alloc_null ();
 		#endif
@@ -1792,7 +1609,7 @@ namespace lime {
 	value lime_video_open_url (value inVideo, value url) {
 
 		#ifdef LIME_VIDEO
-		Video *video = GetPointer<Video> (inVideo);
+		Video *video = (Video*)val_data (inVideo);
 		if (video == NULL) return alloc_null ();
 		return alloc_bool (video->OpenURL (val_wstring (url)));
 		#else
@@ -1805,7 +1622,7 @@ namespace lime {
 	value lime_video_get_state (value inVideo) {
 
 		#ifdef LIME_VIDEO
-		Video *video = GetPointer<Video> (inVideo);
+		Video *video = (Video*)val_data (inVideo);
 		if (video == NULL) return alloc_null ();
 		return alloc_int (video->GetState ());
 		#else
@@ -1818,7 +1635,7 @@ namespace lime {
 	value lime_video_play (value inVideo) {
 
 		#ifdef LIME_VIDEO
-		Video *video = GetPointer<Video> (inVideo);
+		Video *video = (Video*)val_data (inVideo);
 		if (video == NULL) return alloc_null ();
 		return alloc_bool (video->Play ());
 		#else
@@ -1831,7 +1648,7 @@ namespace lime {
 	value lime_video_set_texture (value inVideo, value texture) {
 
 		#ifdef LIME_VIDEO
-		Video *video = GetPointer<Video> (inVideo);
+		Video *video = (Video*)val_data (inVideo);
 		if (video == NULL) return alloc_null ();
 		video->SetTexture (val_int (texture));
 		return alloc_null ();
@@ -1843,8 +1660,7 @@ namespace lime {
 	
 	value lime_window_set_title (value window, HxString title) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
-		if (targetWindow == NULL) return alloc_null ();
+		Window* targetWindow = (Window*)val_data (window);
 		const char* result = targetWindow->SetTitle (title.__s);
 		
 		if (result) {
@@ -1864,14 +1680,14 @@ namespace lime {
 	
 	value lime_gl_context_create (value window) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
+		Window* targetWindow = (Window*)val_data (window);
 		if (targetWindow == NULL) return alloc_null ();
 		OpenGLContext* context = CreateOpenGLContext (targetWindow);
 		
 		if (context) {
 			
 			OpenGLBindings::Init ();
-			return WrapPointerWithGC<OpenGLContext> (context);
+			return CFFIPointer (context, lime_pointer_destroy<OpenGLContext>);
 			
 		} else {
 			
@@ -1884,9 +1700,9 @@ namespace lime {
 	
 	bool lime_gl_context_make_current (value window, value context) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
+		Window* targetWindow = (Window*)val_data (window);
 		if (targetWindow == NULL) return false;
-		OpenGLContext *targetContext = GetPointer<OpenGLContext> (context);
+		OpenGLContext *targetContext = (OpenGLContext*) val_data (context);
 		if (targetContext == NULL) return false;
 		
 		return targetContext->MakeCurrent (targetWindow);
@@ -1902,7 +1718,7 @@ namespace lime {
 	
 	void lime_gl_swap_window (value window) {
 		
-		Window* targetWindow = GetPointer<Window> (window);
+		Window* targetWindow = (Window*)val_data (window);
 		if (targetWindow == NULL) return;
 		
 		SwapWindow (targetWindow);
@@ -2039,6 +1855,7 @@ namespace lime {
 	
 	
 }
+
 
 #ifdef LIME_CAIRO
 extern "C" int lime_cairo_register_prims ();

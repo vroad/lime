@@ -1,7 +1,7 @@
 #include <audio/AudioBuffer.h>
+#include <system/CFFIPointer.h>
 #include <utils/PointerWrapper.h>
 #include <utils/ThreadLocalStorage.h>
-#include <utils/Kinds.h>
 
 namespace lime {
 	
@@ -28,21 +28,6 @@ namespace lime {
 		
 	}
 	
-	template <>
-	value WrapPointer<AudioBuffer> (AudioBuffer *pointer) {
-		
-		return WrapPointerInternal<AudioBuffer> (pointer, GetKinds ().AudioBuffer);
-		
-	}
-
-	template <>
-	value WrapPointer<AudioStream> (AudioStream *pointer) {
-		
-		AudioBufferId id = GetAudioBufferId ();
-		return WrapPointerInternal<AudioStream> (pointer, GetKinds ().AudioStream);
-		
-	}
-
 	AudioBuffer::AudioBuffer () {
 		
 		bitsPerSample = 0;
@@ -70,7 +55,7 @@ namespace lime {
 		value handleValue;
 		if (handle != NULL) {
 			
-			handleValue = WrapPointerWithGC<AudioStream> (handle);
+			handleValue = CFFIPointer (handle, lime_pointer_destroy<AudioBuffer>);
 			
 		} else {
 			
