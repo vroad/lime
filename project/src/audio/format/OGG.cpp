@@ -233,6 +233,12 @@ namespace lime {
 			
 		} else {
 			
+			if (audioBuffer->sourceData != NULL) {
+				
+				audioBuffer->sourceData->Pin ();
+				
+			}
+			
 			audioBuffer->handle = new OggAudioStream (oggFile, fakeFile);
 			
 		}

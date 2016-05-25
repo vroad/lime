@@ -29,11 +29,12 @@ namespace lime {
 		void Set (const QuickVec<unsigned char> data);
 		value Value ();
 		int ReadFile (FILE_HANDLE *file);
+		void Pin ();
 		
 		unsigned char *_data;
 		int _length;
 		AutoGCRoot *_root;
-		
+		value _pin;
 		
 	};
 	

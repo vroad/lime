@@ -1,8 +1,10 @@
+#include <assert.h>
 #include <system/System.h>
 #include <utils/Bytes.h>
 #include <utils/ThreadLocalStorage.h>
-#include <hx/CFFIPrimePatch.h>
-
+//#include <hx/CFFIPrimePatch.h>
+#include <hx/CFFIPrime.h>
+#include <hx/CFFIExt.h>
 
 namespace lime {
 	
@@ -62,6 +64,7 @@ namespace lime {
 		_data = 0;
 		_length = 0;
 		_root = 0;
+		_pin = 0;
 		
 	}
 	
@@ -73,6 +76,7 @@ namespace lime {
 		_data = 0;
 		_length = 0;
 		_root = 0;
+		_pin = 0;
 		
 		Resize (size);
 		
@@ -86,6 +90,7 @@ namespace lime {
 		_data = 0;
 		_length = 0;
 		_root = 0;
+		_pin = 0;
 		
 		Set (bytes);
 		
@@ -99,6 +104,7 @@ namespace lime {
 		_data = 0;
 		_length = 0;
 		_root = 0;
+		_pin = 0;
 		
 		FILE_HANDLE *file = lime::fopen (path, "rb");
 		
@@ -116,6 +122,7 @@ namespace lime {
 		_data = 0;
 		_length = 0;
 		_root = 0;
+		_pin = 0;
 		
 		Set (data);
 		
@@ -129,6 +136,7 @@ namespace lime {
 		_data = other._data;
 		_length = other._length;
 		_root = other._root != NULL ? new AutoGCRoot (other._root->get ()) : 0;
+		_pin = 0;
 		
 	}
 	
@@ -138,6 +146,12 @@ namespace lime {
 		if (_root) {
 			
 			delete _root;
+			
+		}
+		
+		if (_pin) {
+			
+			EXT_unpin_buffer (_pin);
 			
 		}
 		
@@ -351,6 +365,24 @@ namespace lime {
 		}
 		
 		return 0;
+		
+	}
+	
+	
+	void Bytes::Pin () {
+		
+		if (!_root || !HAS_pin_buffer ()) {
+			
+			return;
+			
+		}
+		
+		assert (_pin == 0);
+		value val = _root->get ();
+		BytesId id = stringId.Get ();
+		value b = val_field (val, id.b);
+		buffer buf = val_to_buffer (b);
+		_pin = EXT_pin_buffer (buf);
 		
 	}
 	
