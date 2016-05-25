@@ -264,20 +264,7 @@ class AL {
 	public static function genBuffers (n:Int):Array<Int> {
 		
 		#if (lime_native && lime_openal && !macro)
-		#if cs
-		var buffers:Array<Dynamic> = lime_al_gen_buffers (n);
-		var intBuffers = new Array<Int>();
-		
-		for (i in 0 ... buffers.length) {
-			
-			intBuffers[i] = buffers[i];
-			
-		}
-		
-		return intBuffers;
-		#else
 		return lime_al_gen_buffers (n);
-		#end
 		#else
 		return null;
 		#end

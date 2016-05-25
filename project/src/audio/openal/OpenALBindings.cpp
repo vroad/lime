@@ -8,6 +8,7 @@
 #endif
 
 //#include <hx/CFFIPrimePatch.h>
+#include <hx/CFFIExt.h>
 #include <hx/CFFIPrime.h>
 #include <system/CFFIPointer.h>
 #include <utils/Bytes.h>
@@ -191,7 +192,7 @@ namespace lime {
 		ALuint* buffers = new ALuint[n];
 		alGenBuffers (n, buffers);
 		
-		value result = alloc_array (n);
+		value result = alloc_array_type_wrap (n, valtInt);
 		
 		for (int i = 0; i < n; i++) {
 			
@@ -219,7 +220,7 @@ namespace lime {
 		ALuint* sources = new ALuint[n];
 		alGenSources (n, sources);
 		
-		value result = alloc_array (n);
+		value result = alloc_array_type_wrap (n, valtInt);
 		
 		for (int i = 0; i < n; i++) {
 			
@@ -245,7 +246,7 @@ namespace lime {
 		ALboolean* values = new ALboolean[count];
 		alGetBooleanv (param, values);
 		
-		value result = alloc_array (count);
+		value result = alloc_array_type_wrap (count, valtBool);
 		
 		for (int i = 0; i < count; i++) {
 			
@@ -265,7 +266,7 @@ namespace lime {
 		
 		alGetBuffer3f (buffer, param, &val1, &val2, &val3);
 		
-		value result = alloc_array (3);
+		value result = alloc_array_type_wrap (3, valtFloat);
 		val_array_set_i (result, 0, alloc_float (val1));
 		val_array_set_i (result, 1, alloc_float (val2));
 		val_array_set_i (result, 2, alloc_float (val3));
@@ -280,7 +281,7 @@ namespace lime {
 		
 		alGetBuffer3i (buffer, param, &val1, &val2, &val3);
 		
-		value result = alloc_array (3);
+		value result = alloc_array_type_wrap (3, valtInt);
 		val_array_set_i (result, 0, alloc_int(val1));
 		val_array_set_i (result, 1, alloc_int(val2));
 		val_array_set_i (result, 2, alloc_int(val3));
@@ -303,7 +304,7 @@ namespace lime {
 		ALfloat* values = new ALfloat[count];
 		alGetBufferfv (buffer, param, values);
 		
-		value result = alloc_array (count);
+		value result = alloc_array_type_wrap (count, valtFloat);
 		
 		for (int i = 0; i < count; ++i) {
 			
@@ -331,7 +332,7 @@ namespace lime {
 		ALint* values = new ALint[count];
 		alGetBufferiv (buffer, param, values);
 		
-		value result = alloc_array (count);
+		value result = alloc_array_type_wrap (count, valtInt);
 		
 		for (int i = 0; i < count; i++) {
 			
@@ -357,7 +358,7 @@ namespace lime {
 		ALdouble* values = new ALdouble[count];
 		alGetDoublev (param, values);
 		
-		value result = alloc_array (count);
+		value result = alloc_array_type_wrap (count, valtFloat);
 		
 		for (int i = 0; i < count; i++) {
 			
@@ -397,7 +398,7 @@ namespace lime {
 		ALfloat* values = new ALfloat[count];
 		alGetFloatv (param, values);
 		
-		value result = alloc_array (count);
+		value result = alloc_array_type_wrap (count, valtFloat);
 		
 		for (int i = 0; i < count; i++) {
 			
@@ -423,7 +424,7 @@ namespace lime {
 		ALint* values = new ALint[count];
 		alGetIntegerv (param, values);
 		
-		value result = alloc_array (count);
+		value result = alloc_array_type_wrap (count, valtInt);
 		
 		for (int i = 0; i < count; i++) {
 			
@@ -443,7 +444,7 @@ namespace lime {
 		
 		alGetListener3f (param, &val1, &val2, &val3);
 		
-		value result = alloc_array (3);
+		value result = alloc_array_type_wrap (3, valtFloat);
 		val_array_set_i (result, 0, alloc_float (val1));
 		val_array_set_i (result, 1, alloc_float (val2));
 		val_array_set_i (result, 2, alloc_float (val3));
@@ -458,7 +459,7 @@ namespace lime {
 		
 		alGetListener3i (param, &val1, &val2, &val3);
 		
-		value result = alloc_array (3);
+		value result = alloc_array_type_wrap (3, valtInt);
 		val_array_set_i (result, 0, alloc_int (val1));
 		val_array_set_i (result, 1, alloc_int (val2));
 		val_array_set_i (result, 2, alloc_int (val3));
@@ -481,7 +482,7 @@ namespace lime {
 		ALfloat* values = new ALfloat[count];
 		alGetListenerfv (param, values);
 		
-		value result = alloc_array (count);
+		value result = alloc_array_type_wrap (count, valtFloat);
 		
 		for (int i = 0; i < count; i++) {
 			
@@ -509,7 +510,7 @@ namespace lime {
 		ALint* values = new ALint[count];
 		alGetListeneriv (param, values);
 		
-		value result = alloc_array (count);
+		value result = alloc_array_type_wrap (count, valtInt);
 		
 		for (int i = 0; i < count; i++) {
 			
@@ -540,7 +541,7 @@ namespace lime {
 		
 		alGetBuffer3f (source, param, &val1, &val2, &val3);
 		
-		value result = alloc_array (3);
+		value result = alloc_array_type_wrap (3, valtFloat);
 		val_array_set_i (result, 0, alloc_float (val1));
 		val_array_set_i (result, 1, alloc_float (val2));
 		val_array_set_i (result, 2, alloc_float (val3));
@@ -555,7 +556,7 @@ namespace lime {
 		
 		alGetSource3i (source, param, &val1, &val2, &val3);
 		
-		value result = alloc_array (3);
+		value result = alloc_array_type_wrap (3, valtInt);
 		val_array_set_i (result, 1, alloc_int (val1));
 		val_array_set_i (result, 2, alloc_int (val2));
 		val_array_set_i (result, 3, alloc_int (val3));
@@ -578,7 +579,7 @@ namespace lime {
 		ALfloat* values = new ALfloat[count];
 		alGetSourcefv (source, param, values);
 		
-		value result = alloc_array (count);
+		value result = alloc_array_type_wrap (count, valtFloat);
 		
 		for (int i = 0; i < count; i++) {
 			
@@ -606,7 +607,7 @@ namespace lime {
 		ALint* values = new ALint[count];
 		alGetSourceiv (source, param, values);
 		
-		value result = alloc_array (count);
+		value result = alloc_array_type_wrap (count, valtInt);
 		
 		for (int i = 0; i < count; i++) {
 			
@@ -808,7 +809,7 @@ namespace lime {
 		ALuint* buffers = new ALuint[nb];
 		alSourceUnqueueBuffers (source, nb, buffers);
 		
-		value result = alloc_array (nb);
+		value result = alloc_array_type_wrap (nb, valtInt);
 		
 		for (int i = 0; i < nb; i++) {
 			
@@ -942,7 +943,7 @@ namespace lime {
 		ALCint* values = new ALCint[size];
 		alcGetIntegerv (alcDevice, param, size, values);
 		
-		value result = alloc_array (size);
+		value result = alloc_array_type_wrap (size, valtInt);
 		
 		for (int i = 0; i < size; i++) {
 			
