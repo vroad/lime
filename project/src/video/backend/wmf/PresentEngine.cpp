@@ -130,7 +130,7 @@ bool D3DPresentEngine::createSharedTexture(unsigned int textureID)
     if (!egl_surface)
     {
         EGLint error = lime::eglGetError();
-        printf("egl surface creation failed:%d\n");
+        printf("egl surface creation failed:%d\n", error);
         return false;
     }
 
@@ -138,7 +138,7 @@ bool D3DPresentEngine::createSharedTexture(unsigned int textureID)
     EGLBoolean ret = lime::eglQuerySurfacePointerANGLE(
         egl_display,
         egl_surface,
-        EGL_D3D_TEXTURE_2D_SHARE_HANDLE_ANGLE,
+        (EGLint)EGL_D3D_TEXTURE_2D_SHARE_HANDLE_ANGLE,
         &sharedHandle);
 
     if (!ret)
