@@ -17,7 +17,7 @@ import lime.project.AssetType;
 import sys.FileSystem;
 import sys.io.File;
 
-#if (lime && !lime_legacy)
+#if lime
 import haxe.xml.Fast;
 import lime.text.Font;
 import lime.tools.helpers.FileHelper;
@@ -193,6 +193,11 @@ class HXProject {
 				// TODO: Better handle platform type for pluggable targets
 				
 				platformType = PlatformType.CONSOLE;
+
+				defaultWindow.width = 0;
+				defaultWindow.height = 0;
+				defaultWindow.fps = 60;
+				defaultWindow.fullscreen = true;
 			
 		}
 		
@@ -398,7 +403,7 @@ class HXProject {
 	}
 	
 	
-	#if (lime && !lime_legacy)
+	#if lime
 	
 	public static function fromFile (projectFile:String, userDefines:Map <String, Dynamic> = null, includePaths:Array <String> = null):HXProject {
 		
@@ -620,7 +625,7 @@ class HXProject {
 	}
 	
 	
-	#if (lime && !lime_legacy)
+	#if lime
 	
 	public function includeXML (xml:String):Void {
 		
@@ -734,7 +739,7 @@ class HXProject {
 	}
 	
 	
-	#if (lime && !lime_legacy)
+	#if lime
 	
 	@:noCompletion private static function processHaxelibs (project:HXProject, userDefines:Map <String, Dynamic>):Void {
 		
@@ -930,7 +935,7 @@ class HXProject {
 				
 				embeddedAsset.type = Std.string (asset.type).toLowerCase ();
 				
-				#if (lime && !lime_legacy)
+				#if lime
 				if (asset.type == FONT) {
 					
 					try {
@@ -986,7 +991,7 @@ class HXProject {
 				
 			}
 			
-			#if (lime && !lime_legacy)
+			#if lime
 			
 			if (PathHelper.haxelibOverrides.exists (name)) {
 				

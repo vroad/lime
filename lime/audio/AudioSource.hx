@@ -55,6 +55,7 @@ class AudioSource {
 	private var channel:SoundChannel;
 	#elseif lime_console
 	private var channel:FMODChannel;
+	private var __gain:Float = 1.0;
 	#end
 	
 	#if lime_native
@@ -203,7 +204,10 @@ class AudioSource {
 		} else {
 			
 			channel = buffer.src.play ();
-			channel.setLoopCount (this.__loops);
+			channel.setLoopCount (__loops);
+			if (__gain < 1.0) {
+				channel.setVolume (__gain);
+			}
 			
 			var old = setFmodActive (channel, this);
 			
@@ -672,8 +676,13 @@ class AudioSource {
 
 		#elseif lime_console
 
-		lime.Lib.notImplemented ("AudioSource.get_gain");
-		return 1;
+		if (channel.valid) {
+			
+			__gain = channel.getVolume ();
+			
+		}
+
+		return __gain;
 		
 		#else
 		
@@ -699,8 +708,13 @@ class AudioSource {
 
 		#elseif lime_console
 
-		lime.Lib.notImplemented ("AudioSource.set_gain");
-		return value;
+		if (channel.valid) {
+			
+			channel.setVolume (value);
+			
+		}
+
+		return __gain = value;
 		
 		#else
 		

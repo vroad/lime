@@ -7,25 +7,7 @@
 	
 	<haxedef name="no-compilation" />
 	
-	<set name="lime-hybrid" value="1" if="hybrid || lime_hybrid" />
-	<set name="lime-legacy" value="1" if="legacy || lime_legacy" unless="lime-hybrid" />
-	
-	<set name="angle" if="windows" />
-	
-	<section if="web || display">
-		
-		<unset name="lime-legacy" />
-		<unset name="lime-hybrid" />
-		<unset name="legacy" />
-		<unset name="hybrid" />
-		
-	</section>
-	
-	<haxedef name="lime-hybrid" if="lime-hybrid" />
-	<haxedef name="lime-legacy" if="lime-legacy" />
-	
-	<include path="legacy/include.xml" if="lime-legacy || lime-hybrid" unless="setup" />
-	<templatePath name="templates" unless="lime-legacy" />
+	<templatePath name="templates" />
 	<sample path="samples" unless="openfl" />
 	
 	<haxelib name="hxnodejs" if="nodejs" />

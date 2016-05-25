@@ -81,6 +81,7 @@ class Image {
 	public var src (get, set):Dynamic;
 	public var transparent (get, set):Bool;
 	public var type:ImageType;
+	public var version:Int;
 	public var width:Int;
 	public var x:Float;
 	public var y:Float;
@@ -92,6 +93,8 @@ class Image {
 		this.offsetY = offsetY;
 		this.width = width;
 		this.height = height;
+		
+		version = 0;
 		
 		if (type == null) {
 			
@@ -170,15 +173,20 @@ class Image {
 		
 		if (buffer != null) {
 			
-			if (type == CANVAS && buffer.__srcImage == null) {
+			#if (js && html5)
+			if (type == CANVAS) {
 				
 				ImageCanvasUtil.convertToCanvas (this);
-				ImageCanvasUtil.sync (this, true);
+				
+			} else {
+				
+				ImageCanvasUtil.convertToData (this);
 				
 			}
+			#end
 			
 			var image = new Image (buffer.clone (), offsetX, offsetY, width, height, null, type);
-			image.dirty = dirty;
+			image.version = version;
 			return image;
 			
 		} else {
@@ -497,7 +505,9 @@ class Image {
 		if (canvas == null) return null;
 		var buffer = new ImageBuffer (null, canvas.width, canvas.height);
 		buffer.src = canvas;
-		return new Image (buffer);
+		var image = new Image (buffer);
+		image.type = CANVAS;
+		return image;
 		
 	}
 	
@@ -520,7 +530,9 @@ class Image {
 		if (image == null) return null;
 		var buffer = new ImageBuffer (null, image.width, image.height);
 		buffer.src = image;
-		return new Image (buffer);
+		var _image = new Image (buffer);
+		_image.type = CANVAS;
+		return _image;
 		
 	}
 	
@@ -1402,9 +1414,7 @@ class Image {
 			
 			#if (js && html5)
 				
-				ImageCanvasUtil.convertToCanvas (this);
-				ImageCanvasUtil.sync (this, false);
-				ImageCanvasUtil.createImageData (this);
+				ImageCanvasUtil.convertToData (this);
 				
 			#elseif flash
 				
@@ -1525,7 +1535,7 @@ class Image {
 			
 			switch (type) {
 				
-				case DATA:
+				case CANVAS, DATA:
 					
 					#if (js && html5)
 					ImageCanvasUtil.convertToData (this);

@@ -74,7 +74,7 @@ class NativeRenderer {
 		
 		#if lime_console
 		
-		parent.context = CONSOLE (new ConsoleRenderContext ());
+		parent.context = CONSOLE (ConsoleRenderContext.singleton);
 		parent.type = CONSOLE;
 		
 		#else

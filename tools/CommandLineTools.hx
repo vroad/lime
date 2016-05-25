@@ -573,7 +573,7 @@ class CommandLineTools {
 					
 				case BLACKBERRY:
 					
-					platform = new BlackBerryPlatform (command, project, targetFlags);
+					//platform = new BlackBerryPlatform (command, project, targetFlags);
 				
 				case IOS:
 					
@@ -581,11 +581,11 @@ class CommandLineTools {
 				
 				case TIZEN:
 					
-					platform = new TizenPlatform (command, project, targetFlags);
+					//platform = new TizenPlatform (command, project, targetFlags);
 				
 				case WEBOS:
 					
-					platform = new WebOSPlatform (command, project, targetFlags);
+					//platform = new WebOSPlatform (command, project, targetFlags);
 				
 				case WINDOWS:
 					
