@@ -19,10 +19,17 @@ namespace cs.ndll
             }
             set
             {
-                if (finalizer != null)
+                if (disposed && value != null)
+                    throw new InvalidOperationException("Tried to set finalizer to disposed CSAbstract");
+                if (finalizer != null && value != null)
                     throw new InvalidOperationException("Finalizer is already set");
 
                 finalizer = value;
+                if (finalizer == null)
+                {
+                    GC.SuppressFinalize(this);
+                    disposed = true;
+                }
             }
         }
         private bool disposed;
