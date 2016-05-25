@@ -668,8 +668,7 @@ namespace cs.ndll
                     return val_bool.ToPointer();
             }
 
-            String msg = String.Format("{0} is not implemented", inName);
-            throw new NotImplementedException(msg);
+            return IntPtr.Zero;
         }
     }
 }
