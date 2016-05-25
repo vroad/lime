@@ -55,7 +55,7 @@ namespace lime {
 		value handleValue;
 		if (handle != NULL) {
 			
-			handleValue = CFFIPointer (handle, lime_pointer_destroy<AudioBuffer>);
+			handleValue = CFFIPointer (handle, lime_pointer_destroy<AudioStream>);
 			
 		} else {
 			
