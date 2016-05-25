@@ -87,6 +87,14 @@ namespace lime {
 	}
 	
 	
+	void gc_bytes (void* inData) {
+		
+		Bytes* data = (Bytes*)inData;
+		delete data;
+		
+	}
+	
+	
 	void lime_cairo_arc (value handle, double xc, double yc, double radius, double angle1, double angle2) {
 		
 		cairo_arc ((cairo_t*)val_data (handle), xc, yc, radius, angle1, angle2);
@@ -434,17 +442,18 @@ namespace lime {
 	
 	value lime_cairo_image_surface_create_for_data (value inData, int format, int width, int height, int stride) {
 		
-		Bytes data (inData);
-		cairo_surface_t *surface = cairo_image_surface_create_for_data (data.Data (), (cairo_format_t)format, width, height, stride);
+		Bytes *data = new Bytes (inData);
+		cairo_surface_t *surface = cairo_image_surface_create_for_data (data->Data (), (cairo_format_t)format, width, height, stride);
 		
 		if (!surface) {
 			
+			delete data;
 			return alloc_null ();
 			
 		}
 		
-		AutoGCRoot *reference = new AutoGCRoot (inData);
-		cairo_surface_set_user_data (surface, &userData, reference, gc_user_data);
+		data->Pin ();
+		cairo_surface_set_user_data (surface, &userData, data, gc_bytes);
 		
 		return CFFIPointer (surface, gc_cairo_surface);
 		

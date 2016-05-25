@@ -110,6 +110,12 @@ namespace cs.ndll
         private delegate IntPtr ValToBufferDelegate(IntPtr arg1);
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
+        private delegate IntPtr PinBufferDelegate(IntPtr arg1);
+
+        [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
+        private delegate void UnPinBufferDelegate(IntPtr arg1);
+
+        [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
         private delegate IntPtr ValFieldDelegate(IntPtr arg1, int arg2);
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
@@ -170,6 +176,8 @@ namespace cs.ndll
         private static DelegateConverter<BufferDataDelegate> buffer_data;
         private static DelegateConverter<BufferValDelegate> buffer_val;
         private static DelegateConverter<ValToBufferDelegate> val_to_buffer;
+        private static DelegateConverter<PinBufferDelegate> pin_buffer;
+        private static DelegateConverter<UnPinBufferDelegate> unpin_buffer;
         private static DelegateConverter<ValFieldDelegate> val_field;
         private static DelegateConverter<ValBoolDelegate> val_bool;
         private static DelegateConverter<EmptyDelegate> empty;
@@ -282,7 +290,6 @@ namespace cs.ndll
         {
             GCHandle handle = GCHandle.FromIntPtr(inValue);
             CSPersistent persistent = (CSPersistent)handle.Target;
-            persistent.Destroy();
             handle.Free();
         }
 
@@ -539,6 +546,18 @@ namespace cs.ndll
             return CSHandleContainer.GetCurrent().GetAddrOfBlittableObject(buffer);
         }
 
+        private static IntPtr cs_pin_buffer(IntPtr inBuffer)
+        {
+            byte[] buffer = (byte[])GCHandle.FromIntPtr(inBuffer).Target;
+            return GCHandle.ToIntPtr(GCHandle.Alloc(buffer, GCHandleType.Pinned));
+        }
+
+        private static void cs_unpin_buffer(IntPtr inArg1)
+        {
+            GCHandle handle = GCHandle.FromIntPtr(inArg1);
+            handle.Free();
+        }
+
         private static bool cs_val_bool(IntPtr inArg1)
         {
             object arg1 = HandleUtils.GetObjectFromIntPtr(inArg1);
@@ -585,6 +604,8 @@ namespace cs.ndll
             buffer_data = new DelegateConverter<BufferDataDelegate>(new BufferDataDelegate(cs_buffer_data));
             buffer_val = new DelegateConverter<BufferValDelegate>(new BufferValDelegate(cs_buffer_val));
             val_to_buffer = new DelegateConverter<ValToBufferDelegate>(new ValToBufferDelegate(cs_val_to_buffer));
+            pin_buffer = new DelegateConverter<PinBufferDelegate>(new PinBufferDelegate(cs_pin_buffer));
+            unpin_buffer = new DelegateConverter<UnPinBufferDelegate>(new UnPinBufferDelegate(cs_unpin_buffer));
             val_field = new DelegateConverter<ValFieldDelegate>(new ValFieldDelegate(cs_val_field));
             val_bool = new DelegateConverter<ValBoolDelegate>(new ValBoolDelegate(cs_val_bool));
             empty = new DelegateConverter<EmptyDelegate>(new EmptyDelegate(cs_empty));
@@ -662,6 +683,10 @@ namespace cs.ndll
                     return buffer_val.ToPointer();
                 case "val_to_buffer":
                     return val_to_buffer.ToPointer();
+                case "pin_buffer":
+                    return pin_buffer.ToPointer();
+                case "unpin_buffer":
+                    return unpin_buffer.ToPointer();
                 case "val_field":
                     return val_field.ToPointer();
                 case "val_bool":
