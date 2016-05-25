@@ -174,16 +174,7 @@ namespace lime {
 			if (!_root) {
 				
 				val = alloc_empty_object ();
-				
-				if (!_root) {
-					
-					_root = new AutoGCRoot (val);
-					
-				} else {
-					
-					_root->set (val);
-					
-				}
+				_root = new AutoGCRoot (val);
 				
 			} else {
 				
