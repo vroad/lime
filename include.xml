@@ -5,6 +5,8 @@
 	<haxedef name="lime-html5" if="html5" />
 	<haxedef name="lime-native" if="native" unless="doc" />
 	
+	<set name="angle" if="windows" />
+	
 	<haxedef name="no-compilation" />
 	
 	<templatePath name="templates" />
