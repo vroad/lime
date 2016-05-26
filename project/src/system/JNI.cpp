@@ -1,4 +1,5 @@
 #include <system/JNI.h>
+#include <system/CFFIPointer.h>
 #include <utils/Object.h>
 #include <hx/CFFIPrimePatch.h>
 //#include <hx/CFFIPrime.h>
@@ -10,7 +11,6 @@
 #include <string>
 
 #include <utils/PointerWrapper.h>
-#include <utils/Kinds.h>
 #include <utils/GCRootUtils.h>
 
 #define ELOG(args...) __android_log_print (ANDROID_LOG_ERROR, "Lime", args)
@@ -23,15 +23,6 @@
 
 
 namespace lime {
-
-
-	template <>
-	value WrapPointer<JNIEnv> (JNIEnv *env) {
-		
-		return WrapPointerInternal<JNIEnv> (env, GetKinds ().JNIEnv);
-		
-	}
-	
 	
 	vkind gObjectKind;
 	
@@ -1971,7 +1962,7 @@ namespace lime {
 	value lime_jni_get_env () {
 		
 		JNIEnv *env = (JNIEnv*)JNI::GetEnv ();
-		return WrapPointer<JNIEnv> (env);
+		return CFFIPointer (env);
 		
 	}
 	
