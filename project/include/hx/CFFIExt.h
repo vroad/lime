@@ -12,7 +12,7 @@ extern void *LoadFunc(const char *inName);
    bool LOADED_##name = false; \
    bool HAS_##name () \
    { \
-     if (!LOADED_##name && IMPL_##name == NULL) \
+     if (!LOADED_##name) \
      { \
        IMPL_##name = (FUNC_##name)LoadFunc(#name); \
        LOADED_##name = true; \
