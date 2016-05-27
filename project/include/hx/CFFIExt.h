@@ -9,6 +9,7 @@ extern void *LoadFunc(const char *inName);
 #define DEFFUNC_EXT(name,ret,def_args,call_args) \
    typedef ret (*FUNC_##name)def_args; \
    FUNC_##name IMPL_##name = NULL; \
+   extern FUNC_##name EXT_##name; \
    bool LOADED_##name = false; \
    bool HAS_##name () \
    { \
@@ -19,20 +20,22 @@ extern void *LoadFunc(const char *inName);
      } \
      return IMPL_##name != NULL; \
    } \
-   ret EXT_##name def_args \
+   ret REAL_##name def_args \
    { \
       if (!HAS_##name()) \
       { \
         fprintf(stderr,"Could not find external function:" #name " \n"); \
         abort(); \
       } \
+      EXT_##name = IMPL_##name; \
       return IMPL_##name call_args; \
-   }
+   } \
+   FUNC_##name EXT_##name = REAL_##name;
 #else
 #define DEFFUNC_EXT(name,ret,def_args,call_args) \
 typedef ret (*FUNC_##name)def_args; \
 extern bool HAS_##name (); \
-extern ret EXT_##name def_args;
+extern FUNC_##name EXT_##name;
 #endif   
 
 #define DEFFUNC_EXT_0(ret,name) DEFFUNC_EXT(name,ret, (), ())
