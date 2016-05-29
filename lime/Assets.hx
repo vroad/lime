@@ -1170,13 +1170,29 @@ class Assets {
 		if (fields != null) {
 		#end
 			
-			var constructor = macro {
+			var constructor;
+			
+			if (Context.defined("js")) {
 				
-				var bytes = haxe.Resource.getBytes (resourceName);
+				constructor = macro {
+					
+					var bytes = haxe.Resource.getBytes (resourceName);
+					
+					super (bytes.length, bytes.b.buffer);
+					
+				};
 				
-				super (bytes.length, bytes.b);
+			} else {
 				
-			};
+				constructor = macro {
+					
+					var bytes = haxe.Resource.getBytes (resourceName);
+					
+					super (bytes.length, bytes.b);
+					
+				};
+			
+			}
 			
 			var args = [ { name: "length", opt: false, type: macro :Int }, { name: "bytesData", opt: false, type: macro :haxe.io.BytesData } ];
 			fields.push ({ name: "new", access: [ APublic ], kind: FFun({ args: args, expr: constructor, params: [], ret: null }), pos: Context.currentPos () });
