@@ -620,27 +620,27 @@ namespace lime {
 	}
 	
 	
-	bool lime_font_render_glyph (value fontHandle, int index, value data) {
+	value lime_font_render_glyph (value fontHandle, int index, value data) {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)val_data (fontHandle);
 		Bytes bytes = Bytes (data);
 		return font->RenderGlyph (index, &bytes);
 		#else
-		return false;
+		return alloc_null ();
 		#endif
 		
 	}
 	
 	
-	bool lime_font_render_glyphs (value fontHandle, value indices, value data) {
+	value lime_font_render_glyphs (value fontHandle, value indices, value data) {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)val_data (fontHandle);
 		Bytes bytes = Bytes (data);
 		return font->RenderGlyphs (indices, &bytes);
 		#else
-		return false;
+		return alloc_null ();
 		#endif
 		
 	}
