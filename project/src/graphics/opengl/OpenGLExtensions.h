@@ -48,7 +48,7 @@
    
    #define EGL_EXT(func,ret,args) \
    {\
-      *(void **)&lime::func = (void *)GetProcAddress((HMODULE)lime::OpenGLBindings::eglHandle, #func);\
+      *(void **)&lime::func = (void *)GetProcAddress((HMODULE)lime::OpenGLBindings::eglHandle.get (), #func);\
    }
 #elif LIME_SDL
    #define OGL_EXT(func,ret,args) \
@@ -67,9 +67,9 @@
 #elif defined(HX_LINUX)
    #define OGL_EXT(func,ret,args) \
    {\
-      *(void **)&lime::func = (void *)dlsym(lime::OpenGLBindings::handle,#func);\
+      *(void **)&lime::func = (void *)dlsym(lime::OpenGLBindings::handle.get (),#func);\
       if (!func) \
-         *(void **)&lime::func = (void *)dlsym(lime::OpenGLBindings::handle,#func "ARB");\
+         *(void **)&lime::func = (void *)dlsym(lime::OpenGLBindings::handle.get (),#func "ARB");\
    }
 #endif
 
