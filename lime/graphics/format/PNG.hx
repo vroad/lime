@@ -2,6 +2,7 @@ package lime.graphics.format;
 
 
 import haxe.io.Bytes;
+import lime.graphics.utils.ImageCanvasUtil;
 import lime.graphics.Image;
 import lime.system.CFFI;
 import lime.utils.BytesUtil;
@@ -92,7 +93,8 @@ class PNG {
 			return BytesUtil.createBytes (data.length, data.b);
 			
 		}
-		
+		#end
+
 		#if (!html5 && format)
 		
 		else {
@@ -146,7 +148,7 @@ class PNG {
 			
 			for (i in 0...buffer.length) {
 				
-				bytes[i] = buffer.charCodeAt (i);
+				bytes.set (i, buffer.charCodeAt (i));
 				
 			}
 			
@@ -154,7 +156,6 @@ class PNG {
 			
 		}
 		
-		#end
 		#end
 		
 		return null;
