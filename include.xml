@@ -2,6 +2,9 @@
 <extension>
 	
 	<set name="lime" />
+	
+	<haxedef name="native" if="native" />
+	
 	<haxedef name="lime-html5" if="html5" />
 	<haxedef name="lime-native" if="native" unless="doc" />
 	
