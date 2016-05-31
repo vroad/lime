@@ -43,13 +43,17 @@ class LogHelper {
 				
 			}
 			
+			#if !nodejs
 			Sys.stderr ().write (Bytes.ofString (stripColor (output)));
+			#end
 			
 		}
 		
 		if (verbose && e != null) {
 			
+			#if !nodejs
 			Lib.rethrow (e);
+			#end
 			
 		}
 		
