@@ -25,9 +25,9 @@ namespace lime {
 	
 	
 	bool OpenGLBindings::initialized = false;
-	void *OpenGLBindings::handle = 0;
+	std::unique_ptr<void, UnixLibraryDeleter> OpenGLBindings::handle;
 	#ifdef NATIVE_TOOLKIT_SDL_ANGLE
-	void *OpenGLBindings::eglHandle = 0;
+	std::unique_ptr<void, WinLibraryDeleter> OpenGLBindings::eglHandle;
 	#endif
 	
 	void lime_gl_delete_buffer (value handle);
@@ -1639,11 +1639,11 @@ namespace lime {
 			
 			#ifdef HX_LINUX
 			
-			OpenGLBindings::handle = dlopen ("libGL.so.1", RTLD_NOW|RTLD_GLOBAL);
+			OpenGLBindings::handle.reset (dlopen ("libGL.so.1", RTLD_NOW|RTLD_GLOBAL));
 			
 			if (!OpenGLBindings::handle) {
 				
-				OpenGLBindings::handle = dlopen ("libGL.so", RTLD_NOW|RTLD_GLOBAL);
+				OpenGLBindings::handle.reset (dlopen ("libGL.so", RTLD_NOW|RTLD_GLOBAL));
 				
 			}
 			
@@ -1656,7 +1656,7 @@ namespace lime {
 			
 			#elif defined (NATIVE_TOOLKIT_SDL_ANGLE)
 			
-			OpenGLBindings::eglHandle = LoadLibrary (L"libegl.dll");
+			OpenGLBindings::eglHandle.reset (LoadLibrary (L"libegl.dll"));
 			
 			if (!OpenGLBindings::eglHandle) {
 				
@@ -1679,6 +1679,19 @@ namespace lime {
 		
 	}
 	
+	void UnixLibraryDeleter::operator () (void *handle) const
+	{
+		#ifdef HX_LINUX
+		dlclose (handle);
+		#endif
+	}
+	
+	void WinLibraryDeleter::operator () (void *handle) const
+	{
+		#ifdef NATIVE_TOOLKIT_SDL_ANGLE
+		FreeLibrary ((HMODULE)handle);
+		#endif
+	}
 	
 	DEFINE_PRIME1v (lime_gl_active_texture);
 	DEFINE_PRIME2v (lime_gl_attach_shader);

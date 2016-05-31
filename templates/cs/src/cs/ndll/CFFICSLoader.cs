@@ -65,6 +65,9 @@ namespace cs.ndll
         private delegate IntPtr AllocArrayDelegate(int arg1);
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
+        private delegate IntPtr AllocArrayTypeDelegate(int arg1, hxValueType arg2);
+
+        [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
         private delegate int ValArraySizeDelegate(IntPtr arg1);
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
@@ -161,6 +164,7 @@ namespace cs.ndll
         private static DelegateConverter<ValIntDelegate> val_int;
         private static DelegateConverter<AllocIntDelegate> alloc_int;
         private static DelegateConverter<AllocArrayDelegate> alloc_array;
+        private static DelegateConverter<AllocArrayTypeDelegate> alloc_array_type;
         private static DelegateConverter<ValArraySizeDelegate> val_array_size;
         private static DelegateConverter<ValArrayIDelegate> val_array_i;
         private static DelegateConverter<ValArraySetIDelegate> val_array_set_i;
@@ -405,6 +409,32 @@ namespace cs.ndll
             return CSHandleContainer.GetCurrent().CreateGCHandle(new Array<object>(new object[arg1]));
         }
 
+        private static IntPtr cs_alloc_array_type(int arg1, hxValueType arg2)
+        {
+            Array arr;
+            switch(arg2)
+            {
+                case hxValueType.valtBool:
+                    arr = new Array<bool>(new bool[arg1]);
+                    break;
+                case hxValueType.valtInt:
+                    arr = new Array<int>(new int[arg1]);
+                    break;
+                case hxValueType.valtFloat:
+                    arr = new Array<float>(new float[arg1]);
+                    break;
+                case hxValueType.valtString:
+                    arr = new Array<String>(new String[arg1]);
+                    break;
+                case hxValueType.valtObject:
+                    arr = new Array<object>(new object[arg1]);
+                    break;
+                default:
+                    return IntPtr.Zero;
+            }
+            return CSHandleContainer.GetCurrent().CreateGCHandle(arr);
+        }
+
         private static int cs_val_array_size(IntPtr inArg1)
         {
             Array<object> arg1 = (Array<object>)HandleUtils.GetObjectFromIntPtr(inArg1);
@@ -589,6 +619,7 @@ namespace cs.ndll
             val_int = new DelegateConverter<ValIntDelegate>(new ValIntDelegate(cs_val_int));
             alloc_int = new DelegateConverter<AllocIntDelegate>(new AllocIntDelegate(cs_alloc_int));
             alloc_array = new DelegateConverter<AllocArrayDelegate>(new AllocArrayDelegate(cs_alloc_array));
+            alloc_array_type = new DelegateConverter<AllocArrayTypeDelegate>(new AllocArrayTypeDelegate(cs_alloc_array_type));
             val_array_size = new DelegateConverter<ValArraySizeDelegate>(new ValArraySizeDelegate(cs_val_array_size));
             val_array_i = new DelegateConverter<ValArrayIDelegate>(new ValArrayIDelegate(cs_val_array_i));
             val_array_set_i = new DelegateConverter<ValArraySetIDelegate>(new ValArraySetIDelegate(cs_val_array_set_i));
@@ -653,6 +684,8 @@ namespace cs.ndll
                     return alloc_int.ToPointer();
                 case "alloc_array":
                     return alloc_array.ToPointer();
+                case "alloc_array_type":
+                    return alloc_array_type.ToPointer();
                 case "val_array_size":
                     return val_array_size.ToPointer();
                 case "val_array_i":

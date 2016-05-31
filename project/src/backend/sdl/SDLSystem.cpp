@@ -48,6 +48,22 @@ namespace lime {
 	static int id_width;
 	static bool init = false;
 	
+	char* CreateCStringFromStdString (const std::string &str) {
+		
+		char *cstr = new char[str.size () + 1];
+		strcpy (cstr, str.c_str ());
+		return cstr;
+		
+	}
+	
+	char* CreateCStringFromConstCString (const char *str) {
+		
+		size_t len = strlen (str);
+		char *cstr = new char[len + 1];
+		strcpy (cstr, str);
+		return cstr;
+		
+	}
 	
 	const char* Clipboard::GetText () {
 		
@@ -88,7 +104,7 @@ namespace lime {
 	}
 	
 	
-	std::string System::GetDirectory (SystemDirectory type, const char* company, const char* title) {
+	const char* System::GetDirectory (SystemDirectory type, const char* company, const char* title) {
 		
 		switch (type) {
 			
@@ -107,23 +123,20 @@ namespace lime {
 				#if defined (HX_WINRT)
 				
 				Windows::Storage::StorageFolder folder = Windows::Storage::KnownFolders::HomeGroup;
-				std::wstring resultW (folder->Begin ());
-				std::string result (resultW.begin (), resultW.end ());
-				return result;
+				const char *utf8Str = WIN_StringToUTF8 (folder->Begin ());
+				return utf8Str;
 				
 				#elif defined (HX_WINDOWS)
 				
 				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, result);
 				const char *utf8Str = WIN_StringToUTF8 (result);
-				std::string utf8Result = std::string (utf8Str);
-				delete utf8Str;
-				return utf8Result;
+				return utf8Str;
 				
 				#else
 				
 				std::string result = std::string (getenv ("HOME")) + std::string ("/Desktop");
-				return result;
+				return CreateCStringFromStdString (result);
 				
 				#endif
 				break;
@@ -135,23 +148,20 @@ namespace lime {
 				#if defined (HX_WINRT)
 				
 				Windows::Storage::StorageFolder folder = Windows::Storage::KnownFolders::DocumentsLibrary;
-				std::wstring resultW (folder->Begin ());
-				std::string result (resultW.begin (), resultW.end ());
-				return result;
+				const char *utf8Str = WIN_StringToUTF8 (folder->Begin ());
+				return utf8Str;
 				
 				#elif defined (HX_WINDOWS)
 				
 				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, result);
 				const char *utf8Str = WIN_StringToUTF8 (result);
-				std::string utf8Result (utf8Str);
-				delete utf8Str;
-				return utf8Result;
+				return utf8Str;
 				
 				#else
 				
 				std::string result = std::string (getenv ("HOME")) + std::string ("/Documents");
-				return result;
+				return CreateCStringFromStdString (result);
 				
 				#endif
 				break;
@@ -172,23 +182,23 @@ namespace lime {
 				
 				#elif defined (HX_MACOS)
 				
-				return "/Library/Fonts";
+				return CreateCStringFromConstCString ("/Library/Fonts");
 				
 				#elif defined (IPHONEOS)
 				
-				return "/System/Library/Fonts";
+				return CreateCStringFromConstCString ("/System/Library/Fonts");
 				
 				#elif defined (ANDROID)
 				
-				return "/system/fonts";
+				return CreateCStringFromConstCString ("/system/fonts");
 				
 				#elif defined (BLACKBERRY)
 				
-				return "/usr/fonts/font_repository/monotype";
+				return CreateCStringFromConstCString ("/usr/fonts/font_repository/monotype");
 				
 				#else
 				
-				return "/usr/share/fonts/truetype";
+				return CreateCStringFromConstCString ("/usr/share/fonts/truetype");
 				
 				#endif
 				break;
@@ -200,23 +210,20 @@ namespace lime {
 				#if defined (HX_WINRT)
 				
 				Windows::Storage::StorageFolder folder = Windows::Storage::ApplicationData::Current->RoamingFolder;
-				std::wstring resultW (folder->Begin ());
-				std::string result (resultW.begin (), resultW.end ());
-				return result;
+				const char *utf8Str = WIN_StringToUTF8 (folder->Begin ());
+				return utf8Str;
 				
 				#elif defined (HX_WINDOWS)
 				
 				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, result);
 				const char *utf8Str = WIN_StringToUTF8 (result);
-				std::string utf8Result (utf8Str);
-				delete utf8Str;
-				return utf8Result;
+				return utf8Str;
 				
 				#else
 				
 				std::string result = getenv ("HOME");
-				return result;
+				return CreateCStringFromStdString (result);
 				
 				#endif
 				break;

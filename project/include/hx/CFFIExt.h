@@ -5,28 +5,38 @@
 
 extern void *LoadFunc(const char *inName);
 
+#ifdef IMPLEMENT_CFFI_EXT
 #define DEFFUNC_EXT(name,ret,def_args,call_args) \
    typedef ret (*FUNC_##name)def_args; \
    FUNC_##name IMPL_##name = NULL; \
+   extern FUNC_##name EXT_##name; \
    bool LOADED_##name = false; \
    bool HAS_##name () \
    { \
-     if (!LOADED_##name && IMPL_##name == NULL) \
+     if (!LOADED_##name) \
      { \
        IMPL_##name = (FUNC_##name)LoadFunc(#name); \
        LOADED_##name = true; \
      } \
      return IMPL_##name != NULL; \
    } \
-   ret EXT_##name def_args \
+   ret REAL_##name def_args \
    { \
       if (!HAS_##name()) \
       { \
         fprintf(stderr,"Could not find external function:" #name " \n"); \
         abort(); \
       } \
+      EXT_##name = IMPL_##name; \
       return IMPL_##name call_args; \
-   }
+   } \
+   FUNC_##name EXT_##name = REAL_##name;
+#else
+#define DEFFUNC_EXT(name,ret,def_args,call_args) \
+typedef ret (*FUNC_##name)def_args; \
+extern bool HAS_##name (); \
+extern FUNC_##name EXT_##name;
+#endif   
 
 #define DEFFUNC_EXT_0(ret,name) DEFFUNC_EXT(name,ret, (), ())
 #define DEFFUNC_EXT_1(ret,name,t1) DEFFUNC_EXT(name,ret, (t1 a1), (a1))
@@ -37,5 +47,11 @@ extern void *LoadFunc(const char *inName);
 
 DEFFUNC_EXT_1(value,pin_buffer,buffer);
 DEFFUNC_EXT_1(void,unpin_buffer,value);
+DEFFUNC_EXT_2(value,alloc_array_type,int,hxValueType);
+
+static value alloc_array_type_wrap(int size, hxValueType type)
+{
+    return HAS_alloc_array_type() ? EXT_alloc_array_type(size, type) : alloc_array (size);
+}
 
 #endif

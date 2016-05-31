@@ -135,9 +135,12 @@ HRESULT WMFVideo::QueryInterface(REFIID riid, void** ppv)
 {
     static const QITAB qit[] = 
     {
+    #pragma warning(push)
+    #pragma warning(disable: 4838)
         QITABENT(WMFVideo, IMFAsyncCallback),
-        { (int)0 }
+        {0}
     };
+    #pragma warning(pop)
     return QISearch(this, qit, riid, ppv);
 }
 

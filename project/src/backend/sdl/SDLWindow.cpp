@@ -7,11 +7,17 @@
 #undef CreateWindow
 #endif
 
+#include <memory>
 
 namespace lime {
 	
+	SDLWindow::SDLWindow () {
+		
+		sdlWindow = NULL;
+		
+	}
 	
-	SDLWindow::SDLWindow (Application* application, int width, int height, int flags, const char* title) {
+	bool SDLWindow::Init (Application* application, int width, int height, int flags, const char* title) {
 		
 		currentApplication = application;
 		this->flags = flags;
@@ -95,6 +101,7 @@ namespace lime {
 		if (!sdlWindow) {
 			
 			printf ("Could not create SDL window: %s.\n", SDL_GetError ());
+			return false;
 			
 		}
 		
@@ -120,6 +127,8 @@ namespace lime {
 		}
 		
 		#endif
+		
+		return true;
 		
 	}
 	
@@ -417,7 +426,15 @@ namespace lime {
 	
 	Window* CreateWindow (Application* application, int width, int height, int flags, const char* title) {
 		
-		return new SDLWindow (application, width, height, flags, title);
+		std::unique_ptr<SDLWindow> window (new SDLWindow ());
+		
+		if (!window->Init (application, width, height, flags, title)) {
+			
+			return NULL;
+			
+		}
+		
+		return window.release ();
 		
 	}
 	

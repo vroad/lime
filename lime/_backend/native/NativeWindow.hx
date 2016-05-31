@@ -106,15 +106,18 @@ class NativeWindow {
 		#if !macro
 		handle = lime_window_create (application.backend.handle, parent.width, parent.height, flags, title);
 		
-		if (handle != null) {
+		if (handle == null) {
 			
-			parent.__width = lime_window_get_width (handle);
-			parent.__height = lime_window_get_height (handle);
-			parent.__x = lime_window_get_x (handle);
-			parent.__y = lime_window_get_y (handle);
-			parent.id = lime_window_get_id (handle);
+			throw "Failed to create window";
 			
 		}
+		
+		parent.__width = lime_window_get_width (handle);
+		parent.__height = lime_window_get_height (handle);
+		parent.__x = lime_window_get_x (handle);
+		parent.__y = lime_window_get_y (handle);
+		parent.id = lime_window_get_id (handle);
+		
 		#end
 		
 	}

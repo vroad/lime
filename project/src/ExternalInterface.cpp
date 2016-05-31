@@ -62,6 +62,8 @@
 #include <graphics/OpenGLContext.h>
 #include "graphics/opengl/OpenGLBindings.h"
 
+#include <memory>
+
 
 namespace lime {
 	
@@ -312,12 +314,8 @@ namespace lime {
 		
 		if (Clipboard::HasText ()) {
 			
-			const char* text = Clipboard::GetText ();
-			value _text = alloc_string (text);
-			
-			// TODO: Should we free for all backends? (SDL requires it)
-			
-			free ((char*)text);
+			std::unique_ptr<const char[]> text (Clipboard::GetText ());
+			value _text = alloc_string (text.get ());
 			return _text;
 			
 		} else {
@@ -347,12 +345,11 @@ namespace lime {
 	value lime_file_dialog_open_directory (HxString filter, HxString defaultPath) {
 		
 		#ifdef LIME_NFD
-		const char* path = FileDialog::OpenDirectory (filter.__s, defaultPath.__s);
+		std::unique_ptr<const char[]> path (FileDialog::OpenDirectory (filter.__s, defaultPath.__s));
 		
 		if (path) {
 			
-			value _path = alloc_string (path);
-			free ((char*) path);
+			value _path = alloc_string (path.get ());
 			return _path;
 			
 		} else {
@@ -369,12 +366,11 @@ namespace lime {
 	value lime_file_dialog_open_file (HxString filter, HxString defaultPath) {
 		
 		#ifdef LIME_NFD
-		const char* path = FileDialog::OpenFile (filter.__s, defaultPath.__s);
+		std::unique_ptr<const char[]> path (FileDialog::OpenFile (filter.__s, defaultPath.__s));
 		
 		if (path) {
 			
-			value _path = alloc_string (path);
-			free ((char*) path);
+			value _path = alloc_string (path.get ());
 			return _path;
 			
 		} else {
@@ -415,12 +411,11 @@ namespace lime {
 	value lime_file_dialog_save_file (HxString filter, HxString defaultPath) {
 		
 		#ifdef LIME_NFD
-		const char* path = FileDialog::SaveFile (filter.__s, defaultPath.__s);
+		std::unique_ptr<const char[]> path (FileDialog::SaveFile (filter.__s, defaultPath.__s));
 		
 		if (path) {
 			
-			value _path = alloc_string (path);
-			free ((char*) path);
+			value _path = alloc_string (path.get ());
 			return _path;
 			
 		} else {
@@ -463,9 +458,8 @@ namespace lime {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)val_data (fontHandle);
-		wchar_t *name = font->GetFamilyName ();
-		value result = alloc_wstring (name);
-		delete name;
+		std::unique_ptr<wchar_t> name (font->GetFamilyName ());
+		value result = alloc_wstring (name.get ());
 		return result;
 		#else
 		return 0;
@@ -621,27 +615,27 @@ namespace lime {
 	}
 	
 	
-	bool lime_font_render_glyph (value fontHandle, int index, value data) {
+	value lime_font_render_glyph (value fontHandle, int index, value data) {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)val_data (fontHandle);
 		Bytes bytes = Bytes (data);
 		return font->RenderGlyph (index, &bytes);
 		#else
-		return false;
+		return alloc_null ();
 		#endif
 		
 	}
 	
 	
-	bool lime_font_render_glyphs (value fontHandle, value indices, value data) {
+	value lime_font_render_glyphs (value fontHandle, value indices, value data) {
 		
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)val_data (fontHandle);
 		Bytes bytes = Bytes (data);
 		return font->RenderGlyphs (indices, &bytes);
 		#else
-		return false;
+		return alloc_null ();
 		#endif
 		
 	}
@@ -1662,12 +1656,11 @@ namespace lime {
 	value lime_window_set_title (value window, HxString title) {
 		
 		Window* targetWindow = (Window*)val_data (window);
-		const char* result = targetWindow->SetTitle (title.__s);
+		std::unique_ptr<const char[]> result (targetWindow->SetTitle (title.__s));
 		
 		if (result) {
 			
-			value _result = alloc_string (result);
-			free ((char*) result);
+			value _result = alloc_string (result.get ());
 			return _result;
 			
 		} else {
@@ -1681,13 +1674,15 @@ namespace lime {
 	
 	value lime_gl_context_create (value window) {
 		
+		if (!OpenGLBindings::Init ())
+			return alloc_null ();
+		
 		Window* targetWindow = (Window*)val_data (window);
 		if (targetWindow == NULL) return alloc_null ();
 		OpenGLContext* context = CreateOpenGLContext (targetWindow);
 		
 		if (context) {
 			
-			OpenGLBindings::Init ();
 			return CFFIPointer (context, lime_pointer_destroy<OpenGLContext>);
 			
 		} else {

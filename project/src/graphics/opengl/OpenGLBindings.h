@@ -1,9 +1,19 @@
 #ifndef LIME_GRAPHICS_OPENGL_OPENGL_BINDINGS_H
 #define LIME_GRAPHICS_OPENGL_OPENGL_BINDINGS_H
 
+#include <memory>
 
 namespace lime {
 	
+	struct UnixLibraryDeleter
+	{
+		void operator () (void* handle) const;
+	};
+	
+	struct WinLibraryDeleter
+	{
+		void operator () (void* handle) const;
+	};
 	
 	class OpenGLBindings {
 		
@@ -11,9 +21,9 @@ namespace lime {
 			
 			static bool Init ();
 			
-			static void* handle;
+			static std::unique_ptr<void, UnixLibraryDeleter> handle;
 			#ifdef NATIVE_TOOLKIT_SDL_ANGLE
-			static void *eglHandle;
+			static std::unique_ptr<void, WinLibraryDeleter> eglHandle;
 			#endif
 		
 		private:
