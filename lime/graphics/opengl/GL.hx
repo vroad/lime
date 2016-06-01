@@ -344,6 +344,7 @@ class GL {
 	public static inline var STENCIL_INDEX = 0x1901;
 	public static inline var STENCIL_INDEX8 = 0x8D48;
 	public static inline var DEPTH_STENCIL = 0x84F9;
+	public static inline var DEPTH24_STENCIL8_EXT = 0x88F0;
 	
 	public static inline var RENDERBUFFER_WIDTH = 0x8D42;
 	public static inline var RENDERBUFFER_HEIGHT = 0x8D43;
