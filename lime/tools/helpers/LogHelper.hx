@@ -43,7 +43,7 @@ class LogHelper {
 				
 			}
 			
-			#if !nodejs
+			#if (!nodejs && !cs)
 			Sys.stderr ().write (Bytes.ofString (stripColor (output)));
 			#end
 			
@@ -51,7 +51,7 @@ class LogHelper {
 		
 		if (verbose && e != null) {
 			
-			#if !nodejs
+			#if (!nodejs && !cs)
 			Lib.rethrow (e);
 			#end
 			
