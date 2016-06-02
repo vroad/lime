@@ -83,6 +83,13 @@ class NativeApplication {
 		
 		#if !macro
 		handle = lime_application_create ( { } );
+		
+		if (handle == null) {
+			
+			throw "Failed to create application";
+			
+		}
+		
 		#end
 		
 	}
