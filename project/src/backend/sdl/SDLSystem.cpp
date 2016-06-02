@@ -3,6 +3,7 @@
 #include <system/Clipboard.h>
 #include <system/JNI.h>
 #include <system/System.h>
+#include <utils/StringId.h>
 
 #ifdef HX_MACOS
 #include <CoreFoundation/CoreFoundation.h>
@@ -36,17 +37,6 @@
 
 namespace lime {
 	
-	
-	static int id_bounds;
-	static int id_currentMode;
-	static int id_dpi;
-	static int id_height;
-	static int id_name;
-	static int id_pixelFormat;
-	static int id_refreshRate;
-	static int id_supportedModes;
-	static int id_width;
-	static bool init = false;
 	
 	char* CreateCStringFromStdString (const std::string &str) {
 		
@@ -239,20 +229,7 @@ namespace lime {
 	
 	value System::GetDisplay (int id) {
 		
-		if (!init) {
-			
-			id_bounds = val_id ("bounds");
-			id_currentMode = val_id ("currentMode");
-			id_dpi = val_id ("dpi");
-			id_height = val_id ("height");
-			id_name = val_id ("name");
-			id_pixelFormat = val_id ("pixelFormat");
-			id_refreshRate = val_id ("refreshRate");
-			id_supportedModes = val_id ("supportedModes");
-			id_width = val_id ("width");
-			init = true;
-			
-		}
+		StringId* sid = StringId::Get ();
 		
 		int numDisplays = GetNumDisplays ();
 		
@@ -263,17 +240,17 @@ namespace lime {
 		}
 		
 		value display = alloc_empty_object ();
-		alloc_field (display, id_name, alloc_string (SDL_GetDisplayName (id)));
+		alloc_field (display, sid->name, alloc_string (SDL_GetDisplayName (id)));
 		
 		SDL_Rect bounds = { 0, 0, 0, 0 };
 		SDL_GetDisplayBounds (id, &bounds);
-		alloc_field (display, id_bounds, Rectangle (bounds.x, bounds.y, bounds.w, bounds.h).Value ());
+		alloc_field (display, sid->bounds, Rectangle (bounds.x, bounds.y, bounds.w, bounds.h).Value ());
 		
 		float dpi = 72.0;
 		#ifndef EMSCRIPTEN
 		SDL_GetDisplayDPI (id, &dpi, NULL, NULL);
 		#endif
-		alloc_field (display, id_dpi, alloc_float (dpi));
+		alloc_field (display, sid->dpi, alloc_float (dpi));
 		
 		SDL_DisplayMode currentDisplayMode = { SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0 };
 		SDL_DisplayMode displayMode = { SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0 };
@@ -290,40 +267,40 @@ namespace lime {
 			
 			if (displayMode.format == currentDisplayMode.format && displayMode.w == currentDisplayMode.w && displayMode.h == currentDisplayMode.h && displayMode.refresh_rate == currentDisplayMode.refresh_rate) {
 				
-				alloc_field (display, id_currentMode, alloc_int (i));
+				alloc_field (display, sid->currentMode, alloc_int (i));
 				
 			}
 			
 			mode = alloc_empty_object ();
-			alloc_field (mode, id_height, alloc_int (displayMode.h));
+			alloc_field (mode, sid->height, alloc_int (displayMode.h));
 			
 			switch (displayMode.format) {
 				
 				case SDL_PIXELFORMAT_ARGB8888:
 					
-					alloc_field (mode, id_pixelFormat, alloc_int (ARGB32));
+					alloc_field (mode, sid->pixelFormat, alloc_int (ARGB32));
 					break;
 				
 				case SDL_PIXELFORMAT_BGRA8888:
 				case SDL_PIXELFORMAT_BGRX8888:
 					
-					alloc_field (mode, id_pixelFormat, alloc_int (BGRA32));
+					alloc_field (mode, sid->pixelFormat, alloc_int (BGRA32));
 					break;
 				
 				default:
 					
-					alloc_field (mode, id_pixelFormat, alloc_int (RGBA32));
+					alloc_field (mode, sid->pixelFormat, alloc_int (RGBA32));
 				
 			}
 			
-			alloc_field (mode, id_refreshRate, alloc_int (displayMode.refresh_rate));
-			alloc_field (mode, id_width, alloc_int (displayMode.w));
+			alloc_field (mode, sid->refreshRate, alloc_int (displayMode.refresh_rate));
+			alloc_field (mode, sid->width, alloc_int (displayMode.w));
 			
 			val_array_set_i (supportedModes, i, mode);
 			
 		}
 		
-		alloc_field (display, id_supportedModes, supportedModes);
+		alloc_field (display, sid->supportedModes, supportedModes);
 		return display;
 		
 	}

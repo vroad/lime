@@ -99,19 +99,19 @@ class NativeApplication {
 		
 		#if !macro
 		
-		lime_application_event_manager_register (handleApplicationEvent, applicationEventInfo);
-		lime_drop_event_manager_register (handleDropEvent, dropEventInfo);
-		lime_gamepad_event_manager_register (handleGamepadEvent, gamepadEventInfo);
-		lime_joystick_event_manager_register (handleJoystickEvent, joystickEventInfo);
-		lime_key_event_manager_register (handleKeyEvent, keyEventInfo);
-		lime_mouse_event_manager_register (handleMouseEvent, mouseEventInfo);
-		lime_render_event_manager_register (handleRenderEvent, renderEventInfo);
-		lime_text_event_manager_register (handleTextEvent, textEventInfo);
-		lime_touch_event_manager_register (handleTouchEvent, touchEventInfo);
-		lime_window_event_manager_register (handleWindowEvent, windowEventInfo);
+		lime_application_event_manager_register (handle, handleApplicationEvent, applicationEventInfo);
+		lime_drop_event_manager_register (handle, handleDropEvent, dropEventInfo);
+		lime_gamepad_event_manager_register (handle, handleGamepadEvent, gamepadEventInfo);
+		lime_joystick_event_manager_register (handle, handleJoystickEvent, joystickEventInfo);
+		lime_key_event_manager_register (handle, handleKeyEvent, keyEventInfo);
+		lime_mouse_event_manager_register (handle, handleMouseEvent, mouseEventInfo);
+		lime_render_event_manager_register (handle, handleRenderEvent, renderEventInfo);
+		lime_text_event_manager_register (handle, handleTextEvent, textEventInfo);
+		lime_touch_event_manager_register (handle, handleTouchEvent, touchEventInfo);
+		lime_window_event_manager_register (handle, handleWindowEvent, windowEventInfo);
 		
 		#if (ios || android || tvos)
-		lime_sensor_event_manager_register (handleSensorEvent, sensorEventInfo);
+		lime_sensor_event_manager_register (handle, handleSensorEvent, sensorEventInfo);
 		#end
 		
 		#if nodejs
@@ -151,6 +151,8 @@ class NativeApplication {
 		
 		var result = lime_application_quit (handle);
 		parent.onExit.dispatch (result);
+		
+		lime_reset ();
 		return result;
 		
 		#elseif (cpp || neko)
@@ -158,6 +160,7 @@ class NativeApplication {
 		var result = lime_application_exec (handle);
 		parent.onExit.dispatch (result);
 		
+		lime_reset ();
 		return result;
 		
 		#end
@@ -661,22 +664,23 @@ class NativeApplication {
 	
 	#if !macro
 	@:cffi private static function lime_application_create (config:Dynamic):Dynamic;
-	@:cffi private static function lime_application_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_application_event_manager_register (app:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
 	@:cffi private static function lime_application_exec (handle:Dynamic):Int;
 	@:cffi private static function lime_application_init (handle:Dynamic):Void;
 	@:cffi private static function lime_application_quit (handle:Dynamic):Int;
+	@:cffi private static function lime_reset ():Void;
 	@:cffi private static function lime_application_set_frame_rate (handle:Dynamic, value:Float):Void;
 	@:cffi private static function lime_application_update (handle:Dynamic):Bool;
-	@:cffi private static function lime_drop_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_gamepad_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_joystick_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_key_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_mouse_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_render_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_sensor_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_text_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_touch_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_window_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_drop_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_gamepad_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_joystick_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_key_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_mouse_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_render_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_sensor_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_text_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_touch_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function lime_window_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
 	#end
 	
 	

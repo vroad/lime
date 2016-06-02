@@ -56,7 +56,7 @@
 #include <video/Video.h>
 #endif
 
-#include <utils/SafeDelete.h>
+#include <utils/StringId.h>
 #include <utils/GCRootUtils.h>
 
 #include <graphics/OpenGLContext.h>
@@ -67,34 +67,19 @@
 
 namespace lime {
 	
-	static bool gQuit = false;
-	
 	
 	value lime_application_create (value callback) {
 		
 		Application* application = CreateApplication ();
-		if (Application::callback == NULL)
-			Application::callback = new AutoGCRoot (callback);
-		else
-			Application::callback->set (callback);
 		return CFFIPointer (application, lime_pointer_destroy<Application>);
 		
 	}
 	
 	
-	void lime_application_event_manager_register (value callback, value eventObject) {
+	void lime_application_event_manager_register (value application, value callback, value eventObject) {
 		
-		if (gQuit) return;
-		
-		if (ApplicationEvent::callback == NULL)
-			ApplicationEvent::callback = new AutoGCRoot (callback);
-		else
-			ApplicationEvent::callback->set (callback);
-		
-		if (ApplicationEvent::eventObject == NULL)
-			ApplicationEvent::eventObject = new AutoGCRoot (eventObject);
-		else
-			ApplicationEvent::eventObject->set (eventObject);
+		Application* app = (Application*)val_data (application);
+		app->appEventManager->set (callback, eventObject);
 		
 	}
 	
@@ -120,31 +105,16 @@ namespace lime {
 		Application* app = (Application*)val_data (application);
 		if (app == NULL) return 0;
 		int result = app->Quit ();
-		gQuit = true;
-		
-		SafeDelete (Application::callback);
-		SafeDelete (ApplicationEvent::callback);
-		SafeDelete (ApplicationEvent::eventObject);
-		SafeDelete (GamepadEvent::callback);
-		SafeDelete (GamepadEvent::eventObject);
-		SafeDelete (KeyEvent::callback);
-		SafeDelete (KeyEvent::eventObject);
-		SafeDelete (MouseEvent::callback);
-		SafeDelete (MouseEvent::eventObject);
-		SafeDelete (RenderEvent::callback);
-		SafeDelete (RenderEvent::eventObject);
-		SafeDelete (SensorEvent::callback);
-		SafeDelete (SensorEvent::eventObject);
-		SafeDelete (TextEvent::callback);
-		SafeDelete (TextEvent::eventObject);
-		SafeDelete (TouchEvent::callback);
-		SafeDelete (TouchEvent::eventObject);
-		SafeDelete (WindowEvent::callback);
-		SafeDelete (WindowEvent::eventObject);
-		
-		removeAllGCRoot ();
 		
 		return result;
+		
+	}
+	
+	
+	void lime_reset () {
+		
+		StringId::Reset ();
+		removeAllGCRoot ();
 		
 	}
 	
@@ -334,10 +304,10 @@ namespace lime {
 	}
 	
 	
-	void lime_drop_event_manager_register (value callback, value eventObject) {
+	void lime_drop_event_manager_register (value application, value callback, value eventObject) {
 		
-		DropEvent::callback = new AutoGCRoot (callback);
-		DropEvent::eventObject = new AutoGCRoot (eventObject);
+		Application* app = (Application*)val_data (application);
+		app->dropEventManager->set (callback, eventObject);
 		
 	}
 	
@@ -664,19 +634,10 @@ namespace lime {
 	}
 	
 	
-	void lime_gamepad_event_manager_register (value callback, value eventObject) {
+	void lime_gamepad_event_manager_register (value application, value callback, value eventObject) {
 		
-		if (gQuit) return;
-		
-		if (GamepadEvent::callback == NULL)
-			GamepadEvent::callback = new AutoGCRoot (callback);
-		else
-			GamepadEvent::callback->set (callback);
-		
-		if (GamepadEvent::eventObject == NULL)
-			GamepadEvent::eventObject = new AutoGCRoot (eventObject);
-		else
-			GamepadEvent::eventObject->set (eventObject);
+		Application* app = (Application*)val_data (application);
+		app->gamepadEventManager->set (callback, eventObject);
 		
 	}
 	
@@ -918,10 +879,10 @@ namespace lime {
 	}
 	
 	
-	void lime_joystick_event_manager_register (value callback, value eventObject) {
+	void lime_joystick_event_manager_register (value application, value callback, value eventObject) {
 		
-		JoystickEvent::callback = new AutoGCRoot (callback);
-		JoystickEvent::eventObject = new AutoGCRoot (eventObject);
+		Application* app = (Application*)val_data (application);
+		app->joystickEventManager->set (callback, eventObject);
 		
 	}
 	
@@ -1008,19 +969,10 @@ namespace lime {
 	}
 	
 	
-	void lime_key_event_manager_register (value callback, value eventObject) {
+	void lime_key_event_manager_register (value application, value callback, value eventObject) {
 		
-		if (gQuit) return;
-		
-		if (KeyEvent::callback == NULL)
-			KeyEvent::callback = new AutoGCRoot (callback);
-		else
-			KeyEvent::callback->set (callback);
-		
-		if (KeyEvent::eventObject == NULL)
-			KeyEvent::eventObject = new AutoGCRoot (eventObject);
-		else
-			KeyEvent::eventObject->set (eventObject);
+		Application* app = (Application*)val_data (application);
+		app->keyEventManager->set (callback, eventObject);
 		
 	}
 	
@@ -1057,19 +1009,10 @@ namespace lime {
 	}
 	
 	
-	void lime_mouse_event_manager_register (value callback, value eventObject) {
+	void lime_mouse_event_manager_register (value application, value callback, value eventObject) {
 		
-		if (gQuit) return;
-		
-		if (MouseEvent::callback == NULL)
-			MouseEvent::callback = new AutoGCRoot (callback);
-		else
-			MouseEvent::callback->set (callback);
-		
-		if (MouseEvent::eventObject == NULL)
-			MouseEvent::eventObject = new AutoGCRoot (eventObject);
-		else
-			MouseEvent::eventObject->set (eventObject);
+		Application* app = (Application*)val_data (application);		
+		app->mouseEventManager->set (callback, eventObject);
 		
 	}
 	
@@ -1164,19 +1107,10 @@ namespace lime {
 	}
 	
 	
-	void lime_render_event_manager_register (value callback, value eventObject) {
+	void lime_render_event_manager_register (value application, value callback, value eventObject) {
 		
-		if (gQuit) return;
-		
-		if (RenderEvent::callback == NULL)
-			RenderEvent::callback = new AutoGCRoot (callback);
-		else
-			RenderEvent::callback->set (callback);
-		
-		if (RenderEvent::eventObject == NULL)
-			RenderEvent::eventObject = new AutoGCRoot (eventObject);
-		else
-			RenderEvent::eventObject->set (eventObject);
+		Application* app = (Application*)val_data (application);
+		app->renderEventManager->set (callback, eventObject);
 		
 	}
 	
@@ -1239,19 +1173,10 @@ namespace lime {
 	}
 	
 	
-	void lime_sensor_event_manager_register (value callback, value eventObject) {
+	void lime_sensor_event_manager_register (value application, value callback, value eventObject) {
 		
-		if (gQuit) return;
-		
-		if (SensorEvent::callback == NULL)
-			SensorEvent::callback = new AutoGCRoot (callback);
-		else
-			SensorEvent::callback->set (callback);
-		
-		if (SensorEvent::eventObject == NULL)
-			SensorEvent::eventObject = new AutoGCRoot (eventObject);
-		else
-			SensorEvent::eventObject->set (eventObject);
+		Application* app = (Application*)val_data (application);
+		app->sensorEventManager->set (callback, eventObject);
 		
 	}
 	
@@ -1309,14 +1234,10 @@ namespace lime {
 	}
 	
 	
-	void lime_text_event_manager_register (value callback, value eventObject) {
+	void lime_text_event_manager_register (value application, value callback, value eventObject) {
 		
-		if (gQuit) return;
-		
-		if (TextEvent::callback == NULL)
-			TextEvent::callback = new AutoGCRoot (callback);
-		else
-			TextEvent::callback->set (callback);
+		Application* app = (Application*)val_data (application);
+		app->textEventManager->set (callback, eventObject);
 		
 	}
 	
@@ -1384,19 +1305,10 @@ namespace lime {
 	}
 	
 	
-	void lime_touch_event_manager_register (value callback, value eventObject) {
+	void lime_touch_event_manager_register (value application, value callback, value eventObject) {
 		
-		if (gQuit) return;
-		
-		if (TouchEvent::callback == NULL)
-			TouchEvent::callback = new AutoGCRoot (callback);
-		else
-			TouchEvent::callback->set (callback);
-		
-		if (TouchEvent::eventObject == NULL)
-			TouchEvent::eventObject = new AutoGCRoot (eventObject);
-		else
-			TouchEvent::eventObject->set (eventObject);
+		Application* app = (Application*)val_data (application);
+		app->touchEventManager->set (callback, eventObject);
 		
 	}
 	
@@ -1425,19 +1337,10 @@ namespace lime {
 	}
 	
 	
-	void lime_window_event_manager_register (value callback, value eventObject) {
+	void lime_window_event_manager_register (value application, value callback, value eventObject) {
 		
-		if (gQuit) return;
-		
-		if (WindowEvent::callback == NULL)
-			WindowEvent::callback = new AutoGCRoot (callback);
-		else
-			WindowEvent::callback->set (callback);
-		
-		if (WindowEvent::eventObject == NULL)
-			WindowEvent::eventObject = new AutoGCRoot (eventObject);
-		else
-			WindowEvent::eventObject->set (eventObject);
+		Application* app = (Application*)val_data (application);
+		app->windowEventManager->set (callback, eventObject);
 		
 	}
 	
@@ -1722,10 +1625,11 @@ namespace lime {
 	}
 	
 	DEFINE_PRIME1 (lime_application_create);
-	DEFINE_PRIME2v (lime_application_event_manager_register);
+	DEFINE_PRIME3v (lime_application_event_manager_register);
 	DEFINE_PRIME1 (lime_application_exec);
 	DEFINE_PRIME1v (lime_application_init);
 	DEFINE_PRIME1 (lime_application_quit);
+	DEFINE_PRIME0v (lime_reset);
 	DEFINE_PRIME2v (lime_application_set_frame_rate);
 	DEFINE_PRIME1 (lime_application_update);
 	DEFINE_PRIME2 (lime_audio_load);
@@ -1740,7 +1644,7 @@ namespace lime {
 	#endif
 	DEFINE_PRIME0 (lime_clipboard_get_text);
 	DEFINE_PRIME1v (lime_clipboard_set_text);
-	DEFINE_PRIME2v (lime_drop_event_manager_register);
+	DEFINE_PRIME3v (lime_drop_event_manager_register);
 	DEFINE_PRIME2 (lime_file_dialog_open_directory);
 	DEFINE_PRIME2 (lime_file_dialog_open_file);
 	DEFINE_PRIME2 (lime_file_dialog_open_files);
@@ -1762,7 +1666,7 @@ namespace lime {
 	DEFINE_PRIME3 (lime_font_render_glyphs);
 	DEFINE_PRIME2v (lime_font_set_size);
 	DEFINE_PRIME1v (lime_gamepad_add_mappings);
-	DEFINE_PRIME2v (lime_gamepad_event_manager_register);
+	DEFINE_PRIME3v (lime_gamepad_event_manager_register);
 	DEFINE_PRIME1 (lime_gamepad_get_device_guid);
 	DEFINE_PRIME1 (lime_gamepad_get_device_name);
 	DEFINE_PRIME3v (lime_image_data_util_color_transform);
@@ -1780,7 +1684,7 @@ namespace lime {
 	DEFINE_PRIME1v (lime_image_data_util_unmultiply_alpha);
 	DEFINE_PRIME3 (lime_image_encode);
 	DEFINE_PRIME1 (lime_image_load);
-	DEFINE_PRIME2v (lime_joystick_event_manager_register);
+	DEFINE_PRIME3v (lime_joystick_event_manager_register);
 	DEFINE_PRIME1 (lime_joystick_get_device_guid);
 	DEFINE_PRIME1 (lime_joystick_get_device_name);
 	DEFINE_PRIME1 (lime_joystick_get_num_axes);
@@ -1789,10 +1693,10 @@ namespace lime {
 	DEFINE_PRIME1 (lime_joystick_get_num_trackballs);
 	DEFINE_PRIME2 (lime_jpeg_decode_bytes);
 	DEFINE_PRIME2 (lime_jpeg_decode_file);
-	DEFINE_PRIME2v (lime_key_event_manager_register);
+	DEFINE_PRIME3v (lime_key_event_manager_register);
 	DEFINE_PRIME1 (lime_lzma_decode);
 	DEFINE_PRIME1 (lime_lzma_encode);
-	DEFINE_PRIME2v (lime_mouse_event_manager_register);
+	DEFINE_PRIME3v (lime_mouse_event_manager_register);
 	DEFINE_PRIME0v (lime_mouse_hide);
 	DEFINE_PRIME1v (lime_mouse_set_cursor);
 	DEFINE_PRIME1v (lime_mouse_set_lock);
@@ -1807,25 +1711,25 @@ namespace lime {
 	DEFINE_PRIME1 (lime_renderer_lock);
 	DEFINE_PRIME2 (lime_renderer_read_pixels);
 	DEFINE_PRIME1v (lime_renderer_unlock);
-	DEFINE_PRIME2v (lime_render_event_manager_register);
-	DEFINE_PRIME2v (lime_sensor_event_manager_register);
+	DEFINE_PRIME3v (lime_render_event_manager_register);
+	DEFINE_PRIME3v (lime_sensor_event_manager_register);
 	DEFINE_PRIME0 (lime_system_get_allow_screen_timeout);
 	DEFINE_PRIME3 (lime_system_get_directory);
 	DEFINE_PRIME1 (lime_system_get_display);
 	DEFINE_PRIME0 (lime_system_get_num_displays);
 	DEFINE_PRIME0 (lime_system_get_timer);
 	DEFINE_PRIME1 (lime_system_set_allow_screen_timeout);
-	DEFINE_PRIME2v (lime_text_event_manager_register);
+	DEFINE_PRIME3v (lime_text_event_manager_register);
 	DEFINE_PRIME3 (lime_text_layout_create);
 	DEFINE_PRIME5 (lime_text_layout_position);
 	DEFINE_PRIME2v (lime_text_layout_set_direction);
 	DEFINE_PRIME2v (lime_text_layout_set_language);
 	DEFINE_PRIME2v (lime_text_layout_set_script);
-	DEFINE_PRIME2v (lime_touch_event_manager_register);
+	DEFINE_PRIME3v (lime_touch_event_manager_register);
 	DEFINE_PRIME3v (lime_window_alert);
 	DEFINE_PRIME1v (lime_window_close);
 	DEFINE_PRIME5 (lime_window_create);
-	DEFINE_PRIME2v (lime_window_event_manager_register);
+	DEFINE_PRIME3v (lime_window_event_manager_register);
 	DEFINE_PRIME1v (lime_window_focus);
 	DEFINE_PRIME1 (lime_window_get_display);
 	DEFINE_PRIME1 (lime_window_get_enable_text_events);

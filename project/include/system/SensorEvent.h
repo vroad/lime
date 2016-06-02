@@ -3,6 +3,7 @@
 
 
 #include <hx/CFFI.h>
+#include <app/Application.h>
 
 
 namespace lime {
@@ -19,12 +20,9 @@ namespace lime {
 		
 		public:
 			
-			static AutoGCRoot* callback;
-			static AutoGCRoot* eventObject;
-			
 			SensorEvent ();
 			
-			static void Dispatch (SensorEvent* event);
+			static void Dispatch (Application* app, SensorEvent* event);
 			
 			int id;
 			SensorEventType type;

@@ -33,6 +33,7 @@ class ALC {
 	public static inline var DEFAULT_ALL_DEVICES_SPECIFIER:Int = 0x1012;
 	public static inline var ALL_DEVICES_SPECIFIER:Int = 0x1013;
 	
+	private static var currentContext:ALContext = null;
 	
 	public static function closeDevice (device:ALDevice):Bool {
 		
@@ -90,17 +91,7 @@ class ALC {
 	
 	public static function getCurrentContext ():ALContext {
 		
-		#if (lime_native && lime_openal && !macro)
-		var handle:Dynamic = lime_alc_get_current_context ();
-		
-		if (handle != null) {
-			
-			return new ALContext (handle);
-			
-		}
-		#end
-		
-		return null;
+		return currentContext;
 		
 	}
 	
@@ -157,6 +148,7 @@ class ALC {
 	public static function makeContextCurrent (context:ALContext):Bool {
 		
 		#if (lime_native && lime_openal && !macro)
+		currentContext = context;
 		return lime_alc_make_context_current (context);
 		#else
 		return false;
@@ -222,7 +214,6 @@ class ALC {
 	@:cffi private static function lime_alc_create_context (device:CFFIPointer, attrlist:Dynamic):CFFIPointer;
 	@:cffi private static function lime_alc_destroy_context (context:CFFIPointer):Void;
 	@:cffi private static function lime_alc_get_contexts_device (context:CFFIPointer):CFFIPointer;
-	@:cffi private static function lime_alc_get_current_context ():CFFIPointer;
 	@:cffi private static function lime_alc_get_error (device:CFFIPointer):Int;
 	@:cffi private static function lime_alc_get_integerv (device:CFFIPointer, param:Int, size:Int):Dynamic;
 	@:cffi private static function lime_alc_get_string (device:CFFIPointer, param:Int):Dynamic;

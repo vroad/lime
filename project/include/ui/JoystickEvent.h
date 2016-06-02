@@ -3,6 +3,7 @@
 
 
 #include <hx/CFFI.h>
+#include <app/Application.h>
 
 
 namespace lime {
@@ -30,7 +31,7 @@ namespace lime {
 			
 			JoystickEvent ();
 			
-			static void Dispatch (JoystickEvent* event);
+			static void Dispatch (Application* app, JoystickEvent* event);
 			
 			double eventValue;
 			int id;

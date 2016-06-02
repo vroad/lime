@@ -1,6 +1,7 @@
 #include <text/Font.h>
 #include <graphics/ImageBuffer.h>
 #include <system/System.h>
+#include <utils/StringId.h>
 
 #include <algorithm>
 #include <list>
@@ -264,60 +265,6 @@ namespace {
 
 
 namespace lime {
-	
-	
-	static int id_buffer;
-	static int id_charCode;
-	static int id_codepoint;
-	static int id_height;
-	static int id_index;
-	static int id_horizontalAdvance;
-	static int id_horizontalBearingX;
-	static int id_horizontalBearingY;
-	static int id_image;
-	static int id_offset;
-	static int id_offsetX;
-	static int id_offsetY;
-	static int id_size;
-	static int id_verticalAdvance;
-	static int id_verticalBearingX;
-	static int id_verticalBearingY;
-	static int id_width;
-	static int id_x;
-	static int id_y;
-	static bool init = false;
-	
-	
-	static void initialize () {
-		
-		if (!init) {
-			
-			id_width = val_id ("width");
-			id_height = val_id ("height");
-			id_x = val_id ("x");
-			id_y = val_id ("y");
-			id_offset = val_id ("offset");
-			id_size = val_id ("size");
-			id_codepoint = val_id ("codepoint");
-			
-			id_buffer = val_id ("buffer");
-			id_charCode = val_id ("charCode");
-			id_horizontalAdvance = val_id ("horizontalAdvance");
-			id_horizontalBearingX = val_id ("horizontalBearingX");
-			id_horizontalBearingY = val_id ("horizontalBearingY");
-			id_image = val_id ("image");
-			id_index = val_id ("index");
-			id_offsetX = val_id ("offsetX");
-			id_offsetY = val_id ("offsetY");
-			id_verticalAdvance = val_id ("verticalAdvance");
-			id_verticalBearingX = val_id ("verticalBearingX");
-			id_verticalBearingY = val_id ("verticalBearingY");
-			
-			init = true;
-			
-		}
-		
-	}
 	
 	
 	Font::Font (Resource *resource, int faceIndex) {
@@ -713,19 +660,18 @@ namespace lime {
 	
 	value Font::GetGlyphMetrics (int index) {
 		
-		initialize ();
-		
 		if (FT_Load_Glyph ((FT_Face)face, index, FT_LOAD_NO_BITMAP | FT_LOAD_DEFAULT) == 0) {
 			
 			value metrics = alloc_empty_object ();
 			
-			alloc_field (metrics, id_height, alloc_int (((FT_Face)face)->glyph->metrics.height));
-			alloc_field (metrics, id_horizontalBearingX, alloc_int (((FT_Face)face)->glyph->metrics.horiBearingX));
-			alloc_field (metrics, id_horizontalBearingY, alloc_int (((FT_Face)face)->glyph->metrics.horiBearingY));
-			alloc_field (metrics, id_horizontalAdvance, alloc_int (((FT_Face)face)->glyph->metrics.horiAdvance));
-			alloc_field (metrics, id_verticalBearingX, alloc_int (((FT_Face)face)->glyph->metrics.vertBearingX));
-			alloc_field (metrics, id_verticalBearingY, alloc_int (((FT_Face)face)->glyph->metrics.vertBearingY));
-			alloc_field (metrics, id_verticalAdvance, alloc_int (((FT_Face)face)->glyph->metrics.vertAdvance));
+			StringId* id = StringId::Get ();
+			alloc_field (metrics, id->height, alloc_int (((FT_Face)face)->glyph->metrics.height));
+			alloc_field (metrics, id->horizontalBearingX, alloc_int (((FT_Face)face)->glyph->metrics.horiBearingX));
+			alloc_field (metrics, id->horizontalBearingY, alloc_int (((FT_Face)face)->glyph->metrics.horiBearingY));
+			alloc_field (metrics, id->horizontalAdvance, alloc_int (((FT_Face)face)->glyph->metrics.horiAdvance));
+			alloc_field (metrics, id->verticalBearingX, alloc_int (((FT_Face)face)->glyph->metrics.vertBearingX));
+			alloc_field (metrics, id->verticalBearingY, alloc_int (((FT_Face)face)->glyph->metrics.vertBearingY));
+			alloc_field (metrics, id->verticalAdvance, alloc_int (((FT_Face)face)->glyph->metrics.vertAdvance));
 			
 			return metrics;
 			

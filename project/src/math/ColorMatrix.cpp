@@ -1,12 +1,8 @@
 #include <math/ColorMatrix.h>
 #include <utils/Bytes.h>
-
+#include <utils/StringId.h>
 
 namespace lime {
-	
-	
-	static int id_buffer;
-	static bool init = false;
 	
 	
 	ColorMatrix::ColorMatrix () {
@@ -30,14 +26,9 @@ namespace lime {
 	
 	ColorMatrix::ColorMatrix (value colorMatrix) {
 		
-		if (!init) {
-			
-			id_buffer = val_id ("buffer");
-			init = true;
-			
-		}
+		StringId* id = StringId::Get ();
 		
-		value buffer_value = val_field (colorMatrix, id_buffer);
+		value buffer_value = val_field (colorMatrix, id->buffer);
 		Bytes bytes = Bytes (buffer_value);
 		float* src = (float*)bytes.Data ();
 		

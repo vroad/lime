@@ -4,6 +4,7 @@
 
 #include <hx/CFFI.h>
 #include <stdint.h>
+#include <app/Application.h>
 
 
 namespace lime {
@@ -22,12 +23,9 @@ namespace lime {
 		
 		public:
 			
-			static AutoGCRoot* callback;
-			static AutoGCRoot* eventObject;
-			
 			TouchEvent ();
 			
-			static void Dispatch (TouchEvent* event);
+			static void Dispatch (Application* app, TouchEvent* event);
 			
 			uint32_t device;
 			float dx;

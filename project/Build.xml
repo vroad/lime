@@ -159,6 +159,7 @@
 			<compilerflag value="-DAL_ALEXT_PROTOTYPES" />
 			
 			<file name="src/audio/openal/OpenALBindings.cpp" />
+			<file name="src/audio/openal/ALCContextWrapper.cpp" />
 			
 		</section>
 		
@@ -276,7 +277,9 @@
 		<file name="src/ui/TextEvent.cpp" />
 		<file name="src/ui/TouchEvent.cpp" />
 		<file name="src/ui/WindowEvent.cpp" />
+		<file name="src/utils/EventManager.cpp" />
 		<file name="src/utils/Bytes.cpp" />
+		<file name="src/utils/StringId.cpp" />
 		
 	</files>
 	

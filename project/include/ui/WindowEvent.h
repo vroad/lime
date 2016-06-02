@@ -4,6 +4,7 @@
 
 #include <hx/CFFI.h>
 #include <stdint.h>
+#include <app/Application.h>
 
 
 namespace lime {
@@ -35,7 +36,7 @@ namespace lime {
 			
 			WindowEvent ();
 			
-			static void Dispatch (WindowEvent* event);
+			static void Dispatch (Application* app, WindowEvent* event);
 			
 			int height;
 			WindowEventType type;

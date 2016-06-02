@@ -3,6 +3,7 @@
 
 
 #include <hx/CFFI.h>
+#include <app/Application.h>
 
 
 namespace lime {
@@ -20,12 +21,9 @@ namespace lime {
 		
 		public:
 			
-			static AutoGCRoot* callback;
-			static AutoGCRoot* eventObject;
-			
 			ApplicationEvent ();
 			
-			static void Dispatch (ApplicationEvent* event);
+			static void Dispatch (Application* app, ApplicationEvent* event);
 			
 			int deltaTime;
 			ApplicationEventType type;

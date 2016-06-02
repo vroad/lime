@@ -3,6 +3,7 @@
 
 
 #include <hx/CFFI.h>
+#include <app/Application.h>
 
 
 namespace lime {
@@ -21,12 +22,9 @@ namespace lime {
 		
 		public:
 			
-			static AutoGCRoot* callback;
-			static AutoGCRoot* eventObject;
-			
 			RenderEvent ();
 			
-			static void Dispatch (RenderEvent* event);
+			static void Dispatch (Application* app, RenderEvent* event);
 			
 			RenderEventType type;
 		

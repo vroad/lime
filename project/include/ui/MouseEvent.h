@@ -4,6 +4,7 @@
 
 #include <hx/CFFI.h>
 #include <stdint.h>
+#include <app/Application.h>
 
 
 namespace lime {
@@ -23,12 +24,9 @@ namespace lime {
 		
 		public:
 			
-			static AutoGCRoot* callback;
-			static AutoGCRoot* eventObject;
-			
 			MouseEvent ();
 			
-			static void Dispatch (MouseEvent* event);
+			static void Dispatch (Application* app, MouseEvent* event);
 			
 			int button;
 			double movementX;

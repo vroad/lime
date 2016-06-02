@@ -1,22 +1,9 @@
 #include <hx/CFFI.h>
 #include <ui/TouchEvent.h>
+#include <utils/StringId.h>
 
 
 namespace lime {
-	
-	
-	AutoGCRoot* TouchEvent::callback = 0;
-	AutoGCRoot* TouchEvent::eventObject = 0;
-	
-	static int id_device;
-	static int id_dx;
-	static int id_dy;
-	static int id_id;
-	static int id_pressure;
-	static int id_type;
-	static int id_x;
-	static int id_y;
-	static bool init = false;
 	
 	
 	TouchEvent::TouchEvent () {
@@ -33,36 +20,24 @@ namespace lime {
 	}
 	
 	
-	void TouchEvent::Dispatch (TouchEvent* event) {
+	void TouchEvent::Dispatch (Application* app, TouchEvent* event) {
 		
-		if (TouchEvent::callback) {
+		value callback = app->touchEventManager->callback->get ();
+		if (!val_is_null (callback)) {
 			
-			if (!init) {
-				
-				id_device = val_id ("device");
-				id_dx = val_id ("dx");
-				id_dy = val_id ("dy");
-				id_id = val_id ("id");
-				id_pressure = val_id ("pressure");
-				id_type = val_id ("type");
-				id_x = val_id ("x");
-				id_y = val_id ("y");
-				init = true;
-				
-			}
+			StringId* id = StringId::Get ();
+			value object = app->touchEventManager->eventObject->get ();
 			
-			value object = (TouchEvent::eventObject ? TouchEvent::eventObject->get () : alloc_empty_object ());
+			alloc_field (object, id->device, alloc_int (event->device));
+			alloc_field (object, id->dx, alloc_float (event->dx));
+			alloc_field (object, id->dy, alloc_float (event->dy));
+			alloc_field (object, id->id, alloc_int (event->id));
+			alloc_field (object, id->pressure, alloc_float (event->pressure));
+			alloc_field (object, id->type, alloc_int (event->type));
+			alloc_field (object, id->x, alloc_float (event->x));
+			alloc_field (object, id->y, alloc_float (event->y));
 			
-			alloc_field (object, id_device, alloc_int (event->device));
-			alloc_field (object, id_dx, alloc_float (event->dx));
-			alloc_field (object, id_dy, alloc_float (event->dy));
-			alloc_field (object, id_id, alloc_int (event->id));
-			alloc_field (object, id_pressure, alloc_float (event->pressure));
-			alloc_field (object, id_type, alloc_int (event->type));
-			alloc_field (object, id_x, alloc_float (event->x));
-			alloc_field (object, id_y, alloc_float (event->y));
-			
-			val_call0 (TouchEvent::callback->get ());
+			val_call0 (callback);
 			
 		}
 		

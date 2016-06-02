@@ -16,11 +16,9 @@
 namespace lime {
 	
 	
-	AutoGCRoot* Application::callback = 0;
 	SDLApplication* SDLApplication::currentApplication = 0;
 	
 	const int analogAxisDeadZone = 1000;
-	std::map<int, std::map<int, int> > gamepadsAxisMap;
 	
 	
 	SDLApplication::SDLApplication () {
@@ -55,18 +53,6 @@ namespace lime {
 		currentUpdate = 0;
 		lastUpdate = 0;
 		nextUpdate = 0;
-		
-		ApplicationEvent applicationEvent;
-		DropEvent dropEvent;
-		GamepadEvent gamepadEvent;
-		JoystickEvent joystickEvent;
-		KeyEvent keyEvent;
-		MouseEvent mouseEvent;
-		RenderEvent renderEvent;
-		SensorEvent sensorEvent;
-		TextEvent textEvent;
-		TouchEvent touchEvent;
-		WindowEvent windowEvent;
 		
 		SDL_EventState (SDL_DROPFILE, SDL_ENABLE);
 		SDLJoystick::Init ();
@@ -138,20 +124,20 @@ namespace lime {
 					
 				}
 				
-				ApplicationEvent::Dispatch (&applicationEvent);
-				RenderEvent::Dispatch (&renderEvent);
+				ApplicationEvent::Dispatch (this, &applicationEvent);
+				RenderEvent::Dispatch (this, &renderEvent);
 				break;
 			
 			case SDL_APP_WILLENTERBACKGROUND:
 				
 				windowEvent.type = WINDOW_DEACTIVATE;
-				WindowEvent::Dispatch (&windowEvent);
+				WindowEvent::Dispatch (this, &windowEvent);
 				break;
 			
 			case SDL_APP_WILLENTERFOREGROUND:
 				
 				windowEvent.type = WINDOW_ACTIVATE;
-				WindowEvent::Dispatch (&windowEvent);
+				WindowEvent::Dispatch (this, &windowEvent);
 				break;
 			
 			case SDL_CONTROLLERAXISMOTION:
@@ -240,13 +226,13 @@ namespace lime {
 					
 					case SDL_WINDOWEVENT_EXPOSED: 
 						
-						RenderEvent::Dispatch (&renderEvent);
+						RenderEvent::Dispatch (this, &renderEvent);
 						break;
 					
 					case SDL_WINDOWEVENT_SIZE_CHANGED:
 						
 						ProcessWindowEvent (event);
-						RenderEvent::Dispatch (&renderEvent);
+						RenderEvent::Dispatch (this, &renderEvent);
 						break;
 					
 					case SDL_WINDOWEVENT_CLOSE:
@@ -279,12 +265,13 @@ namespace lime {
 	
 	void SDLApplication::ProcessDropEvent (SDL_Event* event) {
 		
-		if (DropEvent::callback) {
+		value callback = dropEventManager->callback->get ();
+		if (!val_is_null (callback)) {
 			
 			dropEvent.type = DROP_FILE;
 			dropEvent.file = event->drop.file;
 			
-			DropEvent::Dispatch (&dropEvent);
+			DropEvent::Dispatch (this, &dropEvent);
 			SDL_free (dropEvent.file);
 			
 		}
@@ -320,7 +307,7 @@ namespace lime {
 							
 							gamepadsAxisMap[event->caxis.which][event->caxis.axis] = 0;
 							gamepadEvent.axisValue = 0;
-							GamepadEvent::Dispatch (&gamepadEvent);
+							GamepadEvent::Dispatch (this, &gamepadEvent);
 							
 						}
 						
@@ -331,7 +318,7 @@ namespace lime {
 					gamepadsAxisMap[event->caxis.which][event->caxis.axis] = event->caxis.value;
 					gamepadEvent.axisValue = event->caxis.value / (event->caxis.value > 0 ? 32767.0 : 32768.0);
 					
-					GamepadEvent::Dispatch (&gamepadEvent);
+					GamepadEvent::Dispatch (this, &gamepadEvent);
 					break;
 				
 				case SDL_CONTROLLERBUTTONDOWN:
@@ -340,7 +327,7 @@ namespace lime {
 					gamepadEvent.button = event->cbutton.button;
 					gamepadEvent.id = event->cbutton.which;
 					
-					GamepadEvent::Dispatch (&gamepadEvent);
+					GamepadEvent::Dispatch (this, &gamepadEvent);
 					break;
 				
 				case SDL_CONTROLLERBUTTONUP:
@@ -349,7 +336,7 @@ namespace lime {
 					gamepadEvent.button = event->cbutton.button;
 					gamepadEvent.id = event->cbutton.which;
 					
-					GamepadEvent::Dispatch (&gamepadEvent);
+					GamepadEvent::Dispatch (this, &gamepadEvent);
 					break;
 				
 				case SDL_CONTROLLERDEVICEADDED:
@@ -359,7 +346,7 @@ namespace lime {
 						gamepadEvent.type = GAMEPAD_CONNECT;
 						gamepadEvent.id = SDLGamepad::GetInstanceID (event->cdevice.which);
 						
-						GamepadEvent::Dispatch (&gamepadEvent);
+						GamepadEvent::Dispatch (this, &gamepadEvent);
 						
 					}
 					
@@ -370,7 +357,7 @@ namespace lime {
 					gamepadEvent.type = GAMEPAD_DISCONNECT;
 					gamepadEvent.id = event->cdevice.which;
 					
-					GamepadEvent::Dispatch (&gamepadEvent);
+					GamepadEvent::Dispatch (this, &gamepadEvent);
 					SDLGamepad::Disconnect (event->cdevice.which);
 					break;
 					
@@ -398,7 +385,7 @@ namespace lime {
 						joystickEvent.eventValue = event->jaxis.value / (event->jaxis.value > 0 ? 32767.0 : 32768.0);
 						joystickEvent.id = event->jaxis.which;
 						
-						JoystickEvent::Dispatch (&joystickEvent);
+						JoystickEvent::Dispatch (this, &joystickEvent);
 						
 					}
 					break;
@@ -413,7 +400,7 @@ namespace lime {
 						joystickEvent.y = event->jball.yrel;
 						joystickEvent.id = event->jball.which;
 						
-						JoystickEvent::Dispatch (&joystickEvent);
+						JoystickEvent::Dispatch (this, &joystickEvent);
 						
 					}
 					break;
@@ -426,7 +413,7 @@ namespace lime {
 						joystickEvent.index = event->jbutton.button;
 						joystickEvent.id = event->jbutton.which;
 						
-						JoystickEvent::Dispatch (&joystickEvent);
+						JoystickEvent::Dispatch (this, &joystickEvent);
 						
 					}
 					break;
@@ -439,7 +426,7 @@ namespace lime {
 						joystickEvent.index = event->jbutton.button;
 						joystickEvent.id = event->jbutton.which;
 						
-						JoystickEvent::Dispatch (&joystickEvent);
+						JoystickEvent::Dispatch (this, &joystickEvent);
 						
 					}
 					break;
@@ -453,7 +440,7 @@ namespace lime {
 						joystickEvent.x = event->jhat.value;
 						joystickEvent.id = event->jhat.which;
 						
-						JoystickEvent::Dispatch (&joystickEvent);
+						JoystickEvent::Dispatch (this, &joystickEvent);
 						
 					}
 					break;
@@ -465,7 +452,7 @@ namespace lime {
 						joystickEvent.type = JOYSTICK_CONNECT;
 						joystickEvent.id = SDLJoystick::GetInstanceID (event->jdevice.which);
 						
-						JoystickEvent::Dispatch (&joystickEvent);
+						JoystickEvent::Dispatch (this, &joystickEvent);
 						
 					}
 					break;
@@ -477,7 +464,7 @@ namespace lime {
 						joystickEvent.type = JOYSTICK_DISCONNECT;
 						joystickEvent.id = event->jdevice.which;
 						
-						JoystickEvent::Dispatch (&joystickEvent);
+						JoystickEvent::Dispatch (this, &joystickEvent);
 						SDLJoystick::Disconnect (event->jdevice.which);
 						
 					}
@@ -492,7 +479,8 @@ namespace lime {
 	
 	void SDLApplication::ProcessKeyEvent (SDL_Event* event) {
 		
-		if (KeyEvent::callback) {
+		value callback = keyEventManager->callback->get ();
+		if (!val_is_null (callback)) {
 			
 			switch (event->type) {
 				
@@ -505,7 +493,7 @@ namespace lime {
 			keyEvent.modifier = event->key.keysym.mod;
 			keyEvent.windowID = event->key.windowID;
 			
-			KeyEvent::Dispatch (&keyEvent);
+			KeyEvent::Dispatch (this, &keyEvent);
 			
 		}
 		
@@ -514,7 +502,8 @@ namespace lime {
 	
 	void SDLApplication::ProcessMouseEvent (SDL_Event* event) {
 		
-		if (MouseEvent::callback) {
+		value callback = mouseEventManager->callback->get ();
+		if (!val_is_null (callback)) {
 			
 			switch (event->type) {
 				
@@ -557,7 +546,7 @@ namespace lime {
 			}
 			
 			mouseEvent.windowID = event->button.windowID;
-			MouseEvent::Dispatch (&mouseEvent);
+			MouseEvent::Dispatch (this, &mouseEvent);
 			
 		}
 		
@@ -566,7 +555,8 @@ namespace lime {
 	
 	void SDLApplication::ProcessSensorEvent (SDL_Event* event) {
 		
-		if (SensorEvent::callback) {
+		value callback = sensorEventManager->callback->get ();
+		if (!val_is_null (callback)) {
 			
 			double value = event->jaxis.value / 32767.0f;
 			
@@ -579,7 +569,7 @@ namespace lime {
 				
 			}
 			
-			SensorEvent::Dispatch (&sensorEvent);
+			SensorEvent::Dispatch (this, &sensorEvent);
 			
 		}
 		
@@ -588,7 +578,8 @@ namespace lime {
 	
 	void SDLApplication::ProcessTextEvent (SDL_Event* event) {
 		
-		if (TextEvent::callback) {
+		value callback = textEventManager->callback->get ();
+		if (!val_is_null (callback)) {
 			
 			switch (event->type) {
 				
@@ -608,7 +599,7 @@ namespace lime {
 			
 			strcpy (textEvent.text, event->text.text);
 			textEvent.windowID = event->text.windowID;
-			TextEvent::Dispatch (&textEvent);
+			TextEvent::Dispatch (this, &textEvent);
 			
 		}
 		
@@ -617,7 +608,8 @@ namespace lime {
 	
 	void SDLApplication::ProcessTouchEvent (SDL_Event* event) {
 		
-		if (TouchEvent::callback) {
+		value callback = touchEventManager->callback->get ();
+		if (!val_is_null (callback)) {
 			
 			switch (event->type) {
 				
@@ -646,7 +638,7 @@ namespace lime {
 			touchEvent.pressure = event->tfinger.pressure;
 			touchEvent.device = event->tfinger.touchId;
 			
-			TouchEvent::Dispatch (&touchEvent);
+			TouchEvent::Dispatch (this, &touchEvent);
 			
 		}
 		
@@ -655,7 +647,8 @@ namespace lime {
 	
 	void SDLApplication::ProcessWindowEvent (SDL_Event* event) {
 		
-		if (WindowEvent::callback) {
+		value callback = windowEventManager->callback->get ();
+		if (!val_is_null (callback)) {
 			
 			switch (event->window.event) {
 				
@@ -687,7 +680,7 @@ namespace lime {
 			}
 			
 			windowEvent.windowID = event->window.windowID;
-			WindowEvent::Dispatch (&windowEvent);
+			WindowEvent::Dispatch (this, &windowEvent);
 			
 		}
 		
@@ -697,7 +690,7 @@ namespace lime {
 	int SDLApplication::Quit () {
 		
 		applicationEvent.type = EXIT;
-		ApplicationEvent::Dispatch (&applicationEvent);
+		ApplicationEvent::Dispatch (this, &applicationEvent);
 		
 		SDL_Quit ();
 		

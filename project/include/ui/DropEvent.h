@@ -3,6 +3,7 @@
 
 
 #include <hx/CFFI.h>
+#include <app/Application.h>
 
 
 namespace lime {
@@ -19,12 +20,9 @@ namespace lime {
 		
 		public:
 			
-			static AutoGCRoot* callback;
-			static AutoGCRoot* eventObject;
-			
 			DropEvent ();
 			
-			static void Dispatch (DropEvent* event);
+			static void Dispatch (Application* app, DropEvent* event);
 			
 			char* file;
 			DropEventType type;

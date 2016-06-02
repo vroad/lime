@@ -29,27 +29,6 @@
 
 namespace lime {
 	
-	struct AudioBufferId {
-		
-		AudioBufferId () {
-			
-			init = false;
-			
-		}
-		
-		int bitsPerSample;
-		int channels;
-		int handle;
-		int sourceData;
-		int data;
-		int sampleRate;
-		int length;
-		bool init;
-		
-	};
-	
-	AudioBufferId GetAudioBufferId ();
-	
 	class AudioBuffer {
 		
 		

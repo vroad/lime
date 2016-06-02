@@ -17,6 +17,7 @@
 #include <ui/WindowEvent.h>
 #include "SDLWindow.h"
 #include <vector>
+#include <map>
 
 namespace lime {
 	
@@ -72,6 +73,7 @@ namespace lime {
 			TextEvent textEvent;
 			TouchEvent touchEvent;
 			WindowEvent windowEvent;
+			std::map<int, std::map<int, int> > gamepadsAxisMap;
 			std::vector<SDLWindow*> windows;
 		
 	};

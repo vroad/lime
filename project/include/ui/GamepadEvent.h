@@ -3,6 +3,7 @@
 
 
 #include <hx/CFFI.h>
+#include <app/Application.h>
 
 
 namespace lime {
@@ -28,7 +29,7 @@ namespace lime {
 			
 			GamepadEvent ();
 			
-			static void Dispatch (GamepadEvent* event);
+			static void Dispatch (Application* app, GamepadEvent* event);
 			
 			int axis;
 			double axisValue;

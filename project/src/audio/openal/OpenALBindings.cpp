@@ -13,9 +13,18 @@
 #include <system/CFFIPointer.h>
 #include <utils/Bytes.h>
 #include <utils/PointerWrapper.h>
+#include <audio/openal/ALCContextWrapper.h>
 #include <vector>
 
 namespace lime {
+	
+	
+	void gc_alc_device (value device) {
+		
+		ALCdevice* alcDevice = (ALCdevice*)val_data (device);
+		alcCloseDevice (alcDevice);
+		
+	}
 	
 	
 	void lime_al_buffer_data (int buffer, int format, value data, int size, int freq) {
@@ -88,28 +97,6 @@ namespace lime {
 			}
 			
 			alBufferiv (buffer, param, &data[0]);
-			
-		}
-		
-	}
-	
-	
-	void lime_al_cleanup () {
-		
-		ALCcontext* alcContext = alcGetCurrentContext ();
-		
-		if (alcContext) {
-			
-			ALCdevice* alcDevice = alcGetContextsDevice (alcContext);
-			
-			alcMakeContextCurrent (0);
-			alcDestroyContext (alcContext);
-			
-			if (alcDevice) {
-				
-				alcCloseDevice (alcDevice);
-				
-			}
 			
 		}
 		
@@ -981,6 +968,7 @@ namespace lime {
 	bool lime_alc_close_device (value device) {
 		
 		ALCdevice* alcDevice = (ALCdevice*)val_data (device);
+		val_gc (device, 0);
 		return alcCloseDevice (alcDevice);
 		
 	}
@@ -1004,37 +992,28 @@ namespace lime {
 		}
 		
 		ALCcontext* alcContext = alcCreateContext (alcDevice, &list[0]);
+		ALCContextWrapper *contextWrap = new ALCContextWrapper (alcContext, device);
 		
-		if (list != NULL) {
-			delete[] list;
-		}
-		
-		return CFFIPointer (alcContext);
+		return CFFIPointer (contextWrap, lime_pointer_destroy<ALCContextWrapper>);
 		
 	}
 	
 	
 	void lime_alc_destroy_context (value context) {
 		
-		ALCcontext* alcContext = (ALCcontext*)val_data (context);
+		ALCContextWrapper *contextWrap = (ALCContextWrapper*)val_data (context);
+		ALCcontext* alcContext = contextWrap->alcContext;
 		alcDestroyContext (alcContext);
+		contextWrap->alcContext = NULL;
+		contextWrap->alcDevice.reset (NULL);
 		
 	}
 	
 	
 	value lime_alc_get_contexts_device (value context) {
 		
-		ALCcontext* alcContext = (ALCcontext*)val_data (context);
-		ALCdevice* alcDevice = alcGetContextsDevice (alcContext);
-		return CFFIPointer (alcDevice);
-		
-	}
-	
-	
-	value lime_alc_get_current_context () {
-		
-		ALCcontext* alcContext = alcGetCurrentContext ();
-		return CFFIPointer (alcContext);
+		ALCContextWrapper* contextWrap = (ALCContextWrapper*)val_data (context);
+		return contextWrap->alcDevice->get ();
 		
 	}
 	
@@ -1078,7 +1057,8 @@ namespace lime {
 	
 	bool lime_alc_make_context_current (value context) {
 		
-		ALCcontext* alcContext = (ALCcontext*)val_data (context);
+		ALCContextWrapper* contextWrap = (ALCContextWrapper*)val_data (context);
+		ALCcontext* alcContext = contextWrap != NULL ? contextWrap->alcContext : NULL;
 		return alcMakeContextCurrent (alcContext);
 		
 	}
@@ -1087,15 +1067,14 @@ namespace lime {
 	value lime_alc_open_device (HxString devicename) {
 		
 		ALCdevice* alcDevice = alcOpenDevice (devicename.__s);
-		atexit (lime_al_cleanup);
-		return CFFIPointer (alcDevice);
+		return CFFIPointer (alcDevice, gc_alc_device);
 		
 	}
 	
 	
 	void lime_alc_process_context (value context) {
 		
-		ALCcontext* alcContext = (ALCcontext*)val_data (context);
+		ALCcontext* alcContext = ((ALCContextWrapper*)val_data (context))->alcContext;
 		alcProcessContext (alcContext);
 		
 	}
@@ -1103,7 +1082,7 @@ namespace lime {
 	
 	void lime_alc_suspend_context (value context) {
 		
-		ALCcontext* alcContext = (ALCcontext*)val_data (context);
+		ALCcontext* alcContext = ((ALCContextWrapper*)val_data (context))->alcContext;
 		alcSuspendContext (alcContext);
 		
 	}
@@ -1204,7 +1183,6 @@ namespace lime {
 	DEFINE_PRIME1 (lime_alc_close_device);
 	DEFINE_PRIME1v (lime_alc_destroy_context);
 	DEFINE_PRIME1 (lime_alc_get_contexts_device);
-	DEFINE_PRIME0 (lime_alc_get_current_context);
 	DEFINE_PRIME1 (lime_alc_get_error);
 	DEFINE_PRIME3 (lime_alc_get_integerv);
 	DEFINE_PRIME2 (lime_alc_get_string);

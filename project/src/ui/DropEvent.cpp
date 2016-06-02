@@ -1,16 +1,9 @@
 #include <hx/CFFI.h>
 #include <ui/DropEvent.h>
+#include <utils/StringId.h>
 
 
 namespace lime {
-	
-	
-	AutoGCRoot* DropEvent::callback = 0;
-	AutoGCRoot* DropEvent::eventObject = 0;
-	
-	static int id_file;
-	static int id_type;
-	static bool init = false;
 	
 	
 	DropEvent::DropEvent () {
@@ -21,24 +14,18 @@ namespace lime {
 	}
 	
 	
-	void DropEvent::Dispatch (DropEvent* event) {
+	void DropEvent::Dispatch (Application* app, DropEvent* event) {
 		
-		if (DropEvent::callback) {
+		value callback = app->dropEventManager->callback->get ();
+		if (!val_is_null (callback)) {
 			
-			if (!init) {
-				
-				id_file = val_id ("file");
-				id_type = val_id ("type");
-				init = true;
-				
-			}
+			value object = app->dropEventManager->eventObject->get ();
+			StringId* id = StringId::Get ();
 			
-			value object = (DropEvent::eventObject ? DropEvent::eventObject->get () : alloc_empty_object ());
+			alloc_field (object, id->file, alloc_string (event->file));
+			alloc_field (object, id->type, alloc_int (event->type));
 			
-			alloc_field (object, id_file, alloc_string (event->file));
-			alloc_field (object, id_type, alloc_int (event->type));
-			
-			val_call0 (DropEvent::callback->get ());
+			val_call0 (callback);
 			
 		}
 		

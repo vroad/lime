@@ -1,56 +1,29 @@
 #include <assert.h>
 #include <system/System.h>
 #include <utils/Bytes.h>
-#include <utils/ThreadLocalStorage.h>
+#include <utils/Stringid.h>
 //#include <hx/CFFIPrimePatch.h>
 #include <hx/CFFIPrime.h>
 #include <hx/CFFIExt.h>
 
 namespace lime {
 	
-	struct BytesId {
-
-		BytesId () {
-
-			init = false;
-
-		}
-
-		int b;
-		int length;
-		bool init;
-
-	};
-	
-	static ThreadLocalStorage<BytesId> stringId;
 	static bool useBufferInitialized = false;
 	static bool useBuffer = false;
 	
 	inline void initialize () {
-
-		BytesId id = stringId.Get ();
 		
-		if (!id.init) {
-			
-			id.b = val_id ("b");
-			id.length = val_id ("length");
+		if (!useBufferInitialized) {
 			
 			buffer b = alloc_buffer_len (1);
 			
-			if (!useBufferInitialized) {
-
-				if (buffer_data (b)) {
+			if (buffer_data (b)) {
 				
-					useBuffer = true;
+				useBuffer = true;
 				
-				}
-
-				useBufferInitialized = true;
-
 			}
 			
-			id.init = true;
-			stringId.Set (id);
+			useBufferInitialized = true;
 			
 		}
 		
@@ -196,9 +169,9 @@ namespace lime {
 				
 			}
 
-			BytesId id = stringId.Get ();
+			StringId* id = StringId::Get ();
 			
-			if (val_is_null (val_field (val, id.b))) {
+			if (val_is_null (val_field (val, id->b))) {
 				
 				value dataValue;
 				
@@ -215,7 +188,7 @@ namespace lime {
 					
 				}
 				
-				alloc_field (val, id.b, dataValue);
+				alloc_field (val, id->b, dataValue);
 				
 			} else {
 
@@ -225,19 +198,19 @@ namespace lime {
 					
 					buffer b = alloc_buffer_len (size);
 					_data = (unsigned char*)buffer_data (b);
-					alloc_field (val, id.b, buffer_val (b));
+					alloc_field (val, id->b, buffer_val (b));
 					
 				} else {
 					
 					value s = alloc_raw_string (size);
-					alloc_field (val, id.b, s);
+					alloc_field (val, id->b, s);
 					_data = (unsigned char*)val_string (s);
 					
 				}
 				
 			}
 			
-			alloc_field (val, id.length, alloc_int (size));
+			alloc_field (val, id->length, alloc_int (size));
 			
 		}
 		
@@ -263,7 +236,7 @@ namespace lime {
 			
 		} else {
 			
-			BytesId id = stringId.Get ();
+			StringId* id = StringId::Get ();
 			
 			if (_root == NULL) {
 				
@@ -275,11 +248,11 @@ namespace lime {
 				
 			}
 			
-			_length = val_int (val_field (bytes, id.length));
+			_length = val_int (val_field (bytes, id->length));
 			
 			if (_length > 0) {
 				
-				value b = val_field (bytes, id.b);
+				value b = val_field (bytes, id->b);
 				
 				if (val_is_string (b)) {
 					
@@ -379,8 +352,8 @@ namespace lime {
 		
 		assert (_pin == 0);
 		value val = _root->get ();
-		BytesId id = stringId.Get ();
-		value b = val_field (val, id.b);
+		StringId* id = StringId::Get ();
+		value b = val_field (val, id->b);
 		buffer buf = val_to_buffer (b);
 		_pin = EXT_pin_buffer (buf);
 		

@@ -1,14 +1,8 @@
 #include <math/Rectangle.h>
+#include <utils/StringId.h>
 
 
 namespace lime {
-	
-	
-	static int id_height;
-	static int id_width;
-	static int id_x;
-	static int id_y;
-	static bool init = false;
 	
 	
 	Rectangle::Rectangle () {
@@ -33,20 +27,12 @@ namespace lime {
 	
 	Rectangle::Rectangle (value rect) {
 		
-		if (!init) {
-			
-			id_height = val_id ("height");
-			id_width = val_id ("width");
-			id_x = val_id ("x");
-			id_y = val_id ("y");
-			init = true;
-			
-		}
+		StringId* id = StringId::Get ();
 		
-		width = val_number (val_field (rect, id_width));
-		height = val_number (val_field (rect, id_height));
-		x = val_number (val_field (rect, id_x));
-		y = val_number (val_field (rect, id_y));
+		width = val_number (val_field (rect, id->width));
+		height = val_number (val_field (rect, id->height));
+		x = val_number (val_field (rect, id->x));
+		y = val_number (val_field (rect, id->y));
 		
 	}
 	
@@ -72,21 +58,13 @@ namespace lime {
 	
 	value Rectangle::Value () {
 		
-		if (!init) {
-			
-			id_height = val_id ("height");
-			id_width = val_id ("width");
-			id_x = val_id ("x");
-			id_y = val_id ("y");
-			init = true;
-			
-		}
+		StringId* id = StringId::Get ();
 		
 		value rect = alloc_empty_object ();
-		alloc_field (rect, id_height, alloc_float (height));
-		alloc_field (rect, id_width, alloc_float (width));
-		alloc_field (rect, id_x, alloc_float (x));
-		alloc_field (rect, id_y, alloc_float (y));
+		alloc_field (rect, id->height, alloc_float (height));
+		alloc_field (rect, id->width, alloc_float (width));
+		alloc_field (rect, id->x, alloc_float (x));
+		alloc_field (rect, id->y, alloc_float (y));
 		return rect;
 		
 	}

@@ -4,6 +4,7 @@
 
 #include <hx/CFFI.h>
 #include <stdint.h>
+#include <app/Application.h>
 
 
 namespace lime {
@@ -21,12 +22,9 @@ namespace lime {
 		
 		public:
 			
-			static AutoGCRoot* callback;
-			static AutoGCRoot* eventObject;
-			
 			KeyEvent ();
 			
-			static void Dispatch (KeyEvent* event);
+			static void Dispatch (Application* app, KeyEvent* event);
 			
 			double keyCode;
 			int modifier;

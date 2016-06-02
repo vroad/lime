@@ -1,16 +1,8 @@
 #include <hx/CFFI.h>
 #include <app/ApplicationEvent.h>
-
+#include <utils/StringId.h>
 
 namespace lime {
-	
-	
-	AutoGCRoot* ApplicationEvent::callback = 0;
-	AutoGCRoot* ApplicationEvent::eventObject = 0;
-	
-	static int id_deltaTime;
-	static int id_type;
-	static bool init = false;
 	
 	
 	ApplicationEvent::ApplicationEvent () {
@@ -21,24 +13,18 @@ namespace lime {
 	}
 	
 	
-	void ApplicationEvent::Dispatch (ApplicationEvent* event) {
+	void ApplicationEvent::Dispatch (Application* app, ApplicationEvent* event) {
 		
-		if (ApplicationEvent::callback) {
+		value callback = app->appEventManager->callback->get ();
+		if (!val_is_null (callback)) {
 			
-			if (!init) {
-				
-				id_deltaTime = val_id ("deltaTime");
-				id_type = val_id ("type");
-				init = true;
-				
-			}
+			value object = app->appEventManager->eventObject->get ();
+			StringId* id = StringId::Get ();
 			
-			value object = (ApplicationEvent::eventObject ? ApplicationEvent::eventObject->get () : alloc_empty_object ());
+			alloc_field (object, id->deltaTime, alloc_int (event->deltaTime));
+			alloc_field (object, id->type, alloc_int (event->type));
 			
-			alloc_field (object, id_deltaTime, alloc_int (event->deltaTime));
-			alloc_field (object, id_type, alloc_int (event->type));
-			
-			val_call0 (ApplicationEvent::callback->get ());
+			val_call0 (callback);
 			
 		}
 		

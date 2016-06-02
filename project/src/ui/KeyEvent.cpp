@@ -1,18 +1,9 @@
 #include <hx/CFFI.h>
 #include <ui/KeyEvent.h>
+#include <utils/StringId.h>
 
 
 namespace lime {
-	
-	
-	AutoGCRoot* KeyEvent::callback = 0;
-	AutoGCRoot* KeyEvent::eventObject = 0;
-	
-	static double id_keyCode;
-	static int id_modifier;
-	static int id_type;
-	static int id_windowID;
-	static bool init = false;
 	
 	
 	KeyEvent::KeyEvent () {
@@ -25,28 +16,20 @@ namespace lime {
 	}
 	
 	
-	void KeyEvent::Dispatch (KeyEvent* event) {
+	void KeyEvent::Dispatch (Application* app, KeyEvent* event) {
 		
-		if (KeyEvent::callback) {
+		value callback = app->keyEventManager->callback->get ();
+		if (!val_is_null (callback)) {
 			
-			if (!init) {
-				
-				id_keyCode = val_id ("keyCode");
-				id_modifier = val_id ("modifier");
-				id_type = val_id ("type");
-				id_windowID = val_id ("windowID");
-				init = true;
-				
-			}
+			value object = app->keyEventManager->eventObject->get ();
+			StringId* id = StringId::Get ();
 			
-			value object = (KeyEvent::eventObject ? KeyEvent::eventObject->get () : alloc_empty_object ());
+			alloc_field (object, id->keyCode, alloc_float (event->keyCode));
+			alloc_field (object, id->modifier, alloc_int (event->modifier));
+			alloc_field (object, id->type, alloc_int (event->type));
+			alloc_field (object, id->windowID, alloc_int (event->windowID));
 			
-			alloc_field (object, id_keyCode, alloc_float (event->keyCode));
-			alloc_field (object, id_modifier, alloc_int (event->modifier));
-			alloc_field (object, id_type, alloc_int (event->type));
-			alloc_field (object, id_windowID, alloc_int (event->windowID));
-			
-			val_call0 (KeyEvent::callback->get ());
+			val_call0 (callback);
 			
 		}
 		

@@ -1,5 +1,6 @@
 #include <hx/CFFI.h>
 #include <ui/GamepadEvent.h>
+#include <utils/StringId.h>
 
 
 namespace lime {
@@ -7,13 +8,6 @@ namespace lime {
 	
 	AutoGCRoot* GamepadEvent::callback = 0;
 	AutoGCRoot* GamepadEvent::eventObject = 0;
-	
-	static double id_axis;
-	static int id_button;
-	static int id_id;
-	static int id_type;
-	static int id_value;
-	static bool init = false;
 	
 	
 	GamepadEvent::GamepadEvent () {
@@ -27,28 +21,19 @@ namespace lime {
 	}
 	
 	
-	void GamepadEvent::Dispatch (GamepadEvent* event) {
+	void GamepadEvent::Dispatch (Application* app, GamepadEvent* event) {
 		
-		if (GamepadEvent::callback) {
+		value callback = app->gamepadEventManager->callback->get ();
+		if (!val_is_null (callback)) {
 			
-			if (!init) {
-				
-				id_axis = val_id ("axis");
-				id_button = val_id ("button");
-				id_id = val_id ("id");
-				id_type = val_id ("type");
-				id_value = val_id ("value");
-				init = true;
-				
-			}
+			value object = app->gamepadEventManager->eventObject->get ();
+			StringId* id = StringId::Get ();
 			
-			value object = (GamepadEvent::eventObject ? GamepadEvent::eventObject->get () : alloc_empty_object ());
-			
-			alloc_field (object, id_axis, alloc_int (event->axis));
-			alloc_field (object, id_button, alloc_int (event->button));
-			alloc_field (object, id_id, alloc_int (event->id));
-			alloc_field (object, id_type, alloc_int (event->type));
-			alloc_field (object, id_value, alloc_float (event->axisValue));
+			alloc_field (object, id->axis, alloc_int (event->axis));
+			alloc_field (object, id->button, alloc_int (event->button));
+			alloc_field (object, id->id, alloc_int (event->id));
+			alloc_field (object, id->type, alloc_int (event->type));
+			alloc_field (object, id->value, alloc_float (event->axisValue));
 			
 			val_call0 (GamepadEvent::callback->get ());
 			
