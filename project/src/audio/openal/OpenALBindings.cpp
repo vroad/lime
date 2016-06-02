@@ -13,6 +13,7 @@
 #include <system/CFFIPointer.h>
 #include <utils/Bytes.h>
 #include <utils/PointerWrapper.h>
+#include <vector>
 
 namespace lime {
 	
@@ -51,7 +52,7 @@ namespace lime {
 		if (val_is_null (values) == false) {
 			
 			int size = val_array_size (values);
-			ALfloat *data = new ALfloat[size];
+			std::vector<ALfloat> data (size);
 			
 			for (int i = 0; i < size; ++i) {
 				
@@ -59,9 +60,7 @@ namespace lime {
 				
 			}
 			
-			alBufferfv (buffer, param, data);
-			
-			delete[] data;
+			alBufferfv (buffer, param, &data[0]);
 			
 		}
 		
@@ -80,7 +79,7 @@ namespace lime {
 		if (val_is_null (values) == false) {
 			
 			int size = val_array_size (values);
-			ALint* data = new ALint[size];
+			std::vector<ALint> data (size);
 			
 			for (int i = 0; i < size; ++i) {
 				
@@ -88,9 +87,7 @@ namespace lime {
 				
 			}
 			
-			alBufferiv (buffer, param, data);
-			
-			delete[] data;
+			alBufferiv (buffer, param, &data[0]);
 			
 		}
 		
@@ -132,7 +129,7 @@ namespace lime {
 		if (val_is_null (buffers) == false) {
 			
 			int size = val_array_size (buffers);
-			ALuint* data = new ALuint[size];
+			std::vector<ALuint> data (size);
 			
 			for (int i = 0; i < size; ++i) {
 				
@@ -140,9 +137,7 @@ namespace lime {
 				
 			}
 			
-			alDeleteBuffers (n, data);
-			
-			delete[] data;
+			alDeleteBuffers (n, &data[0]);
 			
 		}
 		
@@ -162,7 +157,7 @@ namespace lime {
 		if (val_is_null (sources) == false) {
 			
 			int size = val_array_size (sources);
-			ALuint* data = new ALuint[size];
+			std::vector<ALuint> data (size);
 			
 			for (int i = 0; i < size; ++i) {
 				
@@ -170,9 +165,7 @@ namespace lime {
 				
 			}
 			
-			alDeleteSources (n, data);
-			
-			delete[] data;
+			alDeleteSources (n, &data[0]);
 			
 		}
 		
@@ -225,8 +218,8 @@ namespace lime {
 	
 	value lime_al_gen_buffers (int n) {
 		
-		ALuint* buffers = new ALuint[n];
-		alGenBuffers (n, buffers);
+		std::vector<ALuint> buffers (n);
+		alGenBuffers (n, &buffers[0]);
 		
 		value result = alloc_array_type_wrap (n, valtInt);
 		
@@ -236,7 +229,6 @@ namespace lime {
 			
 		}
 		
-		delete [] buffers;
 		return result;
 		
 	}
@@ -253,8 +245,8 @@ namespace lime {
 	
 	value lime_al_gen_sources (int n) {
 		
-		ALuint* sources = new ALuint[n];
-		alGenSources (n, sources);
+		std::vector<ALuint> sources (n);
+		alGenSources (n, &sources[0]);
 		
 		value result = alloc_array_type_wrap (n, valtInt);
 		
@@ -264,7 +256,6 @@ namespace lime {
 			
 		}
 		
-		delete [] sources;
 		return result;
 		
 	}
@@ -279,8 +270,8 @@ namespace lime {
 	
 	value lime_al_get_booleanv (int param, int count) {
 		
-		ALboolean* values = new ALboolean[count];
-		alGetBooleanv (param, values);
+		std::vector<ALboolean> values (count);
+		alGetBooleanv (param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtBool);
 		
@@ -290,7 +281,6 @@ namespace lime {
 			
 		}
 		
-		delete [] values;
 		return result;
 		
 	}
@@ -337,8 +327,8 @@ namespace lime {
 	
 	value lime_al_get_bufferfv (int buffer, int param, int count) {
 		
-		ALfloat* values = new ALfloat[count];
-		alGetBufferfv (buffer, param, values);
+		std::vector<ALfloat> values (count);
+		alGetBufferfv (buffer, param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtFloat);
 		
@@ -348,7 +338,6 @@ namespace lime {
 			
 		}
 		
-		delete [] values;
 		return result;
 		
 	}
@@ -365,8 +354,8 @@ namespace lime {
 	
 	value lime_al_get_bufferiv (int buffer, int param, int count) {
 		
-		ALint* values = new ALint[count];
-		alGetBufferiv (buffer, param, values);
+		std::vector<ALint> values (count);
+		alGetBufferiv (buffer, param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtInt);
 		
@@ -376,7 +365,6 @@ namespace lime {
 			
 		}
 		
-		delete [] values;
 		return result;
 		
 	}
@@ -391,8 +379,8 @@ namespace lime {
 	
 	value lime_al_get_doublev (int param, int count) {
 		
-		ALdouble* values = new ALdouble[count];
-		alGetDoublev (param, values);
+		std::vector<ALdouble> values (count);
+		alGetDoublev (param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtFloat);
 		
@@ -402,7 +390,6 @@ namespace lime {
 			
 		}
 		
-		delete [] values;
 		return result;
 		
 	}
@@ -431,8 +418,8 @@ namespace lime {
 	
 	value lime_al_get_floatv (int param, int count) {
 		
-		ALfloat* values = new ALfloat[count];
-		alGetFloatv (param, values);
+		std::vector<ALfloat> values (count);
+		alGetFloatv (param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtFloat);
 		
@@ -442,7 +429,6 @@ namespace lime {
 			
 		}
 		
-		delete [] values;
 		return result;
 		
 	}
@@ -457,8 +443,8 @@ namespace lime {
 	
 	value lime_al_get_integerv (int param, int count) {
 		
-		ALint* values = new ALint[count];
-		alGetIntegerv (param, values);
+		std::vector<ALint> values (count);
+		alGetIntegerv (param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtInt);
 		
@@ -468,7 +454,6 @@ namespace lime {
 			
 		}
 		
-		delete [] values;
 		return result;
 		
 	}
@@ -515,8 +500,8 @@ namespace lime {
 	
 	value lime_al_get_listenerfv (int param, int count) {
 		
-		ALfloat* values = new ALfloat[count];
-		alGetListenerfv (param, values);
+		std::vector<ALfloat> values (count);
+		alGetListenerfv (param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtFloat);
 		
@@ -526,7 +511,6 @@ namespace lime {
 			
 		}
 		
-		delete [] values;
 		return result;
 		
 	}
@@ -543,8 +527,8 @@ namespace lime {
 	
 	value lime_al_get_listeneriv (int param, int count) {
 		
-		ALint* values = new ALint[count];
-		alGetListeneriv (param, values);
+		std::vector<ALint> values (count);
+		alGetListeneriv (param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtInt);
 		
@@ -554,7 +538,6 @@ namespace lime {
 			
 		}
 		
-		delete [] values;
 		return result;
 		
 	}
@@ -612,8 +595,8 @@ namespace lime {
 	
 	value lime_al_get_sourcefv (int source, int param, int count) {
 		
-		ALfloat* values = new ALfloat[count];
-		alGetSourcefv (source, param, values);
+		std::vector<ALfloat> values (count);
+		alGetSourcefv (source, param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtFloat);
 		
@@ -623,7 +606,6 @@ namespace lime {
 			
 		}
 		
-		delete [] values;
 		return result;
 		
 	}
@@ -640,8 +622,8 @@ namespace lime {
 	
 	value lime_al_get_sourceiv (int source, int param, int count) {
 		
-		ALint* values = new ALint[count];
-		alGetSourceiv (source, param, values);
+		std::vector<ALint> values (count);
+		alGetSourceiv (source, param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtInt);
 		
@@ -651,7 +633,6 @@ namespace lime {
 			
 		}
 		
-		delete [] values;
 		return result;
 		
 	}
@@ -827,7 +808,7 @@ namespace lime {
 		if (val_is_null (buffers) == false) {
 			
 			int size = val_array_size (buffers);
-			ALuint* data = new ALuint[size];
+			std::vector<ALuint> data (size);
 			
 			for (int i = 0; i < size; ++i) {
 				
@@ -835,9 +816,7 @@ namespace lime {
 				
 			}
 			
-			alSourceQueueBuffers (source, nb, data);
-			
-			delete[] data;
+			alSourceQueueBuffers (source, nb, &data[0]);
 			
 		}
 		
@@ -904,8 +883,8 @@ namespace lime {
 	
 	value lime_al_source_unqueue_buffers (int source, int nb) {
 		
-		ALuint* buffers = new ALuint[nb];
-		alSourceUnqueueBuffers (source, nb, buffers);
+		std::vector<ALuint> buffers;
+		alSourceUnqueueBuffers (source, nb, &buffers[0]);
 		
 		value result = alloc_array_type_wrap (nb, valtInt);
 		
@@ -915,7 +894,6 @@ namespace lime {
 			
 		}
 		
-		delete [] buffers;
 		return result;
 		
 	}
@@ -1073,8 +1051,8 @@ namespace lime {
 		
 		ALCdevice* alcDevice = (ALCdevice*)val_data (device);
 		
-		ALCint* values = new ALCint[size];
-		alcGetIntegerv (alcDevice, param, size, values);
+		std::vector<ALCint> values (size);
+		alcGetIntegerv (alcDevice, param, size, &values[0]);
 		
 		value result = alloc_array_type_wrap (size, valtInt);
 		
@@ -1084,7 +1062,6 @@ namespace lime {
 			
 		}
 		
-		delete [] values;
 		return result;
 		
 	}
