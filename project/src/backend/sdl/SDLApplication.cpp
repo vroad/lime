@@ -1,6 +1,7 @@
 #include "SDLApplication.h"
 #include "SDLGamepad.h"
 #include "SDLJoystick.h"
+#include <utils/Logger.h>
 
 #ifdef HX_MACOS
 #include <CoreFoundation/CoreFoundation.h>
@@ -27,7 +28,7 @@ namespace lime {
 		
 		if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) != 0) {
 			
-			printf ("Could not initialize SDL: %s.\n", SDL_GetError ());
+			LOG_ERROR ("Could not initialize SDL: %s.\n", SDL_GetError ());
 			
 		}
 		

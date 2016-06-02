@@ -1,5 +1,6 @@
 #include "SDLWindow.h"
 #include "SDLApplication.h"
+#include <utils/Logger.h>
 
 #ifdef HX_WINDOWS
 #include <SDL_syswm.h>
@@ -100,7 +101,7 @@ namespace lime {
 		
 		if (!sdlWindow) {
 			
-			printf ("Could not create SDL window: %s.\n", SDL_GetError ());
+			LOG_ERROR ("Could not create SDL window: %s.\n", SDL_GetError ());
 			return false;
 			
 		}
