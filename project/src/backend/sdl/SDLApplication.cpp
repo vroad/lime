@@ -11,6 +11,7 @@
 #include "emscripten.h"
 #endif
 
+#include <memory>
 
 namespace lime {
 	
@@ -24,11 +25,18 @@ namespace lime {
 	
 	SDLApplication::SDLApplication () {
 		
+		
+		
+	}
+	
+	bool SDLApplication::InitSDL () {
+		
 		SDL_SetHint (SDL_HINT_TIMER_RESOLUTION, "0");
 		
 		if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) != 0) {
 			
 			LOG_ERROR ("Could not initialize SDL: %s.\n", SDL_GetError ());
+			return false;
 			
 		}
 		
@@ -75,6 +83,8 @@ namespace lime {
 		
 		CFRelease (resourcesURL);
 		#endif
+		
+		return true;
 		
 	}
 	
@@ -874,7 +884,15 @@ namespace lime {
 	
 	Application* CreateApplication () {
 		
-		return new SDLApplication ();
+		std::unique_ptr<SDLApplication> app (new SDLApplication ());
+		
+		if (!app->InitSDL ()) {
+			
+			return NULL;
+			
+		}
+		
+		return app.release ();
 		
 	}
 	

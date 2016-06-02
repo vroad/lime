@@ -26,6 +26,7 @@ namespace lime {
 		public:
 			
 			SDLApplication ();
+			bool InitSDL ();
 			~SDLApplication ();
 			
 			virtual int Exec ();
