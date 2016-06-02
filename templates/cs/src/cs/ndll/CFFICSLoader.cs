@@ -437,11 +437,29 @@ namespace cs.ndll
 
         private static int cs_val_array_size(IntPtr inArg1)
         {
-            Array<object> arg1 = (Array<object>)HandleUtils.GetObjectFromIntPtr(inArg1);
-            if (arg1 == null)
-                return 0;
+            object arg1 = HandleUtils.GetObjectFromIntPtr(inArg1);
+            if (arg1 is Array<object>)
+                return ((Array<object>)arg1).length;
+            else if (arg1 is Array<bool>)
+                return ((Array<bool>)arg1).length;
+            else if (arg1 is Array<byte>)
+                return ((Array<byte>)arg1).length;
+            else if (arg1 is Array<sbyte>)
+                return ((Array<sbyte>)arg1).length;
+            else if (arg1 is Array<uint>)
+                return ((Array<uint>)arg1).length;
+            else if (arg1 is Array<int>)
+                return ((Array<int>)arg1).length;
+            else if (arg1 is Array<ulong>)
+                return ((Array<ulong>)arg1).length;
+            else if (arg1 is Array<long>)
+                return ((Array<long>)arg1).length;
+            else if (arg1 is Array<float>)
+                return ((Array<float>)arg1).length;
+            else if (arg1 is Array<double>)
+                return ((Array<double>)arg1).length;
 
-            return arg1.length;
+            return 0;
         }
 
         private static IntPtr cs_val_array_i(IntPtr inArg1, int arg2)
