@@ -990,12 +990,12 @@ namespace lime {
 		
 		ALCdevice* alcDevice = (ALCdevice*)val_data (device);
 		
-		ALCint* list = NULL;
+		std::vector<ALCint> list;
 		
 		if (val_is_null (attrlist) == false) {
 			
 			int size = val_array_size (attrlist);
-			list = new ALCint[size];
+			list.reserve (size);
 			
 			for (int i = 0; i < size; ++i) {
 				list[i] = (ALCint)val_int( val_array_i (attrlist, i) );
@@ -1003,7 +1003,7 @@ namespace lime {
 			
 		}
 		
-		ALCcontext* alcContext = alcCreateContext (alcDevice, list);
+		ALCcontext* alcContext = alcCreateContext (alcDevice, &list[0]);
 		
 		if (list != NULL) {
 			delete[] list;
