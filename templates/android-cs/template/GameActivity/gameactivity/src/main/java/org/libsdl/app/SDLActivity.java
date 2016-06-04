@@ -280,7 +280,7 @@ public class SDLActivity extends Activity {
             }
 
             SDLActivity.mSurface = null;
-            mIsPaused = true;
+            mIsPaused = false;
         }
 
         super.onDestroy();
