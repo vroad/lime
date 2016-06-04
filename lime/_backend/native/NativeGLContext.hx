@@ -11,6 +11,7 @@ class NativeGLContext {
 	
 	private var handle:Dynamic;
 	private var window:NativeWindow;
+	public static var current(default, null):NativeGLContext = null;
 	
 	private function new () {
 		
@@ -34,6 +35,7 @@ class NativeGLContext {
 		var context:NativeGLContext = new NativeGLContext();
 		context.handle = handle;
 		context.window = nativeWindow;
+		current = context;
 		return context;
 		
 		#else
@@ -49,7 +51,15 @@ class NativeGLContext {
 		#if lime_native
 		
 		var nativeWindow:NativeWindow = @:privateAccess window.backend;
-		return lime_gl_context_make_current (nativeWindow.handle, handle);
+		var result = lime_gl_context_make_current (nativeWindow.handle, handle);
+		
+		if (result) {
+			
+			current = this;
+			
+		}
+		
+		return result;
 		
 		#else
 		
@@ -63,7 +73,15 @@ class NativeGLContext {
 		
 		#if lime_native
 		
-		return lime_gl_context_clear_current ();
+		var result = lime_gl_context_clear_current ();
+		
+		if (result) {
+			
+			current = null;
+			
+		}
+		
+		return result;
 		
 		#else
 		
