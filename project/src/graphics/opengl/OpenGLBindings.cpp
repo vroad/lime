@@ -20,6 +20,7 @@
 #include <SDL.h>
 #endif
 
+#include <utils/Exception.h>
 
 namespace lime {
 	
@@ -1245,6 +1246,13 @@ namespace lime {
 	
 	
 	void lime_gl_shader_source (value handle, HxString source) {
+		
+		if (source.__s == NULL) {
+			
+			ThrowException ("source can't be null");
+			return;
+			
+		}
 		
 		glShaderSource (reinterpret_cast<uintptr_t> (val_data (handle)), 1, &source.__s, 0);
 		
