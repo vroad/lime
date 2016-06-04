@@ -46,8 +46,6 @@ public class SDLActivity extends Activity {
     // If we want to separate mouse and touch events.
     //  This is only toggled in native code when a hint is set!
     public static boolean mSeparateMouseAndTouch;
-    
-    public static boolean mRecreateWindow = false;
 
     // Main components
     protected static SDLActivity mSingleton;
@@ -114,7 +112,6 @@ public class SDLActivity extends Activity {
         //mIsPaused = false;
         mIsSurfaceReady = false;
         mHasFocus = true;
-        //mRecreateWindow = false;
     }
 
     // Setup
@@ -125,7 +122,7 @@ public class SDLActivity extends Activity {
         Log.v(TAG, "onCreate(): " + mSingleton);
         super.onCreate(savedInstanceState);
 
-        initialize();
+        SDLActivity.initialize();
         // So we can call stuff from static callbacks
         mSingleton = this;
 
@@ -215,19 +212,11 @@ public class SDLActivity extends Activity {
 
     @Override
     protected void onResume() {
-        
         Log.v(TAG, "onResume()");
         super.onResume();
 
         if (SDLActivity.mBrokenLibraries) {
             return;
-        }
-        
-        if (mRecreateWindow)  {
-            
-            Log.v(TAG, "Skipped calling handleResume because recreation of window is pending");
-            return;
-            
         }
 
         SDLActivity.handleResume();
@@ -269,9 +258,6 @@ public class SDLActivity extends Activity {
             super.onDestroy();
             // Reset everything in case the user re opens the app
             SDLActivity.initialize();
-            SDLActivity.mSDLThread = null;
-            SDLActivity.mIsPaused = false;
-            SDLActivity.mSurface = null;
             return;
         }
 
@@ -289,17 +275,10 @@ public class SDLActivity extends Activity {
                 }
                 SDLActivity.mSDLThread = null;
 
-                Log.v(TAG, "Finished waiting for SDL thread");
+                //Log.v(TAG, "Finished waiting for SDL thread");
             }
         } else {
-            Log.v(TAG, "Not finishing SDL thread");
-        }
-
-        if (!isFinishing()) {
             SDLActivity.mLayout.removeView (SDLActivity.mSurface);
-            mRecreateWindow = true;
-            Log.v(TAG, "Scheduled window recreation");
-
             // Reset everything in case the user re opens the app
             SDLActivity.initialize();
         }
@@ -348,19 +327,11 @@ public class SDLActivity extends Activity {
             SDLActivity.mIsPaused = false;
             SDLActivity.nativeResume();
             mSurface.handleResume();
-        } else {
-            
-            Log.v(TAG, "Not resuming");
-            Log.v(TAG, "mIsPaused:" + SDLActivity.mIsPaused);
-            Log.v(TAG, "mIsSurfaceReady:" + SDLActivity.mIsSurfaceReady);
-            Log.v(TAG, "mHasFocus:" + SDLActivity.mHasFocus);
-            
         }
     }
 
     /* The native thread has finished */
     public static void handleNativeExit() {
-        Log.v(TAG, "handleNativeExit()");
         SDLActivity.mSDLThread = null;
         mSingleton.finish();
     }
@@ -452,7 +423,6 @@ public class SDLActivity extends Activity {
     public static native void nativeQuit();
     public static native void nativePause();
     public static native void nativeResume();
-    public static native void onNativeActivityDestroyed();
     public static native void onNativeDropFile(String filename);
     public static native void onNativeResize(int x, int y, int format, float rate);
     public static native int onNativePadDown(int device_id, int keycode);
@@ -1023,7 +993,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     protected static float mWidth, mHeight;
 
     // Activity
-    public SDLActivity mActivity;
+    SDLActivity mActivity;
 
     // Startup
     public SDLSurface(Context context, SDLActivity activity) {
@@ -1205,14 +1175,6 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
                 }
             }, "SDLThreadListener");
             SDLActivity.mSDLThread.start();
-            Log.v("SDL", "created thread");
-        } else if (SDLActivity.mRecreateWindow) {
-            
-            //SDLActivity.onNativeActivityDestroyed ();
-            Log.v("SDL", "recreated window");
-            SDLActivity.mRecreateWindow = false;
-            //SDLActivity.handleResume();
-            
         }
 
         if (SDLActivity.mHasFocus) {
