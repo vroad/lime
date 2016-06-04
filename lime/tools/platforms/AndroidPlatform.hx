@@ -198,34 +198,23 @@ class AndroidPlatform extends PlatformTarget {
 			
 			ProcessHelper.runCommand ("", "haxe", [hxml, "-D", "android"]);
 			CSHelper.copySourceFiles (project.templatePaths, targetDirectory + "/obj/src");
-			//FileHelper.copyFileTemplate (project.templatePaths, templateDirectory + "/MainActivity.cs", targetDirectory + "/obj/src/MainActivity.cs", project.templateContext);
 			FileHelper.copyFileTemplate (project.templatePaths, templateDirectory + "/AssemblyInfo.cs", targetDirectory + "/obj/src/AssemblyInfo.cs", project.templateContext);
 			var txtPath = targetDirectory + "/obj/hxcs_build.txt";
 			var resources = getResourcePaths (csResourceDir);
 			var sourceFiles = CSHelper.ndllSourceFiles.copy ();
-			//sourceFiles.push ("MainActivity");
 			sourceFiles.push ("AssemblyInfo");
 			CSHelper.addSourceFiles (txtPath, sourceFiles);
 			
-			#if 0
-			CSHelper.addAndroidResources (txtPath, resources);
-			CSHelper.addAssemblies (txtPath, [FileSystem.absolutePath(targetDirectory + "/obj/GameActivity\\bin\\Release\\Org.Haxe.Lime.GameActivity.dll")]);
-			CSHelper.addAndroidABIs (txtPath, architectures);
-			CSHelper.addNativeLibraries (txtPath, targetDirectory + "/obj/Libraries/", project.ndlls, architectures);
-			CSHelper.addAssets (txtPath, assetPaths);
-			#end
 			CSHelper.addGUID (txtPath, appMainGUID);
 			
 			CSHelper.buildGradleProj (targetDirectory + "/obj/GameActivity/gameactivity");
-			//CSHelper.buildCSProj (targetDirectory + "/obj", targetDirectory + "/obj/GameActivity/GameActivity.csproj");
 			CSHelper.compile (project, targetDirectory + "/obj", targetDirectory +  "/obj/ApplicationMain", "anycpu", "android", true);
-			//CSHelper.buildCSProj (targetDirectory + "/obj", targetDirectory + "/obj/ApplicationMain.csproj");
 			CSHelper.buildSln (targetDirectory + "/obj", targetDirectory + "/obj/MainActivity.sln");
 			CSHelper.buildCSProj (targetDirectory + "/obj", targetDirectory + "/obj/MainActivity.csproj", "SignAndroidPackage");
 			
 			FileHelper.copyIfNewer (targetDirectory + "/obj/bin/" + (project.debug ? "Debug" : "Release") + "/" + project.meta.packageName + "-Signed.apk",
 				targetDirectory + "/bin/" + project.app.file + "-debug.apk");
-				
+			
 		}
 		
 		if (targetType == "cs") {
