@@ -277,13 +277,16 @@ public class SDLActivity extends Activity {
 
                 //Log.v(TAG, "Finished waiting for SDL thread");
             }
+
+            SDLActivity.mSurface = null;
+            mIsPaused = true;
         } else {
             SDLActivity.mLayout.removeView (SDLActivity.mSurface);
-            // Reset everything in case the user re opens the app
-            SDLActivity.initialize();
         }
 
         super.onDestroy();
+        // Reset everything in case the user re opens the app
+        SDLActivity.initialize();
     }
 
     @Override
