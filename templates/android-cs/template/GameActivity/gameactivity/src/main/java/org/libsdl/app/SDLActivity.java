@@ -166,6 +166,10 @@ public class SDLActivity extends Activity {
         if (mSurface == null) {
             mSurface = new SDLSurface(getApplication(), this);
         } else {
+            ViewGroup parent = (ViewGroup)mSurface.getParent(); 
+            if (parent != null) {
+                parent.removeView(mSurface);
+            }
             mSurface.mActivity = this;
         }
 
@@ -261,7 +265,6 @@ public class SDLActivity extends Activity {
             return;
         }
 
-        SDLActivity.mLayout.removeView (SDLActivity.mSurface);
         // Send a quit message to the application
         if (isFinishing()) {
             SDLActivity.mExitCalledFromJava = true;
