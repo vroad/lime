@@ -1,7 +1,8 @@
 using Android.App;
 using Android.Content.PM;
-using System;
-using System.Reflection;
+using Android.OS;
+using cs.ndll;
+using Org.Libsdl.App;
 
 namespace ::APP_PACKAGE::
 {
@@ -14,27 +15,13 @@ namespace ::APP_PACKAGE::
         {
             public void Run()
             {
-                AppDomain domain = AppDomain.CreateDomain("ApplicationMainDomain");
-
-                Assembly asm = Assembly.Load("ApplicationMain.dll");
-                System.Type ndllType = asm.GetType("cs.ndll.NDLLFunction");
-                FieldInfo libDirField = ndllType.GetField("LibraryDir");
-                FieldInfo libPrefixField = ndllType.GetField("LibraryPrefix");
-                FieldInfo libSuffixField = ndllType.GetField("LibrarySuffix");
-
-                System.Type appMainType = asm.GetType("ApplicationMain");
-                MethodInfo mainMethod = appMainType.GetMethod("main");
-
-                libDirField.SetValue(null, MainActivity.MSingleton.ApplicationInfo.NativeLibraryDir);
-                libPrefixField.SetValue(null, "lib");
-                libSuffixField.SetValue(null, ".so");
+                NDLLFunction.LibraryDir = MainActivity.MSingleton.ApplicationInfo.NativeLibraryDir;
+                NDLLFunction.LibraryPrefix = "lib";
+                NDLLFunction.LibrarySuffix = ".so";
                 
-                Java.Lang.String[] sdlArgs = {};
-                NativeInit(sdlArgs);
-                string[] mainArgs = {};
-                mainMethod.Invoke(null, mainArgs);
-
-                AppDomain.Unload(domain);
+                Java.Lang.String[] arguments = {};
+                SDLActivity.NativeInit(arguments);
+                ApplicationMain.main();
             }
         }
 
