@@ -261,6 +261,7 @@ public class SDLActivity extends Activity {
             return;
         }
 
+        SDLActivity.mLayout.removeView (SDLActivity.mSurface);
         // Send a quit message to the application
         if (isFinishing()) {
             SDLActivity.mExitCalledFromJava = true;
@@ -280,8 +281,6 @@ public class SDLActivity extends Activity {
 
             SDLActivity.mSurface = null;
             mIsPaused = true;
-        } else {
-            SDLActivity.mLayout.removeView (SDLActivity.mSurface);
         }
 
         super.onDestroy();
