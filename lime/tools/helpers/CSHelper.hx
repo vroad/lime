@@ -23,6 +23,79 @@ class CSHelper {
 		"cs.ndll.NDLLFunction",
 	];
 	
+	private static function getAndroidABIName(arch:Architecture):String {
+		
+		var name = switch(arch) {
+			case ARMV5:
+				"armeabi";
+			case ARMV7:
+				"armeabi-v7a";
+			case ARM64:
+				"arm64-v8a";
+			case X86:
+				"x86";
+			case X64:
+				"x86_64";
+			case _:
+				null;
+		}
+		
+		if (name == null) {
+			
+			throw "Unsupported architecture:" + arch;
+			
+		}
+		
+		return name;
+		
+	}
+	
+	public static function getAndroidABINames (architectures:Array<Architecture>):String {
+		
+		var result = "";
+		var first = true;
+		
+		for (arch in architectures) {
+			
+			if (first) {
+				
+				first = false;
+				
+			} else {
+				
+				result += ",";
+				
+			}
+			
+			var archName = getAndroidABIName (arch);
+			result += archName;
+			
+		}
+		
+		return result;
+		
+	}
+	
+	public static function getAndroidNativeLibraryPaths (libPath:String, libraries:Array<NDLL>, architectures:Array<Architecture>):Array<String> {
+		
+		var paths = [];
+		
+		for (arch in architectures) {
+			
+			var archName = getAndroidABIName (arch);
+			
+			for (lib in libraries) {
+				
+				paths.push (FileSystem.absolutePath (libPath + "/" + archName + "/" + "lib" + lib.name + ".so").replace ("/", "\\"));
+				
+			}
+			
+		}
+		
+		return paths;
+		
+	}
+	
 	public static function copySourceFiles (templatePaths:Array<String>, targetPath:String) {
 		
 		FileHelper.recursiveCopyTemplate (templatePaths, "cs/src", targetPath);
@@ -110,12 +183,6 @@ class CSHelper {
 			
 			var archName = getAndroidABIName (arch);
 			
-			if (archName == null) {
-				
-				throw "Unsupported architecture:" + arch;
-				
-			}
-			
 			for (lib in libraries) {
 				
 				file.writeString (FileSystem.absolutePath(libPath + "/" + archName + "/" + "lib" + lib.name + ".so").replace("/", "\\") + '\n');
@@ -143,13 +210,6 @@ class CSHelper {
 		for (arch in architectures) {
 			
 			var archName = getAndroidABIName (arch);
-			
-			if (archName == null) {
-				
-				throw "Unsupported architecture:" + arch;
-				
-			}
-			
 			file.writeString (archName + '\n');
 			
 		}
@@ -182,6 +242,18 @@ class CSHelper {
 		
 	}
 	
+	public static function addGUID (txtPath:String, guid:String) {
+		
+		var file = File.append (txtPath, false);
+		file.writeString ('\nbegin guid\n');
+		
+		file.writeString ('$guid\n');
+		
+		file.writeString ('end guid\n');
+		file.close ();
+		
+	}
+	
 	public static function compile (project:HXProject, path:String, outPath:String, arch:String, platform:String, buildFile:String = "hxcs_build.txt", noCompile:Bool = false) {
 		
 		var args = [ "run", project.config.getString ("cs.buildLibrary", "hxcs"), buildFile, "--arch", arch, "--platform", platform, "--out", outPath, "--unsafe" ];
@@ -204,6 +276,12 @@ class CSHelper {
 		
 	}
 	
+	inline public static function buildSln (path:String, slnPath:String, task:String = null) {
+		
+		buildCSProj (path, slnPath, task);
+		
+	}
+	
 	public static function buildCSProj (path:String, csprojPath:String, task:String = null) {
 		
 		var msBuildPath = "C:/Program Files (x86)/MSBuild/14.0/Bin/MSBuild.exe";
@@ -217,25 +295,6 @@ class CSHelper {
 		}
 		
 		ProcessHelper.runCommand (path, msBuildPath, args);
-		
-	}
-	
-	private static function getAndroidABIName(arch:Architecture):String {
-		
-		return switch(arch) {
-			case ARMV5:
-				"armeabi";
-			case ARMV7:
-				"armeabi-v7a";
-			case ARM64:
-				"arm64-v8a";
-			case X86:
-				"x86";
-			case X64:
-				"x86_64";
-			case _:
-				null;
-		}
 		
 	}
 	

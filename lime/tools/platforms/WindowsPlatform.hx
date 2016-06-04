@@ -11,6 +11,7 @@ import lime.tools.helpers.FileHelper;
 import lime.tools.helpers.IconHelper;
 import lime.tools.helpers.LogHelper;
 import lime.tools.helpers.CSHelper;
+import lime.tools.helpers.GUID;
 import lime.tools.helpers.NekoHelper;
 import lime.tools.helpers.NodeJSHelper;
 import lime.tools.helpers.PathHelper;
@@ -137,7 +138,9 @@ class WindowsPlatform extends PlatformTarget {
 			
 			ProcessHelper.runCommand ("", "haxe", [ hxml ]);
 			CSHelper.copySourceFiles (project.templatePaths, targetDirectory + "/obj/src");
-			CSHelper.addSourceFiles (targetDirectory + "/obj/hxcs_build.txt", CSHelper.ndllSourceFiles);
+			var txtPath = targetDirectory + "/obj/hxcs_build.txt";
+			CSHelper.addSourceFiles (txtPath, CSHelper.ndllSourceFiles);
+			CSHelper.addGUID (txtPath, GUID.uuid ());
 			CSHelper.compile (project, targetDirectory + "/obj", applicationDirectory + project.app.file, "x86", "desktop");
 			
 		} else {

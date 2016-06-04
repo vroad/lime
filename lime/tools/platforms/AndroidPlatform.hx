@@ -10,6 +10,7 @@ import lime.tools.helpers.CPPHelper;
 import lime.tools.helpers.CSHelper;
 import lime.tools.helpers.DeploymentHelper;
 import lime.tools.helpers.FileHelper;
+import lime.tools.helpers.GUID;
 import lime.tools.helpers.IconHelper;
 import lime.tools.helpers.LogHelper;
 import lime.tools.helpers.PathHelper;
@@ -22,7 +23,7 @@ import lime.project.NDLL;
 import lime.project.PlatformTarget;
 import sys.io.File;
 import sys.FileSystem;
-
+using StringTools;
 
 class AndroidPlatform extends PlatformTarget {
 	
@@ -31,7 +32,9 @@ class AndroidPlatform extends PlatformTarget {
 	private var targetType:String;
 	private var templateDirectory:String;
 	private static var iconTypes:Array<String> = [ "ldpi", "mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi" ];
+	private static var csResourceDir:String = "Resources\\";
 	private var assetPaths:Array<String>;
+	private var appMainGUID:String;
 	
 	public function new (command:String, _project:HXProject, targetFlags:Map <String, String>) {
 		
@@ -195,32 +198,30 @@ class AndroidPlatform extends PlatformTarget {
 			
 			ProcessHelper.runCommand ("", "haxe", [hxml, "-D", "android"]);
 			CSHelper.copySourceFiles (project.templatePaths, targetDirectory + "/obj/src");
-			FileHelper.copyFileTemplate (project.templatePaths, templateDirectory + "/MainActivity.cs", targetDirectory + "/obj/src/MainActivity.cs", project.templateContext);
+			//FileHelper.copyFileTemplate (project.templatePaths, templateDirectory + "/MainActivity.cs", targetDirectory + "/obj/src/MainActivity.cs", project.templateContext);
 			FileHelper.copyFileTemplate (project.templatePaths, templateDirectory + "/AssemblyInfo.cs", targetDirectory + "/obj/src/AssemblyInfo.cs", project.templateContext);
 			var txtPath = targetDirectory + "/obj/hxcs_build.txt";
-			var resourceDir = "Resources\\";
-			var resources = [];
+			var resources = getResourcePaths (csResourceDir);
 			var sourceFiles = CSHelper.ndllSourceFiles.copy ();
-			sourceFiles.push ("MainActivity");
+			//sourceFiles.push ("MainActivity");
 			sourceFiles.push ("AssemblyInfo");
 			CSHelper.addSourceFiles (txtPath, sourceFiles);
 			
-			for (iconType in iconTypes) {
-				
-				resources.push (resourceDir + "drawable-" + iconType + "\\icon.png");
-				
-			}
-			
-			resources.push (resourceDir + "drawable-xhdpi\\ouya_icon.png");
+			#if 0
 			CSHelper.addAndroidResources (txtPath, resources);
 			CSHelper.addAssemblies (txtPath, [FileSystem.absolutePath(targetDirectory + "/obj/GameActivity\\bin\\Release\\Org.Haxe.Lime.GameActivity.dll")]);
 			CSHelper.addAndroidABIs (txtPath, architectures);
 			CSHelper.addNativeLibraries (txtPath, targetDirectory + "/obj/Libraries/", project.ndlls, architectures);
 			CSHelper.addAssets (txtPath, assetPaths);
+			#end
+			CSHelper.addGUID (txtPath, appMainGUID);
+			
 			CSHelper.buildGradleProj (targetDirectory + "/obj/GameActivity/gameactivity");
-			CSHelper.buildCSProj (targetDirectory + "/obj", targetDirectory + "/obj/GameActivity/GameActivity.csproj");
+			//CSHelper.buildCSProj (targetDirectory + "/obj", targetDirectory + "/obj/GameActivity/GameActivity.csproj");
 			CSHelper.compile (project, targetDirectory + "/obj", targetDirectory +  "/obj/ApplicationMain", "anycpu", "android", true);
-			CSHelper.buildCSProj (targetDirectory + "/obj", targetDirectory + "/obj/ApplicationMain.csproj", "SignAndroidPackage");
+			//CSHelper.buildCSProj (targetDirectory + "/obj", targetDirectory + "/obj/ApplicationMain.csproj");
+			CSHelper.buildSln (targetDirectory + "/obj", targetDirectory + "/obj/MainActivity.sln");
+			CSHelper.buildCSProj (targetDirectory + "/obj", targetDirectory + "/obj/MainActivity.csproj", "SignAndroidPackage");
 			
 			FileHelper.copyIfNewer (targetDirectory + "/obj/bin/" + (project.debug ? "Debug" : "Release") + "/" + project.meta.packageName + "-Signed.apk",
 				targetDirectory + "/bin/" + project.app.file + "-debug.apk");
@@ -379,16 +380,17 @@ class AndroidPlatform extends PlatformTarget {
 		if (targetType == "cs") {
 			
 			destination = targetDirectory + "/obj/";
-			assetDir = destination + "/Assets/";
+			assetDir = destination + "Assets/";
 			resourceDir = "/Resources/";
 			
 		} else {
 			
 			destination = targetDirectory + "/bin/";
-			assetDir = destination + "/assets/";
+			assetDir = destination + "assets/";
 			resourceDir = "/res/";
 			
 		}
+		trace(assetDir);
 		
 		PathHelper.mkdir (destination);
 		PathHelper.mkdir (destination + resourceDir + "drawable-ldpi/");
@@ -529,6 +531,37 @@ class AndroidPlatform extends PlatformTarget {
 			
 		}
 		
+		if (targetType == "cs") {
+			
+			var gameActivityGUID = GUID.uuid ();
+			this.appMainGUID = GUID.uuid ();
+			var mainActivityGUID = GUID.uuid ();
+			var assetPaths:Array<String> = project.assets.map (
+				
+				function (v):String {
+					
+					return PathHelper.combine ("Assets/", v.resourceName).replace ("/", "\\");
+					
+				}
+				
+			);
+			assetPaths.push ("Assets\\manifest");
+			
+			context.GAME_ACTIVITY_GUID = gameActivityGUID;
+			context.APP_MAIN_GUID = appMainGUID;
+			context.MAIN_ACTIVITY_GUID = mainActivityGUID; 
+			context.GAME_ACTIVITY_GUID_LOWER = gameActivityGUID.toLowerCase ();
+			context.APP_MAIN_GUID_LOWER = appMainGUID.toLowerCase ();
+			context.ANDROID_ABIS = CSHelper.getAndroidABINames (project.architectures);
+			context.REFS = [];
+			context.SRCS = ["Sources\\MainActivity.cs"];
+			context.RES = [];
+			context.ANDROID_RESOURCES = getResourcePaths (csResourceDir);
+			context.ANDROID_ASSETS = assetPaths;
+			context.ANDROID_NATIVE_LIBS = CSHelper.getAndroidNativeLibraryPaths (targetDirectory + "/obj/Libraries/", project.ndlls, project.architectures);
+			
+		}
+		
 		FileHelper.recursiveCopyTemplate (project.templatePaths, templateDirectory + "/template", destination, context);
 		
 		if (targetType == "cs") {
@@ -561,5 +594,20 @@ class AndroidPlatform extends PlatformTarget {
 		
 	}
 	
+	
+	private static function getResourcePaths (resourceDir:String):Array<String> {
+		
+		var resources = [];
+		
+		for (iconType in iconTypes) {
+			
+			resources.push (resourceDir + "drawable-" + iconType + "\\icon.png");
+			
+		}
+		
+		resources.push (resourceDir + "drawable-xhdpi\\ouya_icon.png");
+		return resources;
+		
+	}
 	
 }
