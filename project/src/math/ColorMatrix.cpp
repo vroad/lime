@@ -29,7 +29,8 @@ namespace lime {
 		StringId* id = StringId::Get ();
 		
 		value buffer_value = val_field (colorMatrix, id->buffer);
-		Bytes bytes = Bytes (buffer_value);
+		Bytes bytes;
+		bytes.Set (buffer_value);
 		float* src = (float*)bytes.Data ();
 		
 		for (int i = 0; i < 20; i++) {

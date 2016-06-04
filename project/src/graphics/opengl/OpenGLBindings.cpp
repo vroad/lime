@@ -169,7 +169,8 @@ namespace lime {
 		
 		if (len == 0) return;
 		
-		Bytes bytes (inByteBuffer);
+		Bytes bytes;
+		bytes.Set (inByteBuffer);
 		const unsigned char *data = bytes.Data ();
 		int size = bytes.Length ();
 		
@@ -188,8 +189,8 @@ namespace lime {
 		
 		if (len == 0) return;
 		
-		Bytes bytes (inByteBuffer);
-		
+		Bytes bytes;
+		bytes.Set (inByteBuffer);
 		const unsigned char *data = bytes.Data ();
 		int size = bytes.Length ();
 		
@@ -262,7 +263,8 @@ namespace lime {
 		unsigned char *data = 0;
 		int size = 0;
 		
-		Bytes bytes (buffer);
+		Bytes bytes;
+		bytes.Set (buffer);
 		
 		if (bytes.Length ()) {
 			
@@ -281,7 +283,8 @@ namespace lime {
 		unsigned char *data = 0;
 		int size = 0;
 		
-		Bytes bytes (buffer);
+		Bytes bytes;
+		bytes.Set (buffer);
 		
 		if (bytes.Length ()) {
 			
@@ -1211,7 +1214,8 @@ namespace lime {
 	void lime_gl_read_pixels (int x, int y, int width, int height, int format, int type, value buffer, int offset) {
 		
 		unsigned char *data = 0;
-		Bytes bytes (buffer);
+		Bytes bytes;
+		bytes.Set (buffer);
 		
 		if (bytes.Length ()) {
 			
@@ -1305,7 +1309,8 @@ namespace lime {
 		
 		unsigned char *data = 0;
 		
-		Bytes bytes (buffer);
+		Bytes bytes;
+		bytes.Set (buffer);
 		
 		if (bytes.Length ()) {
 			
@@ -1335,7 +1340,8 @@ namespace lime {
 	void lime_gl_tex_sub_image_2d (int target, int level, int xOffset, int yOffset, int width, int height, int format, int type, value buffer, int offset) {
 		
 		unsigned char *data = 0;
-		Bytes bytes (buffer);
+		Bytes bytes;
+		bytes.Set (buffer);
 		
 		if (bytes.Length ()) {
 			
@@ -1350,7 +1356,8 @@ namespace lime {
 	
 	void lime_gl_uniform_matrix (int loc, bool trans, value inBytes, int count) {
 		
-		Bytes bytes (inBytes);
+		Bytes bytes;
+		bytes.Set (inBytes);
 		int size = bytes.Length ();
 		const float *data = (float *)bytes.Data ();
 		int nbElems = size / sizeof (float);
@@ -1375,7 +1382,8 @@ namespace lime {
 	
 	void lime_gl_uniform1fv (int loc, value inByteBuffer) {
 		
-		Bytes bytes (inByteBuffer);
+		Bytes bytes;
+		bytes.Set (inByteBuffer);
 		int size = bytes.Length ();
 		const float *data = (float *)bytes.Data ();
 		int nbElems = size / sizeof (float);
@@ -1394,7 +1402,8 @@ namespace lime {
 	
 	void lime_gl_uniform1iv (int loc, value inByteBuffer) {
 		
-		Bytes bytes (inByteBuffer);
+		Bytes bytes;
+		bytes.Set (inByteBuffer);
 		int size = bytes.Length ();
 		const int *data = (int *)bytes.Data ();
 		int nbElems = size / sizeof (int);

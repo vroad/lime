@@ -147,8 +147,8 @@ namespace lime {
 			
 		} else {
 			
-			bytes = Bytes();
-			bytes.Set(data);
+			bytes = Bytes ();
+			bytes.Set (data);
 			resource = Resource (&bytes);
 			
 		}
@@ -935,7 +935,8 @@ namespace lime {
 		
 		ImageBuffer imageBuffer;
 		
-		Bytes bytes (data);
+		Bytes bytes;
+		bytes.Set (data);
 		Resource resource = Resource (&bytes);
 		
 		#ifdef LIME_JPEG
@@ -980,7 +981,8 @@ namespace lime {
 	value lime_lzma_decode (value buffer) {
 		
 		#ifdef LIME_LZMA
-		Bytes data = Bytes (buffer);
+		Bytes data;
+		data.Set (buffer);
 		Bytes result;
 		
 		LZMA::Decode (&data, &result);
@@ -996,7 +998,8 @@ namespace lime {
 	value lime_lzma_encode (value buffer) {
 		
 		#ifdef LIME_LZMA
-		Bytes data = Bytes (buffer);
+		Bytes data;
+		data.Set (buffer);
 		Bytes result;
 		
 		LZMA::Encode (&data, &result);
@@ -1264,7 +1267,8 @@ namespace lime {
 		
 		TextLayout *text = (TextLayout*)val_data (textHandle);
 		Font *font = (Font*)val_data (fontHandle);
-		Bytes bytes = Bytes (data);
+		Bytes bytes;
+		bytes.Set (data);
 		text->Position (font, size, textString.__s, &bytes);
 		return bytes.Value ();
 		
