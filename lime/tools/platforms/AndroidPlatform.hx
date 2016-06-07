@@ -379,7 +379,6 @@ class AndroidPlatform extends PlatformTarget {
 			resourceDir = "/res/";
 			
 		}
-		trace(assetDir);
 		
 		PathHelper.mkdir (destination);
 		PathHelper.mkdir (destination + resourceDir + "drawable-ldpi/");
