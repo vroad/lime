@@ -12,7 +12,6 @@ class ApplicationMain {
 	public static var preloader:lime.app.Preloader;
 	
 	private static var app:lime.app.Application;
-	private static var exitCode:Int = -1;
 	
 	public static function create ():Void {
 		
@@ -62,7 +61,7 @@ class ApplicationMain {
 	}
 	
 	
-	public static function main ():Int {
+	public static function main ():Void {
 		
 		config = {
 			
@@ -102,8 +101,6 @@ class ApplicationMain {
 		create ();
 		#end
 		
-		return exitCode;
-		
 	}
 	
 	
@@ -111,7 +108,15 @@ class ApplicationMain {
 		
 		#if !munit
 		
-		exitCode = app.exec ();
+		var result = app.exec ();
+		
+		#if (sys && !nodejs && !emscripten)
+		if (result != 0) {
+			
+			Sys.exit (result);
+			
+		}
+		#end
 		
 		#else
 		
