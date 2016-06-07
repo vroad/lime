@@ -125,6 +125,9 @@ namespace cs.ndll
         private delegate bool ValBoolDelegate(IntPtr arg1);
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
+        private delegate void ValThrowDelegate(IntPtr arg1);
+
+        [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
         private delegate IntPtr EmptyDelegate();
 
         private enum hxValueType
@@ -184,6 +187,7 @@ namespace cs.ndll
         private static DelegateConverter<UnPinBufferDelegate> unpin_buffer;
         private static DelegateConverter<ValFieldDelegate> val_field;
         private static DelegateConverter<ValBoolDelegate> val_bool;
+         private static DelegateConverter<ValThrowDelegate> val_throw;
         private static DelegateConverter<EmptyDelegate> empty;
 
         private static int cs_val_type(IntPtr inArg1)
@@ -615,6 +619,12 @@ namespace cs.ndll
             return (bool)arg1;
         }
 
+        private static void cs_val_throw(IntPtr inArg1)
+        {
+            object arg1 = HandleUtils.GetObjectFromIntPtr(inArg1);
+            throw new Exception(arg1.ToString());
+        }
+
         private static IntPtr cs_empty() { return IntPtr.Zero; }
 
         static CFFICSLoader()
@@ -657,6 +667,7 @@ namespace cs.ndll
             unpin_buffer = new DelegateConverter<UnPinBufferDelegate>(new UnPinBufferDelegate(cs_unpin_buffer));
             val_field = new DelegateConverter<ValFieldDelegate>(new ValFieldDelegate(cs_val_field));
             val_bool = new DelegateConverter<ValBoolDelegate>(new ValBoolDelegate(cs_val_bool));
+            val_throw = new DelegateConverter<ValThrowDelegate>(new ValThrowDelegate(cs_val_throw));
             empty = new DelegateConverter<EmptyDelegate>(new EmptyDelegate(cs_empty));
         }
 
@@ -742,6 +753,8 @@ namespace cs.ndll
                     return val_field.ToPointer();
                 case "val_bool":
                     return val_bool.ToPointer();
+                case "val_throw":
+                    return val_throw.ToPointer();
             }
 
             return IntPtr.Zero;
