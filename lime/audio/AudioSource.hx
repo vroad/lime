@@ -44,7 +44,8 @@ class AudioSource {
 	public var length (get, set):Int;
 	public var loops (get, set):Int;
 	public var offset:Int;
-
+	public var pan (get, set):Float;
+	
 	private var id:UInt;
 	private var playing:Bool;
 	private var pauseTime:Int;
@@ -98,7 +99,7 @@ class AudioSource {
 		}
 		
 	}
-
+	
 	
 	public function dispose ():Void {
 		
@@ -606,9 +607,9 @@ class AudioSource {
 		#elseif flash
 		
 		return Std.int (channel.position);
-
+		
 		#elseif lime_console
-
+		
 		lime.Lib.notImplemented ("AudioSource.get_currentTime");
 		return 0;
 		
@@ -634,9 +635,9 @@ class AudioSource {
 		// TODO: create new sound channel
 		//channel.position = value;
 		return pauseTime = value;
-
+		
 		#elseif lime_console
-
+		
 		lime.Lib.notImplemented ("AudioSource.set_currentTime");
 		return value;
 		
@@ -673,15 +674,15 @@ class AudioSource {
 		#elseif flash
 		
 		return channel.soundTransform.volume;
-
+		
 		#elseif lime_console
-
+		
 		if (channel.valid) {
 			
 			__gain = channel.getVolume ();
 			
 		}
-
+		
 		return __gain;
 		
 		#else
@@ -705,15 +706,15 @@ class AudioSource {
 		soundTransform.volume = value;
 		channel.soundTransform = soundTransform;
 		return value;
-
+		
 		#elseif lime_console
-
+		
 		if (channel.valid) {
 			
 			channel.setVolume (value);
 			
 		}
-
+		
 		return __gain = value;
 		
 		#else
@@ -741,9 +742,9 @@ class AudioSource {
 		#elseif flash
 		
 		return Std.int (buffer.src.length);
-
+		
 		#elseif lime_console
-
+		
 		lime.Lib.notImplemented ("AudioSource.get_length");
 		return 0;
 		
@@ -760,10 +761,10 @@ class AudioSource {
 	private function set_length (value:Int):Int {
 		
 		#if lime_console
-
+		
 		lime.Lib.notImplemented ("AudioSource.set_length");
 		return value;
-
+		
 		#elseif (!flash && !html5)
 		#end
 		
@@ -824,6 +825,73 @@ class AudioSource {
         #end
 		
 	}
+	
+	private function get_pan ():Float {
+		
+		#if html5
+		
+		return 0;
+		
+		#elseif flash
+		
+		return channel.soundTransform.pan;
+		
+		#elseif lime_console
+		
+		//if (channel.valid) {
+			//
+			//__gain = channel.getVolume ();
+			//
+		//}
+		//
+		//return __gain;
+		
+		return 0;
+		
+		#else
+		
+		return AL.getSource3f (id, AL.POSITION)[0];
+		
+		#end
+		
+	}
+	
+	
+	private function set_pan (value:Float):Float {
+		
+		#if html5
+		
+		return 0;
+		
+		#elseif flash
+		
+		var soundTransform = channel.soundTransform;
+		soundTransform.pan = value;
+		channel.soundTransform = soundTransform;
+		return value;
+		
+		#elseif lime_console
+		
+		//if (channel.valid) {
+			//
+			//channel.setVolume (value);
+			//
+		//}
+		//
+		//return __gain = value;
+		
+		return 0;
+		
+		#else
+		
+		AL.distanceModel (AL.NONE);
+		AL.source3f (id, AL.POSITION, pan, 0, -1 * Math.sqrt (1 - Math.pow (pan, 2)));
+		return value;
+		
+		#end
+		
+	}
+	
 	
 	#if lime_native
 	@:cffi private static function lime_audio_stream_decode (handle:Dynamic, data:Dynamic, readSize:Int, writeOffset:Int):Int;
