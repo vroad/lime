@@ -1139,7 +1139,7 @@ class ImageDataUtil {
 			var srcPremultiplied = sourceImage.buffer.premultiplied;
 			var destPremultiplied = image.buffer.premultiplied;
 			
-			var srcPosition, destPosition, srcPixel:RGBA, destPixel:RGBA, pixelMask:Int, test:Bool, value:Int;
+			var srcPosition, destPosition, srcPixel:RGBA, destPixel:RGBA, pixelMask:UInt, test:Bool, value:UInt;
 			
 			for (y in 0...destView.height) {
 				
@@ -1228,10 +1228,10 @@ class ImageDataUtil {
 	}
 	
 	
-	private static inline function __pixelCompare (n1:Int, n2:Int):Int {
+	private static function __pixelCompare (n1:UInt, n2:UInt):Int {
 		
-		var tmp1:Int;
-		var tmp2:Int;
+		var tmp1:UInt;
+		var tmp2:UInt;
 		
 		tmp1 = (n1 >> 24) & 0xFF;
 		tmp2 = (n2 >> 24) & 0xFF;
