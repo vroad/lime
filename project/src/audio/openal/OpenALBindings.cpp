@@ -871,7 +871,7 @@ namespace lime {
 	
 	value lime_al_source_unqueue_buffers (int source, int nb) {
 		
-		std::vector<ALuint> buffers;
+		std::vector<ALuint> buffers (nb);
 		alSourceUnqueueBuffers (source, nb, &buffers[0]);
 		
 		value result = alloc_array_type_wrap (nb, valtInt);
