@@ -42,6 +42,7 @@
 	<files id="lime">
 		
 		<compilerflag value="-Iinclude" />
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/boost" />
 		
 		<file name="src/ExternalInterface.cpp" />
 		
@@ -237,6 +238,7 @@
 		
 	</files>
 	
+	<include name="lib/boost/files.xml" />
 	<include name="lib/cairo/files.xml" />
 	<include name="lib/curl/files.xml" />
 	<include name="lib/freetype/files.xml" />
