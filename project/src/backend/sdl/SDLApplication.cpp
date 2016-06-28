@@ -843,7 +843,7 @@ namespace lime {
 	}
 	
 	
-	Application* CreateApplication () {
+	Application* Application::Create () {
 		
 		return new SDLApplication ();
 		

@@ -119,6 +119,7 @@ class NativeRenderer {
 	
 	public function readPixels (rect:Rectangle):Image {
 		
+		#if !macro
 		var data:Dynamic = lime_renderer_read_pixels (handle, rect);
 		
 		if (data != null) {
@@ -130,6 +131,7 @@ class NativeRenderer {
 			
 		}
 		
+		#end
 		return null;
 		
 	}

@@ -13,6 +13,9 @@ namespace lime {
 		
 		public:
 			
+			
+			static Application* Create ();
+			
 			virtual ~Application () {};
 			
 			static AutoGCRoot* callback;
@@ -26,8 +29,8 @@ namespace lime {
 		
 	};
 	
-	
-	Application* CreateApplication ();
+	value Application_to_val (Application *inInstance);
+	Application* val_to_Application (value inHandle);
 	
 	
 }

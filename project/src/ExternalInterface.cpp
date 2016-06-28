@@ -95,59 +95,10 @@ namespace lime {
 	}
 	
 	
-	value lime_application_create (value callback) {
-		
-		Application* application = CreateApplication ();
-		Application::callback = new AutoGCRoot (callback);
-		return CFFIPointer (application, gc_application);
-		
-	}
-	
-	
 	void lime_application_event_manager_register (value callback, value eventObject) {
 		
 		ApplicationEvent::callback = new AutoGCRoot (callback);
 		ApplicationEvent::eventObject = new AutoGCRoot (eventObject);
-		
-	}
-	
-	
-	int lime_application_exec (value application) {
-		
-		Application* app = (Application*)val_data (application);
-		return app->Exec ();
-		
-	}
-	
-	
-	void lime_application_init (value application) {
-		
-		Application* app = (Application*)val_data (application);
-		app->Init ();
-		
-	}
-	
-	
-	int lime_application_quit (value application) {
-		
-		Application* app = (Application*)val_data (application);
-		return app->Quit ();
-		
-	}
-	
-	
-	void lime_application_set_frame_rate (value application, double frameRate) {
-		
-		Application* app = (Application*)val_data (application);
-		app->SetFrameRate (frameRate);
-		
-	}
-	
-	
-	bool lime_application_update (value application) {
-		
-		Application* app = (Application*)val_data (application);
-		return app->Update ();
 		
 	}
 	
@@ -1526,13 +1477,7 @@ namespace lime {
 	}
 	
 	
-	DEFINE_PRIME1 (lime_application_create);
 	DEFINE_PRIME2v (lime_application_event_manager_register);
-	DEFINE_PRIME1 (lime_application_exec);
-	DEFINE_PRIME1v (lime_application_init);
-	DEFINE_PRIME1 (lime_application_quit);
-	DEFINE_PRIME2v (lime_application_set_frame_rate);
-	DEFINE_PRIME1 (lime_application_update);
 	DEFINE_PRIME1 (lime_audio_load);
 	DEFINE_PRIME2 (lime_bytes_from_data_pointer);
 	DEFINE_PRIME1 (lime_bytes_get_data_pointer);

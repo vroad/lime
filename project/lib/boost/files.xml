@@ -1,0 +1,10 @@
+<xml>
+	
+	<files id="native-toolkit-boost" >
+		
+		<file name="${NATIVE_TOOLKIT_PATH}/boost/libs/smart_ptr/src/sp_collector.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/boost/libs/smart_ptr/src/sp_debug_hooks.cpp" />
+		
+	</files>
+	
+</xml>
