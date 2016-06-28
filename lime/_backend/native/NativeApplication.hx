@@ -10,6 +10,7 @@ import lime.graphics.GLRenderContext;
 import lime.graphics.RenderContext;
 import lime.graphics.Renderer;
 import lime.math.Rectangle;
+import lime.system.CFFIPointer;
 import lime.system.Display;
 import lime.system.DisplayMode;
 import lime.system.Sensor;
@@ -22,6 +23,7 @@ import lime.ui.KeyCode;
 import lime.ui.KeyModifier;
 import lime.ui.Touch;
 import lime.ui.Window;
+import lime._backend.native.bindings.ApplicationWrap;
 
 #if !macro
 @:build(lime.system.CFFI.build())
@@ -54,7 +56,8 @@ class NativeApplication {
 	private var unusedTouchesPool = new List<Touch> ();
 	private var windowEventInfo = new WindowEventInfo ();
 	
-	public var handle:Dynamic;
+	public var wrap(default, null):ApplicationWrap;
+	public var handle(get, never):CFFIPointer;
 	
 	private var frameRate:Float;
 	private var parent:Application;
@@ -82,7 +85,7 @@ class NativeApplication {
 	public function create (config:Config):Void {
 		
 		#if !macro
-		handle = lime_application_create ( { } );
+		wrap = new ApplicationWrap ();
 		#end
 		
 	}
@@ -109,15 +112,15 @@ class NativeApplication {
 		
 		#if nodejs
 		
-		lime_application_init (handle);
+		wrap.Init ();
 		
 		var eventLoop = function () {
 			
-			var active = lime_application_update (handle);
+			var active = wrap.Update ();
 			
 			if (!active) {
 				
-				untyped process.exitCode = lime_application_quit (handle);
+				untyped process.exitCode = wrap.Quit ();
 				parent.onExit.dispatch (untyped process.exitCode);
 				
 			} else {
@@ -133,7 +136,7 @@ class NativeApplication {
 		
 		#elseif (cpp || neko)
 		
-		var result = lime_application_exec (handle);
+		var result = wrap.Exec ();
 		parent.onExit.dispatch (result);
 		
 		return result;
@@ -151,7 +154,7 @@ class NativeApplication {
 		AudioManager.shutdown ();
 		
 		#if !macro
-		lime_application_quit (handle);
+		wrap.Quit ();
 		#end
 		
 	}
@@ -575,7 +578,7 @@ class NativeApplication {
 	public function setFrameRate (value:Float):Float {
 		
 		#if !macro
-		lime_application_set_frame_rate (handle, value);
+		wrap.SetFrameRate (value);
 		#end
 		return frameRate = value;
 		
@@ -621,15 +624,15 @@ class NativeApplication {
 		
 	}
 	
+	public function get_handle ():CFFIPointer {
+		
+		return wrap.handle;
+		
+	}
+	
 	
 	#if !macro
-	@:cffi private static function lime_application_create (config:Dynamic):Dynamic;
 	@:cffi private static function lime_application_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_application_exec (handle:Dynamic):Int;
-	@:cffi private static function lime_application_init (handle:Dynamic):Void;
-	@:cffi private static function lime_application_quit (handle:Dynamic):Int;
-	@:cffi private static function lime_application_set_frame_rate (handle:Dynamic, value:Float):Void;
-	@:cffi private static function lime_application_update (handle:Dynamic):Bool;
 	@:cffi private static function lime_drop_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
 	@:cffi private static function lime_gamepad_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;
 	@:cffi private static function lime_joystick_event_manager_register (callback:Dynamic, eventObject:Dynamic):Void;

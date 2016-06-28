@@ -137,6 +137,7 @@ class NativeWindow {
 		
 		if (handle != null) {
 			
+			#if !macro
 			var index = lime_window_get_display (handle);
 			
 			if (index > -1) {
@@ -144,6 +145,7 @@ class NativeWindow {
 				return System.getDisplay (index);
 				
 			}
+			#end
 			
 		}
 		
@@ -228,7 +230,6 @@ class NativeWindow {
 			
 			#if !macro
 			value = lime_window_set_fullscreen (handle, value);
-			#end
 			
 			parent.__width = lime_window_get_width (handle);
 			parent.__height = lime_window_get_height (handle);
@@ -240,6 +241,7 @@ class NativeWindow {
 				parent.onFullscreen.dispatch ();
 				
 			}
+			#end
 			
 		}
 		

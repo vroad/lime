@@ -1,0 +1,6 @@
+-main Bindings
+-neko dummy.n
+-cp ..
+-D native
+-D bindings
+--no-output

@@ -212,6 +212,7 @@
 			
 		</section>
 		
+		<file name="src/app/Application.cpp" />
 		<file name="src/app/ApplicationEvent.cpp" />
 		<file name="src/audio/format/WAV.cpp" />
 		<file name="src/audio/AudioBuffer.cpp" />
@@ -235,6 +236,7 @@
 		<file name="src/ui/TouchEvent.cpp" />
 		<file name="src/ui/WindowEvent.cpp" />
 		<file name="src/utils/Bytes.cpp" />
+		<file name="src/utils/Kinds.cpp" />
 		
 	</files>
 	
@@ -256,6 +258,8 @@
 	<include name="lib/vorbis/files.xml" />
 	<include name="lib/zlib/files.xml" />
 	
+	<include name="bindings/files.xml" />
+	
 	<set name="DEBUGEXTRA" value="-debug" if="fulldebug" />
 	<set name="LIBSUFFIX" value="${HX_TARGET_SUFFIX}" if="HX_TARGET_SUFFIX" />
 	<set name="LIBSUFFIX" value="${LIBEXTRA}" unless="LIBSUFFIX" />
@@ -265,7 +269,9 @@
 		<outdir name="${OUTPUT_DIR}/${BINDIR}" />
 		
 		<files id="lime" />
+		<files id="bindings" />
 		
+		<files id="native-toolkit-boost" />
 		<files id="native-toolkit-cairo" if="LIME_CAIRO" />
 		<files id="native-toolkit-curl" if="LIME_CURL" />
 		<files id="native-toolkit-jpeg" if="LIME_JPEG" />
