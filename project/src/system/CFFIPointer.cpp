@@ -4,11 +4,11 @@
 namespace lime {
 	
 	
-	value CFFIPointer (void* ptr, hx::finalizer finalizer) {
+	value CFFIPointer (void* ptr, hx::finalizer finalizer, vkind kind) {
 		
 		if (ptr) {
 			
-			value handle = cffi::alloc_pointer (ptr);
+			value handle = kind != 0 ? alloc_abstract (kind, ptr) : cffi::alloc_pointer (ptr);
 			
 			if (finalizer) {
 				

@@ -15,7 +15,8 @@ namespace lime {
 		
 		
 		public:
-
+			
+			static Renderer* Create (Window* window);
 			virtual ~Renderer() {};
 			
 			virtual void Flip () = 0;
@@ -30,7 +31,9 @@ namespace lime {
 	};
 	
 	
-	Renderer* CreateRenderer (Window* window);
+	value Renderer_to_val (Renderer *inInstance);
+	
+	Renderer* val_to_Renderer (value inHandle);
 	
 	
 }

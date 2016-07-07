@@ -1,0 +1,16 @@
+<interface>
+
+<include name="Common.xml"/>
+
+<typemap method="in" type="lime::SystemDirectory">$1 = (lime::SystemDirectory)$input;</typemap>
+
+<insert>
+<![CDATA[
+#include <system/System.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

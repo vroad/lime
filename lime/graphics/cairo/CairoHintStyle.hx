@@ -1,6 +1,7 @@
 package lime.graphics.cairo;
 
 
+@:cffiCppType("cairo_hint_style_t")
 @:enum abstract CairoHintStyle(Int) from Int to Int from UInt to UInt {
 	
 	public var DEFAULT = 0;

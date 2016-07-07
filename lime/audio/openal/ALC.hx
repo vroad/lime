@@ -1,6 +1,10 @@
 package lime.audio.openal;
 
-
+import lime._internal.audio.openal.ALCContextWrapperHandle;
+import lime._internal.audio.openal.ALCContextWrapperNullableHandle;
+import lime._internal.audio.openal.ALCDeviceHandle;
+import lime._internal.utils.CString;
+import lime._internal.utils.HxVector_Int;
 import lime.system.CFFIPointer;
 
 #if !macro
@@ -8,6 +12,7 @@ import lime.system.CFFIPointer;
 #end
 
 
+@:cffiInterface("ALC.xml")
 class ALC {
 	
 	
@@ -38,7 +43,7 @@ class ALC {
 	public static function closeDevice (device:ALDevice):Bool {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_alc_close_device (device);
+		return alcCloseDevice_wrap (device);
 		#else
 		return false;
 		#end
@@ -49,7 +54,7 @@ class ALC {
 	public static function createContext (device:ALDevice, attrlist:Array<Int> = null):ALContext {
 		
 		#if (lime_native && lime_openal && !macro)
-		var handle:Dynamic = lime_alc_create_context (device, attrlist);
+		var handle:Dynamic = alcCreateContext_wrap (device, attrlist);
 		
 		if (handle != null) {
 			
@@ -66,7 +71,7 @@ class ALC {
 	public static function destroyContext (context:ALContext):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_alc_destroy_context (context);
+		alcDestroyContext_wrap (context);
 		#end
 		
 	}
@@ -75,7 +80,7 @@ class ALC {
 	public static function getContextsDevice (context:ALContext):ALDevice {
 		
 		#if (lime_native && lime_openal && !macro)
-		var handle:Dynamic = lime_alc_get_contexts_device (context);
+		var handle:CFFIPointer = alcGetContextsDevice_wrap (context);
 		
 		if (handle != null) {
 			
@@ -99,7 +104,7 @@ class ALC {
 	public static function getError (device:ALDevice):Int {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_alc_get_error (device);
+		return alcGetError (device);
 		#else
 		return 0;
 		#end
@@ -126,7 +131,7 @@ class ALC {
 	public static function getIntegerv (device:ALDevice, param:Int, size:Int):Array<Int> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_alc_get_integerv (device, param, size);
+		return alcGetIntegerv_wrap (device, param, size);
 		#else
 		return null;
 		#end
@@ -137,7 +142,7 @@ class ALC {
 	public static function getString (device:ALDevice, param:Int):String {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_alc_get_string (device, param);
+		return alcGetString (device, param);
 		#else
 		return null;
 		#end
@@ -149,7 +154,7 @@ class ALC {
 		
 		#if (lime_native && lime_openal && !macro)
 		currentContext = context;
-		return lime_alc_make_context_current (context);
+		return alcMakeContextCurrent_wrap (context);
 		#else
 		return false;
 		#end
@@ -160,7 +165,7 @@ class ALC {
 	public static function openDevice (deviceName:String = null):ALDevice {
 		
 		#if (lime_native && lime_openal && !macro)
-		var handle:Dynamic = lime_alc_open_device (deviceName);
+		var handle = alcOpenDevice (deviceName);
 		
 		if (handle != null) {
 			
@@ -177,7 +182,7 @@ class ALC {
 	public static function processContext (context:ALContext):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_alc_process_context (context);
+		alcProcessContext_wrap (context);
 		#end
 		
 	}
@@ -186,7 +191,7 @@ class ALC {
 	public static function suspendContext (context:ALContext):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_alc_suspend_context (context);
+		alcSuspendContext_wrap (context);
 		#end
 		
 	}
@@ -195,7 +200,7 @@ class ALC {
 	public static function pauseDevice (device:ALDevice):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_alc_device_pause_soft (device);
+		alcDevicePauseSOFT (device);
 		#end
 		
 	}
@@ -203,26 +208,26 @@ class ALC {
 	public static function resumeDevice (device:ALDevice):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_alc_device_resume_soft (device);
+		alcDeviceResumeSOFT (device);
 		#end
  		
 	}
 	
 	
 	#if (lime_native && lime_openal && !macro)
-	@:cffi private static function lime_alc_close_device (device:CFFIPointer):Bool;
-	@:cffi private static function lime_alc_create_context (device:CFFIPointer, attrlist:Dynamic):CFFIPointer;
-	@:cffi private static function lime_alc_destroy_context (context:CFFIPointer):Void;
-	@:cffi private static function lime_alc_get_contexts_device (context:CFFIPointer):CFFIPointer;
-	@:cffi private static function lime_alc_get_error (device:CFFIPointer):Int;
-	@:cffi private static function lime_alc_get_integerv (device:CFFIPointer, param:Int, size:Int):Dynamic;
-	@:cffi private static function lime_alc_get_string (device:CFFIPointer, param:Int):Dynamic;
-	@:cffi private static function lime_alc_make_context_current (context:CFFIPointer):Bool;
-	@:cffi private static function lime_alc_open_device (devicename:String):CFFIPointer;
-	@:cffi private static function lime_alc_process_context (context:CFFIPointer):Void;
-	@:cffi private static function lime_alc_suspend_context (context:CFFIPointer):Void;
-	@:cffi private static function lime_alc_device_pause_soft (device:CFFIPointer):Void;
-	@:cffi private static function lime_alc_device_resume_soft (device:CFFIPointer):Void;
+	@:cffi private static function alcCloseDevice_wrap (device:CFFIPointer):Bool;
+	@:cffi private static function alcCreateContext_wrap (device:CFFIPointer, attrlist:HxVector_Int):ALCContextWrapperHandle;
+	@:cffi private static function alcDestroyContext_wrap (context:CFFIPointer):Void;
+	@:cffi private static function alcGetContextsDevice_wrap (context:ALCContextWrapperHandle):CFFIPointer;
+	@:cffi private static function alcGetError (device:ALCDeviceHandle):Int;
+	@:cffi private static function alcGetIntegerv_wrap (device:ALCDeviceHandle, param:Int, size:Int):Dynamic;
+	@:cffi private static function alcGetString (device:ALCDeviceHandle, param:Int):String;
+	@:cffi private static function alcMakeContextCurrent_wrap (context:ALCContextWrapperNullableHandle):Bool;
+	@:cffi private static function alcOpenDevice (devicename:CString):ALCDeviceHandle;
+	@:cffi private static function alcProcessContext_wrap (context:ALCContextWrapperHandle):Void;
+	@:cffi private static function alcSuspendContext_wrap (context:ALCContextWrapperHandle):Void;
+	@:cffi private static function alcDevicePauseSOFT (device:ALCDeviceHandle):Void;
+	@:cffi private static function alcDeviceResumeSOFT (device:ALCDeviceHandle):Void;
 	#end
 	
 	

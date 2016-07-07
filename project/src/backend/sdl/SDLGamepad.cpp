@@ -57,9 +57,16 @@ namespace lime {
 	}
 	
 	
-	void Gamepad::AddMapping (const char* content) {
+	void Gamepad::AddMappings (value mappings) {
 		
-		SDL_GameControllerAddMapping (content);
+		int length = val_array_size (mappings);
+		
+		for (int i = 0; i < length; i++) {
+			
+			const char* content = val_string (val_array_i (mappings, i));
+			SDL_GameControllerAddMapping (content);
+			
+		}
 		
 	}
 	

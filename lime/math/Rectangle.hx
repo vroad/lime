@@ -6,6 +6,7 @@ import flash.geom.Rectangle in FlashRectangle;
 #end
 
 
+@:cffiCppType("lime::Rectangle*")
 class Rectangle {
 	
 	

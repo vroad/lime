@@ -1,6 +1,6 @@
 package lime.graphics.cairo;
 
-
+@:cffiCppType("cairo_subpixel_order_t")
 @:enum abstract CairoSubpixelOrder(Int) from Int to Int from UInt to UInt {
 	
 	public var DEFAULT = 0;

@@ -2,6 +2,9 @@
 #define LIME_UI_JOYSTICK_H
 
 
+#include <hx/CFFI.h>
+
+
 namespace lime {
 	
 	
@@ -9,7 +12,7 @@ namespace lime {
 		
 		public:
 			
-			static const char* GetDeviceGUID (int id);
+			static value GetDeviceGUID (int id);
 			static const char* GetDeviceName (int id);
 			static int GetNumAxes (int id);
 			static int GetNumButtons (int id);

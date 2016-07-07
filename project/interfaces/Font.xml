@@ -1,0 +1,15 @@
+<interface>
+
+<include name="Common.xml"/>
+
+<insert>
+<![CDATA[
+#include <text/Font.h>
+#include <utils/StdString.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

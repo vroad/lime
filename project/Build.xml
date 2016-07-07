@@ -168,6 +168,9 @@
 			<compilerflag value="-DLIME_OPENGL" />
 			<compilerflag value="-I${DEVELOPER_DIR}/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS${TVOS_VER}.sdk/" if="tvos" />
 			
+			<file name="src/graphics/opengl/GLContext.cpp" />
+			<file name="src/graphics/opengl/GLContextHandle.cpp" />
+			<file name="src/graphics/opengl/GLObject.cpp" />
 			<file name="src/graphics/opengl/OpenGLBindings.cpp" />
 			
 		</section>
@@ -211,6 +214,7 @@
 			<compilerflag value="-DAPPLETV" if="tvos" />
 			
 			<file name="src/backend/sdl/SDLApplication.cpp" />
+			<file name="src/backend/sdl/SDLGLContextHandle.cpp" />
 			<file name="src/backend/sdl/SDLWindow.cpp" />
 			<file name="src/backend/sdl/SDLRenderer.cpp" />
 			<file name="src/backend/sdl/SDLGamepad.cpp" />
@@ -255,12 +259,14 @@
 
 		</section>
 		
+		<file name="src/app/Application.cpp" />
 		<file name="src/app/ApplicationEvent.cpp" />
 		<file name="src/audio/format/WAV.cpp" />
 		<file name="src/audio/AudioBuffer.cpp" />
 		<file name="src/graphics/utils/ImageDataUtil.cpp" />
 		<file name="src/graphics/Image.cpp" />
 		<file name="src/graphics/ImageBuffer.cpp" />
+		<file name="src/graphics/Renderer.cpp" />
 		<file name="src/graphics/RenderEvent.cpp" />
 		<file name="src/math/ColorMatrix.cpp" />
 		<file name="src/math/Matrix3.cpp" />
@@ -276,9 +282,12 @@
 		<file name="src/ui/MouseEvent.cpp" />
 		<file name="src/ui/TextEvent.cpp" />
 		<file name="src/ui/TouchEvent.cpp" />
+		<file name="src/ui/Window.cpp" />
 		<file name="src/ui/WindowEvent.cpp" />
+		<file name="src/utils/ArrayBufferView.cpp" />
 		<file name="src/utils/EventManager.cpp" />
 		<file name="src/utils/Bytes.cpp" />
+		<file name="src/utils/Kinds.cpp" />
 		<file name="src/utils/StringId.cpp" />
 		
 	</files>
@@ -300,6 +309,8 @@
 	<include name="lib/vorbis/files.xml" />
 	<include name="lib/zlib/files.xml" />
 	
+	<include name="bindings/files.xml" />
+	
 	<set name="DEBUGEXTRA" value="-debug" if="fulldebug" />
 	<set name="LIBSUFFIX" value="${HX_TARGET_SUFFIX}" if="HX_TARGET_SUFFIX" />
 	<set name="LIBSUFFIX" value="${LIBEXTRA}" unless="LIBSUFFIX" />
@@ -309,6 +320,7 @@
 		<outdir name="${OUTPUT_DIR}/${BINDIR}" />
 		
 		<files id="lime" />
+		<files id="bindings" />
 		
 		<files id="native-toolkit-cairo" if="LIME_CAIRO" />
 		<files id="native-toolkit-curl" if="LIME_CURL" />

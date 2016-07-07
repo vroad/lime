@@ -1,0 +1,16 @@
+<interface>
+
+<include name="Common.xml"/>
+
+<typemap method="in" type="lime::MouseCursor">$1 = (lime::MouseCursor)$input;</typemap>
+
+<insert>
+<![CDATA[
+#include <ui/Mouse.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

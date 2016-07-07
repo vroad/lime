@@ -1,6 +1,7 @@
 package lime._backend.native;
 
 
+import lime._backend.native.WindowHandle;
 import lime.ui.MouseCursor;
 import lime.ui.Window;
 
@@ -9,8 +10,8 @@ import lime.ui.Window;
 #end
 
 @:access(lime.ui.Window)
-
-
+@:cffiInterface("Mouse.xml")
+@:cffiCppType("lime::Mouse")
 class NativeMouse {
 	
 	
@@ -26,7 +27,7 @@ class NativeMouse {
 			__hidden = true;
 			
 			#if !macro
-			lime_mouse_hide ();
+			Hide ();
 			#end
 			
 		}
@@ -41,7 +42,7 @@ class NativeMouse {
 			__hidden = false;
 			
 			#if !macro
-			lime_mouse_show ();
+			Show ();
 			#end
 			
 		}
@@ -52,7 +53,7 @@ class NativeMouse {
 	public static function warp (x:Int, y:Int, window:Window):Void {
 		
 		#if !macro
-		lime_mouse_warp (x, y, window == null ? 0 : window.backend.handle);
+		Warp (x, y, window == null ? null : window.backend.handle);
 		#end
 		
 	}
@@ -97,7 +98,7 @@ class NativeMouse {
 				}
 				
 				#if !macro
-				lime_mouse_set_cursor (type);
+				SetCursor (type);
 				#end
 				
 			}
@@ -123,7 +124,7 @@ class NativeMouse {
 		if (__lock != value) {
 			
 			#if !macro
-			lime_mouse_set_lock (value);
+			SetLock (value);
 			#end
 			
 			__hidden = value;
@@ -144,18 +145,19 @@ class NativeMouse {
 	
 	
 	#if !macro
-	@:cffi private static function lime_mouse_hide ():Void;
-	@:cffi private static function lime_mouse_set_cursor (cursor:Int):Void;
-	@:cffi private static function lime_mouse_set_lock (lock:Bool):Void;
-	@:cffi private static function lime_mouse_show ():Void;
-	@:cffi private static function lime_mouse_warp (x:Int, y:Int, window:Dynamic):Void;
+	@:cffi private static function Hide ():Void;
+	@:cffi private static function SetCursor (cursor:MouseCursorType):Void;
+	@:cffi private static function SetLock (lock:Bool):Void;
+	@:cffi private static function Show ():Void;
+	@:cffi private static function Warp (x:Int, y:Int, window:WindowHandle):Void;
 	#end
 	
 	
 }
 
 
-@:enum private abstract MouseCursorType(Int) from Int to Int {
+@:cffiCppType("lime::MouseCursor")
+@:enum abstract MouseCursorType(Int) from Int to Int {
 	
 	var ARROW = 0;
 	var CROSSHAIR = 1;

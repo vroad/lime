@@ -1,7 +1,7 @@
 package lime.graphics.opengl; #if (!js || !html5 || display)
 
 
-typedef GLUniformLocation = Int;
+typedef GLUniformLocation = lime._backend.native.opengl.UniformLocation;
 
 
 #else

@@ -1,6 +1,7 @@
 package lime.graphics.cairo;
 
 
+@:cffiCppType("cairo_format_t")
 @:enum abstract CairoFormat(Int) from Int to Int from UInt to UInt {
 	
 	public var INVALID = -1;

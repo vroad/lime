@@ -10,7 +10,7 @@
 #define CALLING_CONVENTION APIENTRY
 #endif
 
-#include "OpenGLBindings.h"
+#include <graphics/opengl/OpenGLBindings.h>
 
 #ifdef LIME_SDL
 #include <SDL.h>

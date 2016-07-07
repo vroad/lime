@@ -1,6 +1,7 @@
 package lime.graphics.cairo;
 
 
+@:cffiCppType("cairo_extend_t")
 @:enum abstract CairoExtend(Int) from Int to Int from UInt to UInt {
 	
 	public var NONE = 0;

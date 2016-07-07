@@ -2,19 +2,33 @@ package lime.graphics.cairo;
 
 
 import lime.system.CFFIPointer;
+import lime._internal.graphics.cairo.CairoSurfaceHandle;
+
 
 #if !macro
 @:build(lime.system.CFFI.build())
 #end
 
-
-abstract CairoSurface(CFFIPointer) from CFFIPointer to CFFIPointer {
+@:cffiInterface("CairoSurface.xml")
+class CairoSurface {
+	
+	
+	private var handle:CairoSurfaceHandle;
+	
+	
+	private function new (handle:CairoSurfaceHandle) {
+		
+		#if (lime_cairo && !macro)
+		this.handle = handle;
+		#end
+		
+	}
 	
 	
 	public function flush ():Void {
 		
 		#if (lime_cairo && !macro)
-		lime_cairo_surface_flush (this);
+		cairo_surface_flush (handle);
 		#end
 		
 	}
@@ -28,7 +42,7 @@ abstract CairoSurface(CFFIPointer) from CFFIPointer to CFFIPointer {
 	
 	
 	#if (lime_cairo && !macro)
-	@:cffi private static function lime_cairo_surface_flush (surface:CFFIPointer):Void;
+	@:cffi private static function cairo_surface_flush (surface:CairoSurfaceHandle):Void;
 	#end
 	
 	

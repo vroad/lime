@@ -4,6 +4,7 @@
 #include <system/JNI.h>
 #include <system/System.h>
 #include <utils/StringId.h>
+#include <memory>
 
 #ifdef HX_MACOS
 #include <CoreFoundation/CoreFoundation.h>
@@ -37,23 +38,6 @@
 
 namespace lime {
 	
-	
-	char* CreateCStringFromStdString (const std::string &str) {
-		
-		char *cstr = new char[str.size () + 1];
-		strcpy (cstr, str.c_str ());
-		return cstr;
-		
-	}
-	
-	char* CreateCStringFromConstCString (const char *str) {
-		
-		size_t len = strlen (str);
-		char *cstr = new char[len + 1];
-		strcpy (cstr, str);
-		return cstr;
-		
-	}
 	
 	const char* Clipboard::GetText () {
 		
@@ -94,42 +78,39 @@ namespace lime {
 	}
 	
 	
-	const char* System::GetDirectory (SystemDirectory type, const char* company, const char* title) {
+	value System::GetDirectory (SystemDirectory type, const char* company, const char* title) {
 		
 		switch (type) {
 			
 			case APPLICATION:
 				
-				return SDL_GetBasePath ();
-				break;
-			
+				return alloc_string (SDL_GetBasePath ());
+				
 			case APPLICATION_STORAGE:
 				
-				return SDL_GetPrefPath (company, title);
-				break;
-			
+				return alloc_string (SDL_GetPrefPath (company, title));
+				
 			case DESKTOP: {
 				
 				#if defined (HX_WINRT)
 				
 				Windows::Storage::StorageFolder folder = Windows::Storage::KnownFolders::HomeGroup;
-				const char *utf8Str = WIN_StringToUTF8 (folder->Begin ());
-				return utf8Str;
+				std::unique_ptr<char> utf8Str (WIN_StringToUTF8 (folder->Begin ()));
+				return alloc_string (utf8Str.get ());
 				
 				#elif defined (HX_WINDOWS)
 				
 				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, result);
-				const char *utf8Str = WIN_StringToUTF8 (result);
-				return utf8Str;
+				std::unique_ptr<char> utf8Str (WIN_StringToUTF8 (result));
+				return alloc_string (utf8Str.get ());
 				
 				#else
 				
 				std::string result = std::string (getenv ("HOME")) + std::string ("/Desktop");
-				return CreateCStringFromStdString (result);
+				return alloc_string_len (result.c_str (), result.size ());
 				
 				#endif
-				break;
 				
 			}
 			
@@ -138,23 +119,22 @@ namespace lime {
 				#if defined (HX_WINRT)
 				
 				Windows::Storage::StorageFolder folder = Windows::Storage::KnownFolders::DocumentsLibrary;
-				const char *utf8Str = WIN_StringToUTF8 (folder->Begin ());
-				return utf8Str;
+				std::unique_ptr<char> utf8Str (WIN_StringToUTF8 (folder->Begin ()));
+				return alloc_string (utf8Str.get ());
 				
 				#elif defined (HX_WINDOWS)
 				
 				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, result);
-				const char *utf8Str = WIN_StringToUTF8 (result);
-				return utf8Str;
+				std::unique_ptr<char> utf8Str (WIN_StringToUTF8 (result));
+				return alloc_string (utf8Str.get ());
 				
 				#else
 				
 				std::string result = std::string (getenv ("HOME")) + std::string ("/Documents");
-				return CreateCStringFromStdString (result);
+				return alloc_string_len (result.c_str (), result.size ());
 				
 				#endif
-				break;
 				
 			}
 			
@@ -168,30 +148,30 @@ namespace lime {
 				
 				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, result);
-				return WIN_StringToUTF8 (result);
+				std::unique_ptr<char> utf8Str (WIN_StringToUTF8 (result));
+				return alloc_string (utf8Str.get ());
 				
 				#elif defined (HX_MACOS)
 				
-				return CreateCStringFromConstCString ("/Library/Fonts");
+				return alloc_string ("/Library/Fonts");
 				
 				#elif defined (IPHONEOS)
 				
-				return CreateCStringFromConstCString ("/System/Library/Fonts");
+				return alloc_string ("/System/Library/Fonts");
 				
 				#elif defined (ANDROID)
 				
-				return CreateCStringFromConstCString ("/system/fonts");
+				return alloc_string ("/system/fonts");
 				
 				#elif defined (BLACKBERRY)
 				
-				return CreateCStringFromConstCString ("/usr/fonts/font_repository/monotype");
+				return alloc_string ("/usr/fonts/font_repository/monotype");
 				
 				#else
 				
-				return CreateCStringFromConstCString ("/usr/share/fonts/truetype");
+				return alloc_string ("/usr/share/fonts/truetype");
 				
 				#endif
-				break;
 				
 			}
 			
@@ -200,23 +180,22 @@ namespace lime {
 				#if defined (HX_WINRT)
 				
 				Windows::Storage::StorageFolder folder = Windows::Storage::ApplicationData::Current->RoamingFolder;
-				const char *utf8Str = WIN_StringToUTF8 (folder->Begin ());
-				return utf8Str;
+				std::unique_ptr<char> utf8Str (WIN_StringToUTF8 (folder->Begin ()));
+				return alloc_string (utf8Str.get ());
 				
 				#elif defined (HX_WINDOWS)
 				
 				wchar_t result[MAX_PATH] = L"";
 				SHGetFolderPath (NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, result);
-				const char *utf8Str = WIN_StringToUTF8 (result);
-				return utf8Str;
+				std::unique_ptr<char> utf8Str (WIN_StringToUTF8 (result));
+				return alloc_string (utf8Str.get ());
 				
 				#else
 				
 				std::string result = getenv ("HOME");
-				return CreateCStringFromStdString (result);
+				return alloc_string_len (result.c_str (), result.size ());
 				
 				#endif
-				break;
 				
 			}
 			
@@ -320,7 +299,7 @@ namespace lime {
 	}
 	
 	
-	bool System::SetAllowScreenTimeout (bool allow) {
+	void System::SetAllowScreenTimeout (bool allow) {
 		
 		if (allow) {
 			
@@ -331,8 +310,6 @@ namespace lime {
 			SDL_DisableScreenSaver ();
 			
 		}
-		
-		return allow;
 		
 	}
 	

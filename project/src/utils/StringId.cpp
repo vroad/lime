@@ -17,6 +17,14 @@ namespace lime
 		type = val_id ("type");
 		
 		//
+		// ArrayBufferView
+		//
+		
+		buffer = val_id ("buffer");
+		byteOffset = val_id ("byteOffset");
+		byteLength = val_id ("byteLength");
+		
+		//
 		// AudioBuffer
 		//
 		
@@ -39,7 +47,7 @@ namespace lime
 		// ColorMatrix
 		//
 		
-		buffer = val_id ("buffer");
+		//buffer = val_id ("buffer");
 		
 		//
 		// DropEvent

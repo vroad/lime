@@ -24,15 +24,18 @@ namespace lime {
 		
 		public:
 			
-			TextLayout (int direction, const char *script, const char *language);
 			~TextLayout ();
+			static TextLayout* Create (int direction, const char *script, const char *language);
 			
-			void Position (Font *font, size_t size, const char *text, Bytes *bytes);
+			value Position (Font *font, size_t size, const char *text, Bytes *bytes);
 			void SetDirection (int direction);
 			void SetLanguage (const char* language);
 			void SetScript (const char* script);
 			
 		private:
+			
+			TextLayout ();
+			bool Init (int direction, const char *script, const char *language);
 			
 			Font *mFont;
 			void *mHBFont;
@@ -42,6 +45,12 @@ namespace lime {
 			void *mLanguage;
 			
 	};
+	
+	
+	value TextLayout_to_val (TextLayout* inInstance);
+	
+	
+	TextLayout* val_to_TextLayout (value inHandle) ;
 	
 	
 }

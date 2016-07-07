@@ -2,6 +2,7 @@ package lime._backend.native;
 
 
 import haxe.io.Bytes;
+import lime._backend.native.opengl.RenderingContext;
 import lime.graphics.cairo.Cairo;
 import lime.graphics.cairo.CairoFormat;
 import lime.graphics.cairo.CairoImageSurface;
@@ -12,7 +13,7 @@ import lime.graphics.GLRenderContext;
 import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
 import lime.graphics.Renderer;
-import lime.graphics.opengl.GLContext;
+import lime.graphics.opengl.GL;
 import lime.math.Rectangle;
 import lime.utils.BytesUtil;
 import lime.utils.UInt8Array;
@@ -23,15 +24,18 @@ import lime.utils.UInt8Array;
 
 @:access(lime.graphics.cairo.Cairo)
 @:access(lime.ui.Window)
+@:access(lime.graphics.opengl.GL)
 
 
+@:cffiInterface("Renderer.xml")
+@:cffiCppType("lime::Renderer")
 class NativeRenderer {
 	
 	
-	public var handle:Dynamic;
+	@:cffiHandle public var handle (default, null):Dynamic;
 	
 	private var parent:Renderer;
-	private var glContext:GLContext;
+	private var glContext:RenderingContext;
 	
 	#if lime_cairo
 	private var cacheLock:Dynamic;
@@ -51,7 +55,7 @@ class NativeRenderer {
 		
 		#if !macro
 		
-		glContext = GLContext.create (parent.window);
+		glContext = RenderingContext.create (parent.window.backend.handle);
 		
 		if (glContext != null) {
 			
@@ -60,7 +64,7 @@ class NativeRenderer {
 			
 		} else {
 			
-			handle = lime_renderer_create (parent.window.backend.handle);
+			handle = Create (parent.window.backend.handle);
 			
 			if (handle == null) {
 				
@@ -68,7 +72,7 @@ class NativeRenderer {
 				
 			}
 			
-			parent.window.__scale = lime_renderer_get_scale (handle);
+			parent.window.__scale = GetScale ();
 			
 		}
 		
@@ -81,13 +85,10 @@ class NativeRenderer {
 		
 		if (glContext != null) {
 			
-			#if !disable_gl_renderer
-			parent.context = OPENGL (new GLRenderContext ());
+			parent.context = OPENGL (glContext);
 			parent.type = OPENGL;
-			#else
-			parent.context = CUSTOM (null);
-			parent.type = null;
-			#end
+			
+			GL.context = glContext;
 			
 		} else {
 			
@@ -118,7 +119,7 @@ class NativeRenderer {
 		
 		if (glContext != null) {
 			
-			lime_gl_swap_window (parent.window.backend.handle);
+			parent.window.backend.swapWindow ();
 			
 		} else {
 			
@@ -130,8 +131,8 @@ class NativeRenderer {
 			}
 			#end
 			
-			lime_renderer_unlock (handle);
-			lime_renderer_flip (handle);
+			Unlock ();
+			Flip ();
 			
 		}
 		
@@ -142,18 +143,13 @@ class NativeRenderer {
 	
 	public function readPixels (rect:Rectangle):Image {
 		
-		var data:Dynamic = lime_renderer_read_pixels (handle, rect);
-		
-		if (data != null) {
-			
-			var buffer = new ImageBuffer (BytesUtil.getUInt8ArrayFromAnonBytes (data.data), data.width, data.height, data.bitsPerPixel);
-			buffer.format = RGBA32;
-			
-			return new Image (buffer);
-			
-		}
-		
+		#if !macro
+		var buffer:ImageBuffer = new ImageBuffer (null, Std.int (rect.width), Std.int (rect.height));
+		ReadPixels (buffer, rect);
+		return new Image (buffer);
+		#else
 		return null;
+		#end
 		
 	}
 	
@@ -164,7 +160,7 @@ class NativeRenderer {
 		if (glContext == null) {
 			
 			#if lime_cairo
-			var lock:Dynamic = lime_renderer_lock (handle);
+			var lock:Dynamic = Lock ();
 			
 			if (cacheLock == null || cacheLock.pixels != lock.pixels || cacheLock.width != lock.width || cacheLock.height != lock.height) {
 				
@@ -201,14 +197,12 @@ class NativeRenderer {
 	
 	
 	#if !macro
-	@:cffi private static function lime_renderer_create (window:Dynamic):Dynamic;
-	@:cffi private static function lime_renderer_flip (handle:Dynamic):Void;
-	@:cffi private static function lime_renderer_get_scale (handle:Dynamic):Float;
-	@:cffi private static function lime_renderer_lock (handle:Dynamic):Dynamic;
-	@:cffi private static function lime_renderer_read_pixels (handle:Dynamic, rect:Dynamic):Dynamic;
-	@:cffi private static function lime_renderer_unlock (handle:Dynamic):Void;
-	
-	@:cffi private static function lime_gl_swap_window (window:Dynamic):Void;
+	@:cffi private static function Create (window:WindowHandle):RendererHandle;
+	@:cffi private function Flip ():Void;
+	@:cffi private function GetScale ():Float;
+	@:cffi private function Lock ():Dynamic;
+	@:cffi private function ReadPixels (buffer:ImageBuffer, rect:Rectangle):Void;
+	@:cffi private function Unlock ():Void;
 	#end
 	
 	

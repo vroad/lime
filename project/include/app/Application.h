@@ -15,23 +15,21 @@ namespace lime {
 		
 		public:
 			
-			Application () {
-				
-				appEventManager.reset (new EventManager ());
-				dropEventManager.reset (new EventManager ());
-				gamepadEventManager.reset (new EventManager ());
-				joystickEventManager.reset (new EventManager ());
-				keyEventManager.reset (new EventManager ());
-				mouseEventManager.reset (new EventManager ());
-				renderEventManager.reset (new EventManager ());
-				sensorEventManager.reset (new EventManager ());
-				textEventManager.reset (new EventManager ());
-				touchEventManager.reset (new EventManager ());
-				windowEventManager.reset (new EventManager ());
-				
-			}
-			
+			Application ();
 			virtual ~Application () {};
+			
+			static Application* Create ();
+			void RegisterAppEvent (value callback, value eventObject);
+			void RegisterDropEvent (value callback, value eventObject);
+			void RegisterGamepadEvent (value callback, value eventObject);
+			void RegisterJoystickEvent (value callback, value eventObject);
+			void RegisterKeyEvent (value callback, value eventObject);
+			void RegisterMouseEvent (value callback, value eventObject);
+			void RegisterRenderEvent (value callback, value eventObject);
+			void RegisterSensorEvent (value callback, value eventObject);
+			void RegisterTextEvent (value callback, value eventObject);
+			void RegisterTouchEvent (value callback, value eventObject);
+			void RegisterWindowEvent (value callback, value eventObject);
 			
 			virtual int Exec () = 0;
 			virtual void Init () = 0;
@@ -53,9 +51,8 @@ namespace lime {
 			
 	};
 	
-	
-	Application* CreateApplication ();
-	
+	value Application_to_val (Application *inInstance);
+	Application* val_to_Application (value inHandle);
 	
 }
 

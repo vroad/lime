@@ -7,7 +7,6 @@ import js.html.CanvasElement;
 import js.Browser;
 import lime.app.Application;
 import lime.graphics.Image;
-import lime.graphics.opengl.GL;
 import lime.graphics.GLRenderContext;
 import lime.graphics.Renderer;
 import lime.math.Rectangle;

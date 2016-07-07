@@ -380,13 +380,6 @@ class ALAudioContext {
 	}
 	
 	
-	public function getProcAddress (fname:String):Dynamic {
-		
-		return AL.getProcAddress (fname);
-		
-	}
-	
-	
 	public function getSource3f (source:Int, param:Int):Array<Float> {
 		
 		return AL.getSource3f (source, param);

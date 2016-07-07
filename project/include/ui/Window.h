@@ -13,13 +13,21 @@
 
 namespace lime {
 	
+	class Window;
+	Window* CreateWindow (Application* application, int width, int height, int flags, const char* title);
 	
 	class Window {
 		
 		
 		public:
-
-			virtual ~Window() {};
+			
+			static Window* Create (Application* application, int width, int height, int flags, const char* title) {
+				
+				return CreateWindow (application, width, height, flags, title);
+				
+			}
+			
+			virtual ~Window () {};
 			
 			virtual void Alert (const char* message, const char* title) = 0;
 			virtual void Close () = 0;
@@ -33,23 +41,21 @@ namespace lime {
 			virtual int GetY () = 0;
 			virtual void Move (int x, int y) = 0;
 			virtual void Resize (int width, int height) = 0;
-			virtual bool SetBorderless (bool borderless) = 0;
+			virtual void SetBorderless (bool borderless) = 0;
 			virtual void SetEnableTextEvents (bool enable) = 0;
-			virtual bool SetFullscreen (bool fullscreen) = 0;
+			virtual void SetFullscreen (bool fullscreen) = 0;
 			virtual void SetIcon (ImageBuffer *imageBuffer) = 0;
-			virtual bool SetMaximized (bool minimized) = 0;
-			virtual bool SetMinimized (bool minimized) = 0;
-			virtual bool SetResizable (bool resizable) = 0;
-			virtual const char* SetTitle (const char* title) = 0;
+			virtual void SetMaximized (bool minimized) = 0;
+			virtual void SetMinimized (bool minimized) = 0;
+			virtual void SetResizable (bool resizable) = 0;
+			virtual void SetTitle (const char* title) = 0;
+			virtual void SwapWindow () = 0;
 			
 			Application* currentApplication;
 			int flags;
 		
 		
 	};
-	
-	
-	Window* CreateWindow (Application* application, int width, int height, int flags, const char* title);
 	
 	
 	enum WindowFlags {
@@ -68,6 +74,10 @@ namespace lime {
 		WINDOW_FLAG_ALLOW_HIGHDPI = 0x00000800
 		
 	};
+	
+	value Window_to_val (Window *inInstance);
+	
+	Window* val_to_Window (value inHandle);
 	
 }
 

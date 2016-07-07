@@ -1,28 +1,29 @@
 package lime.utils;
 
 
+import lime.graphics.GLRenderContext;
+import lime.graphics.opengl.GLES20;
 import lime.graphics.opengl.GLProgram;
 import lime.graphics.opengl.GLShader;
-import lime.graphics.opengl.GL;
 
 
 class GLUtils {
 	
 	
-	public static function compileShader (source:String, type:Int):GLShader {
+	public static function compileShader (gl:GLRenderContext, source:String, type:Int):GLShader {
 		
-		var shader = GL.createShader (type);
-		GL.shaderSource (shader, source);
-		GL.compileShader (shader);
+		var shader = gl.createShader (type);
+		gl.shaderSource (shader, source);
+		gl.compileShader (shader);
 		
-		if (GL.getShaderParameter (shader, GL.COMPILE_STATUS) == 0) {
+		if (gl.getShaderParameter (shader, GLES20.COMPILE_STATUS) == 0) {
 			
-			var log = GL.getShaderInfoLog (shader);
+			var log = gl.getShaderInfoLog (shader);
 			
 			switch (type) {
 				
-				case GL.VERTEX_SHADER: throw "Error compiling vertex shader\n" + log;
-				case GL.FRAGMENT_SHADER: throw "Error compiling fragment shader\n" + log;
+				case GLES20.VERTEX_SHADER: throw "Error compiling vertex shader\n" + log;
+				case GLES20.FRAGMENT_SHADER: throw "Error compiling fragment shader\n" + log;
 				default: throw "Error compiling unknown shader type\n" + log;
 				
 			}
@@ -34,17 +35,17 @@ class GLUtils {
 	}
 	
 	
-	public static function createProgram (vertexSource:String, fragmentSource:String):GLProgram {
+	public static function createProgram (gl:GLRenderContext, vertexSource:String, fragmentSource:String):GLProgram {
 		
-		var vertexShader = compileShader (vertexSource, GL.VERTEX_SHADER);
-		var fragmentShader = compileShader (fragmentSource, GL.FRAGMENT_SHADER);
+		var vertexShader = compileShader (gl, vertexSource, GLES20.VERTEX_SHADER);
+		var fragmentShader = compileShader (gl, fragmentSource, GLES20.FRAGMENT_SHADER);
 		
-		var program = GL.createProgram ();
-		GL.attachShader (program, vertexShader);
-		GL.attachShader (program, fragmentShader);
-		GL.linkProgram (program);
+		var program = gl.createProgram ();
+		gl.attachShader (program, vertexShader);
+		gl.attachShader (program, fragmentShader);
+		gl.linkProgram (program);
 		
-		if (GL.getProgramParameter (program, GL.LINK_STATUS) == 0) {
+		if (gl.getProgramParameter (program, GLES20.LINK_STATUS) == 0) {
 			
 			throw "Unable to initialize the shader program.";
 			

@@ -1,0 +1,48 @@
+<interface>
+
+<include name="Common.xml"/>
+
+<typemap method="in" type="lime::GLContext*">$1 = val_to_GLContext($input);</typemap>
+
+<typemap method="out" type="lime::GLContext*">$result = GLContext_to_val($input);</typemap>
+
+<typemap method="in" type="lime::GLBuffer*">$1 = val_to_GLBuffer($input);</typemap>
+
+<typemap method="out" type="lime::GLBuffer*">$result = GLBuffer_to_val($input);</typemap>
+
+<typemap method="in" type="lime::GLContextHandle*">$1 = val_to_GLContextHandle($input);</typemap>
+
+<typemap method="out" type="lime::GLContextHandle*">$result = GLContextHandle_to_val($input);</typemap>
+
+<typemap method="in" type="lime::GLFramebuffer*">$1 = val_to_GLFramebuffer($input);</typemap>
+
+<typemap method="out" type="lime::GLFramebuffer*">$result = GLFramebuffer_to_val($input);</typemap>
+
+<typemap method="in" type="lime::GLProgram*">$1 = val_to_GLProgram($input);</typemap>
+
+<typemap method="out" type="lime::GLProgram*">$result = GLProgram_to_val($input);</typemap>
+
+<typemap method="in" type="lime::GLRenderbuffer*">$1 = val_to_GLRenderbuffer($input);</typemap>
+
+<typemap method="out" type="lime::GLRenderbuffer*">$result = GLRenderbuffer_to_val($input);</typemap>
+
+<typemap method="in" type="lime::GLShader*">$1 = val_to_GLShader($input);</typemap>
+
+<typemap method="out" type="lime::GLShader*">$result = GLShader_to_val($input);</typemap>
+
+<typemap method="in" type="lime::GLTexture*">$1 = val_to_GLTexture($input);</typemap>
+
+<typemap method="out" type="lime::GLTexture*">$result = GLTexture_to_val($input);</typemap>
+
+<insert>
+<![CDATA[
+#include <graphics/opengl/GLContext.h>
+#include <graphics/opengl/GLObject.h>
+#include <utils/ArrayBufferView.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

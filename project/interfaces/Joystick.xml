@@ -1,0 +1,14 @@
+<interface>
+
+<include name="Common.xml"/>
+
+<insert>
+<![CDATA[
+#include <ui/Joystick.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

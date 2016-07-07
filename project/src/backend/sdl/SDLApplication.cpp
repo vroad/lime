@@ -875,7 +875,7 @@ namespace lime {
 	}
 	
 	
-	Application* CreateApplication () {
+	Application* Application::Create () {
 		
 		std::unique_ptr<SDLApplication> app (new SDLApplication ());
 		

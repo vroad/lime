@@ -28,6 +28,7 @@ class CommandLineTools {
 	public static var commandName = "lime";
 	public static var defaultLibrary = "lime";
 	public static var defaultLibraryName = "Lime";
+	private static var limePath:String;
 	
 	private var additionalArguments:Array <String>;
 	private var command:String;
@@ -341,6 +342,8 @@ class CommandLineTools {
 					project.config.set ("project.rebuild.path", rebuildPath);
 					project.config.set ("project.rebuild.file", rebuildFile);
 					
+					buildBindings ();
+					
 					initializeProject (project, targetName);
 					buildProject (project);
 					
@@ -459,6 +462,7 @@ class CommandLineTools {
 		}
 		
 		process.close ();
+		limePath = path;
 		path += "/ndll/";
 		
 		switch (PlatformHelper.hostPlatform) {
@@ -510,6 +514,14 @@ class CommandLineTools {
 		
 	}
 	#end
+	
+	
+	private function buildBindings ():Void {
+		
+		var dir = PathHelper.combine (limePath, "tools");
+		ProcessHelper.runCommand (dir, "haxe", ["bindings.hxml"], true, true);
+		
+	}
 	
 	
 	private function buildProject (project:HXProject, command:String = "") {

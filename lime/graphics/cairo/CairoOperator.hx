@@ -1,6 +1,7 @@
 package lime.graphics.cairo;
 
 
+@:cffiCppType("cairo_operator_t")
 @:enum abstract CairoOperator(Int) from Int to Int from UInt to UInt {
 	
 	public var CLEAR = 0;

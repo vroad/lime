@@ -219,7 +219,7 @@ namespace lime {
 	}
 	
 	
-	void Bytes::Set (value bytes) {
+	bool Bytes::Set (value bytes) {
 		
 		if (val_is_null (bytes)) {
 			
@@ -233,6 +233,7 @@ namespace lime {
 			}
 			
 			_root = 0;
+			return false;
 			
 		} else {
 			
@@ -258,19 +259,31 @@ namespace lime {
 					
 					_data = (unsigned char*)val_string (b);
 					
-				} else if (!val_is_null (b)) {
+				} else {
 					
-					_data = (unsigned char*)buffer_data (val_to_buffer (b));
+					cffiByteBuffer buf = val_to_buffer (b);
+					_data = (unsigned char*)buffer_data (buf);
+					int bufferSize = buffer_size (buf);
+					
+					if (_length > bufferSize) {
+						
+						val_throw (alloc_string ("Invalid bytes length"));
+						return false;
+						
+					}
 					
 				}
 				
 			} else {
 				
 				_data = 0;
+				return false;
 				
 			}
 			
 		}
+		
+		return true;
 		
 	}
 	

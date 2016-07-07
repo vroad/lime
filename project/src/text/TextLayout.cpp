@@ -1,5 +1,7 @@
 #include <system/System.h>
 #include <text/TextLayout.h>
+#include <utils/Kinds.h>
+#include <utils/PointerUtils.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -10,12 +12,22 @@
 namespace lime {
 	
 	
-	TextLayout::TextLayout (int direction, const char *script, const char *language) {
-		
-		if (strlen (script) != 4) return;
+	TextLayout::TextLayout () {
 		
 		mFont = 0;
 		mHBFont = 0;
+		mBuffer = 0;
+		mDirection = HB_DIRECTION_INVALID;
+		mScript = HB_SCRIPT_INVALID;
+		mLanguage = 0;
+		
+	}
+	
+	
+	bool TextLayout::Init (int direction, const char *script, const char *language) {
+		
+		if (strlen (script) != 4) return false;
+		
 		mDirection = (hb_direction_t)direction;
 		mLanguage = (void *)hb_language_from_string (language, strlen (language));
 		mScript = hb_script_from_string (script, -1);
@@ -24,6 +36,8 @@ namespace lime {
 		hb_buffer_set_direction ((hb_buffer_t*)mBuffer, (hb_direction_t)mDirection);
 		hb_buffer_set_script ((hb_buffer_t*)mBuffer, (hb_script_t)mScript);
 		hb_buffer_set_language ((hb_buffer_t*)mBuffer, (hb_language_t)mLanguage);
+		
+		return true;
 		
 	}
 	
@@ -36,7 +50,30 @@ namespace lime {
 	}
 	
 	
-	void TextLayout::Position (Font *font, size_t size, const char *text, Bytes *bytes) {
+	TextLayout* TextLayout::Create (int direction, const char *script, const char *language) {
+		
+		TextLayout *layout = new TextLayout ();
+		
+		if (!layout->Init (direction, script, language)) {
+			
+			delete layout;
+			return NULL;
+			
+		}
+		
+		return layout;
+		
+	}
+	
+	
+	value TextLayout::Position (Font *font, size_t size, const char *text, Bytes* bytes) {
+		
+		if (!font) {
+			
+			val_throw (alloc_string ("Invalid Font handle"));
+			return alloc_null ();
+			
+		}
 		
 		if (mFont != font) {
 			
@@ -45,6 +82,7 @@ namespace lime {
 			mHBFont = hb_ft_font_create ((FT_Face)font->face, NULL);
 			
 		}
+		
 		font->SetSize (size);
 		
 		// reset buffer
@@ -97,6 +135,7 @@ namespace lime {
 		}
 
 		hb_buffer_clear_contents ((hb_buffer_t*)mBuffer);
+		return bytes->Value ();
 		
 	}
 	
@@ -118,6 +157,20 @@ namespace lime {
 	void TextLayout::SetScript (const char* script) {
 		
 		mScript = hb_script_from_string (script, -1);
+		
+	}
+	
+	
+	value TextLayout_to_val (TextLayout* inInstance) {
+		
+		return CFFIPointer (inInstance, lime_destroy_abstract<TextLayout>, Kinds::Get ()->TextLayout);
+		
+	}
+	
+	
+	TextLayout* val_to_TextLayout (value inHandle) {
+		
+		return lime_abstract_to_pointer<TextLayout> (inHandle, Kinds::Get ()->TextLayout);
 		
 	}
 	

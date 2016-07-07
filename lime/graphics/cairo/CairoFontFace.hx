@@ -2,18 +2,29 @@ package lime.graphics.cairo;
 
 
 import lime.system.CFFIPointer;
+import lime._internal.graphics.cairo.CairoFontFaceHandle;
+
 
 #if !macro
 @:build(lime.system.CFFI.build())
 #end
 
 
-abstract CairoFontFace(CFFIPointer) from CFFIPointer to CFFIPointer {
+@:cffiInterface("CairoFontFace.xml")
+class CairoFontFace {
 	
+	@:cffiHandle private var handle:CairoFontFaceHandle;
 	
-	private function new () {
+	private function new (handle:CairoFontFaceHandle) {
 		
-		this = null;
+		this.handle = handle;
+		
+	}
+	
+	
+	public static function create (handle:CFFIPointer):CairoFontFace {
+		
+		return handle != null ? new CairoFontFace (handle) : null;
 		
 	}
 	
@@ -21,7 +32,7 @@ abstract CairoFontFace(CFFIPointer) from CFFIPointer to CFFIPointer {
 	public function status ():CairoStatus {
 		
 		#if (lime_cairo && lime_native && !macro)
-		return lime_cairo_font_face_status (this);
+		return cairo_font_face_status (handle);
 		#else
 		return 0;
 		#end
@@ -36,8 +47,8 @@ abstract CairoFontFace(CFFIPointer) from CFFIPointer to CFFIPointer {
 	
 	
 	
-	#if (lime_cairo && lime_native && !macro)
-	@:cffi private static function lime_cairo_font_face_status (handle:CFFIPointer):Int;
+	#if (lime_cairo && !macro)
+	@:cffi private static function cairo_font_face_status (handle:CairoFontFaceHandle):Int;
 	#end
 	
 	

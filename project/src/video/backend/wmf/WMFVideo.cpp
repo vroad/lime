@@ -6,7 +6,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 
 #include "WMFVideo.h"
-#include "../../../graphics/opengl/OpenGL.h"
+#include <graphics/opengl/OpenGL.h>
 #include <assert.h>
 #include <iostream>
 

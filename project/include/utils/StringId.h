@@ -22,6 +22,14 @@ namespace lime {
 		int type;
 		
 		//
+		// ArrayBufferView
+		//
+		
+		int buffer;
+		int byteOffset;
+		int byteLength;
+		
+		//
 		// AudioBuffer
 		//
 		
@@ -44,7 +52,7 @@ namespace lime {
 		// ColorMatrix
 		//
 		
-		int buffer;
+		//int buffer;
 		
 		//
 		// DropEvent

@@ -1,0 +1,14 @@
+<interface>
+
+<include name="Common.xml"/>
+
+<insert>
+<![CDATA[
+#include <audio/openal/OpenALBindings.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

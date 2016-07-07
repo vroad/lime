@@ -1,0 +1,10 @@
+-main Bindings
+-neko dummy.n
+-cp ..
+-D lime-cairo
+-D lime-native
+-D lime-openal
+-D native
+-D bindings
+-dce no
+--no-output

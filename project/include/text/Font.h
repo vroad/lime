@@ -7,6 +7,8 @@
 #include <utils/Resource.h>
 #include <hx/CFFI.h>
 
+#include <string>
+
 #ifdef HX_WINDOWS
 #undef GetGlyphIndices
 #endif
@@ -46,9 +48,9 @@ namespace lime {
 			value Decompose (int em);
 			int GetAscender ();
 			int GetDescender ();
-			wchar_t *GetFamilyName ();
-			int GetGlyphIndex (char* character);
-			value GetGlyphIndices (char* characters);
+			std::wstring GetFamilyName ();
+			int GetGlyphIndex (const char* character);
+			value GetGlyphIndices (const char* characters);
 			value GetGlyphMetrics (int index);
 			int GetHeight ();
 			int GetNumGlyphs ();
@@ -59,6 +61,8 @@ namespace lime {
 			value RenderGlyphs (value indices, Bytes *imageData);
 			void SetSize (size_t size);
 			
+			static Font* Load (value data);
+			
 			void* library;
 			void* face;
 			Bytes *faceMemory;
@@ -68,6 +72,10 @@ namespace lime {
 			size_t mSize;
 		
 	};
+	
+	
+	value Font_to_val (Font* inInstance);
+	Font* val_to_Font (value inHandle);
 	
 	
 }

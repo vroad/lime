@@ -1,12 +1,19 @@
 package lime.audio.openal;
 
 
+import lime._internal.utils.HaxeBytes;
+import lime._internal.utils.HxVector_Float;
+import lime._internal.utils.HxVector_Int;
+import lime._internal.utils.CString;
+import lime.utils.AnonArrayBufferView;
 import lime.utils.ArrayBufferView;
 import lime.utils.BytesUtil;
+using lime.utils.ArrayBufferViewUtils;
 
 #if ((haxe_ver >= 3.2) && cpp)
 import cpp.Float32;
 #else
+@:cffiCppType("float", "cpp.Float32")
 typedef Float32 = Float;
 #end
 
@@ -15,6 +22,7 @@ typedef Float32 = Float;
 #end
 
 
+@:cffiInterface("AL.xml")
 class AL {
 	
 	
@@ -84,10 +92,8 @@ class AL {
 	
 	public static function bufferData (buffer:Int, format:Int, data:ArrayBufferView, size:Int, freq:Int):Void {
 		
-		#if ((cpp || neko || cs) && lime_openal && !macro)
-		lime_al_buffer_data (buffer, format, data.buffer, size, freq);
-		#elseif (nodejs && lime_openal && !macro)
-		lime_al_buffer_data (buffer, format, BytesUtil.getAnonBytesFromTypedArray (data), size, freq);
+		#if (lime_native && lime_openal && !macro)
+		alBufferData_wrap (buffer, format, data.toAnonArrayBufferView (), size, freq);
 		#end
 		
 	}
@@ -96,7 +102,7 @@ class AL {
 	public static function buffer3f (buffer:Int, param:Int, value1:Float, value2:Float, value3:Float):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_buffer3f (buffer, param, value1, value2, value3);
+		alBuffer3f (buffer, param, value1, value2, value3);
 		#end
 		
 	}
@@ -105,7 +111,7 @@ class AL {
 	public static function buffer3i (buffer:Int, param:Int, value1:Int, value2:Int, value3:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_buffer3i (buffer, param, value1, value2, value3);
+		alBuffer3i (buffer, param, value1, value2, value3);
 		#end
 		
 	}
@@ -114,7 +120,7 @@ class AL {
 	public static function bufferf (buffer:Int, param:Int, value:Float):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_bufferf (buffer, param, value);
+		alBufferf (buffer, param, value);
 		#end
 		
 	}
@@ -123,7 +129,7 @@ class AL {
 	public static function bufferfv (buffer:Int, param:Int, values:Array<Float>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_bufferfv (buffer, param, values);
+		alBufferfv_wrap (buffer, param, values);
 		#end
 		
 	}
@@ -132,7 +138,7 @@ class AL {
 	public static function bufferi (buffer:Int, param:Int, value:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_bufferi (buffer, param, value);
+		alBufferi (buffer, param, value);
 		#end
 		
 	}
@@ -141,7 +147,7 @@ class AL {
 	public static function bufferiv (buffer:Int, param:Int, values:Array<Int>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_bufferiv (buffer, param, values);
+		alBufferiv_wrap (buffer, param, values);
 		#end
 		
 	}
@@ -150,7 +156,7 @@ class AL {
 	public static function deleteBuffer (buffer:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_delete_buffer (buffer);
+		alDeleteBuffer_wrap (buffer);
 		#end
 		
 	}
@@ -159,7 +165,7 @@ class AL {
 	public static function deleteBuffers (buffers:Array<Int>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_delete_buffers (buffers.length, buffers);
+		alDeleteBuffers_wrap (buffers);
 		#end
 		
 	}
@@ -168,7 +174,7 @@ class AL {
 	public static function deleteSource (source:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_delete_source (source);
+		alDeleteSource_wrap (source);
 		#end
 		
 	}
@@ -177,7 +183,7 @@ class AL {
 	public static function deleteSources (sources:Array<Int>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_delete_sources (sources.length, sources);
+		alDeleteSources_wrap (sources);
 		#end
 		
 	}
@@ -186,7 +192,7 @@ class AL {
 	public static function disable (capability:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_disable (capability);
+		alDisable (capability);
 		#end
 		
 	}
@@ -195,7 +201,7 @@ class AL {
 	public static function distanceModel (distanceModel:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_distance_model (distanceModel);
+		alDistanceModel (distanceModel);
 		#end
 		
 	}
@@ -204,7 +210,7 @@ class AL {
 	public static function dopplerFactor (value:Float):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_doppler_factor (value);
+		alDopplerFactor (value);
 		#end
 		
 	}
@@ -213,7 +219,7 @@ class AL {
 	public static function dopplerVelocity (value:Float):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_doppler_velocity (value);
+		alDopplerVelocity (value);
 		#end
 		
 	}
@@ -222,7 +228,7 @@ class AL {
 	public static function enable (capability:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_enable (capability);
+		alEnable (capability);
 		#end
 		
 	}
@@ -231,7 +237,7 @@ class AL {
 	public static function genSource ():Int {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_gen_source ();
+		return alGenSource_wrap ();
 		#else
 		return 0;
 		#end
@@ -242,7 +248,7 @@ class AL {
 	public static function genSources (n:Int):Array<Int> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_gen_sources (n);
+		return alGenSources_wrap (n);
 		#else
 		return null;
 		#end
@@ -253,7 +259,7 @@ class AL {
 	public static function genBuffer ():Int {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_gen_buffer ();
+		return alGenBuffer_wrap ();
 		#else
 		return 0;
 		#end
@@ -264,7 +270,7 @@ class AL {
 	public static function genBuffers (n:Int):Array<Int> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_gen_buffers (n);
+		return alGenBuffers_wrap (n);
 		#else
 		return null;
 		#end
@@ -275,7 +281,7 @@ class AL {
 	public static function getBoolean (param:Int):Bool {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_boolean (param);
+		return alGetBoolean (param);
 		#else
 		return false;
 		#end
@@ -286,7 +292,7 @@ class AL {
 	public static function getBooleanv (param:Int, count:Int = 1):Array<Bool> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_booleanv (param, 1);
+		return alGetBooleanv_wrap (param, count);
 		#else
 		return null;
 		#end
@@ -297,7 +303,7 @@ class AL {
 	public static function getBuffer3f (buffer:Int, param:Int):Array<Float> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_buffer3f (buffer, param);
+		return alGetBuffer3f_wrap (buffer, param);
 		#else
 		return null;
 		#end
@@ -308,7 +314,7 @@ class AL {
 	public static function getBuffer3i (buffer:Int, param:Int):Array<Int> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_buffer3i (buffer, param);
+		return alGetBuffer3i_wrap (buffer, param);
 		#else
 		return null;
 		#end
@@ -319,7 +325,7 @@ class AL {
 	public static function getBufferf (buffer:Int, param:Int):Float {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_bufferf (buffer, param);
+		return alGetBufferf_wrap (buffer, param);
 		#else
 		return 0;
 		#end
@@ -330,7 +336,7 @@ class AL {
 	public static function getBufferfv (buffer:Int, param:Int, count:Int = 1):Array<Float> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_bufferfv (buffer, param, count);
+		return alGetBufferfv_wrap (buffer, param, count);
 		#else
 		return null;
 		#end
@@ -341,7 +347,7 @@ class AL {
 	public static function getBufferi (buffer:Int, param:Int):Int {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_bufferi (buffer, param);
+		return alGetBufferi_wrap (buffer, param);
 		#else
 		return 0;
 		#end
@@ -352,7 +358,7 @@ class AL {
 	public static function getBufferiv (buffer:Int, param:Int, count:Int = 1):Array<Int> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_bufferiv (buffer, param, count);
+		return alGetBufferiv_wrap (buffer, param, count);
 		#else
 		return null;
 		#end
@@ -363,7 +369,7 @@ class AL {
 	public static function getDouble (param:Int):Float {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_double (param);
+		return alGetDouble (param);
 		#else
 		return 0;
 		#end
@@ -374,7 +380,7 @@ class AL {
 	public static function getDoublev (param:Int, count:Int = 1):Array<Float> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_doublev (param, count);
+		return alGetDoublev_wrap (param, count);
 		#else
 		return null;
 		#end
@@ -385,7 +391,7 @@ class AL {
 	public static function getEnumValue (ename:String):Int {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_enum_value (ename);
+		return alGetEnumValue (ename);
 		#else
 		return 0;
 		#end
@@ -396,7 +402,7 @@ class AL {
 	public static function getError ():Int {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_error ();
+		return alGetError ();
 		#else
 		return 0;
 		#end
@@ -423,7 +429,7 @@ class AL {
 	public static function getFloat (param:Int):Float {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_float (param);
+		return alGetFloat (param);
 		#else
 		return 0;
 		#end
@@ -434,7 +440,7 @@ class AL {
 	public static function getFloatv (param:Int, count:Int = 1):Array<Float> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_floatv (param, count);
+		return alGetFloatv_wrap (param, count);
 		#else
 		return null;
 		#end
@@ -445,7 +451,7 @@ class AL {
 	public static function getInteger (param:Int):Int {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_integer (param);
+		return alGetInteger (param);
 		#else
 		return 0;
 		#end
@@ -456,7 +462,7 @@ class AL {
 	public static function getIntegerv (param:Int, count:Int = 1):Array<Int> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_integerv (param, count);
+		return alGetIntegerv_wrap (param, count);
 		#else
 		return null;
 		#end
@@ -467,7 +473,7 @@ class AL {
 	public static function getListener3f (param:Int):Array<Float> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_listener3f (param);
+		return alGetListener3f_wrap (param);
 		#else
 		return null;
 		#end
@@ -478,7 +484,7 @@ class AL {
 	public static function getListener3i (param:Int):Array<Int> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_listener3i (param);
+		return alGetListener3i_wrap (param);
 		#else
 		return null;
 		#end
@@ -489,7 +495,7 @@ class AL {
 	public static function getListenerf (param:Int):Float {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_listenerf (param);
+		return alGetListenerf_wrap (param);
 		#else
 		return 0;
 		#end
@@ -500,7 +506,7 @@ class AL {
 	public static function getListenerfv (param:Int, count:Int = 1):Array<Float> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_listenerfv (param, count);
+		return alGetListenerfv_wrap (param, count);
 		#else
 		return null;
 		#end
@@ -511,7 +517,7 @@ class AL {
 	public static function getListeneri (param:Int):Int {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_listeneri (param);
+		return alGetListeneri_wrap (param);
 		#else
 		return 0;
 		#end
@@ -522,18 +528,7 @@ class AL {
 	public static function getListeneriv (param:Int, count:Int = 1):Array<Int> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_listeneriv (param, count);
-		#else
-		return null;
-		#end
-		
-	}
-	
-	
-	public static function getProcAddress (fname:String):Dynamic {
-		
-		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_proc_address (fname);
+		return alGetListeneriv_wrap (param, count);
 		#else
 		return null;
 		#end
@@ -544,7 +539,7 @@ class AL {
 	public static function getSource3f (source:Int, param:Int):Array<Float> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_source3f (source, param);
+		return alGetSource3f_wrap (source, param);
 		#else
 		return null;
 		#end
@@ -555,7 +550,7 @@ class AL {
 	public static function getSourcef (source:Int, param:Int):Float {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_sourcef (source, param);
+		return alGetSourcef_wrap (source, param);
 		#else
 		return 0;
 		#end
@@ -566,7 +561,7 @@ class AL {
 	public static function getSource3i (source:Int, param:Int):Array<Int> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_source3i (source, param);
+		return alGetSource3i_wrap (source, param);
 		#else
 		return null;
 		#end
@@ -577,7 +572,7 @@ class AL {
 	public static function getSourcefv (source:Int, param:Int, count:Int = 1):Array<Float> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_sourcefv (source, param, count);
+		return alGetSourcefv_wrap (source, param, count);
 		#else
 		return null;
 		#end
@@ -588,7 +583,7 @@ class AL {
 	public static function getSourcei (source:Int, param:Int):Int {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_sourcei (source, param);
+		return alGetSourcei_wrap (source, param);
 		#else
 		return 0;
 		#end
@@ -599,7 +594,7 @@ class AL {
 	public static function getSourceiv (source:Int, param:Int, count:Int = 1):Array<Int> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_sourceiv (source, param, count);
+		return alGetSourceiv_wrap (source, param, count);
 		#else
 		return null;
 		#end
@@ -610,7 +605,7 @@ class AL {
 	public static function getString (param:Int):String {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_get_string (param);
+		return alGetString (param);
 		#else
 		return null;
 		#end
@@ -621,7 +616,7 @@ class AL {
 	public static function isBuffer (buffer:Int):Bool {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_is_buffer (buffer);
+		return alIsBuffer (buffer);
 		#else
 		return false;
 		#end
@@ -632,7 +627,7 @@ class AL {
 	public static function isEnabled (capability:Int):Bool {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_is_enabled (capability);
+		return alIsEnabled (capability);
 		#else
 		return false;
 		#end
@@ -643,7 +638,7 @@ class AL {
 	public static function isExtensionPresent (extname:String):Bool {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_is_extension_present (extname);
+		return alIsExtensionPresent (extname);
 		#else
 		return false;
 		#end
@@ -654,7 +649,7 @@ class AL {
 	public static function isSource (source:Int):Bool {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_is_source (source);
+		return alIsSource (source);
 		#else
 		return false;
 		#end
@@ -665,7 +660,7 @@ class AL {
 	public static function listener3f (param:Int, value1:Float, value2:Float, value3:Float):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_listener3f (param, value1, value2, value3);
+		alListener3f (param, value1, value2, value3);
 		#end
 		
 	}
@@ -674,7 +669,7 @@ class AL {
 	public static function listener3i (param:Int, value1:Int, value2:Int, value3:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_listener3i (param, value1, value2, value3);
+		alListener3i (param, value1, value2, value3);
 		#end
 		
 	}
@@ -683,7 +678,7 @@ class AL {
 	public static function listenerf (param:Int, value:Float):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_listenerf (param, value);
+		alListenerf (param, value);
 		#end
 		
 	}
@@ -692,7 +687,7 @@ class AL {
 	public static function listenerfv (param:Int, values:Array<Float>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_listenerfv (param, values);
+		alListenerfv_wrap (param, values);
 		#end
 		
 	}
@@ -701,7 +696,7 @@ class AL {
 	public static function listeneri (param:Int, value:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_listeneri (param, value);
+		alListeneri (param, value);
 		#end
 		
 	}
@@ -710,7 +705,7 @@ class AL {
 	public static function listeneriv (param:Int, values:Array<Int>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_listeneriv (param, values);
+		alListeneriv_wrap (param, values);
 		#end
 		
 	}
@@ -719,7 +714,7 @@ class AL {
 	public static function source3f (source:Int, param:Int, value1:Float, value2:Float, value3:Float):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_source3f (source, param, value1, value2, value3);
+		alSource3f (source, param, value1, value2, value3);
 		#end
 		
 	}
@@ -728,7 +723,7 @@ class AL {
 	public static function source3i (source:Int, param:Int, value1:Int, value2:Int, value3:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_source3i (source, param, value1, value2, value3);
+		alSource3i (source, param, value1, value2, value3);
 		#end
 		
 	}
@@ -737,7 +732,7 @@ class AL {
 	public static function sourcef (source:Int, param:Int, value:Float):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_sourcef (source, param, value);
+		alSourcef (source, param, value);
 		#end
 		
 	}
@@ -746,7 +741,7 @@ class AL {
 	public static function sourcefv (source:Int, param:Int, values:Array<Float>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_sourcefv (source, param, values);
+		alSourcefv_wrap (source, param, values);
 		#end
 		
 	}
@@ -755,7 +750,7 @@ class AL {
 	public static function sourcei (source:Int, param:Int, value:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_sourcei (source, param, value);
+		alSourcei (source, param, value);
 		#end
 		
 	}
@@ -764,7 +759,7 @@ class AL {
 	public static function sourceiv (source:Int, param:Int, values:Array<Int>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_sourceiv (source, param, values);
+		alSourceiv_wrap (source, param, values);
 		#end
 		
 	}
@@ -773,7 +768,7 @@ class AL {
 	public static function sourcePlay (source:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_source_play (source);
+		alSourcePlay (source);
 		#end
 		
 	}
@@ -782,7 +777,7 @@ class AL {
 	public static function sourcePlayv (sources:Array<Int>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_source_playv (sources.length, sources);
+		alSourcePlayv_wrap (sources.length, sources);
 		#end
 		
 	}
@@ -791,7 +786,7 @@ class AL {
 	public static function sourceStop (source:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_source_stop (source);
+		alSourceStop (source);
 		#end
 		
 	}
@@ -800,7 +795,7 @@ class AL {
 	public static function sourceStopv (sources:Array<Int>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_source_stopv (sources.length, sources);
+		alSourceStopv_wrap (sources.length, sources);
 		#end
 		
 	}
@@ -809,7 +804,7 @@ class AL {
 	public static function sourceRewind (source:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_source_rewind (source);
+		alSourceRewind (source);
 		#end
 		
 	}
@@ -818,7 +813,7 @@ class AL {
 	public static function sourceRewindv (sources:Array<Int>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_source_rewindv (sources.length, sources);
+		alSourceRewindv_wrap (sources.length, sources);
 		#end
 		
 	}
@@ -827,7 +822,7 @@ class AL {
 	public static function sourcePause (source:Int):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_source_pause (source);
+		alSourcePause (source);
 		#end
 		
 	}
@@ -836,7 +831,7 @@ class AL {
 	public static function sourcePausev (sources:Array<Int>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_source_pausev (sources.length, sources);
+		alSourcePausev_wrap (sources.length, sources);
 		#end
 		
 	}
@@ -846,7 +841,7 @@ class AL {
 		
 		#if (lime_native && lime_openal && !macro)
 		var buffers:Array<Int> = [ buffer ];
-		lime_al_source_queue_buffers (source, 1, buffers);
+		alSourceQueueBuffers_wrap (source, 1, buffers);
 		#end
 		
 	}
@@ -855,7 +850,7 @@ class AL {
 	public static function sourceQueueBuffers (source:Int, nb:Int, buffers:Array<Int>):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_source_queue_buffers (source, nb, buffers);
+		alSourceQueueBuffers_wrap (source, nb, buffers);
 		#end
 		
 	}
@@ -864,7 +859,7 @@ class AL {
 	public static function sourceUnqueueBuffer (source:Int):Int {
 		
 		#if (lime_native && lime_openal && !macro)
-		var res = lime_al_source_unqueue_buffers (source, 1);
+		var res = alSourceUnqueueBuffers_wrap (source, 1);
 		return res[0];
 		#else
 		return 0;
@@ -876,7 +871,7 @@ class AL {
 	public static function sourceUnqueueBuffers (source:Int, nb:Int):Array<Int> {
 		
 		#if (lime_native && lime_openal && !macro)
-		return lime_al_source_unqueue_buffers (source, nb);
+		return alSourceUnqueueBuffers_wrap (source, nb);
 		#else
 		return null;
 		#end
@@ -887,90 +882,89 @@ class AL {
 	public static function speedOfSound (value:Float):Void {
 		
 		#if (lime_native && lime_openal && !macro)
-		lime_al_speed_of_sound (value);
+		alSpeedOfSound (value);
 		#end
 		
 	}
 	
 	
 	#if (lime_native && lime_openal && !macro)
-	@:cffi private static function lime_al_buffer_data (buffer:Int, format:Int, data:Dynamic, size:Int, freq:Int):Void;
-	@:cffi private static function lime_al_buffer3f (buffer:Int, param:Int, value1:Float32, value2:Float32, value3:Float32):Void;
-	@:cffi private static function lime_al_buffer3i (buffer:Int, param:Int, value1:Int, value2:Int, value3:Int):Void;
-	@:cffi private static function lime_al_bufferf (buffer:Int, param:Int, value:Float32):Void;
-	@:cffi private static function lime_al_bufferfv (buffer:Int, param:Int, values:Dynamic):Void;
-	@:cffi private static function lime_al_bufferi (buffer:Int, param:Int, value:Int):Void;
-	@:cffi private static function lime_al_bufferiv (buffer:Int, param:Int, values:Dynamic):Void;
-	@:cffi private static function lime_al_delete_buffer (buffer:Int):Void;
-	@:cffi private static function lime_al_delete_buffers (n:Int, buffers:Dynamic):Void;
-	@:cffi private static function lime_al_delete_source (source:Int):Void;
-	@:cffi private static function lime_al_delete_sources (n:Int, sources:Dynamic):Void;
-	@:cffi private static function lime_al_disable (capability:Int):Void;
-	@:cffi private static function lime_al_distance_model (distanceModel:Int):Void;
-	@:cffi private static function lime_al_doppler_factor (value:Float32):Void;
-	@:cffi private static function lime_al_doppler_velocity (value:Float32):Void;
-	@:cffi private static function lime_al_enable (capability:Int):Void;
-	@:cffi private static function lime_al_gen_source ():Int;
-	@:cffi private static function lime_al_gen_sources (n:Int):Dynamic;
-	@:cffi private static function lime_al_get_boolean (param:Int):Bool;
-	@:cffi private static function lime_al_get_booleanv (param:Int, count:Int):Dynamic;
-	@:cffi private static function lime_al_gen_buffer ():Int;
-	@:cffi private static function lime_al_gen_buffers (n:Int):Dynamic;
-	@:cffi private static function lime_al_get_buffer3f (buffer:Int, param:Int):Dynamic;
-	@:cffi private static function lime_al_get_buffer3i (buffer:Int, param:Int):Dynamic;
-	@:cffi private static function lime_al_get_bufferf (buffer:Int, param:Int):Float32;
-	@:cffi private static function lime_al_get_bufferfv (buffer:Int, param:Int, count:Int):Dynamic;
-	@:cffi private static function lime_al_get_bufferi (buffer:Int, param:Int):Int;
-	@:cffi private static function lime_al_get_bufferiv (buffer:Int, param:Int, count:Int):Dynamic;
-	@:cffi private static function lime_al_get_double (param:Int):Float;
-	@:cffi private static function lime_al_get_doublev (param:Int, count:Int):Dynamic;
-	@:cffi private static function lime_al_get_enum_value (ename:String):Int;
-	@:cffi private static function lime_al_get_error ():Int;
-	@:cffi private static function lime_al_get_float (param:Int):Float32;
-	@:cffi private static function lime_al_get_floatv (param:Int, count:Int):Dynamic;
-	@:cffi private static function lime_al_get_integer (param:Int):Int;
-	@:cffi private static function lime_al_get_integerv (param:Int, count:Int):Dynamic;
-	@:cffi private static function lime_al_get_listener3f (param:Int):Dynamic;
-	@:cffi private static function lime_al_get_listener3i (param:Int):Dynamic;
-	@:cffi private static function lime_al_get_listenerf (param:Int):Float32;
-	@:cffi private static function lime_al_get_listenerfv (param:Int, count:Int):Dynamic;
-	@:cffi private static function lime_al_get_listeneri (param:Int):Int;
-	@:cffi private static function lime_al_get_listeneriv (param:Int, count:Int):Dynamic;
-	@:cffi private static function lime_al_get_proc_address (fname:String):Float;
-	@:cffi private static function lime_al_get_source3f (source:Int, param:Int):Dynamic;
-	@:cffi private static function lime_al_get_source3i (source:Int, param:Int):Dynamic;
-	@:cffi private static function lime_al_get_sourcef (source:Int, param:Int):Float32;
-	@:cffi private static function lime_al_get_sourcefv (source:Int, param:Int, count:Int):Dynamic;
-	@:cffi private static function lime_al_get_sourcei (source:Int, param:Int):Int;
-	@:cffi private static function lime_al_get_sourceiv (source:Int, param:Int, count:Int):Dynamic;
-	@:cffi private static function lime_al_get_string (param:Int):Dynamic;
-	@:cffi private static function lime_al_is_buffer (buffer:Int):Bool;
-	@:cffi private static function lime_al_is_enabled (capability:Int):Bool;
-	@:cffi private static function lime_al_is_extension_present (extname:String):Bool;
-	@:cffi private static function lime_al_is_source (source:Int):Bool;
-	@:cffi private static function lime_al_listener3f (param:Int, value1:Float32, value2:Float32, value3:Float32):Void;
-	@:cffi private static function lime_al_listener3i (param:Int, value1:Int, value2:Int, value3:Int):Void;
-	@:cffi private static function lime_al_listenerf (param:Int, value1:Float32):Void;
-	@:cffi private static function lime_al_listenerfv (param:Int, values:Dynamic):Void;
-	@:cffi private static function lime_al_listeneri (param:Int, value1:Int):Void;
-	@:cffi private static function lime_al_listeneriv (param:Int, values:Dynamic):Void;
-	@:cffi private static function lime_al_source_pause (source:Int):Void;
-	@:cffi private static function lime_al_source_pausev (n:Int, sources:Dynamic):Void;
-	@:cffi private static function lime_al_source_play (source:Int):Void;
-	@:cffi private static function lime_al_source_playv (n:Int, sources:Dynamic):Void;
-	@:cffi private static function lime_al_source_queue_buffers (source:Int, nb:Int, buffers:Dynamic):Void;
-	@:cffi private static function lime_al_source_rewind (source:Int):Void;
-	@:cffi private static function lime_al_source_rewindv (n:Int, sources:Dynamic):Void;
-	@:cffi private static function lime_al_source_stop (source:Int):Void;
-	@:cffi private static function lime_al_source_stopv (n:Int, sources:Dynamic):Void;
-	@:cffi private static function lime_al_source_unqueue_buffers (source:Int, nb:Int):Dynamic;
-	@:cffi private static function lime_al_source3f (source:Int, param:Int, value1:Float32, value2:Float32, value3:Float32):Void;
-	@:cffi private static function lime_al_source3i (source:Int, param:Int, value1:Int, value2:Int, value3:Int):Void;
-	@:cffi private static function lime_al_sourcef (source:Int, param:Int, value:Float32):Void;
-	@:cffi private static function lime_al_sourcefv (source:Int, param:Int, values:Dynamic):Void;
-	@:cffi private static function lime_al_sourcei (source:Int, param:Int, value:Int):Void;
-	@:cffi private static function lime_al_sourceiv (source:Int, param:Int, values:Dynamic):Void;
-	@:cffi private static function lime_al_speed_of_sound (speed:Float32):Void;
+	@:cffi private static function alBufferData_wrap (buffer:Int, format:Int, data:AnonArrayBufferView, size:Int, freq:Int):Void;
+	@:cffi private static function alBuffer3f (buffer:Int, param:Int, value1:Float32, value2:Float32, value3:Float32):Void;
+	@:cffi private static function alBuffer3i (buffer:Int, param:Int, value1:Int, value2:Int, value3:Int):Void;
+	@:cffi private static function alBufferf (buffer:Int, param:Int, value:Float32):Void;
+	@:cffi private static function alBufferfv_wrap (buffer:Int, param:Int, values:HxVector_Float):Void;
+	@:cffi private static function alBufferi (buffer:Int, param:Int, value:Int):Void;
+	@:cffi private static function alBufferiv_wrap (buffer:Int, param:Int, values:HxVector_Int):Void;
+	@:cffi private static function alDeleteBuffer_wrap (buffer:Int):Void;
+	@:cffi private static function alDeleteBuffers_wrap (buffers:HxVector_Int):Void;
+	@:cffi private static function alDeleteSource_wrap (source:Int):Void;
+	@:cffi private static function alDeleteSources_wrap (sources:HxVector_Int):Void;
+	@:cffi private static function alDisable (capability:Int):Void;
+	@:cffi private static function alDistanceModel (distanceModel:Int):Void;
+	@:cffi private static function alDopplerFactor (value:Float32):Void;
+	@:cffi private static function alDopplerVelocity (value:Float32):Void;
+	@:cffi private static function alEnable (capability:Int):Void;
+	@:cffi private static function alGetBoolean (param:Int):Bool;
+	@:cffi private static function alGetBooleanv_wrap (param:Int, count:Int):Array<Bool>;
+	@:cffi private static function alGenBuffer_wrap ():Int;
+	@:cffi private static function alGenBuffers_wrap (n:Int):Dynamic;
+	@:cffi private static function alGenSource_wrap ():Int;
+	@:cffi private static function alGenSources_wrap (n:Int):Dynamic;
+	@:cffi private static function alGetBuffer3f_wrap (buffer:Int, param:Int):Dynamic;
+	@:cffi private static function alGetBuffer3i_wrap (buffer:Int, param:Int):Dynamic;
+	@:cffi private static function alGetBufferf_wrap (buffer:Int, param:Int):Float32;
+	@:cffi private static function alGetBufferfv_wrap (buffer:Int, param:Int, count:Int):Dynamic;
+	@:cffi private static function alGetBufferi_wrap (buffer:Int, param:Int):Int;
+	@:cffi private static function alGetBufferiv_wrap (buffer:Int, param:Int, count:Int):Dynamic;
+	@:cffi private static function alGetDouble (param:Int):Float;
+	@:cffi private static function alGetDoublev_wrap (param:Int, count:Int):Dynamic;
+	@:cffi private static function alGetEnumValue (ename:CString):Int;
+	@:cffi private static function alGetError ():Int;
+	@:cffi private static function alGetFloat (param:Int):Float32;
+	@:cffi private static function alGetFloatv_wrap (param:Int, count:Int):Dynamic;
+	@:cffi private static function alGetInteger (param:Int):Int;
+	@:cffi private static function alGetIntegerv_wrap (param:Int, count:Int):Dynamic;
+	@:cffi private static function alGetListener3f_wrap (param:Int):Dynamic;
+	@:cffi private static function alGetListener3i_wrap (param:Int):Dynamic;
+	@:cffi private static function alGetListenerf_wrap (param:Int):Float32;
+	@:cffi private static function alGetListenerfv_wrap (param:Int, count:Int):Dynamic;
+	@:cffi private static function alGetListeneri_wrap (param:Int):Int;
+	@:cffi private static function alGetListeneriv_wrap (param:Int, count:Int):Dynamic;
+	@:cffi private static function alGetSource3f_wrap (source:Int, param:Int):Dynamic;
+	@:cffi private static function alGetSource3i_wrap (source:Int, param:Int):Dynamic;
+	@:cffi private static function alGetSourcef_wrap (source:Int, param:Int):Float32;
+	@:cffi private static function alGetSourcefv_wrap (source:Int, param:Int, count:Int):Dynamic;
+	@:cffi private static function alGetSourcei_wrap (source:Int, param:Int):Int;
+	@:cffi private static function alGetSourceiv_wrap (source:Int, param:Int, count:Int):Dynamic;
+	@:cffi private static function alGetString (param:Int):CString;
+	@:cffi private static function alIsBuffer (buffer:Int):Bool;
+	@:cffi private static function alIsEnabled (capability:Int):Bool;
+	@:cffi private static function alIsExtensionPresent (extname:CString):Bool;
+	@:cffi private static function alIsSource (source:Int):Bool;
+	@:cffi private static function alListener3f (param:Int, value1:Float32, value2:Float32, value3:Float32):Void;
+	@:cffi private static function alListener3i (param:Int, value1:Int, value2:Int, value3:Int):Void;
+	@:cffi private static function alListenerf (param:Int, value1:Float32):Void;
+	@:cffi private static function alListenerfv_wrap (param:Int, values:HxVector_Float):Void;
+	@:cffi private static function alListeneri (param:Int, value1:Int):Void;
+	@:cffi private static function alListeneriv_wrap (param:Int, values:HxVector_Int):Void;
+	@:cffi private static function alSourcePause (source:Int):Void;
+	@:cffi private static function alSourcePausev_wrap (n:Int, sources:HxVector_Int):Void;
+	@:cffi private static function alSourcePlay (source:Int):Void;
+	@:cffi private static function alSourcePlayv_wrap (n:Int, sources:HxVector_Int):Void;
+	@:cffi private static function alSourceQueueBuffers_wrap (source:Int, nb:Int, buffers:HxVector_Int):Void;
+	@:cffi private static function alSourceRewind (source:Int):Void;
+	@:cffi private static function alSourceRewindv_wrap (n:Int, sources:HxVector_Int):Void;
+	@:cffi private static function alSourceStop (source:Int):Void;
+	@:cffi private static function alSourceStopv_wrap (n:Int, sources:HxVector_Int):Void;
+	@:cffi private static function alSourceUnqueueBuffers_wrap (source:Int, nb:Int):Dynamic;
+	@:cffi private static function alSource3f (source:Int, param:Int, value1:Float32, value2:Float32, value3:Float32):Void;
+	@:cffi private static function alSource3i (source:Int, param:Int, value1:Int, value2:Int, value3:Int):Void;
+	@:cffi private static function alSourcef (source:Int, param:Int, value:Float32):Void;
+	@:cffi private static function alSourcefv_wrap (source:Int, param:Int, values:HxVector_Float):Void;
+	@:cffi private static function alSourcei (source:Int, param:Int, value:Int):Void;
+	@:cffi private static function alSourceiv_wrap (source:Int, param:Int, values:HxVector_Int):Void;
+	@:cffi private static function alSpeedOfSound (speed:Float32):Void;
 	#end
 	
 	

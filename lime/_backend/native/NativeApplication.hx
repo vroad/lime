@@ -22,6 +22,7 @@ import lime.ui.KeyCode;
 import lime.ui.KeyModifier;
 import lime.ui.Touch;
 import lime.ui.Window;
+import lime._backend.native.ApplicationHandle;
 
 #if !macro
 @:build(lime.system.CFFI.build())
@@ -37,6 +38,8 @@ import lime.ui.Window;
 @:access(lime.ui.Window)
 
 
+@:cffiInterface("Application.xml")
+@:cffiCppType("lime::Application")
 class NativeApplication {
 	
 	
@@ -54,7 +57,7 @@ class NativeApplication {
 	private var unusedTouchesPool = new List<Touch> ();
 	private var windowEventInfo = new WindowEventInfo ();
 	
-	public var handle:Dynamic;
+	@:cffiHandle public var handle (default, null):ApplicationHandle;
 	
 	private var frameRate:Float;
 	private var parent:Application;
@@ -82,7 +85,7 @@ class NativeApplication {
 	public function create (config:Config):Void {
 		
 		#if !macro
-		handle = lime_application_create ( { } );
+		handle = Create ();
 		
 		if (handle == null) {
 			
@@ -99,32 +102,31 @@ class NativeApplication {
 		
 		#if !macro
 		
-		lime_application_event_manager_register (handle, handleApplicationEvent, applicationEventInfo);
-		lime_drop_event_manager_register (handle, handleDropEvent, dropEventInfo);
-		lime_gamepad_event_manager_register (handle, handleGamepadEvent, gamepadEventInfo);
-		lime_joystick_event_manager_register (handle, handleJoystickEvent, joystickEventInfo);
-		lime_key_event_manager_register (handle, handleKeyEvent, keyEventInfo);
-		lime_mouse_event_manager_register (handle, handleMouseEvent, mouseEventInfo);
-		lime_render_event_manager_register (handle, handleRenderEvent, renderEventInfo);
-		lime_text_event_manager_register (handle, handleTextEvent, textEventInfo);
-		lime_touch_event_manager_register (handle, handleTouchEvent, touchEventInfo);
-		lime_window_event_manager_register (handle, handleWindowEvent, windowEventInfo);
+		RegisterAppEvent (handleApplicationEvent, applicationEventInfo);
+		RegisterDropEvent (handleDropEvent, dropEventInfo);
+		RegisterGamepadEvent (handleGamepadEvent, gamepadEventInfo);
+		RegisterJoystickEvent (handleJoystickEvent, joystickEventInfo);
+		RegisterKeyEvent (handleKeyEvent, keyEventInfo);
+		RegisterMouseEvent (handleMouseEvent, mouseEventInfo);
+		RegisterRenderEvent (handleRenderEvent, renderEventInfo);
+		RegisterTextEvent (handleTextEvent, textEventInfo);
+		RegisterTouchEvent (handleTouchEvent, touchEventInfo);
+		RegisterWindowEvent (handleWindowEvent, windowEventInfo);
 		
 		#if (ios || android || tvos)
-		lime_sensor_event_manager_register (handle, handleSensorEvent, sensorEventInfo);
+		RegisterSensorEvent (handleSensorEvent, sensorEventInfo);
 		#end
 		
 		#if nodejs
 		
-		lime_application_init (handle);
+		Init ();
 		
 		var eventLoop = function () {
 			
-			var active = lime_application_update (handle);
+			var active = Update ();
 			
 			if (!active) {
 				
-				untyped process.exitCode = lime_application_quit (handle);
 				parent.onExit.dispatch (untyped process.exitCode);
 				
 			} else {
@@ -140,27 +142,23 @@ class NativeApplication {
 		
 		#elseif cs
 		
-		lime_application_init (handle);
+		Init ();
 		var active = true;
 		
 		do {
 			
-			active = lime_application_update (handle);
+			active = Update ();
 			
 		} while (active);
 		
-		var result = lime_application_quit (handle);
-		parent.onExit.dispatch (result);
-		
-		lime_reset ();
-		return result;
+		parent.onExit.dispatch (0);
+		return 0;
 		
 		#elseif (cpp || neko)
 		
-		var result = lime_application_exec (handle);
+		var result = Exec ();
 		parent.onExit.dispatch (result);
 		
-		lime_reset ();
 		return result;
 		
 		#end
@@ -176,7 +174,7 @@ class NativeApplication {
 		AudioManager.shutdown ();
 		
 		#if !macro
-		lime_application_quit (handle);
+		Quit ();
 		#end
 		
 	}
@@ -422,7 +420,7 @@ class NativeApplication {
 						#if lime_console
 						renderer.context = CONSOLE (ConsoleRenderContext.singleton);
 						#else
-						renderer.context = OPENGL (new GLRenderContext ());
+						renderer.context = OPENGL (GLRenderContext.create (parent.window.backend.handle));
 						#end
 						
 						renderer.onContextRestored.dispatch (renderer.context);
@@ -615,7 +613,7 @@ class NativeApplication {
 	public function setFrameRate (value:Float):Float {
 		
 		#if !macro
-		lime_application_set_frame_rate (handle, value);
+		SetFrameRate (value);
 		#end
 		return frameRate = value;
 		
@@ -663,24 +661,25 @@ class NativeApplication {
 	
 	
 	#if !macro
-	@:cffi private static function lime_application_create (config:Dynamic):Dynamic;
-	@:cffi private static function lime_application_event_manager_register (app:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_application_exec (handle:Dynamic):Int;
-	@:cffi private static function lime_application_init (handle:Dynamic):Void;
-	@:cffi private static function lime_application_quit (handle:Dynamic):Int;
-	@:cffi private static function lime_reset ():Void;
-	@:cffi private static function lime_application_set_frame_rate (handle:Dynamic, value:Float):Void;
-	@:cffi private static function lime_application_update (handle:Dynamic):Bool;
-	@:cffi private static function lime_drop_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_gamepad_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_joystick_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_key_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_mouse_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_render_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_sensor_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_text_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_touch_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
-	@:cffi private static function lime_window_event_manager_register (handle:Dynamic, callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private static function Create ():ApplicationHandle;
+	
+	@:cffi private function RegisterAppEvent (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private function RegisterDropEvent (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private function RegisterGamepadEvent (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private function RegisterJoystickEvent (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private function RegisterKeyEvent (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private function RegisterMouseEvent (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private function RegisterRenderEvent (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private function RegisterSensorEvent (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private function RegisterTextEvent (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private function RegisterTouchEvent (callback:Dynamic, eventObject:Dynamic):Void;
+	@:cffi private function RegisterWindowEvent (callback:Dynamic, eventObject:Dynamic):Void;
+	
+	@:cffi private function Exec ():Int;
+	@:cffi private function Init ():Void;
+	@:cffi private function Quit ():Int;
+	@:cffi private function SetFrameRate (frameRate:Float):Void;
+	@:cffi private function Update ():Bool;
 	#end
 	
 	

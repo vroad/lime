@@ -1,6 +1,7 @@
 package lime.graphics.cairo;
 
 
+@:cffiCppType("cairo_filter_t")
 @:enum abstract CairoFilter(Int) from Int to Int from UInt to UInt {
 	
 	public var FAST = 0;

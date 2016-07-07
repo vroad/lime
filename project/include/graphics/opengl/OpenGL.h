@@ -66,8 +66,13 @@ typedef ptrdiff_t GLsizeiptrARB;
 #define DYNAMIC_OGL
 #define LIME_GLES
 #endif
+
+#ifdef NATIVE_TOOLKIT_SDL_ANGLE
+#include <SDL_opengles2.h>
+#else
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
+#endif
 
 #endif
 

@@ -1,10 +1,13 @@
 #include <text/Font.h>
 #include <graphics/ImageBuffer.h>
 #include <system/System.h>
+#include <utils/Kinds.h>
+#include <utils/PointerUtils.h>
 #include <utils/StringId.h>
 
 #include <algorithm>
 #include <list>
+#include <memory>
 #include <vector>
 
 #ifdef LIME_FREETYPE
@@ -22,7 +25,7 @@
 #define IS_IN_RANGE(c, f, l) (((c) >= (f)) && ((c) <= (l)))
 
 
-unsigned long readNextChar (char*& p)
+unsigned long readNextChar (const char*& p)
 {
 	 // TODO: since UTF-8 is a variable-length
 	 // encoding, you should pass in the input
@@ -481,7 +484,7 @@ namespace lime {
 		
 		int num_glyphs = glyphs.size ();
 		
-		wchar_t* family_name = GetFamilyName ();
+		std::wstring family_name = GetFamilyName ();
 		
 		value ret = alloc_empty_object ();
 		alloc_field (ret, val_id ("has_kerning"), alloc_bool (FT_HAS_KERNING (((FT_Face)face))));
@@ -490,14 +493,12 @@ namespace lime {
 		alloc_field (ret, val_id ("is_italic"), alloc_bool (((FT_Face)face)->style_flags & FT_STYLE_FLAG_ITALIC));
 		alloc_field (ret, val_id ("is_bold"), alloc_bool (((FT_Face)face)->style_flags & FT_STYLE_FLAG_BOLD));
 		alloc_field (ret, val_id ("num_glyphs"), alloc_int (num_glyphs));
-		alloc_field (ret, val_id ("family_name"), family_name == NULL ? alloc_string (((FT_Face)face)->family_name) : alloc_wstring (family_name));
+		alloc_field (ret, val_id ("family_name"), family_name.empty () ? alloc_string (((FT_Face)face)->family_name) : alloc_wstring (family_name.c_str ()));
 		alloc_field (ret, val_id ("style_name"), alloc_string (((FT_Face)face)->style_name));
 		alloc_field (ret, val_id ("em_size"), alloc_int (((FT_Face)face)->units_per_EM));
 		alloc_field (ret, val_id ("ascend"), alloc_int (((FT_Face)face)->ascender));
 		alloc_field (ret, val_id ("descend"), alloc_int (((FT_Face)face)->descender));
 		alloc_field (ret, val_id ("height"), alloc_int (((FT_Face)face)->height));
-		
-		delete family_name;
 		
 		// 'glyphs' field
 		value neko_glyphs = alloc_array (num_glyphs);
@@ -575,14 +576,15 @@ namespace lime {
 	}
 	
 	
-	wchar_t *Font::GetFamilyName () {
+	std::wstring Font::GetFamilyName () {
 		
 		#ifdef LIME_FREETYPE
 		
-		wchar_t *family_name = NULL;
+		std::unique_ptr<wchar_t> stringPtr;
+		wchar_t* family_name = 0;
 		FT_SfntName sfnt_name;
 		FT_UInt num_sfnt_names, sfnt_name_index;
-		int len, i;
+		size_t len, i;
 		
 		if (FT_IS_SFNT (((FT_Face)face))) {
 			
@@ -596,15 +598,17 @@ namespace lime {
 					if (sfnt_name.platform_id == TT_PLATFORM_MACINTOSH) {
 						
 						len = sfnt_name.string_len;
-						family_name = new wchar_t[len + 1];
+						stringPtr.reset (new wchar_t[len + 1]);
+						family_name = stringPtr.get ();
 						mbstowcs (&family_name[0], &reinterpret_cast<const char*>(sfnt_name.string)[0], len);
 						family_name[len] = L'\0';
-						return family_name;
+						return std::wstring (family_name);
 						
 					} else if ((sfnt_name.platform_id == TT_PLATFORM_MICROSOFT) && (sfnt_name.encoding_id == TT_MS_ID_UNICODE_CS)) {
 						
 						len = sfnt_name.string_len / 2;
-						family_name = (wchar_t*)malloc ((len + 1) * sizeof (wchar_t));
+						stringPtr.reset ((wchar_t*)malloc ((len + 1) * sizeof (wchar_t)));
+						family_name = stringPtr.get ();
 						
 						for (i = 0; i < len; i++) {
 							
@@ -613,7 +617,7 @@ namespace lime {
 						}
 						
 						family_name[len] = L'\0';
-						return family_name;
+						return std::wstring (family_name, len);
 						
 					}
 					
@@ -625,12 +629,12 @@ namespace lime {
 		
 		#endif
 		
-		return NULL;
+		return std::wstring ();
 		
 	}
 	
 	
-	int Font::GetGlyphIndex (char* character) {
+	int Font::GetGlyphIndex (const char* character) {
 		
 		long charCode = readNextChar (character);
 		
@@ -639,7 +643,7 @@ namespace lime {
 	}
 	
 	
-	value Font::GetGlyphIndices (char* characters) {
+	value Font::GetGlyphIndices (const char* characters) {
 		
 		value indices = alloc_array (0);
 		unsigned long character;
@@ -719,6 +723,12 @@ namespace lime {
 	
 	value Font::RenderGlyph (int index, Bytes *imageData, int offset) {
 		
+		if (!imageData) {
+			
+			return alloc_null ();
+			
+		}
+		
 		GlyphImage *data = (GlyphImage*)(imageData->Data () + offset);
 		
 		if (FT_Load_Glyph ((FT_Face)face, index, FT_LOAD_RENDER) != 0)
@@ -759,6 +769,12 @@ namespace lime {
 	
 	value Font::RenderGlyphs (value indices, Bytes *imageData) {
 		
+		if (!imageData) {
+			
+			return alloc_null ();
+			
+		}
+		
 		int offset = 0;
 		int totalOffset = 4;
 		uint32_t count = 0;
@@ -793,5 +809,56 @@ namespace lime {
 		
 	}
 	
+	
+	Font* Font::Load (value data) {
+		
+		Font* font = NULL;
+		
+		#ifdef LIME_FREETYPE
+		Resource resource;
+		Bytes bytes;
+		
+		if (val_is_string (data)) {
+			
+			resource = Resource (val_string (data));
+			
+		} else {
+			
+			bytes.Set (data);
+			resource = Resource (&bytes);
+			
+		}
+		
+		font = new Font (&resource, 0);
+		
+		if (font) {
+			
+			if (!font->face) {
+				
+				delete font;
+				font = NULL;
+				
+			}
+			
+		}
+		#endif
+		
+		return font;
+		
+	}
+	
+	
+	value Font_to_val (Font* inInstance) {
+		
+		return CFFIPointer (inInstance, lime_destroy_abstract<Font>, Kinds::Get ()->Font);
+		
+	}
+	
+	
+	Font* val_to_Font (value inHandle) {
+		
+		return lime_abstract_to_pointer<Font> (inHandle, Kinds::Get ()->Font);
+		
+	}
 	
 }

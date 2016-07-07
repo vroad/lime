@@ -2,14 +2,14 @@
 #include <hx/CFFIPrime.h>
 #include <system/CFFIPointer.h>
 #include <utils/Bytes.h>
-#include "OpenGL.h"
-#include "OpenGLBindings.h"
+#include <graphics/opengl/OpenGL.h>
+#include <graphics/opengl/OpenGLBindings.h>
 #include <string>
 
 #ifdef NEED_EXTENSIONS
-#define DEFINE_EXTENSION
-#include "OpenGLExtensions.h"
-#undef DEFINE_EXTENSION
+#define DECLARE_EXTENSION
+#include <graphics/opengl/OpenGLExtensions.h>
+#undef DECLARE_EXTENSION
 #endif
 
 #ifdef HX_LINUX
@@ -1686,7 +1686,7 @@ namespace lime {
 			
 			#ifdef NEED_EXTENSIONS
 			#define GET_EXTENSION
-			#include "OpenGLExtensions.h"
+			#include <graphics/opengl/OpenGLExtensions.h>
 			#undef DEFINE_EXTENSION
 			#endif
 			
@@ -1709,140 +1709,6 @@ namespace lime {
 		FreeLibrary ((HMODULE)handle);
 		#endif
 	}
-	
-	DEFINE_PRIME1v (lime_gl_active_texture);
-	DEFINE_PRIME2v (lime_gl_attach_shader);
-	DEFINE_PRIME3v (lime_gl_bind_attrib_location);
-	DEFINE_PRIME2v (lime_gl_bind_buffer);
-	DEFINE_PRIME2v (lime_gl_bind_framebuffer);
-	DEFINE_PRIME2v (lime_gl_bind_renderbuffer);
-	DEFINE_PRIME2v (lime_gl_bind_texture);
-	DEFINE_PRIME4v (lime_gl_blend_color);
-	DEFINE_PRIME1v (lime_gl_blend_equation);
-	DEFINE_PRIME2v (lime_gl_blend_equation_separate);
-	DEFINE_PRIME2v (lime_gl_blend_func);
-	DEFINE_PRIME4v (lime_gl_blend_func_separate);
-	DEFINE_PRIME5v (lime_gl_buffer_data);
-	DEFINE_PRIME5v (lime_gl_buffer_sub_data);
-	DEFINE_PRIME1 (lime_gl_check_framebuffer_status);
-	DEFINE_PRIME1v (lime_gl_clear);
-	DEFINE_PRIME4v (lime_gl_clear_color);
-	DEFINE_PRIME1v (lime_gl_clear_depth);
-	DEFINE_PRIME1v (lime_gl_clear_stencil);
-	DEFINE_PRIME4v (lime_gl_color_mask);
-	DEFINE_PRIME1v (lime_gl_compile_shader);
-	DEFINE_PRIME8v (lime_gl_compressed_tex_image_2d);
-	DEFINE_PRIME9v (lime_gl_compressed_tex_sub_image_2d);
-	DEFINE_PRIME8v (lime_gl_copy_tex_image_2d);
-	DEFINE_PRIME8v (lime_gl_copy_tex_sub_image_2d);
-	DEFINE_PRIME0 (lime_gl_create_buffer);
-	DEFINE_PRIME0 (lime_gl_create_framebuffer);
-	DEFINE_PRIME0 (lime_gl_create_program);
-	DEFINE_PRIME0 (lime_gl_create_render_buffer);
-	DEFINE_PRIME1 (lime_gl_create_shader);
-	DEFINE_PRIME0 (lime_gl_create_texture);
-	DEFINE_PRIME1v (lime_gl_cull_face);
-	DEFINE_PRIME1v (lime_gl_delete_buffer);
-	DEFINE_PRIME1v (lime_gl_delete_framebuffer);
-	DEFINE_PRIME1v (lime_gl_delete_program);
-	DEFINE_PRIME1v (lime_gl_delete_render_buffer);
-	DEFINE_PRIME1v (lime_gl_delete_shader);
-	DEFINE_PRIME1v (lime_gl_delete_texture);
-	DEFINE_PRIME2v (lime_gl_detach_shader);
-	DEFINE_PRIME1v (lime_gl_depth_func);
-	DEFINE_PRIME1v (lime_gl_depth_mask);
-	DEFINE_PRIME2v (lime_gl_depth_range);
-	DEFINE_PRIME1v (lime_gl_disable);
-	DEFINE_PRIME1v (lime_gl_disable_vertex_attrib_array);
-	DEFINE_PRIME3v (lime_gl_draw_arrays);
-	DEFINE_PRIME4v (lime_gl_draw_elements);
-	DEFINE_PRIME1v (lime_gl_enable);
-	DEFINE_PRIME1v (lime_gl_enable_vertex_attrib_array);
-	DEFINE_PRIME0v (lime_gl_finish);
-	DEFINE_PRIME0v (lime_gl_flush);
-	DEFINE_PRIME4v (lime_gl_framebuffer_renderbuffer);
-	DEFINE_PRIME5v (lime_gl_framebuffer_texture2D);
-	DEFINE_PRIME1v (lime_gl_front_face);
-	DEFINE_PRIME1v (lime_gl_generate_mipmap);
-	DEFINE_PRIME2 (lime_gl_get_active_attrib);
-	DEFINE_PRIME2 (lime_gl_get_active_uniform);
-	DEFINE_PRIME2 (lime_gl_get_attrib_location);
-	DEFINE_PRIME2 (lime_gl_get_buffer_parameter);
-	DEFINE_PRIME0 (lime_gl_get_context_attributes);
-	DEFINE_PRIME0 (lime_gl_get_error);
-	DEFINE_PRIME1 (lime_gl_get_extension);
-	DEFINE_PRIME3 (lime_gl_get_framebuffer_attachment_parameter);
-	DEFINE_PRIME1 (lime_gl_get_parameter);
-	DEFINE_PRIME1 (lime_gl_get_program_info_log);
-	DEFINE_PRIME2 (lime_gl_get_program_parameter);
-	DEFINE_PRIME2 (lime_gl_get_render_buffer_parameter);
-	DEFINE_PRIME1 (lime_gl_get_shader_info_log);
-	DEFINE_PRIME2 (lime_gl_get_shader_parameter);
-	DEFINE_PRIME2 (lime_gl_get_shader_precision_format);
-	DEFINE_PRIME1 (lime_gl_get_shader_source);
-	DEFINE_PRIME1v (lime_gl_get_supported_extensions);
-	DEFINE_PRIME2 (lime_gl_get_tex_parameter);
-	DEFINE_PRIME2 (lime_gl_get_uniform);
-	DEFINE_PRIME2 (lime_gl_get_uniform_location);
-	DEFINE_PRIME2 (lime_gl_get_vertex_attrib);
-	DEFINE_PRIME2 (lime_gl_get_vertex_attrib_offset);
-	DEFINE_PRIME2v (lime_gl_hint);
-	DEFINE_PRIME1 (lime_gl_is_buffer);
-	DEFINE_PRIME1 (lime_gl_is_enabled);
-	DEFINE_PRIME1 (lime_gl_is_framebuffer);
-	DEFINE_PRIME1 (lime_gl_is_program);
-	DEFINE_PRIME1 (lime_gl_is_renderbuffer);
-	DEFINE_PRIME1 (lime_gl_is_shader);
-	DEFINE_PRIME1 (lime_gl_is_texture);
-	DEFINE_PRIME1v (lime_gl_line_width);
-	DEFINE_PRIME1v (lime_gl_link_program);
-	DEFINE_PRIME2v (lime_gl_pixel_storei);
-	DEFINE_PRIME2v (lime_gl_polygon_offset);
-	DEFINE_PRIME8v (lime_gl_read_pixels);
-	DEFINE_PRIME4v (lime_gl_renderbuffer_storage);
-	DEFINE_PRIME2v (lime_gl_sample_coverage);
-	DEFINE_PRIME4v (lime_gl_scissor);
-	DEFINE_PRIME2v (lime_gl_shader_source);
-	DEFINE_PRIME3v (lime_gl_stencil_func);
-	DEFINE_PRIME4v (lime_gl_stencil_func_separate);
-	DEFINE_PRIME1v (lime_gl_stencil_mask);
-	DEFINE_PRIME2v (lime_gl_stencil_mask_separate);
-	DEFINE_PRIME3v (lime_gl_stencil_op);
-	DEFINE_PRIME4v (lime_gl_stencil_op_separate);
-	DEFINE_PRIME10v (lime_gl_tex_image_2d);
-	DEFINE_PRIME3v (lime_gl_tex_parameterf);
-	DEFINE_PRIME3v (lime_gl_tex_parameteri);
-	DEFINE_PRIME10v (lime_gl_tex_sub_image_2d);
-	DEFINE_PRIME4v (lime_gl_uniform_matrix);
-	DEFINE_PRIME2v (lime_gl_uniform1f);
-	DEFINE_PRIME2v (lime_gl_uniform1fv);
-	DEFINE_PRIME2v (lime_gl_uniform1i);
-	DEFINE_PRIME2v (lime_gl_uniform1iv);
-	DEFINE_PRIME3v (lime_gl_uniform2f);
-	DEFINE_PRIME2v (lime_gl_uniform2fv);
-	DEFINE_PRIME3v (lime_gl_uniform2i);
-	DEFINE_PRIME2v (lime_gl_uniform2iv);
-	DEFINE_PRIME4v (lime_gl_uniform3f);
-	DEFINE_PRIME2v (lime_gl_uniform3fv);
-	DEFINE_PRIME4v (lime_gl_uniform3i);
-	DEFINE_PRIME2v (lime_gl_uniform3iv);
-	DEFINE_PRIME5v (lime_gl_uniform4f);
-	DEFINE_PRIME2v (lime_gl_uniform4fv);
-	DEFINE_PRIME5v (lime_gl_uniform4i);
-	DEFINE_PRIME2v (lime_gl_uniform4iv);
-	DEFINE_PRIME1v (lime_gl_use_program);
-	DEFINE_PRIME1v (lime_gl_validate_program);
-	DEFINE_PRIME4v (lime_gl_viewport);
-	DEFINE_PRIME0 (lime_gl_version);
-	DEFINE_PRIME6v (lime_gl_vertex_attrib_pointer);
-	DEFINE_PRIME2v (lime_gl_vertex_attrib1f);
-	DEFINE_PRIME2v (lime_gl_vertex_attrib1fv);
-	DEFINE_PRIME3v (lime_gl_vertex_attrib2f);
-	DEFINE_PRIME2v (lime_gl_vertex_attrib2fv);
-	DEFINE_PRIME4v (lime_gl_vertex_attrib3f);
-	DEFINE_PRIME2v (lime_gl_vertex_attrib3fv);
-	DEFINE_PRIME5v (lime_gl_vertex_attrib4f);
-	DEFINE_PRIME2v (lime_gl_vertex_attrib4fv);
 	
 	
 }

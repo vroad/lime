@@ -1,0 +1,73 @@
+<interface>
+
+<typemap method="in" type="const char*">$1 = $input.c_str();</typemap>
+
+<typemap method="out" type="const char*">$result = HxString($input);</typemap>
+
+<typemap method="in" type="double*">$1 = &amp;$input;</typemap>
+
+<typemap method="in" type="lime::Application*">$1 = val_to_Application($input);</typemap>
+
+<typemap method="out" type="lime::Application*">$result = Application_to_val($input);</typemap>
+
+<typemap method="in" type="lime::ArrayBufferView*">
+  ArrayBufferView tmp$1;
+  tmp$1.Set ($input);
+  $1 = &amp;tmp$1;
+</typemap>
+
+<typemap method="in" type="lime::Bytes">$1 = Bytes($input);</typemap>
+
+<typemap method="in" type="lime::Bytes*">
+  Bytes tmp$1;
+  tmp$1.Set($input);
+  $1 = &amp;tmp$1;
+</typemap>
+
+<typemap method="in" type="lime::Font*">$1 = val_to_Font($input);</typemap>
+
+<typemap method="out" type="lime::Font*">$result = Font_to_val($input);</typemap>
+
+<typemap method="arginit" type="lime::HxVector&lt;double&gt;">$1 = lime::HxVector&lt;double&gt;();</typemap>
+
+<typemap method="in" type="lime::HxVector&lt;double&gt;">val_to_hx_vector_double($input, $1);</typemap>
+
+<typemap method="arginit" type="lime::HxVector&lt;float&gt;">$1 = lime::HxVector&lt;float&gt;();</typemap>
+
+<typemap method="in" type="lime::HxVector&lt;float&gt;">val_to_hx_vector_float($input, $1);</typemap>
+
+<typemap method="arginit" type="lime::HxVector&lt;int&gt;">$1 = lime::HxVector&lt;int&gt;();</typemap>
+
+<typemap method="in" type="lime::HxVector&lt;int&gt;">val_to_hx_vector_int($input, $1);</typemap>
+
+<typemap method="in" type="lime::ImageBuffer*">
+  ImageBuffer tmp$1 = ImageBuffer ($input);
+  $1 =  &amp;tmp$1;
+</typemap>
+
+<typemap method="in" type="lime::Rectangle*">
+  Rectangle tmp$1 = Rectangle ($input);
+  $1 =  &amp;tmp$1;
+</typemap>
+
+<typemap method="in" type="lime::Renderer*">$1 = val_to_Renderer($input);</typemap>
+
+<typemap method="out" type="lime::Renderer*">$result = Renderer_to_val($input);</typemap>
+
+<typemap method="in" type="lime::Window*">$1 = val_to_Window($input);
+</typemap>
+
+<typemap method="out" type="lime::Window*">$result = Window_to_val($input);</typemap>
+
+<typemap method="arginit" type="std::wstring">$1 = std::wstring();</typemap>
+
+<typemap method="out" type="std::wstring">$result = StdWString_to_val($input);</typemap>
+
+<insert>
+<![CDATA[
+#include <hx/CFFIPrime.h>
+#include <system/CFFIPointer.h>
+]]>
+</insert>
+
+</interface>

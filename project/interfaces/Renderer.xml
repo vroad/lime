@@ -1,0 +1,14 @@
+<interface>
+
+<include name="Common.xml"/>
+
+<insert>
+<![CDATA[
+#include <graphics/Renderer.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

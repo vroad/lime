@@ -20,7 +20,7 @@
 #pragma once
 
 #ifdef NATIVE_TOOLKIT_SDL_ANGLE
-#include "../../../graphics/opengl/OpenGL.h"
+#include <graphics/opengl/OpenGL.h>
 #else
 #error
 #endif

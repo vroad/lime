@@ -1,0 +1,18 @@
+<interface>
+
+<include name="Common.xml"/>
+
+<typemap method="in" type="lime::TextLayout*">  $1 = val_to_TextLayout($input);</typemap>
+
+<typemap method="out" type="lime::TextLayout*">  $result = TextLayout_to_val($input);</typemap>
+
+<insert>
+<![CDATA[
+#include <text/TextLayout.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

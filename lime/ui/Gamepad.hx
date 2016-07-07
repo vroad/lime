@@ -1,6 +1,7 @@
 package lime.ui;
 
 
+import lime._internal.utils.CString;
 import lime.app.Event;
 
 #if !macro
@@ -10,6 +11,8 @@ import lime.app.Event;
 @:access(lime.ui.Joystick)
 
 
+@:cffiInterface("GamePad.xml")
+@:cffiCppType("lime::Gamepad")
 class Gamepad {
 	
 	
@@ -37,7 +40,7 @@ class Gamepad {
 	public static function addMappings (mappings:Array<String>):Void {
 		
 		#if (lime_native && !macro)
-		lime_gamepad_add_mappings (mappings);
+		AddMappings (mappings);
 		#end
 		
 	}
@@ -76,7 +79,7 @@ class Gamepad {
 	@:noCompletion private inline function get_guid ():String {
 		
 		#if (lime_native && !macro)
-		return lime_gamepad_get_device_guid (this.id);
+		return GetDeviceGUID (this.id);
 		#elseif (js && html5)
 		var devices = Joystick.__getDeviceData ();
 		return devices[this.id].id;
@@ -90,7 +93,7 @@ class Gamepad {
 	@:noCompletion private inline function get_name ():String {
 		
 		#if (lime_native && !macro)
-		return lime_gamepad_get_device_name (this.id);
+		return GetDeviceName (this.id);
 		#elseif (js && html5)
 		var devices = Joystick.__getDeviceData ();
 		return devices[this.id].id;
@@ -109,9 +112,9 @@ class Gamepad {
 	
 	
 	#if (lime_native && !macro)
-	@:cffi private static function lime_gamepad_add_mappings (mappings:Dynamic):Void;
-	@:cffi private static function lime_gamepad_get_device_guid (id:Int):Dynamic;
-	@:cffi private static function lime_gamepad_get_device_name (id:Int):Dynamic;
+	@:cffi private static function AddMappings (mappings:Dynamic):Void;
+	@:cffi private static function GetDeviceGUID (id:Int):CString;
+	@:cffi private static function GetDeviceName (id:Int):CString;
 	#end
 	
 	

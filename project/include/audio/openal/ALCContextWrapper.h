@@ -25,6 +25,12 @@ namespace lime {
 		
 	};
 	
+	typedef ALCContextWrapper ALCContextWrapper_Nullable;
+	
+	ALCContextWrapper* val_to_ALCContextWrapper (value inHandle);
+	
+	value ALCContextWrapper_to_val (ALCContextWrapper* inInstance);
+	
 	
 }
 

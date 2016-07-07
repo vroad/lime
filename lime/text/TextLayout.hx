@@ -2,6 +2,10 @@ package lime.text;
 
 
 import haxe.io.Bytes;
+import lime._internal.text.FontHandle;
+import lime._internal.text.TextLayoutHandle;
+import lime._internal.utils.CString;
+import lime._internal.utils.HaxeBytes;
 import lime.math.Vector2;
 import lime.system.System;
 import lime.utils.AnonBytes;
@@ -14,6 +18,8 @@ import lime.utils.BytesUtil;
 @:access(lime.text.Font)
 
 
+@:cffiInterface("TextLayout.xml")
+@:cffiCppType("lime::TextLayout")
 class TextLayout {
 	
 	
@@ -30,7 +36,7 @@ class TextLayout {
 	
 	@:noCompletion private var __bytes:AnonBytes;
 	@:noCompletion private var __direction:TextDirection;
-	@:noCompletion private var __handle:Dynamic;
+	@:noCompletion @:cffiHandle private var __handle:TextLayoutHandle;
 	@:noCompletion private var __language:String;
 	@:noCompletion private var __script:TextScript;
 	
@@ -48,7 +54,7 @@ class TextLayout {
 		__dirty = true;
 		
 		#if (lime_native && !macro)
-		__handle = lime_text_layout_create (__direction, __script, __language);
+		__handle = Create (__direction, __script, __language);
 		#end
 	}
 	
@@ -61,7 +67,7 @@ class TextLayout {
 		
 		if (__handle != null && text != null && text != "" && font != null && font.src != null) {
 			
-			__bytes = lime_text_layout_position (__handle, font.src, size, text, __bytes);
+			__bytes = Position (font.src, size, text, __bytes);
 			
 			var __buffer = BytesUtil.getBytesFromAnonBytes (__bytes);
 			var position = 0;
@@ -126,7 +132,7 @@ class TextLayout {
 		__direction = value;
 		
 		#if (lime_native && !macro)
-		lime_text_layout_set_direction (__handle, value);
+		SetDirection (value);
 		#end
 		
 		__dirty = true;
@@ -176,7 +182,7 @@ class TextLayout {
 		__language = value;
 		
 		#if (lime_native && !macro)
-		lime_text_layout_set_language (__handle, value);
+		SetLanguage (value);
 		#end
 		
 		__dirty = true;
@@ -200,7 +206,7 @@ class TextLayout {
 		__script = value;
 		
 		#if (lime_native && !macro)
-		lime_text_layout_set_script (__handle, value);
+		SetScript (value);
 		#end
 		
 		__dirty = true;
@@ -240,11 +246,11 @@ class TextLayout {
 	
 	
 	#if (lime_native && !macro)
-	@:cffi private static function lime_text_layout_create (direction:Int, script:String, language:String):Dynamic;
-	@:cffi private static function lime_text_layout_position (textHandle:Dynamic, fontHandle:Dynamic, size:Int, textString:String, data:Dynamic):Dynamic;
-	@:cffi private static function lime_text_layout_set_direction (textHandle:Dynamic, direction:Int):Void;
-	@:cffi private static function lime_text_layout_set_language (textHandle:Dynamic, language:String):Void;
-	@:cffi private static function lime_text_layout_set_script (textHandle:Dynamic, script:String):Void;
+	@:cffi private static function Create (direction:Int, script:CString, language:CString):TextLayoutHandle;
+	@:cffi private function Position (fontHandle:FontHandle, size:Int, textString:CString, data:HaxeBytes):Dynamic;
+	@:cffi private function SetDirection (direction:Int):Void;
+	@:cffi private function SetLanguage (language:CString):Void;
+	@:cffi private function SetScript (script:CString):Void;
 	#end
 	
 	

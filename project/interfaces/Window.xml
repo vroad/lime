@@ -1,0 +1,14 @@
+<interface>
+
+<include name="Common.xml"/>
+
+<insert>
+<![CDATA[
+#include <ui/Window.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

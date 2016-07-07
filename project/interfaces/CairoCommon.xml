@@ -1,0 +1,62 @@
+<interface>
+	
+<typemap method="in" type="cairo_antialias_t">  $1 = (cairo_antialias_t)$input;</typemap>
+
+<typemap method="in" type="cairo_content_t">  $1 = (cairo_content_t)$input;</typemap>
+
+<typemap method="in" type="cairo_extend_t">  $1 = (cairo_extend_t)$input;</typemap>
+
+<typemap method="in" type="cairo_fill_rule_t">  $1 = (cairo_fill_rule_t)$input;</typemap>
+
+<typemap method="in" type="cairo_filter_t">  $1 = (cairo_filter_t)$input;</typemap>
+
+<typemap method="in" type="cairo_font_face_t*">  $1 = val_to_cairo_font_face_t($input);</typemap>
+
+<typemap method="out" type="cairo_font_face_t*">  $result = cairo_font_face_t_to_val($input);</typemap>
+
+<typemap method="in" type="cairo_font_options_t*">  $1 = val_to_cairo_font_options_t($input);</typemap>
+
+<typemap method="out" type="cairo_font_options_t*">  $result = cairo_font_options_t_to_val($input);</typemap>
+
+<typemap method="in" type="cairo_format_t">  $1 = (cairo_format_t)$input;</typemap>
+
+<typemap method="in" type="cairo_hint_metrics_t">  $1 = (cairo_hint_metrics_t)$input;</typemap>
+
+<typemap method="in" type="cairo_hint_style_t">  $1 = (cairo_hint_style_t)$input;</typemap>
+
+<typemap method="in" type="cairo_line_cap_t">  $1 = (cairo_line_cap_t)$input;</typemap>
+
+<typemap method="in" type="cairo_line_join_t">  $1 = (cairo_line_join_t)$input;</typemap>
+
+<typemap method="in" type="cairo_operator_t">  $1 = (cairo_operator_t)$input;</typemap>
+
+<typemap method="in" type="cairo_pattern_t*">  $1 = val_to_cairo_pattern_t($input);</typemap>
+
+<typemap method="out" type="cairo_pattern_t*">  $result = cairo_pattern_t_to_val($input);</typemap>
+
+<typemap method="arginit" type="cairo_matrix_t">  </typemap>
+
+<typemap method="in" type="cairo_matrix_t*">
+  cairo_matrix_t tmp$1;
+  tmp$1 = val_to_cairo_matrix_t($input);
+  $1 = &amp;tmp$1;
+</typemap>
+
+<typemap method="in" type="cairo_subpixel_order_t">$1 = (cairo_subpixel_order_t)$input;</typemap>
+
+<typemap method="in" type="cairo_surface_t*">$1 = val_to_cairo_surface_t($input);</typemap>
+
+<typemap method="out" type="cairo_surface_t*">$result = cairo_surface_t_to_val($input);</typemap>
+
+<typemap method="in" type="cairo_t*">  $1 = val_to_cairo_t($input);</typemap>
+
+<typemap method="out" type="cairo_t*">  $result = cairo_t_to_val($input);</typemap>
+
+<typemap method="check" type="cairo_t*">
+  if ($1 == NULL) {
+    val_throw (alloc_string ("cairo handle can't be null"));
+    $return;
+  }
+</typemap>
+
+</interface>

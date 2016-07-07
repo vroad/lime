@@ -1,6 +1,7 @@
 package lime.graphics.cairo;
 
 
+import lime._internal.graphics.cairo.CairoFontFaceHandle;
 import lime.system.CFFIPointer;
 import lime.text.Font;
 
@@ -8,16 +9,16 @@ import lime.text.Font;
 @:build(lime.system.CFFI.build())
 #end
 
-
-abstract CairoFTFontFace(CairoFontFace) from CairoFontFace to CairoFontFace from CFFIPointer to CFFIPointer {
+@:cffiInterface("CairoFTFontFace.xml")
+class CairoFTFontFace extends CairoFontFace {
 	
 	
 	public static inline var FT_LOAD_FORCE_AUTOHINT = (1 << 5);
 	
 	
-	private function new () {
+	private function new (handle:CairoFontFaceHandle) {
 		
-		this = cast 0;
+		super (handle);
 		
 	}
 	
@@ -25,7 +26,8 @@ abstract CairoFTFontFace(CairoFontFace) from CairoFontFace to CairoFontFace from
 	public static function create (face:Font, loadFlags:Int):CairoFTFontFace {
 		
 		#if (lime_cairo && !macro)
-		return lime_cairo_ft_font_face_create (face.src, loadFlags);
+		var handle = cairo_ft_font_face_create_wrap (face.src, loadFlags);
+		return handle != null ? new CairoFTFontFace (handle) : null;
 		#else
 		return cast 0;
 		#end
@@ -40,8 +42,8 @@ abstract CairoFTFontFace(CairoFontFace) from CairoFontFace to CairoFontFace from
 	
 	
 	
-	#if (lime_native && !macro)
-	@:cffi private static function lime_cairo_ft_font_face_create (face:CFFIPointer, flags:Int):CFFIPointer;
+	#if (lime_cairo && !macro)
+	@:cffi private static function cairo_ft_font_face_create_wrap (face:CFFIPointer, flags:Int):CairoFontFaceHandle;
 	#end
 	
 	

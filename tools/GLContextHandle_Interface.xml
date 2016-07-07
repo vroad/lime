@@ -1,0 +1,14 @@
+<interface class="lime::GLContextHandle">
+
+<include name="Common.xml"/>
+
+<insert>
+<![CDATA[
+#include <graphics/opengl/GLContextHandle.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

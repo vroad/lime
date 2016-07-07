@@ -30,14 +30,15 @@ namespace lime {
 			virtual int GetY ();
 			virtual void Move (int x, int y);
 			virtual void Resize (int width, int height);
-			virtual bool SetBorderless (bool borderless);
+			virtual void SetBorderless (bool borderless);
 			virtual void SetEnableTextEvents (bool enabled);
-			virtual bool SetFullscreen (bool fullscreen);
+			virtual void SetFullscreen (bool fullscreen);
 			virtual void SetIcon (ImageBuffer *imageBuffer);
-			virtual bool SetMaximized (bool maximized);
-			virtual bool SetMinimized (bool minimized);
-			virtual bool SetResizable (bool resizable);
-			virtual const char* SetTitle (const char* title);
+			virtual void SetMaximized (bool maximized);
+			virtual void SetMinimized (bool minimized);
+			virtual void SetResizable (bool resizable);
+			virtual void SetTitle (const char* title);
+			virtual void SwapWindow ();
 			
 			SDL_Window* sdlWindow;
 		

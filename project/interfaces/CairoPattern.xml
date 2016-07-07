@@ -1,0 +1,16 @@
+<interface>
+
+<include name="Common.xml"/>
+<include name="CairoCommon.xml"/>
+
+<insert>
+<![CDATA[
+#include <graphics/cairo/CairoBindings.h>
+#include <utils/HxVector.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

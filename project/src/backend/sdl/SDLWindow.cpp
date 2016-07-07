@@ -178,11 +178,7 @@ namespace lime {
 	
 	void SDLWindow::Close () {
 		
-		if (sdlWindow) {
-			
-			SDL_DestroyWindow (sdlWindow);
-			
-		}
+		delete this;
 		
 	}
 	
@@ -277,7 +273,7 @@ namespace lime {
 	}
 	
 	
-	bool SDLWindow::SetBorderless (bool borderless) {
+	void SDLWindow::SetBorderless (bool borderless) {
 		
 		if (borderless) {
 			
@@ -288,8 +284,6 @@ namespace lime {
 			SDL_SetWindowBordered (sdlWindow, SDL_TRUE);
 			
 		}
-		
-		return borderless;
 		
 	}
 	
@@ -309,7 +303,7 @@ namespace lime {
 	}
 	
 	
-	bool SDLWindow::SetFullscreen (bool fullscreen) {
+	void SDLWindow::SetFullscreen (bool fullscreen) {
 		
 		if (fullscreen) {
 			
@@ -322,8 +316,6 @@ namespace lime {
 			flags &= ~WINDOW_FLAG_FULLSCREEN;
 			
 		}
-		
-		return fullscreen;
 		
 	}
 	
@@ -342,7 +334,7 @@ namespace lime {
 	}
 	
 	
-	bool SDLWindow::SetMaximized (bool maximized) {
+	void SDLWindow::SetMaximized (bool maximized) {
 		
 		if (maximized) {
 			
@@ -354,12 +346,10 @@ namespace lime {
 			
 		}
 		
-		return maximized;
-		
 	}
 	
 	
-	bool SDLWindow::SetMinimized (bool minimized) {
+	void SDLWindow::SetMinimized (bool minimized) {
 		
 		if (minimized) {
 			
@@ -371,12 +361,10 @@ namespace lime {
 			
 		}
 		
-		return minimized;
-		
 	}
 	
 	
-	bool SDLWindow::SetResizable (bool resizable) {
+	void SDLWindow::SetResizable (bool resizable) {
 		
 		#if defined(HX_WINDOWS)
 		
@@ -411,16 +399,19 @@ namespace lime {
 		
 		#endif
 		
-		return resizable;
+	}
+	
+	
+	void SDLWindow::SetTitle (const char* title) {
+		
+		SDL_SetWindowTitle (sdlWindow, title);
 		
 	}
 	
 	
-	const char* SDLWindow::SetTitle (const char* title) {
+	void SDLWindow::SwapWindow () {
 		
-		SDL_SetWindowTitle (sdlWindow, title);
-		
-		return title;
+		SDL_GL_SwapWindow (sdlWindow);
 		
 	}
 	

@@ -1,6 +1,7 @@
 package lime.graphics.cairo;
 
 
+@:cffiCppType("cairo_antialias_t")
 @:enum abstract CairoAntialias(Int) from Int to Int from UInt to UInt {
 	
 	public var DEFAULT = 0;

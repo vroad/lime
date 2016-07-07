@@ -1,6 +1,7 @@
 package lime.system;
 
 
+import lime._internal.utils.CString;
 import lime.app.Application;
 import lime.math.Rectangle;
 
@@ -28,7 +29,8 @@ import sys.io.Process;
 
 @:access(lime.system.Display)
 @:access(lime.system.DisplayMode)
-
+@:cffiInterface("System.xml")
+@:cffiCppType("lime::System")
 
 class System {
 	
@@ -157,7 +159,7 @@ class System {
 	public static function getDisplay (id:Int):Display {
 		
 		#if (lime_native && !macro)
-		var displayInfo:Dynamic = lime_system_get_display (id);
+		var displayInfo:Dynamic = GetDisplay (id);
 		
 		if (displayInfo != null) {
 			
@@ -225,7 +227,7 @@ class System {
 		#elseif js
 		return cast Date.now ().getTime ();
 		#elseif (lime_native && !disable_cffi && !macro)
-		return cast lime_system_get_timer ();
+		return cast GetTimer ();
 		#elseif cpp
 		return Std.int (untyped __global__.__time_stamp () * 1000);
 		#elseif sys
@@ -258,7 +260,7 @@ class System {
 	private static function get_allowScreenTimeout ():Bool {
 		
 		#if (lime_native && !macro)
-		return lime_system_get_allow_screen_timeout ();
+		return GetAllowScreenTimeout ();
 		#else
 		return true;
 		#end
@@ -269,7 +271,8 @@ class System {
 	private static function set_allowScreenTimeout (value:Bool):Bool {
 		
 		#if (lime_native && !macro)
-		return lime_system_set_allow_screen_timeout (value);
+		SetAllowScreenTimeout (value);
+		return value;
 		#else
 		return true;
 		#end
@@ -280,7 +283,7 @@ class System {
 	private static function get_applicationDirectory ():String {
 		
 		#if (lime_native && !macro)
-		return lime_system_get_directory (SystemDirectory.APPLICATION, null, null);
+		return GetDirectory (SystemDirectory.APPLICATION, null, null);
 		#elseif flash
 		if (Capabilities.playerType == "Desktop") {
 			
@@ -320,7 +323,7 @@ class System {
 		}
 		
 		#if (lime_native && !macro)
-		return lime_system_get_directory (SystemDirectory.APPLICATION_STORAGE, company, file);
+		return GetDirectory (SystemDirectory.APPLICATION_STORAGE, company, file);
 		#elseif flash
 		if (Capabilities.playerType == "Desktop") {
 			
@@ -341,7 +344,7 @@ class System {
 	private static function get_desktopDirectory ():String {
 		
 		#if (lime_native && !macro)
-		return lime_system_get_directory (SystemDirectory.DESKTOP, null, null);
+		return GetDirectory (SystemDirectory.DESKTOP, null, null);
 		#elseif flash
 		if (Capabilities.playerType == "Desktop") {
 			
@@ -362,7 +365,7 @@ class System {
 	private static function get_documentsDirectory ():String {
 		
 		#if (lime_native && !macro)
-		return lime_system_get_directory (SystemDirectory.DOCUMENTS, null, null);
+		return GetDirectory (SystemDirectory.DOCUMENTS, null, null);
 		#elseif flash
 		if (Capabilities.playerType == "Desktop") {
 			
@@ -383,7 +386,7 @@ class System {
 	private static function get_fontsDirectory ():String {
 		
 		#if (lime_native && !macro)
-		return lime_system_get_directory (SystemDirectory.FONTS, null, null);
+		return GetDirectory (SystemDirectory.FONTS, null, null);
 		#else
 		return null;
 		#end
@@ -394,7 +397,7 @@ class System {
 	private static function get_numDisplays ():Int {
 		
 		#if (lime_native && !macro)
-		return lime_system_get_num_displays ();
+		return GetNumDisplays ();
 		#else
 		return 1;
 		#end
@@ -405,7 +408,7 @@ class System {
 	private static function get_userDirectory ():String {
 		
 		#if (lime_native && !macro)
-		return lime_system_get_directory (SystemDirectory.USER, null, null);
+		return GetDirectory (SystemDirectory.USER, null, null);
 		#elseif flash
 		if (Capabilities.playerType == "Desktop") {
 			
@@ -444,19 +447,20 @@ class System {
 	
 	
 	#if (lime_native && !macro)
-	@:cffi private static function lime_system_get_allow_screen_timeout ():Bool;
-	@:cffi private static function lime_system_set_allow_screen_timeout (value:Bool):Bool;
-	@:cffi private static function lime_system_get_directory (type:Int, company:String, title:String):Dynamic;
-	@:cffi private static function lime_system_get_display (index:Int):Dynamic;
-	@:cffi private static function lime_system_get_num_displays ():Int;
-	@:cffi private static function lime_system_get_timer ():Float;
+	@:cffi private static function GetAllowScreenTimeout():Bool;
+	@:cffi private static function GetDirectory (type:SystemDirectory, company:CString, title:CString):Dynamic;
+	@:cffi private static function GetDisplay(id:Int):Dynamic;
+	@:cffi private static function GetNumDisplays():Int;
+	@:cffi private static function GetTimer():Float;
+	@:cffi private static function SetAllowScreenTimeout(allow:Bool):Void;
 	#end
 	
 	
 }
 
 
-@:enum private abstract SystemDirectory(Int) from Int to Int from UInt to UInt {
+@:cffiCppType("lime::SystemDirectory")
+@:enum abstract SystemDirectory(Int) from Int to Int from UInt to UInt {
 	
 	var APPLICATION = 0;
 	var APPLICATION_STORAGE = 1;

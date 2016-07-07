@@ -153,7 +153,7 @@ namespace lime {
 	}
 	
 	
-	Renderer* CreateRenderer (Window* window) {
+	Renderer* Renderer::Create (Window* window) {
 		
 		SDLRenderer *renderer = new SDLRenderer ();
 		
