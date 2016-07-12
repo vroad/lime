@@ -20,6 +20,9 @@ namespace cs.ndll
         private delegate IntPtr AllocAbstractDelegate(int arg1, IntPtr arg2);
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
+        private delegate void FreeAbstractDelegate(IntPtr arg1);
+
+        [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
         private delegate IntPtr ValToKindDelegate(IntPtr arg1, int arg2);
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
@@ -113,6 +116,9 @@ namespace cs.ndll
         private delegate IntPtr ValToBufferDelegate(IntPtr arg1);
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
+        private delegate int BufferSizeDelegate(IntPtr inBuffer);
+
+        [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
         private delegate IntPtr PinBufferDelegate(IntPtr arg1);
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
@@ -152,6 +158,7 @@ namespace cs.ndll
         private static DelegateConverter<ValTypeDelegate> val_type;
         private static DelegateConverter<AllocKindDelegate> alloc_kind;
         private static DelegateConverter<AllocAbstractDelegate> alloc_abstract;
+        private static DelegateConverter<FreeAbstractDelegate> free_abstract;
         private static DelegateConverter<ValToKindDelegate> val_to_kind;
         private static DelegateConverter<ValDataDelegate> val_data;
         private static DelegateConverter<ValArrayIntDelegate> val_array_int;
@@ -183,6 +190,7 @@ namespace cs.ndll
         private static DelegateConverter<BufferDataDelegate> buffer_data;
         private static DelegateConverter<BufferValDelegate> buffer_val;
         private static DelegateConverter<ValToBufferDelegate> val_to_buffer;
+        private static DelegateConverter<BufferSizeDelegate> buffer_size;
         private static DelegateConverter<PinBufferDelegate> pin_buffer;
         private static DelegateConverter<UnPinBufferDelegate> unpin_buffer;
         private static DelegateConverter<ValFieldDelegate> val_field;
@@ -238,6 +246,12 @@ namespace cs.ndll
         private static IntPtr cs_alloc_abstract(int arg1, IntPtr arg2)
         {
             return CSHandleContainer.GetCurrent().CreateGCHandle(new CSAbstract(arg1, arg2));
+        }
+
+        private static void cs_free_abstract(IntPtr inArg1)
+        {
+            CSAbstract arg1 = (CSAbstract)HandleUtils.GetObjectFromIntPtr(inArg1);
+            arg1.Free();
         }
 
         private static IntPtr cs_val_to_kind(IntPtr inArg1, int arg2)
@@ -589,6 +603,15 @@ namespace cs.ndll
             return arg1;
         }
 
+        private static int cs_buffer_size(IntPtr inBuffer)
+        {
+            byte[] buffer = (byte[])HandleUtils.GetObjectFromIntPtr(inBuffer);
+            if (buffer == null)
+                return 0;
+
+            return buffer.Length;
+        }
+
         private static IntPtr cs_buffer_data(IntPtr inBuffer)
         {
             byte[] buffer = (byte[])HandleUtils.GetObjectFromIntPtr(inBuffer);
@@ -632,6 +655,7 @@ namespace cs.ndll
             val_type = new DelegateConverter<ValTypeDelegate>(new ValTypeDelegate(cs_val_type));
             alloc_kind = new DelegateConverter<AllocKindDelegate>(new AllocKindDelegate(cs_alloc_kind));
             alloc_abstract = new DelegateConverter<AllocAbstractDelegate>(new AllocAbstractDelegate(cs_alloc_abstract));
+            free_abstract = new DelegateConverter<FreeAbstractDelegate>(new FreeAbstractDelegate(cs_free_abstract));
             val_to_kind = new DelegateConverter<ValToKindDelegate>(new ValToKindDelegate(cs_val_to_kind));
             val_data = new DelegateConverter<ValDataDelegate>(new ValDataDelegate(cs_val_data));
             val_array_int = new DelegateConverter<ValArrayIntDelegate>(new ValArrayIntDelegate(cs_val_array_int));
@@ -663,6 +687,7 @@ namespace cs.ndll
             buffer_data = new DelegateConverter<BufferDataDelegate>(new BufferDataDelegate(cs_buffer_data));
             buffer_val = new DelegateConverter<BufferValDelegate>(new BufferValDelegate(cs_buffer_val));
             val_to_buffer = new DelegateConverter<ValToBufferDelegate>(new ValToBufferDelegate(cs_val_to_buffer));
+            buffer_size = new DelegateConverter<BufferSizeDelegate>(new BufferSizeDelegate(cs_buffer_size));
             pin_buffer = new DelegateConverter<PinBufferDelegate>(new PinBufferDelegate(cs_pin_buffer));
             unpin_buffer = new DelegateConverter<UnPinBufferDelegate>(new UnPinBufferDelegate(cs_unpin_buffer));
             val_field = new DelegateConverter<ValFieldDelegate>(new ValFieldDelegate(cs_val_field));
@@ -681,6 +706,8 @@ namespace cs.ndll
                     return alloc_kind.ToPointer();
                 case "alloc_abstract":
                     return alloc_abstract.ToPointer();
+                case "free_abstract":
+                    return free_abstract.ToPointer();
                 case "val_to_kind":
                     return val_to_kind.ToPointer();
                 case "val_array_int":
@@ -745,6 +772,8 @@ namespace cs.ndll
                     return buffer_val.ToPointer();
                 case "val_to_buffer":
                     return val_to_buffer.ToPointer();
+                case "buffer_size":
+                    return buffer_size.ToPointer();
                 case "pin_buffer":
                     return pin_buffer.ToPointer();
                 case "unpin_buffer":

@@ -60,6 +60,13 @@ namespace cs.ndll
             handle.Free();
         }
 
+        public void Free()
+        {
+            Pointer = IntPtr.Zero;
+            finalizer = null;
+            disposed = true;
+        }
+
         ~CSAbstract()
         {
             Dispose(false);
