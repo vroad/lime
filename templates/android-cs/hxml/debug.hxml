@@ -1,7 +1,7 @@
 -main ApplicationMain ::HAXE_FLAGS::
 -D net-ver=40
 -D dll
--cp ::BUILD_DIR::/android-cs/haxe
--cs ::BUILD_DIR::/android-cs/obj
+-cp ::OUTPUT_DIR::/haxe
+-cs ::OUTPUT_DIR::/obj
 --macro keep("::APP_MAIN::")
 -debug

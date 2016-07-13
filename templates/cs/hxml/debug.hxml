@@ -1,6 +1,6 @@
 -main ApplicationMain ::HAXE_FLAGS::
 -D net-ver=40
--cp ::BUILD_DIR::/cs/haxe
--cs ::BUILD_DIR::/cs/obj
+-cp ::OUTPUT_DIR::/haxe
+-cs ::OUTPUT_DIR::/obj
 --macro keep("::APP_MAIN::")
 -debug
