@@ -120,7 +120,7 @@ class ProjectXMLParser extends HXProject {
 				
 			}
 			
-		} else if (targetFlags.exists ("cpp") || ((platformType != PlatformType.WEB) && !targetFlags.exists ("html5")) || target == Platform.EMSCRIPTEN) {
+		} else if (targetFlags.exists ("cpp") || target == Platform.EMSCRIPTEN) {
 			
 			defines.set ("native", "1");
 			defines.set ("cpp", "1");
