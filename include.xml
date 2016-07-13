@@ -5,9 +5,6 @@
 	
 	<haxedef name="native" if="native" />
 	
-	<haxedef name="desktop" if="windows || linux || mac || neko || nodejs" />
-	<set name="desktop" if="windows || linux || mac || neko || nodejs" />
-
 	<haxedef name="lime-html5" if="html5" />
 	<haxedef name="lime-native" if="native" unless="doc" />
 	

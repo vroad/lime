@@ -11,6 +11,7 @@ class PlatformTarget {
 	
 	
 	public var additionalArguments:Array <String>;
+	public var buildType:String;
 	public var command:String;
 	public var project:HXProject;
 	public var targetDirectory:String;
@@ -23,6 +24,22 @@ class PlatformTarget {
 		this.command = command;
 		this.project = project;
 		this.targetFlags = targetFlags;
+		
+		buildType = "release";
+		
+		if (project != null) {
+			
+			if (project.debug) {
+				
+				buildType = "debug";
+				
+			} else if (project.targetFlags.exists ("final")) {
+				
+				buildType = "final";
+				
+			}
+			
+		}
 		
 	}
 	

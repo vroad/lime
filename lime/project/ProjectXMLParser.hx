@@ -1789,7 +1789,15 @@ class ProjectXMLParser extends HXProject {
 						
 					}
 					
-					windows[id].background = Std.parseInt (value);
+					if (value == "0x" || (value.length == 10 && StringTools.startsWith (value, "0x00"))) {
+						
+						windows[id].background = null;
+						
+					} else {
+						
+						windows[id].background = Std.parseInt (value);
+						
+					}
 				
 				case "orientation":
 					

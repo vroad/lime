@@ -57,7 +57,7 @@ class WindowsPlatform extends PlatformTarget {
 			
 		}
 		
-		targetDirectory = project.app.path + "/windows/" + targetType;
+		targetDirectory = project.app.path + "/windows/" + targetType + "/" + buildType;
 		applicationDirectory = targetDirectory + "/bin/";
 		executablePath = applicationDirectory + project.app.file + ".exe";
 		
@@ -66,19 +66,7 @@ class WindowsPlatform extends PlatformTarget {
 	
 	public override function build ():Void {
 		
-		var type = "release";
-		
-		if (project.debug) {
-			
-			type = "debug";
-			
-		} else if (project.targetFlags.exists ("final")) {
-			
-			type = "final";
-			
-		}
-		
-		var hxml = targetDirectory + "/haxe/" + type + ".hxml";
+		var hxml = targetDirectory + "/haxe/" + buildType + ".hxml";
 		
 		PathHelper.mkdir (targetDirectory);
 		
@@ -209,22 +197,13 @@ class WindowsPlatform extends PlatformTarget {
 	
 	public override function display ():Void {
 		
-		var type = "release";
-		
-		if (project.debug) {
-			
-			type = "debug";
-			
-		} else if (project.targetFlags.exists ("final")) {
-			
-			type = "final";
-			
-		}
-		
-		var hxml = PathHelper.findTemplate (project.templatePaths, targetType + "/hxml/" + type + ".hxml");
+		var hxml = PathHelper.findTemplate (project.templatePaths, targetType + "/hxml/" + buildType + ".hxml");
 		var template = new Template (File.getContent (hxml));
 		
-		Sys.println (template.execute (generateContext ()));
+		var context = generateContext ();
+		context.OUTPUT_DIR = targetDirectory;
+		
+		Sys.println (template.execute (context));
 		Sys.println ("-D display");
 		
 	}
@@ -306,8 +285,17 @@ class WindowsPlatform extends PlatformTarget {
 		}
 		
 		var context = generateContext ();
+		context.OUTPUT_DIR = targetDirectory;
 		
 		if (targetType == "cpp" && project.targetFlags.exists ("static")) {
+			
+			var suffix = ".lib";
+			
+			if (Sys.getEnv ("VS140COMNTOOLS") != null) {
+				
+				suffix = "-19.lib";
+				
+			}
 			
 			for (i in 0...project.ndlls.length) {
 				
@@ -315,7 +303,7 @@ class WindowsPlatform extends PlatformTarget {
 				
 				if (ndll.path == null || ndll.path == "") {
 					
-					context.ndlls[i].path = PathHelper.getLibraryPath (ndll, "Windows", "lib", ".lib", project.debug);
+					context.ndlls[i].path = PathHelper.getLibraryPath (ndll, "Windows", "lib", suffix, project.debug);
 					
 				}
 				
