@@ -756,7 +756,7 @@ namespace lime {
 			
 		}
 		
-		glDrawElements (mode, count, type, (const GLvoid*)offset);
+		glDrawElements (mode, count, type, (void*)(intptr_t)offset);
 		
 	}
 	
@@ -1449,9 +1449,9 @@ namespace lime {
 			
 		}
 		
-		GLsizeiptr *result;
+		int result = 0;
 		glGetVertexAttribPointerv (index, pname, (GLvoid**)&result);
-		return (int)result;
+		return result;
 		
 	}
 	
@@ -2278,7 +2278,7 @@ namespace lime {
 			
 		}
 		
-		glVertexAttribPointer (indx, size, type, normalized, stride, (const GLvoid*)offset);
+		glVertexAttribPointer (indx, size, type, normalized, stride, (void*)(intptr_t)offset);
 		
 	}
 	
