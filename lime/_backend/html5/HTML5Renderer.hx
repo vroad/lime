@@ -9,6 +9,7 @@ import lime.app.Application;
 import lime.graphics.Image;
 import lime.graphics.GLRenderContext;
 import lime.graphics.Renderer;
+import lime.graphics.opengl.GL;
 import lime.math.Rectangle;
 
 @:access(lime.app.Application)
