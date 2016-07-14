@@ -1040,6 +1040,7 @@ class CFFI {
 		#if bindings
 		if (out != null) {
 			
+			FileSystem.createDirectory (bindingsPath);
 			File.saveBytes (filePath, out.getBytes ());
 			out.close ();
 			
