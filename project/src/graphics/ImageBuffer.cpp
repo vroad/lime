@@ -1,5 +1,5 @@
 #include <graphics/ImageBuffer.h>
-#include <utils/Stringid.h>
+#include <utils/StringId.h>
 
 namespace lime {
 	

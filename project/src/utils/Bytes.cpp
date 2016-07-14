@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <system/System.h>
 #include <utils/Bytes.h>
-#include <utils/Stringid.h>
+#include <utils/StringId.h>
 //#include <hx/CFFIPrimePatch.h>
 #include <hx/CFFIPrime.h>
 #include <hx/CFFIExt.h>
