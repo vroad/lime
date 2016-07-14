@@ -11,7 +11,7 @@ import lime.app.Event;
 @:access(lime.ui.Joystick)
 
 
-@:cffiInterface("GamePad.xml")
+@:cffiInterface("Gamepad.xml")
 @:cffiCppType("lime::Gamepad")
 class Gamepad {
 	
