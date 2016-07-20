@@ -312,9 +312,12 @@ class RenderingContext {
 	public static inline var MAX_RENDERBUFFER_SIZE : Int = 34024;
 	public static inline var INVALID_FRAMEBUFFER_OPERATION : Int = 1286;
 	
+	private var extensions:Array<String>;
+	
 	private function new (handle:ContextHandle) {
 		
 		this.handle = handle;
+		extensions = (getSupportedExtensionsInternal ():String).split (" ");
 		
 	}
 	
@@ -526,6 +529,12 @@ class RenderingContext {
 	public function getShaderSource (shader:Shader):String {
 		
 		return getShaderSourceInternal (shader != null ? shader.handle : null);
+		
+	}
+	
+	public function getSupportedExtensions ():Array<String> {
+		
+		return extensions.copy ();
 		
 	}
 	
@@ -744,7 +753,7 @@ class RenderingContext {
 	
 	@:cffi public function getContextAttributes() : ContextAttributes { throw null; }
 	@:cffi public function isContextLost() : Bool { throw null; }
-	@:cffi public function getSupportedExtensions() : Array<String> { throw null; }
+	@:cffi public function getSupportedExtensionsInternal() : Dynamic { throw null; }
 	@:cffi public function getExtension( name : CString ) : Dynamic { throw null; }
 	@:cffi public function activeTexture( texture : Int ) : Void { throw null; }
 	@:cffi private function attachShaderInternal( program : ProgramHandle, shader : ShaderHandle ) : Void { throw null; }

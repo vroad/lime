@@ -123,16 +123,16 @@ namespace lime {
 		
 	}
 	
-	value GLContext::getSupportedExtensions () {
+	value GLContext::getSupportedExtensionsInternal () {
 		
-		// TODO
 		if (!checkStatus ()) {
 			
 			return alloc_null ();
 			
 		}
 		
-		return alloc_array (0);
+		const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+		return alloc_string (extensions);
 		
 	}
 	

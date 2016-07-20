@@ -33,7 +33,7 @@ namespace lime {
 		
 		value getContextAttributes ();
 		bool isContextLost ();
-		value getSupportedExtensions ();
+		value getSupportedExtensionsInternal ();
 		value getExtension (const char* name);
 		void activeTexture (int texture);
 		void attachShaderInternal (GLProgram* program, GLShader* shader);
