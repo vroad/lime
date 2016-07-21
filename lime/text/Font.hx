@@ -43,7 +43,7 @@ class Font {
 	public var height (get, null):Int;
 	public var name (default, null):String;
 	public var numGlyphs (get, null):Int;
-	@:cffiHandle public var src (default, null):CFFIPointer;
+	@:cffiHandle public var src (default, null):Dynamic;
 	public var underlinePosition (get, null):Int;
 	public var underlineThickness (get, null):Int;
 	public var unitsPerEM (get, null):Int;

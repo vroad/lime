@@ -1142,7 +1142,7 @@ class ImageDataUtil {
 			var srcPremultiplied = sourceImage.buffer.premultiplied;
 			var destPremultiplied = image.buffer.premultiplied;
 			
-			var srcPosition, destPosition, srcPixel:RGBA, destPixel:RGBA, pixelMask:UInt, test:Bool, value:UInt;
+			var srcPosition, destPosition, srcPixel:RGBA, destPixel:RGBA, pixelMask:UInt, test:Bool, value:Int;
 			
 			for (y in 0...destView.height) {
 				

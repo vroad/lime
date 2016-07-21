@@ -605,7 +605,7 @@ class Image {
 	}
 	
 	
-	public function getPixel32 (x:Int, y:Int, format:PixelFormat = null):Int {
+	public function getPixel32 (x:Int, y:Int, format:PixelFormat = null):UInt {
 		
 		if (buffer == null || x < 0 || y < 0 || x >= width || y >= height) return 0;
 		

@@ -270,7 +270,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 		var src = Type.createInstance (className.get (id), []);
 		
 		var font = new Font (src.fontName);
-		font.src = src;
+		@:privateAccess font.src = src;
 		return font;
 		
 		#elseif html5
