@@ -1,12 +1,17 @@
 package lime.net.curl;
 
 
+import lime._internal.utils.CString;
+import lime._internal.utils.TimeTPointer;
+
+
 #if !macro
 @:build(lime.system.CFFI.build())
 #end
 
 
-abstract CURL(Float) from Float to Float {
+@:cffiInterface("CURL.xml")
+class CURL {
 	
 	
 	public static inline var GLOBAL_SSL:Int = 1 << 0;
@@ -17,10 +22,10 @@ abstract CURL(Float) from Float to Float {
 	public static inline var GLOBAL_ACK_EINTR:Int = 1 << 2;
 	
 	
-	public static function getDate (date:String, now:Int):Int {
+	public static function getDate (date:String, now:Float):Float {
 		
 		#if (lime_native && lime_curl && !macro)
-		return cast lime_curl_getdate (date, cast now);
+		return curl_getdate (date, now);
 		#else
 		return 0;
 		#end
@@ -31,7 +36,7 @@ abstract CURL(Float) from Float to Float {
 	public static function globalCleanup ():Void {
 		
 		#if (lime_native && lime_curl && !macro)
-		lime_curl_global_cleanup ();
+		curl_global_cleanup ();
 		#end
 		
 	}
@@ -40,9 +45,9 @@ abstract CURL(Float) from Float to Float {
 	public static function globalInit (flags:Int):CURLCode {
 		
 		#if (lime_native && lime_curl && !macro)
-		return cast lime_curl_global_init (flags);
+		return curl_global_init (flags);
 		#else
-		return cast 0;
+		return 0;
 		#end
 		
 	}
@@ -51,7 +56,7 @@ abstract CURL(Float) from Float to Float {
 	public static function version ():String {
 		
 		#if (lime_native && lime_curl && !macro)
-		return lime_curl_version ();
+		return curl_version ();
 		#else
 		return null;
 		#end
@@ -62,7 +67,7 @@ abstract CURL(Float) from Float to Float {
 	public static function versionInfo (type:CURLVersion):Dynamic {
 		
 		#if (lime_native && lime_curl && !macro)
-		return lime_curl_version_info (cast (type, Int));
+		return curl_version_info_wrap (type);
 		#else
 		return null;
 		#end
@@ -70,20 +75,11 @@ abstract CURL(Float) from Float to Float {
 	}
 	
 	
-	@:op(A > B) private static inline function intGt (a:CURL, b:Float):Bool {
-		
-		return (a:Float) > b;
-		
-	}
-	
-	
-	#if (lime_native && lime_curl && !macro)
-	@:cffi private static function lime_curl_getdate (date:String, now:Float):Float;
-	@:cffi private static function lime_curl_global_cleanup ():Void;
-	@:cffi private static function lime_curl_global_init (flags:Int):Int;
-	@:cffi private static function lime_curl_version ():Dynamic;
-	@:cffi private static function lime_curl_version_info (type:Int):Dynamic;
-	#end
+	@:cffi private static function curl_getdate (date:CString, now:TimeTPointer):Float { throw null; }
+	@:cffi private static function curl_global_cleanup ():Void { throw null; }
+	@:cffi private static function curl_global_init (flags:Int):Int { throw null; }
+	@:cffi private static function curl_version ():CString { throw null; }
+	@:cffi private static function curl_version_info_wrap (type:Int):Dynamic { throw null; }
 	
 	
 }

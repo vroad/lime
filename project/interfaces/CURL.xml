@@ -1,0 +1,15 @@
+<interface>
+
+<include name="Common.xml"/>
+<include name="CURLCommon.xml"/>
+
+<insert>
+<![CDATA[
+#include <net/curl/CURLBindings.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

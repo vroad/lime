@@ -1,6 +1,7 @@
 package lime.net.curl;
 
 
+@:cffiCppType("CURLoption")
 @:enum abstract CURLOption(Int) from Int to Int from UInt to UInt {
 	
 	//var FILE = 10001;

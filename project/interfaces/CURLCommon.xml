@@ -1,0 +1,13 @@
+<interface>
+
+<typemap method="in" type="time_t*">  $1 = (time_t*)&amp;$input;</typemap>
+
+<typemap method="in" type="CURL*">  $1 = val_to_CURL($input);</typemap>
+
+<typemap method="out" type="CURL*">  $result = CURL_to_val($input);</typemap>
+
+<typemap method="in" type="CURLcode">  $1 = (CURLcode)$input;</typemap>
+
+<typemap method="in" type="CURLoption">  $1 = (CURLoption)$input;</typemap>
+
+</interface>

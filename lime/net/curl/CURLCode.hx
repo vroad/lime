@@ -1,6 +1,7 @@
 package lime.net.curl;
 
 
+@:cffiCppType("CURLcode")
 @:enum abstract CURLCode(Int) from Int to Int from UInt to UInt {
 	
 	var OK = 0;

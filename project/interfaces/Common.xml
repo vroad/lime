@@ -63,6 +63,8 @@
 
 <typemap method="out" type="std::wstring">$result = StdWString_to_val($input);</typemap>
 
+<typemap method="in" type="size_t*">$1 = (size_t*)&amp;$input;</typemap>
+
 <insert>
 <![CDATA[
 #include <hx/CFFIPrime.h>

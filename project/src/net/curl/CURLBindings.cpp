@@ -1,44 +1,28 @@
-#include <curl/curl.h>
+#include <net/curl/CURLBindings.h>
 //#include <hx/CFFIPrimePatch.h>
 #include <hx/CFFIPrime.h>
 #include <utils/Bytes.h>
 #include <string.h>
 
-#include <utils/PointerWrapper.h>
 #include <utils/GCRootUtils.h>
-#include <system/CFFIPointer.h>
+#include <utils/Kinds.h>
+#include <utils/PointerUtils.h>
 
 namespace lime {
 	
-	void lime_curl_easy_cleanup (value handle) {
+	
+	void gc_CURL (value inHandle) {
 		
-		CURL *curl = (CURL*)val_data (handle);
+		CURL* curl = (CURL*)val_data (inHandle);
 		curl_easy_cleanup (curl);
+		free_abstract (inHandle);
 		
 	}
 	
 	
-	value lime_curl_easy_duphandle (value handle) {
-		
-		CURL *curl = (CURL*)val_data (handle);
-		return CFFIPointer (curl_easy_duphandle (curl));
-		
-	}
-	
-	
-	value lime_curl_easy_escape (value inCurl, HxString url, int length) {
-		
-		CURL *curl = (CURL*)val_data (inCurl);
-		char* result = curl_easy_escape (curl, url.__s, length);
-		return result ? alloc_string (result) : alloc_null ();
-		
-	}
-	
-	
-	value lime_curl_easy_getinfo (value inCurl, int info) {
+	value curl_easy_getinfo_wrap (CURL* handle, int info) {
 		
 		CURLcode code = CURLE_OK;
-		CURL* handle = (CURL*)val_data (inCurl);
 		CURLINFO type = (CURLINFO)info;
 		
 		switch (type) {
@@ -124,55 +108,6 @@ namespace lime {
 	}
 	
 	
-	value lime_curl_easy_init () {
-		
-		return CFFIPointer (curl_easy_init ());
-		
-	}
-	
-	
-	int lime_curl_easy_pause (value handle, int bitmask) {
-		
-		CURL *curl = (CURL*)val_data (handle);
-		return curl_easy_pause (curl, bitmask);
-		
-	}
-	
-	
-	int lime_curl_easy_perform (value easy_handle) {
-		
-		CURL *curl = (CURL*)val_data (easy_handle);
-		return curl_easy_perform (curl);
-		
-	}
-	
-	
-	int lime_curl_easy_recv (value curl, value buffer, int buflen, int n) {
-		
-		// TODO
-		
-		return 0;
-		
-	}
-	
-	
-	void lime_curl_easy_reset (value inCurl) {
-		
-		CURL *curl = (CURL*)val_data (inCurl);
-		curl_easy_reset (curl);
-		
-	}
-	
-	
-	int lime_curl_easy_send (value curl, value buffer, int buflen, int n) {
-		
-		// TODO
-		
-		return 0;
-		
-	}
-	
-	
 	static size_t write_callback (void *ptr, size_t size, size_t nmemb, void *userp) {
 		
 		AutoGCRoot* callback = (AutoGCRoot*)userp;
@@ -224,10 +159,9 @@ namespace lime {
 	}
 	
 	
-	int lime_curl_easy_setopt (value handle, int option, value parameter) {
+	int curl_easy_setopt_wrap (CURL* curl, int option, value parameter) {
 		
 		CURLcode code = CURLE_OK;
-		CURL* curl = (CURL*)val_data (handle);
 		CURLoption type = (CURLoption)option;
 		
 		switch (type) {
@@ -512,48 +446,9 @@ namespace lime {
 	}
 	
 	
-	value lime_curl_easy_strerror (int errornum) {
-		
-		const char* result = curl_easy_strerror ((CURLcode)errornum);
-		return result ? alloc_string (result) : alloc_null ();
-		
-	}
-	
-	
-	value lime_curl_easy_unescape (value inCurl, HxString url, int inlength, int outlength) {
-		
-		CURL* curl = (CURL*)val_data (inCurl);
-		char* result = curl_easy_unescape (curl, url.__s, inlength, &outlength);
-		return result ? alloc_string (result) : alloc_null ();
-		
-	}
-	
-	
 	//lime_curl_formadd;
 	//lime_curl_formfree;
 	//lime_curl_formget;
-	
-	
-	double lime_curl_getdate (HxString datestring, double now) {
-		
-		time_t time = (time_t)now;
-		return curl_getdate (datestring.__s, &time);
-		
-	}
-	
-	
-	void lime_curl_global_cleanup () {
-		
-		curl_global_cleanup ();
-		
-	}
-	
-	
-	int lime_curl_global_init (int flags) {
-		
-		return curl_global_init (flags);
-		
-	}
 	
 	
 	//lime_curl_multi_add_handle
@@ -579,15 +474,18 @@ namespace lime {
 	//lime_curl_slist_free_all
 	
 	
-	value lime_curl_version () {
+	value curl_easy_unescape_wrap (CURL* curl, HxString url) {
 		
-		char* result = curl_version ();
-		return result ? alloc_string (result) : alloc_null ();
+		int outLength;
+		char* result = curl_easy_unescape (curl, url.c_str (), url.size (), &outLength);
+		value hxResult = alloc_string_len (result, outLength);
+		curl_free (result);
+		return hxResult;
 		
 	}
 	
 	
-	value lime_curl_version_info (int type) {
+	value curl_version_info_wrap (int type) {
 		
 		curl_version_info_data* data = curl_version_info ((CURLversion)type);
 		
@@ -598,24 +496,18 @@ namespace lime {
 	}
 	
 	
-	DEFINE_PRIME1v (lime_curl_easy_cleanup);
-	DEFINE_PRIME1 (lime_curl_easy_duphandle);
-	DEFINE_PRIME3 (lime_curl_easy_escape);
-	DEFINE_PRIME2 (lime_curl_easy_getinfo);
-	DEFINE_PRIME0 (lime_curl_easy_init);
-	DEFINE_PRIME2 (lime_curl_easy_pause);
-	DEFINE_PRIME1 (lime_curl_easy_perform);
-	DEFINE_PRIME4 (lime_curl_easy_recv);
-	DEFINE_PRIME1v (lime_curl_easy_reset);
-	DEFINE_PRIME4 (lime_curl_easy_send);
-	DEFINE_PRIME3 (lime_curl_easy_setopt);
-	DEFINE_PRIME1 (lime_curl_easy_strerror);
-	DEFINE_PRIME4 (lime_curl_easy_unescape);
-	DEFINE_PRIME2 (lime_curl_getdate);
-	DEFINE_PRIME0v (lime_curl_global_cleanup);
-	DEFINE_PRIME1 (lime_curl_global_init);
-	DEFINE_PRIME0 (lime_curl_version);
-	DEFINE_PRIME1 (lime_curl_version_info);
+	CURL* val_to_CURL (value inHandle) {
+		
+		return lime_abstract_to_pointer<CURL> (inHandle, Kinds::Get ()->CURL);
+		
+	}
+	
+	
+	value CURL_to_val (CURL* inInstance) {
+		
+		return CFFIPointer (inInstance, gc_CURL, Kinds::Get ()->CURL);
+		
+	}
 	
 	
 }

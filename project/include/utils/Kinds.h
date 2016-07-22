@@ -23,6 +23,7 @@ namespace lime {
 		vkind Application;
 		vkind ALCContextWrapper;
 		vkind ALCdevice;
+		vkind CURL;
 		vkind Font;
 		vkind GLContext;
 		vkind GLBuffer;

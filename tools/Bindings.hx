@@ -6,6 +6,8 @@ import lime._backend.native.opengl.RenderingContext;
 import lime.graphics.cairo.Cairo;
 import lime.graphics.cairo.CairoFontFace;
 import lime.graphics.cairo.CairoFTFontFace;
+import lime.net.curl.CURL;
+import lime.net.curl.CURLEasy;
 import lime.system.CFFI;
 import lime.text.TextLayout;
 import lime.ui.Gamepad;
@@ -39,6 +41,9 @@ class Bindings {
 		filesElement.addChild (createCompilerFlagElement ("-DLIME_OPENAL"));
 		filesElement.addChild (createCompilerFlagElement ("-DAL_LIBTYPE_STATIC=1"));
 		filesElement.addChild (createCompilerFlagElement ("-DAL_ALEXT_PROTOTYPES"));
+		filesElement.addChild (createCompilerFlagElement ("-I${NATIVE_TOOLKIT_PATH}/curl/include/"));
+		filesElement.addChild (createCompilerFlagElement ("-DLIME_CURL"));
+		filesElement.addChild (createCompilerFlagElement ("-DCURL_STATICLIB"));
 		
 		for (file in CFFI.files) {
 			

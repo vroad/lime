@@ -94,34 +94,34 @@ class HTTPRequest {
 			bytesLoaded = 0;
 			bytesTotal = 0;
 			
-			var curl = CURLEasy.init ();
+			var curl = CURLEasy.create ();
 			
-			CURLEasy.setopt (curl, URL, url);
-			CURLEasy.setopt (curl, HTTPGET, true);
+			curl.setopt (URL, url);
+			curl.setopt (HTTPGET, true);
 			
-			CURLEasy.setopt (curl, FOLLOWLOCATION, true);
-			CURLEasy.setopt (curl, AUTOREFERER, true);
-			CURLEasy.setopt (curl, HTTPHEADER, [ "Expect: " ]);
+			curl.setopt (FOLLOWLOCATION, true);
+			curl.setopt (AUTOREFERER, true);
+			curl.setopt (HTTPHEADER, [ "Expect: " ]);
 			
-			CURLEasy.setopt (curl, PROGRESSFUNCTION, curl_onProgress);
-			CURLEasy.setopt (curl, WRITEFUNCTION, curl_onWrite);
+			curl.setopt (PROGRESSFUNCTION, curl_onProgress);
+			curl.setopt (WRITEFUNCTION, curl_onWrite);
 			
-			CURLEasy.setopt (curl, SSL_VERIFYPEER, false);
-			CURLEasy.setopt (curl, SSL_VERIFYHOST, 0);
-			CURLEasy.setopt (curl, USERAGENT, "libcurl-agent/1.0");
-			CURLEasy.setopt (curl, CONNECTTIMEOUT, 30);
-			CURLEasy.setopt (curl, TRANSFERTEXT, 0);
+			curl.setopt (SSL_VERIFYPEER, false);
+			curl.setopt (SSL_VERIFYHOST, 0);
+			curl.setopt (USERAGENT, "libcurl-agent/1.0");
+			curl.setopt (CONNECTTIMEOUT, 30);
+			curl.setopt (TRANSFERTEXT, 0);
 			
 			var worker = new BackgroundWorker ();
 			worker.doWork.add (function (_) {
 				
-				var result = CURLEasy.perform (curl);
+				var result = curl.perform ();
 				worker.sendComplete (result);
 				
 			});
 			worker.onComplete.add (function (result) {
 				
-				var responseCode = CURLEasy.getinfo (curl, RESPONSE_CODE);
+				var responseCode = curl.getinfo (RESPONSE_CODE);
 				
 				if (result == CURLCode.OK) {
 					

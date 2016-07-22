@@ -2,6 +2,7 @@
 -neko dummy.n
 -cp ..
 -D lime-cairo
+-D lime-curl
 -D lime-native
 -D lime-openal
 -D native
