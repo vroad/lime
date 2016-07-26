@@ -1,6 +1,7 @@
 package lime.utils;
 
 import haxe.io.Bytes;
+import haxe.io.BytesData;
 
 class BytesUtil
 {
@@ -35,7 +36,7 @@ class BytesUtil
 		
 	}
 	
-	public static function createBytes (length:Int, b:Dynamic):Bytes {
+	public static function createBytes (length:Int, b:BytesData):Bytes {
 		
 		#if ((js && haxe < 3.2) || !js)
 		@:privateAccess return new Bytes (length, b);

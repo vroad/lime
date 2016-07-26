@@ -4,7 +4,7 @@ package lime.text;
 import haxe.io.Bytes;
 import lime._internal.text.FontHandle;
 import lime._internal.utils.CString;
-import lime._internal.utils.HaxeBytes;
+import lime._internal.utils.LimeBytes;
 import lime._internal.utils.StdWString;
 import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
@@ -394,8 +394,8 @@ class Font {
 	@:cffi private function GetUnitsPerEM ():Int;
 	@:cffi private static function Load (data:Dynamic):FontHandle;
 	@:cffi private function Decompose (size:Int):Dynamic;
-	@:cffi private function RenderGlyph (index:Int, data:HaxeBytes):Dynamic;
-	@:cffi private function RenderGlyphs (indices:Dynamic, data:HaxeBytes):Array<Dynamic>;
+	@:cffi private function RenderGlyph (index:Int, data:LimeBytes):Dynamic;
+	@:cffi private function RenderGlyphs (indices:Dynamic, data:LimeBytes):Array<Dynamic>;
 	@:cffi private function SetSize (size:Int):Void;
 	#end
 	

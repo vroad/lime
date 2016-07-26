@@ -1,0 +1,14 @@
+<interface>
+
+<include name="Common.xml"/>
+
+<insert>
+<![CDATA[
+#include <utils/compress/LZMA.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

@@ -1,5 +1,6 @@
 package lime.graphics.cairo;
 
+import lime._internal.utils.LimeBytes;
 import lime.utils.AnonBytes;
 import lime.utils.BytesUtil;
 

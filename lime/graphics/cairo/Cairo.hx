@@ -528,8 +528,6 @@ class Cairo {
 	}
 	
 	
-
-	
 	
 	
 	// Get & Set Methods

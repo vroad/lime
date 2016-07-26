@@ -394,6 +394,8 @@ class NativeApplication {
 		
 		for (renderer in parent.renderers) {
 			
+			if (renderer == null) continue;
+			
 			parent.renderer = renderer;
 			
 			switch (renderEventInfo.type) {

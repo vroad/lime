@@ -5,7 +5,7 @@ import haxe.io.Bytes;
 import lime._internal.text.FontHandle;
 import lime._internal.text.TextLayoutHandle;
 import lime._internal.utils.CString;
-import lime._internal.utils.HaxeBytes;
+import lime._internal.utils.LimeBytes;
 import lime.math.Vector2;
 import lime.system.System;
 import lime.utils.AnonBytes;
@@ -34,7 +34,7 @@ class TextLayout {
 	
 	private var __dirty:Bool;
 	
-	@:noCompletion private var __bytes:AnonBytes;
+	@:noCompletion private var __buffer:Bytes;
 	@:noCompletion private var __direction:TextDirection;
 	@:noCompletion @:cffiHandle private var __handle:TextLayoutHandle;
 	@:noCompletion private var __language:String;
@@ -67,9 +67,9 @@ class TextLayout {
 		
 		if (__handle != null && text != null && text != "" && font != null && font.src != null) {
 			
-			__bytes = Position (font.src, size, text, __bytes);
+			var bytes = Position (font.src, size, text, __buffer);
 			
-			var __buffer = BytesUtil.getBytesFromAnonBytes (__bytes);
+			__buffer = BytesUtil.getBytesFromAnonBytes (bytes);
 			var position = 0;
 			
 			if (__buffer.length > 4) {
@@ -247,7 +247,7 @@ class TextLayout {
 	
 	#if (lime_native && !macro)
 	@:cffi private static function Create (direction:Int, script:CString, language:CString):TextLayoutHandle;
-	@:cffi private function Position (fontHandle:FontHandle, size:Int, textString:CString, data:HaxeBytes):Dynamic;
+	@:cffi private function Position (fontHandle:FontHandle, size:Int, textString:CString, data:LimeBytes):AnonBytes;
 	@:cffi private function SetDirection (direction:Int):Void;
 	@:cffi private function SetLanguage (language:CString):Void;
 	@:cffi private function SetScript (script:CString):Void;

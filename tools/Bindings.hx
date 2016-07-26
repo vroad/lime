@@ -12,6 +12,10 @@ import lime.system.CFFI;
 import lime.text.TextLayout;
 import lime.ui.Gamepad;
 import lime.ui.Joystick;
+import lime.utils.compress.Deflate;
+import lime.utils.compress.GZip;
+import lime.utils.compress.LZMA;
+import lime.utils.compress.Zlib;
 import sys.FileSystem;
 import sys.io.File;
 

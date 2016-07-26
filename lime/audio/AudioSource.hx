@@ -7,7 +7,6 @@ import lime.app.Event;
 import lime.audio.openal.AL;
 import lime.math.Vector4;
 import lime.system.System;
-import lime.utils.AnonBytes;
 import lime.utils.BytesUtil;
 import lime.utils.UInt8Array;
 

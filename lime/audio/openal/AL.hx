@@ -1,7 +1,6 @@
 package lime.audio.openal;
 
 
-import lime._internal.utils.HaxeBytes;
 import lime._internal.utils.HxVector_Float;
 import lime._internal.utils.HxVector_Int;
 import lime._internal.utils.CString;

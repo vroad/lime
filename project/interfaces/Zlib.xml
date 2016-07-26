@@ -1,0 +1,16 @@
+<interface>
+
+<include name="Common.xml"/>
+
+<typemap method="in" type="lime::ZlibType">  $1 = (lime::ZlibType)$input;</typemap>
+
+<insert>
+<![CDATA[
+#include <utils/compress/Zlib.h>
+
+using namespace lime;
+
+]]>
+</insert>
+
+</interface>

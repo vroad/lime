@@ -1,4 +1,4 @@
-#include <utils/LZMA.h>
+#include <utils/compress/LZMA.h>
 #include "LzmaEnc.h"
 #include "LzmaDec.h"
 
@@ -32,33 +32,9 @@ namespace lime {
 	}
 	
 	
-	void LZMA::Decode (Bytes* data, Bytes* result) {
+	value LZMA::Compress (Bytes* data) {
 		
-		SizeT inputBufferSize = data->Length ();
-		Byte* inputBufferData = data->Data ();
-		Int64 uncompressedLength = -1;
-		
-		ELzmaStatus status = LZMA_STATUS_NOT_SPECIFIED;
-		ISzAlloc alloc = { LZMA_alloc, LZMA_free };
-		CLzmaProps props = { 0 };
-		
-		LzmaProps_Decode (&props, inputBufferData, LZMA_PROPS_SIZE);
-		uncompressedLength = READ_LE64 (inputBufferData + LZMA_PROPS_SIZE);
-		
-		result->Resize ((int)uncompressedLength);
-		
-		SizeT outputBufferSize = result->Length ();
-		Byte* outputBufferData = result->Data ();
-		
-		Byte* _inputBufferData = inputBufferData + LZMA_PROPS_SIZE + sizeof (uncompressedLength);
-		SizeT _inputBufferSize = inputBufferSize - LZMA_PROPS_SIZE - sizeof (uncompressedLength);
-		
-		LzmaDecode (outputBufferData, &outputBufferSize, _inputBufferData, &_inputBufferSize, inputBufferData, LZMA_PROPS_SIZE, LZMA_FINISH_ANY, &status, &alloc);
-		
-	}
-	
-	
-	void LZMA::Encode (Bytes* data, Bytes* result) {
+		Bytes result;
 		
 		SizeT inputBufferSize = data->Length ();
 		Byte* inputBufferData = data->Data ();
@@ -81,8 +57,8 @@ namespace lime {
 		
 		LzmaEncode (outputBufferData, &outputBufferSize, inputBufferData, inputBufferSize, &props, propsData, &propsSize, props.writeEndMark, &progress, &allocSmall, &allocBig);
 		
-		result->Resize (outputBufferSize + propsSize + 8);
-		Byte* resultData = result->Data ();
+		result.Resize (outputBufferSize + propsSize + 8);
+		Byte* resultData = result.Data ();
 		
 		memcpy (resultData, propsData, propsSize);
 		WRITE_LE64 (resultData + propsSize, uncompressedLength);
@@ -90,6 +66,38 @@ namespace lime {
 		
 		free (outputBufferData);
 		free (propsData);
+		
+		return result.Value ();
+		
+	}
+	
+	
+	value LZMA::Decompress (Bytes* data) {
+		
+		Bytes result;
+		
+		SizeT inputBufferSize = data->Length ();
+		Byte* inputBufferData = data->Data ();
+		Int64 uncompressedLength = -1;
+		
+		ELzmaStatus status = LZMA_STATUS_NOT_SPECIFIED;
+		ISzAlloc alloc = { LZMA_alloc, LZMA_free };
+		CLzmaProps props = { 0 };
+		
+		LzmaProps_Decode (&props, inputBufferData, LZMA_PROPS_SIZE);
+		uncompressedLength = READ_LE64 (inputBufferData + LZMA_PROPS_SIZE);
+		
+		result.Resize ((int)uncompressedLength);
+		
+		SizeT outputBufferSize = result.Length ();
+		Byte* outputBufferData = result.Data ();
+		
+		Byte* _inputBufferData = inputBufferData + LZMA_PROPS_SIZE + sizeof (uncompressedLength);
+		SizeT _inputBufferSize = inputBufferSize - LZMA_PROPS_SIZE - sizeof (uncompressedLength);
+		
+		LzmaDecode (outputBufferData, &outputBufferSize, _inputBufferData, &_inputBufferSize, inputBufferData, LZMA_PROPS_SIZE, LZMA_FINISH_ANY, &status, &alloc);
+		
+		return result.Value ();
 		
 	}
 	

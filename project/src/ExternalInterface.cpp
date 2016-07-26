@@ -41,10 +41,9 @@
 #include <ui/TouchEvent.h>
 #include <ui/Window.h>
 #include <ui/WindowEvent.h>
+
 #include <utils/PointerWrapper.h>
-#ifdef LIME_LZMA
-#include <utils/LZMA.h>
-#endif
+
 #include <vm/NekoVM.h>
 #ifdef LIME_OGG
 #include <audio/OggAudioStream.h>
@@ -591,40 +590,6 @@ namespace lime {
 	}
 	
 	
-	value lime_lzma_decode (value buffer) {
-		
-		#ifdef LIME_LZMA
-		Bytes data;
-		data.Set (buffer);
-		Bytes result;
-		
-		LZMA::Decode (&data, &result);
-		
-		return result.Value ();
-		#else
-		return alloc_null ();
-		#endif
-		
-	}
-	
-	
-	value lime_lzma_encode (value buffer) {
-		
-		#ifdef LIME_LZMA
-		Bytes data;
-		data.Set (buffer);
-		Bytes result;
-		
-		LZMA::Encode (&data, &result);
-		
-		return result.Value ();
-		#else
-		return alloc_null ();
-		#endif
-		
-	}
-	
-	
 	void lime_neko_execute (HxString module) {
 		
 		#ifdef LIME_NEKO
@@ -781,8 +746,6 @@ namespace lime {
 	DEFINE_PRIME1 (lime_image_load);
 	DEFINE_PRIME2 (lime_jpeg_decode_bytes);
 	DEFINE_PRIME2 (lime_jpeg_decode_file);
-	DEFINE_PRIME1 (lime_lzma_decode);
-	DEFINE_PRIME1 (lime_lzma_encode);
 	DEFINE_PRIME1v (lime_neko_execute);
 	DEFINE_PRIME2 (lime_png_decode_bytes);
 	DEFINE_PRIME2 (lime_png_decode_file);
