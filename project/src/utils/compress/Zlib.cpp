@@ -13,7 +13,6 @@ namespace lime {
 			
 			case DEFLATE: windowBits = -15; break;
 			case GZIP: windowBits = 31; break;
-			default: return alloc_null ();
 			
 		}
 		
@@ -71,7 +70,6 @@ namespace lime {
 			
 			case DEFLATE: windowBits = -15; break;
 			case GZIP: windowBits = 31; break;
-			default: return alloc_null ();
 			
 		}
 		
