@@ -1,6 +1,8 @@
 package lime.utils;
 
-class ArrayBufferViewUtils {
+
+class ArrayBufferViewTools {
+	
 	
 	public static function toAnonArrayBufferView (view:ArrayBufferView):AnonArrayBufferView {
 		

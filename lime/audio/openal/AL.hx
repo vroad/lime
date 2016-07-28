@@ -7,7 +7,7 @@ import lime._internal.utils.CString;
 import lime.utils.AnonArrayBufferView;
 import lime.utils.ArrayBufferView;
 import lime.utils.BytesUtil;
-using lime.utils.ArrayBufferViewUtils;
+using lime.utils.ArrayBufferViewTools;
 
 #if ((haxe_ver >= 3.2) && cpp)
 import cpp.Float32;
