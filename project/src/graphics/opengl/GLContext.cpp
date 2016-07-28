@@ -299,7 +299,7 @@ namespace lime {
 		
 	}
 	
-	void GLContext::bufferData (int target, ArrayBufferView* data, int usage) {
+	void GLContext::bufferDataInternal (int target, ArrayBufferView* data, int usage) {
 		
 		if (!checkStatus ()) {
 			
@@ -311,7 +311,7 @@ namespace lime {
 		
 	}
 	
-	void GLContext::bufferSubData (int target, int offset, ArrayBufferView* data) {
+	void GLContext::bufferSubDataInternal (int target, int offset, ArrayBufferView* data) {
 		
 		if (!checkStatus ()) {
 			
@@ -411,7 +411,7 @@ namespace lime {
 		
 	}
 	
-	void GLContext::compressedTexImage2D (int target, int level, int internalformat, int width, int height, int border, ArrayBufferView* data) {
+	void GLContext::compressedTexImage2DInternal (int target, int level, int internalformat, int width, int height, int border, ArrayBufferView* data) {
 		
 		if (!checkStatus ()) {
 			
@@ -423,7 +423,7 @@ namespace lime {
 		
 	}
 	
-	void GLContext::compressedTexSubImage2D (int target, int level, int xoffset, int yoffset, int width, int height, int format, ArrayBufferView* data) {
+	void GLContext::compressedTexSubImage2DInternal (int target, int level, int xoffset, int yoffset, int width, int height, int format, ArrayBufferView* data) {
 		
 		if (!checkStatus ()) {
 			
@@ -1599,7 +1599,7 @@ namespace lime {
 		
 	}
 	
-	void GLContext::readPixels (int x, int y, int width, int height, int format, int type, ArrayBufferView* pixels) {
+	void GLContext::readPixelsInternal (int x, int y, int width, int height, int format, int type, ArrayBufferView* pixels) {
 		
 		if (!checkStatus ()) {
 			
@@ -1741,7 +1741,7 @@ namespace lime {
 		
 	}
 	
-	void GLContext::texImage2D (int target, int level, int internalformat, int width, int height, int border, int format, int type, ArrayBufferView* pixels) {
+	void GLContext::texImage2DInternal (int target, int level, int internalformat, int width, int height, int border, int format, int type, ArrayBufferView* pixels) {
 		
 		if (!checkStatus ()) {
 			
@@ -1777,7 +1777,7 @@ namespace lime {
 		
 	}
 	
-	void GLContext::texSubImage2D (int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, ArrayBufferView* pixels) {
+	void GLContext::texSubImage2DInternal (int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, ArrayBufferView* pixels) {
 		
 		if (!checkStatus ()) {
 			

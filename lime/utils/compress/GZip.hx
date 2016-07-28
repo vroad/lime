@@ -2,6 +2,7 @@ package lime.utils.compress;
 
 
 import haxe.io.Bytes;
+using lime.utils.BytesTools;
 
 
 @:access(lime.utils.compress.Zlib)
@@ -12,9 +13,9 @@ class GZip {
 		
 		#if (lime_native && !macro)
 		
-		var data:Dynamic = Zlib.Compress (ZlibType.GZIP, bytes);
+		var data = Zlib.Compress (ZlibType.GZIP, bytes);
 		if (data == null) return null;
-		return @:privateAccess new Bytes (data.length, data.b);
+		return Bytes.ofAnonBytes (data);
 		
 		#elseif (js && html5)
 		
@@ -36,7 +37,7 @@ class GZip {
 		
 		var data:Dynamic = Zlib.Decompress (ZlibType.GZIP, bytes);
 		if (data == null) return null;
-		return @:privateAccess new Bytes (data.length, data.b);
+		return Bytes.ofAnonBytes (data);
 		
 		#elseif (js && html5)
 		

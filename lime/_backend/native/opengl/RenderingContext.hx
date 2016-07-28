@@ -2,10 +2,15 @@ package lime._backend.native.opengl;
 
 import lime._backend.native.WindowHandle;
 import lime._internal.utils.CString;
+import lime._internal.utils.LimeArrayBufferView;
 import lime.system.CFFIPointer;
+import lime.utils.AnonBytesUtils;
 import lime.utils.ArrayBufferView;
 import lime.utils.Float32Array;
 import lime.utils.Int32Array;
+using lime.utils.ArrayBufferViewTools;
+using lime.utils.ArrayBufferViewTools.Float32ArrayTools;
+using lime.utils.ArrayBufferViewTools.Int32ArrayTools;
 
 #if !macro
 @:build(lime.system.CFFI.build())
@@ -370,9 +375,33 @@ class RenderingContext {
 		
 	}
 	
+	public function bufferData (target:Int, data:ArrayBufferView, usage:Int):Void {
+		
+		bufferDataInternal (target, data.toAnonArrayBufferView (), usage);
+		
+	}
+	
+	public function bufferSubData (target:Int, offset:Int, data:ArrayBufferView):Void {
+		
+		bufferSubDataInternal (target, offset, data.toAnonArrayBufferView ());
+		
+	}
+	
 	public function compileShader (shader:Shader):Void {
 		
 		compileShaderInternal (shader != null ? shader.handle : null);
+		
+	}
+	
+	public function compressedTexImage2D (target:Int, level:Int, internalformat:Int, width:Int, height:Int, border:Int, data:ArrayBufferView):Void {
+		
+		compressedTexImage2DInternal (target, level, internalformat, width, height, border, data.toAnonArrayBufferView ());
+		
+	}
+	
+	public function compressedTexSubImage2D (target:Int, level:Int, xoffset:Int, yoffset:Int, width:Int, height:Int, format:Int, data:ArrayBufferView):Void {
+		
+		compressedTexSubImage2DInternal (target, level, xoffset, yoffset, width, height, format, data.toAnonArrayBufferView ());
 		
 	}
 	
@@ -593,9 +622,27 @@ class RenderingContext {
 		
 	}
 	
+	public function readPixels (x:Int, y:Int, width:Int, height:Int, format:Int, type:Int, pixels:ArrayBufferView):Void {
+		
+		readPixelsInternal (x, y, width, height, format, type, pixels.toAnonArrayBufferView ());
+		
+	}
+	
 	public function shaderSource (shader:Shader, source:String):Void {
 		
 		shaderSourceInternal (shader != null ? shader.handle : null, source);
+		
+	}	
+	
+	public function texImage2D (target:Int, level:Int, internalformat:Int, width:Int, height:Int, border:Int, format:Int, type:Int, pixels:ArrayBufferView):Void {
+		
+		texImage2DInternal (target, level, internalformat, width, height, border, format, type, pixels.toAnonArrayBufferView ());
+		
+	}
+	
+	public function texSubImage2D (target:Int, level:Int, xoffset:Int, yoffset:Int, width:Int, height:Int, format:Int, type:Int, pixels:ArrayBufferView):Void {
+		
+		texSubImage2DInternal (target, level, xoffset, yoffset, width, height, format, type, pixels.toAnonArrayBufferView ());
 		
 	}
 	
@@ -607,7 +654,7 @@ class RenderingContext {
 	
 	public function uniform1fv (location:UniformLocation, v : Float32Array ):Void {
 		
-		uniform1fvInternal (location != null ? location.value : -1, v);
+		uniform1fvInternal (location != null ? location.value : -1, v.toAnonArrayBufferView ());
 		
 	}
 	
@@ -619,7 +666,7 @@ class RenderingContext {
 	
 	public function uniform1iv(location:UniformLocation, v : Int32Array ):Void {
 	
-		uniform1ivInternal (location != null ? location.value : -1, v);
+		uniform1ivInternal (location != null ? location.value : -1, v.toAnonArrayBufferView ());
 	
 	}
 	
@@ -631,7 +678,7 @@ class RenderingContext {
 	
 	public function uniform2fv (location:UniformLocation, v:Float32Array):Void {
 		
-		uniform2fvInternal (location != null ? location.value : -1, v);
+		uniform2fvInternal (location != null ? location.value : -1, v.toAnonArrayBufferView ());
 		
 	}
 	
@@ -643,7 +690,7 @@ class RenderingContext {
 	
 	public function uniform2iv (location:UniformLocation, v : Int32Array ):Void {
 	
-		uniform2ivInternal (location != null ? location.value : -1, v);
+		uniform2ivInternal (location != null ? location.value : -1, v.toAnonArrayBufferView ());
 	
 	}
 	
@@ -655,7 +702,7 @@ class RenderingContext {
 	
 	public function uniform3fv (location:UniformLocation, v:Float32Array):Void {
 		
-		uniform3fvInternal (location != null ? location.value : -1, v);
+		uniform3fvInternal (location != null ? location.value : -1, v.toAnonArrayBufferView ());
 		
 	}
 	
@@ -667,7 +714,7 @@ class RenderingContext {
 	
 	public function uniform3iv(location:UniformLocation, v : Int32Array ):Void {
 	
-		uniform3ivInternal (location != null ? location.value : -1, v);
+		uniform3ivInternal (location != null ? location.value : -1, v.toAnonArrayBufferView ());
 	
 	}
 	
@@ -679,7 +726,7 @@ class RenderingContext {
 	
 	public function uniform4fv(location:UniformLocation, v:Float32Array):Void {
 		
-		uniform4fvInternal (location != null ? location.value : -1, v);
+		uniform4fvInternal (location != null ? location.value : -1, v.toAnonArrayBufferView ());
 		
 	}
 	
@@ -691,25 +738,25 @@ class RenderingContext {
 	
 	public function uniform4iv(location:UniformLocation, v : Int32Array ):Void {
 	
-		uniform4ivInternal (location != null ? location.value : -1, v);
+		uniform4ivInternal (location != null ? location.value : -1, v.toAnonArrayBufferView ());
 	
 	}
 	
 	public function uniformMatrix2fv(location:UniformLocation, transpose : Bool, value : Float32Array ):Void {
 		
-		uniformMatrix2fvInternal (location != null ? location.value : -1, transpose, value);
+		uniformMatrix2fvInternal (location != null ? location.value : -1, transpose, value.toAnonArrayBufferView ());
 		
 	}
 	
 	public function uniformMatrix3fv(location:UniformLocation, transpose : Bool, value : Float32Array ):Void {
 		
-		uniformMatrix3fvInternal (location != null ? location.value : -1, transpose, value);
+		uniformMatrix3fvInternal (location != null ? location.value : -1, transpose, value.toAnonArrayBufferView ());
 		
 	}
 	
 	public function uniformMatrix4fv(location:UniformLocation, transpose : Bool, value : Float32Array ):Void {
 		
-		uniformMatrix4fvInternal (location != null ? location.value : -1, transpose, value);
+		uniformMatrix4fvInternal (location != null ? location.value : -1, transpose, value.toAnonArrayBufferView ());
 		
 	}
 	
@@ -727,25 +774,25 @@ class RenderingContext {
 	
 	public function vertexAttrib1fv (indx:Int, values:Float32Array):Void {
 		
-		vertexAttrib1fvInternal (indx, values);
+		vertexAttrib1fvInternal (indx, values.toAnonArrayBufferView ());
 		
 	}
 	
 	public function vertexAttrib2fv (indx:Int, values:Float32Array):Void {
 		
-		vertexAttrib2fvInternal (indx, values);
+		vertexAttrib2fvInternal (indx, values.toAnonArrayBufferView ());
 		
 	}
 	
 	public function vertexAttrib3fv (indx:Int, values:Float32Array):Void {
 		
-		vertexAttrib3fvInternal (indx, values);
+		vertexAttrib3fvInternal (indx, values.toAnonArrayBufferView ());
 		
 	}
 	
 	public function vertexAttrib4fv (indx:Int, values:Float32Array):Void {
 		
-		vertexAttrib4fvInternal (indx, values);
+		vertexAttrib4fvInternal (indx, values.toAnonArrayBufferView ());
 		
 	}
 	
@@ -767,8 +814,8 @@ class RenderingContext {
 	@:cffi public function blendEquationSeparate( modeRGB : Int, modeAlpha : Int ) : Void { throw null; }
 	@:cffi public function blendFunc( sfactor : Int, dfactor : Int ) : Void { throw null; }
 	@:cffi public function blendFuncSeparate( srcRGB : Int, dstRGB : Int, srcAlpha : Int, dstAlpha : Int ) : Void { throw null; }
-	@:cffi public function bufferData( target : Int, data : ArrayBufferView, usage : Int ) : Void { throw null; }
-	@:cffi public function bufferSubData( target : Int, offset : Int, data : ArrayBufferView ) : Void { throw null; }
+	@:cffi private function bufferDataInternal( target : Int, data : LimeArrayBufferView, usage : Int ) : Void { throw null; }
+	@:cffi private function bufferSubDataInternal( target : Int, offset : Int, data : LimeArrayBufferView ) : Void { throw null; }
 	@:cffi public function checkFramebufferStatus( target : Int ) : Int { throw null; }
 	@:cffi public function clear( mask : Int ) : Void { throw null; }
 	@:cffi public function clearColor( red : Float, green : Float, blue : Float, alpha : Float ) : Void { throw null; }
@@ -776,8 +823,8 @@ class RenderingContext {
 	@:cffi public function clearStencil( s : Int ) : Void { throw null; }
 	@:cffi public function colorMask( red : Bool, green : Bool, blue : Bool, alpha : Bool ) : Void { throw null; }
 	@:cffi private function compileShaderInternal( shader : ShaderHandle ) : Void { throw null; }
-	@:cffi public function compressedTexImage2D( target : Int, level : Int, internalformat : Int, width : Int, height : Int, border : Int, data : ArrayBufferView ) : Void { throw null; }
-	@:cffi public function compressedTexSubImage2D( target : Int, level : Int, xoffset : Int, yoffset : Int, width : Int, height : Int, format : Int, data : ArrayBufferView ) : Void { throw null; }
+	@:cffi private function compressedTexImage2DInternal( target : Int, level : Int, internalformat : Int, width : Int, height : Int, border : Int, data : LimeArrayBufferView ) : Void { throw null; }
+	@:cffi private function compressedTexSubImage2DInternal( target : Int, level : Int, xoffset : Int, yoffset : Int, width : Int, height : Int, format : Int, data : LimeArrayBufferView ) : Void { throw null; }
 	@:cffi public function copyTexImage2D( target : Int, level : Int, internalformat : Int, x : Int, y : Int, width : Int, height : Int, border : Int ) : Void { throw null; }
 	@:cffi public function copyTexSubImage2D( target : Int, level : Int, xoffset : Int, yoffset : Int, x : Int, y : Int, width : Int, height : Int ) : Void { throw null; }
 	@:cffi private static function createInternal(window:CFFIPointer):ContextHandle { throw null; }
@@ -841,7 +888,7 @@ class RenderingContext {
 	@:cffi private function linkProgramInternal( program : ProgramHandle ) : Void { throw null; }
 	@:cffi public function pixelStorei( pname : Int, param : Int ) : Void { throw null; }
 	@:cffi public function polygonOffset( factor : Float, units : Float ) : Void { throw null; }
-	@:cffi public function readPixels( x : Int, y : Int, width : Int, height : Int, format : Int, type : Int, pixels : ArrayBufferView ) : Void { throw null; }
+	@:cffi private function readPixelsInternal( x : Int, y : Int, width : Int, height : Int, format : Int, type : Int, pixels : LimeArrayBufferView ) : Void { throw null; }
 	@:cffi public function renderbufferStorage( target : Int, internalformat : Int, width : Int, height : Int ) : Void { throw null; }
 	@:cffi public function sampleCoverage( value : Float, invert : Bool ) : Void { throw null; }
 	@:cffi public function scissor( x : Int, y : Int, width : Int, height : Int ) : Void { throw null; }
@@ -852,39 +899,39 @@ class RenderingContext {
 	@:cffi public function stencilMaskSeparate( face : Int, mask : Int ) : Void { throw null; }
 	@:cffi public function stencilOp( fail : Int, zfail : Int, zpass : Int ) : Void { throw null; }
 	@:cffi public function stencilOpSeparate( face : Int, fail : Int, zfail : Int, zpass : Int ) : Void { throw null; }
-	@:cffi public function texImage2D( target : Int, level : Int, internalformat : Int, width : Int, height : Int, border : Int, format : Int, type : Int, pixels : ArrayBufferView ) : Void { throw null; }
+	@:cffi private function texImage2DInternal( target : Int, level : Int, internalformat : Int, width : Int, height : Int, border : Int, format : Int, type : Int, pixels : LimeArrayBufferView ) : Void { throw null; }
 	@:cffi public function texParameterf( target : Int, pname : Int, param : Float ) : Void { throw null; }
 	@:cffi public function texParameteri( target : Int, pname : Int, param : Int ) : Void { throw null; }
-	@:cffi public function texSubImage2D( target : Int, level : Int, xoffset : Int, yoffset : Int, width : Int, height : Int, format : Int, type : Int, pixels : ArrayBufferView ) : Void { throw null; }
+	@:cffi private function texSubImage2DInternal( target : Int, level : Int, xoffset : Int, yoffset : Int, width : Int, height : Int, format : Int, type : Int, pixels : LimeArrayBufferView ) : Void { throw null; }
 	@:cffi private function uniform1fInternal( location : Int, x : Float ) : Void { throw null; }
-	@:cffi private function uniform1fvInternal( location : Int, v : Float32Array) : Void { throw null; }
+	@:cffi private function uniform1fvInternal( location : Int, v : LimeArrayBufferView) : Void { throw null; }
 	@:cffi private function uniform1iInternal( location : Int, x : Int ) : Void { throw null; }
-	@:cffi private function uniform1ivInternal( location : Int, v : Int32Array) : Void { throw null; }
+	@:cffi private function uniform1ivInternal( location : Int, v : LimeArrayBufferView) : Void { throw null; }
 	@:cffi private function uniform2fInternal( location : Int, x : Float, y : Float ) : Void { throw null; }
-	@:cffi private function uniform2fvInternal( location : Int, v : Float32Array) : Void { throw null; }
+	@:cffi private function uniform2fvInternal( location : Int, v : LimeArrayBufferView) : Void { throw null; }
 	@:cffi private function uniform2iInternal( location : Int, x : Int, y : Int ) : Void { throw null; }
-	@:cffi private function uniform2ivInternal( location : Int, v : Int32Array) : Void { throw null; }
+	@:cffi private function uniform2ivInternal( location : Int, v : LimeArrayBufferView) : Void { throw null; }
 	@:cffi private function uniform3fInternal( location : Int, x : Float, y : Float, z : Float ) : Void { throw null; }
-	@:cffi private function uniform3fvInternal( location : Int, v : Float32Array) : Void { throw null; }
+	@:cffi private function uniform3fvInternal( location : Int, v : LimeArrayBufferView) : Void { throw null; }
 	@:cffi private function uniform3iInternal( location : Int, x : Int, y : Int, z : Int ) : Void { throw null; }
-	@:cffi private function uniform3ivInternal( location : Int, v : Int32Array) : Void { throw null; }
+	@:cffi private function uniform3ivInternal( location : Int, v : LimeArrayBufferView) : Void { throw null; }
 	@:cffi private function uniform4fInternal( location : Int, x : Float, y : Float, z : Float, w : Float ) : Void { throw null; }
-	@:cffi private function uniform4fvInternal( location : Int, v : Float32Array) : Void { throw null; }
+	@:cffi private function uniform4fvInternal( location : Int, v : LimeArrayBufferView) : Void { throw null; }
 	@:cffi private function uniform4iInternal( location : Int, x : Int, y : Int, z : Int, w : Int ) : Void { throw null; }
-	@:cffi private function uniform4ivInternal( location : Int, v : Int32Array) : Void { throw null; }
-	@:cffi private function uniformMatrix2fvInternal( location : Int, transpose : Bool, value : Float32Array) : Void { throw null; }
-	@:cffi private function uniformMatrix3fvInternal( location : Int, transpose : Bool, value : Float32Array) : Void { throw null; }
-	@:cffi private function uniformMatrix4fvInternal( location : Int, transpose : Bool, value : Float32Array) : Void { throw null; }
+	@:cffi private function uniform4ivInternal( location : Int, v : LimeArrayBufferView) : Void { throw null; }
+	@:cffi private function uniformMatrix2fvInternal( location : Int, transpose : Bool, value : LimeArrayBufferView) : Void { throw null; }
+	@:cffi private function uniformMatrix3fvInternal( location : Int, transpose : Bool, value : LimeArrayBufferView) : Void { throw null; }
+	@:cffi private function uniformMatrix4fvInternal( location : Int, transpose : Bool, value : LimeArrayBufferView) : Void { throw null; }
 	@:cffi private function useProgramInternal( program : ProgramHandle ) : Void { throw null; }
 	@:cffi private function validateProgramInternal( program : ProgramHandle ) : Void { throw null; }
 	@:cffi public function vertexAttrib1f( indx : Int, x : Float ) : Void { throw null; }
-	@:cffi public function vertexAttrib1fvInternal( indx : Int, values : Float32Array) : Void { throw null; }
+	@:cffi private function vertexAttrib1fvInternal( indx : Int, values : LimeArrayBufferView) : Void { throw null; }
 	@:cffi public function vertexAttrib2f( indx : Int, x : Float, y : Float ) : Void { throw null; }
-	@:cffi public function vertexAttrib2fvInternal( indx : Int, values : Float32Array) : Void { throw null; }
+	@:cffi private function vertexAttrib2fvInternal( indx : Int, values : LimeArrayBufferView) : Void { throw null; }
 	@:cffi public function vertexAttrib3f( indx : Int, x : Float, y : Float, z : Float ) : Void { throw null; }
-	@:cffi public function vertexAttrib3fvInternal( indx : Int, values : Float32Array) : Void { throw null; }
+	@:cffi private function vertexAttrib3fvInternal( indx : Int, values : LimeArrayBufferView) : Void { throw null; }
 	@:cffi public function vertexAttrib4f( indx : Int, x : Float, y : Float, z : Float, w : Float ) : Void { throw null; }
-	@:cffi public function vertexAttrib4fvInternal( indx : Int, values : Float32Array) : Void { throw null; }
+	@:cffi private function vertexAttrib4fvInternal( indx : Int, values : LimeArrayBufferView) : Void { throw null; }
 	@:cffi public function vertexAttribPointer( indx : Int, size : Int, type : Int, normalized : Bool, stride : Int, offset : Int ) : Void { throw null; }
 	@:cffi public function viewport( x : Int, y : Int, width : Int, height : Int ) : Void { throw null; }
 	

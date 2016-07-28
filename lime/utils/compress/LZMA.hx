@@ -3,6 +3,8 @@ package lime.utils.compress;
 
 import haxe.io.Bytes;
 import lime._internal.utils.LimeBytes;
+import lime.utils.AnonBytes;
+using lime.utils.BytesTools;
 
 
 #if flash
@@ -24,9 +26,9 @@ class LZMA {
 		
 		#if (lime_native && !macro)
 		
-		var data:Dynamic = Compress (bytes);
+		var data = Compress (bytes);
 		if (data == null) return null;
-		return @:privateAccess new Bytes (data.length, data.b);
+		return Bytes.ofAnonBytes (data);
 		
 		#elseif flash
 		
@@ -51,9 +53,9 @@ class LZMA {
 		
 		#if (lime_native && !macro)
 		
-		var data:Dynamic = Decompress (bytes);
+		var data = Decompress (bytes);
 		if (data == null) return null;
-		return @:privateAccess new Bytes (data.length, data.b);
+		return Bytes.ofAnonBytes (data);
 		
 		#elseif flash
 		
@@ -82,8 +84,8 @@ class LZMA {
 	
 	
 	#if lime_native
-	@:cffi private static function Compress (data:LimeBytes):Dynamic { throw null; }
-	@:cffi private static function Decompress (data:LimeBytes):Dynamic { throw null; }
+	@:cffi private static function Compress (data:LimeBytes):AnonBytes { throw null; }
+	@:cffi private static function Decompress (data:LimeBytes):AnonBytes { throw null; }
 	#end
 	
 	

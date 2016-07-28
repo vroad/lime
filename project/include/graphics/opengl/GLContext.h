@@ -47,8 +47,8 @@ namespace lime {
 		void blendEquationSeparate (int modeRGB, int modeAlpha);
 		void blendFunc (int sfactor, int dfactor);
 		void blendFuncSeparate (int srcRGB, int dstRGB, int srcAlpha, int dstAlpha);
-		void bufferData (int target, ArrayBufferView* data, int usage);
-		void bufferSubData (int target, int offset, ArrayBufferView* data);
+		void bufferDataInternal (int target, ArrayBufferView* data, int usage);
+		void bufferSubDataInternal (int target, int offset, ArrayBufferView* data);
 		int checkFramebufferStatus (int target);
 		void clear (int mask);
 		void clearColor (double red, double green, double blue, double alpha);
@@ -56,8 +56,8 @@ namespace lime {
 		void clearStencil (int s);
 		void colorMask (bool red, bool green, bool blue, bool alpha);
 		void compileShaderInternal (GLShader* shader);
-		void compressedTexImage2D (int target, int level, int internalformat, int width, int height, int border, ArrayBufferView* data);
-		void compressedTexSubImage2D (int target, int level, int xoffset, int yoffset, int width, int height, int format, ArrayBufferView* data);
+		void compressedTexImage2DInternal (int target, int level, int internalformat, int width, int height, int border, ArrayBufferView* data);
+		void compressedTexSubImage2DInternal (int target, int level, int xoffset, int yoffset, int width, int height, int format, ArrayBufferView* data);
 		void copyTexImage2D (int target, int level, int internalformat, int x, int y, int width, int height, int border);
 		void copyTexSubImage2D (int target, int level, int xoffset, int yoffset, int x, int y, int width, int height);
 		static GLContext* createInternal (value inWindow);
@@ -121,7 +121,7 @@ namespace lime {
 		void linkProgramInternal (GLProgram* program);
 		void pixelStorei (int pname, int param);
 		void polygonOffset (double factor, double units);
-		void readPixels (int x, int y, int width, int height, int format, int type, ArrayBufferView* pixels);
+		void readPixelsInternal (int x, int y, int width, int height, int format, int type, ArrayBufferView* pixels);
 		void renderbufferStorage (int target, int internalformat, int width, int height);
 		void sampleCoverage (double value, bool invert);
 		void scissor (int x, int y, int width, int height);
@@ -132,10 +132,10 @@ namespace lime {
 		void stencilMaskSeparate (int face, int mask);
 		void stencilOp (int fail, int zfail, int zpass);
 		void stencilOpSeparate (int face, int fail, int zfail, int zpass);
-		void texImage2D (int target, int level, int internalformat, int width, int height, int border, int format, int type, ArrayBufferView* pixels);
+		void texImage2DInternal (int target, int level, int internalformat, int width, int height, int border, int format, int type, ArrayBufferView* pixels);
 		void texParameterf (int target, int pname, double param);
 		void texParameteri (int target, int pname, int param);
-		void texSubImage2D (int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, ArrayBufferView* pixels);
+		void texSubImage2DInternal (int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, ArrayBufferView* pixels);
 		void uniform1fInternal (int location, double x);
 		void uniform1fvInternal (int location, ArrayBufferView *values);
 		void uniform1iInternal (int location, int x);

@@ -2,6 +2,8 @@ package lime.utils.compress;
 
 
 import haxe.io.Bytes;
+using lime.utils.BytesTools;
+
 
 #if flash
 import flash.utils.ByteArray;
@@ -20,9 +22,9 @@ class Deflate {
 		
 		#if (lime_native && !macro)
 		
-		var data:Dynamic = Zlib.Compress (ZlibType.DEFLATE, bytes);
+		var data = Zlib.Compress (ZlibType.DEFLATE, bytes);
 		if (data == null) return null;
-		return @:privateAccess new Bytes (data.length, data.b);
+		return Bytes.ofAnonBytes (data);
 		
 		#elseif (js && html5)
 		
@@ -52,9 +54,9 @@ class Deflate {
 		
 		#if (lime_native && !macro)
 		
-		var data:Dynamic = Zlib.Decompress (ZlibType.DEFLATE, bytes);
+		var data = Zlib.Decompress (ZlibType.DEFLATE, bytes);
 		if (data == null) return null;
-		return @:privateAccess new Bytes (data.length, data.b);
+		return Bytes.ofAnonBytes (data);
 		
 		#elseif (js && html5)
 		

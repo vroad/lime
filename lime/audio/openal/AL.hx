@@ -4,7 +4,7 @@ package lime.audio.openal;
 import lime._internal.utils.HxVector_Float;
 import lime._internal.utils.HxVector_Int;
 import lime._internal.utils.CString;
-import lime.utils.AnonArrayBufferView;
+import lime._internal.utils.LimeArrayBufferView;
 import lime.utils.AnonBytesUtils;
 import lime.utils.ArrayBufferView;
 using lime.utils.ArrayBufferViewTools;
@@ -888,7 +888,7 @@ class AL {
 	
 	
 	#if (lime_native && lime_openal && !macro)
-	@:cffi private static function alBufferData_wrap (buffer:Int, format:Int, data:AnonArrayBufferView, size:Int, freq:Int):Void;
+	@:cffi private static function alBufferData_wrap (buffer:Int, format:Int, data:LimeArrayBufferView, size:Int, freq:Int):Void;
 	@:cffi private static function alBuffer3f (buffer:Int, param:Int, value1:Float32, value2:Float32, value3:Float32):Void;
 	@:cffi private static function alBuffer3i (buffer:Int, param:Int, value1:Int, value2:Int, value3:Int):Void;
 	@:cffi private static function alBufferf (buffer:Int, param:Int, value:Float32):Void;

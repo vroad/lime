@@ -1,6 +1,5 @@
 package lime.utils;
 
-@:cffiCppType("lime::ArrayBufferView*")
 typedef AnonArrayBufferView = {
 	
 	buffer:Dynamic,

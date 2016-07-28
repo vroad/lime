@@ -214,7 +214,7 @@ class WindowsPlatform extends PlatformTarget {
 		var context = project.templateContext;
 		
 		context.NEKO_FILE = targetDirectory + "/obj/ApplicationMain.n";
-		context.NODE_FILE = targetDirectory + "/bin/ApplicationMain.js";
+		context.NODE_FILE = applicationDirectory + "ApplicationMain.js";
 		context.CPP_DIR = targetDirectory + "/obj";
 		context.BUILD_DIR = project.app.path + "/windows";
 		
@@ -249,7 +249,7 @@ class WindowsPlatform extends PlatformTarget {
 		
 		if (targetType == "nodejs") {
 			
-			NodeJSHelper.run (project, targetDirectory + "/bin/ApplicationMain.js", arguments);
+			NodeJSHelper.run (project, applicationDirectory + "ApplicationMain.js", arguments);
 			
 		} else if (project.target == PlatformHelper.hostPlatform) {
 			

@@ -3,6 +3,7 @@ package lime.utils.compress;
 
 import haxe.io.Bytes;
 import lime._internal.utils.LimeBytes;
+using lime.utils.BytesTools;
 
 #if flash
 import flash.utils.ByteArray;
@@ -22,9 +23,9 @@ class Zlib {
 		
 		#if (lime_native && !macro)
 		
-		var data:Dynamic = Compress (ZlibType.ZLIB, bytes);
+		var data = Compress (ZlibType.ZLIB, bytes);
 		if (data == null) return null;
-		return @:privateAccess new Bytes (data.length, data.b);
+		return Bytes.ofAnonBytes (data);
 		
 		#elseif (js && html5)
 		
@@ -54,9 +55,9 @@ class Zlib {
 		
 		#if (lime_native && !macro)
 		
-		var data:Dynamic = Decompress (ZlibType.ZLIB, bytes);
+		var data = Decompress (ZlibType.ZLIB, bytes);
 		if (data == null) return null;
-		return @:privateAccess new Bytes (data.length, data.b);
+		return Bytes.ofAnonBytes (data);
 		
 		#elseif (js && html5)
 		
