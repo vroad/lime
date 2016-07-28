@@ -9,7 +9,7 @@ import lime._internal.utils.LimeBytes;
 import lime.math.Vector2;
 import lime.system.System;
 import lime.utils.AnonBytes;
-import lime.utils.BytesUtil;
+using lime.utils.BytesTools;
 
 #if !macro
 @:build(lime.system.CFFI.build())
@@ -69,7 +69,7 @@ class TextLayout {
 			
 			var bytes = Position (font.src, size, text, __buffer);
 			
-			__buffer = BytesUtil.getBytesFromAnonBytes (bytes);
+			__buffer = Bytes.ofAnonBytes (bytes);
 			var position = 0;
 			
 			if (__buffer.length > 4) {

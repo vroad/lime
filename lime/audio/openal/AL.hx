@@ -5,8 +5,8 @@ import lime._internal.utils.HxVector_Float;
 import lime._internal.utils.HxVector_Int;
 import lime._internal.utils.CString;
 import lime.utils.AnonArrayBufferView;
+import lime.utils.AnonBytesUtils;
 import lime.utils.ArrayBufferView;
-import lime.utils.BytesUtil;
 using lime.utils.ArrayBufferViewTools;
 
 #if ((haxe_ver >= 3.2) && cpp)

@@ -15,7 +15,7 @@ import lime.graphics.ImageBuffer;
 import lime.graphics.Renderer;
 import lime.graphics.opengl.GL;
 import lime.math.Rectangle;
-import lime.utils.BytesUtil;
+import lime.utils.AnonBytesUtils;
 import lime.utils.UInt8Array;
 
 #if !macro

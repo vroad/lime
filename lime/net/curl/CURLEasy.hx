@@ -6,7 +6,7 @@ import lime._internal.net.curl.CURLEasyHandle;
 import lime._internal.utils.CString;
 import lime._internal.utils.SizeTPointer;
 import lime.net.curl.CURL;
-import lime.utils.BytesUtil;
+using lime.utils.BytesTools;
 
 #if !macro
 @:build(lime.system.CFFI.build())
@@ -177,7 +177,7 @@ class CURLEasy {
 		
 		if (output != null) {
 			
-			bytes = BytesUtil.createBytes (output.length, output.b);
+			bytes = Bytes.ofLengthAndData (output.length, output.b);
 			
 		}
 		

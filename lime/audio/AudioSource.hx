@@ -7,7 +7,7 @@ import lime.app.Event;
 import lime.audio.openal.AL;
 import lime.math.Vector4;
 import lime.system.System;
-import lime.utils.BytesUtil;
+import lime.utils.AnonBytesUtils;
 import lime.utils.UInt8Array;
 
 #if flash
@@ -518,7 +518,7 @@ class AudioSource {
 			var writeOffset:Int = 0;
 			while (i < bufferCount) {
 				
-				var numSamples:Int = lime_audio_stream_decode (buffer.handle, BytesUtil.getAnonBytesFromTypedArray (audioSamples), bufferSize, writeOffset);
+				var numSamples:Int = lime_audio_stream_decode (buffer.handle, AnonBytesUtils.getAnonBytesFromTypedArray (audioSamples), bufferSize, writeOffset);
 				
 				if (numSamples != 0) {
 					

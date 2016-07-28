@@ -5,7 +5,7 @@ import haxe.io.Bytes;
 import lime.graphics.utils.ImageCanvasUtil;
 import lime.graphics.Image;
 import lime.system.CFFI;
-import lime.utils.BytesUtil;
+using lime.utils.BytesTools;
 
 #if (js && html5)
 import js.Browser;
@@ -90,7 +90,7 @@ class PNG {
 		if (CFFI.enabled) {
 			
 			var data:Dynamic = lime_image_encode (image.buffer, 0, 0);
-			return BytesUtil.createBytes (data.length, data.b);
+			return Bytes.ofLengthAndData (data.length, data.b);
 			
 		}
 		#end

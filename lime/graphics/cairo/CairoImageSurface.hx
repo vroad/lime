@@ -2,12 +2,11 @@ package lime.graphics.cairo;
 
 import lime._internal.utils.LimeBytes;
 import lime.utils.AnonBytes;
-import lime.utils.BytesUtil;
+import lime.utils.AnonBytesUtils;
 
 import lime._internal.graphics.cairo.CairoSurfaceHandle;
 import lime.graphics.ImageBuffer;
 import lime.system.CFFIPointer;
-import lime.utils.BytesUtil;
 import lime.utils.UInt8Array;
 
 #if !macro
@@ -36,7 +35,7 @@ class CairoImageSurface extends CairoSurface {
 	public static function create (data:UInt8Array, format:CairoFormat, width:Int, height:Int, stride:Int):CairoImageSurface {
 		
 		#if (lime_cairo && !macro)
-		var handle = cairo_image_surface_create_for_bytes (BytesUtil.getAnonBytesFromTypedArray (data), format, width, height, stride);
+		var handle = cairo_image_surface_create_for_bytes (AnonBytesUtils.getAnonBytesFromTypedArray (data), format, width, height, stride);
 		return handle != null ? new CairoImageSurface (handle) : null;
 		#else
 		return null;

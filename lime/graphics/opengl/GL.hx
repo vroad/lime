@@ -2,9 +2,9 @@ package lime.graphics.opengl;
 
 
 import lime.graphics.GLRenderContext;
+import lime.utils.AnonBytesUtils;
 import lime.utils.ArrayBuffer;
 import lime.utils.ArrayBufferView;
-import lime.utils.BytesUtil;
 import lime.utils.Float32Array;
 import lime.utils.Int32Array;
 import lime.system.CFFIPointer;

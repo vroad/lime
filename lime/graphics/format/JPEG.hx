@@ -6,7 +6,7 @@ import lime.graphics.utils.ImageCanvasUtil;
 import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
 import lime.system.CFFI;
-import lime.utils.BytesUtil;
+using lime.utils.BytesTools;
 
 #if (js && html5)
 import js.Browser;
@@ -81,7 +81,7 @@ class JPEG {
 		#elseif (lime_native && sys && (!disable_cffi || !format) && !macro)
 			
 			var data:Dynamic = lime_image_encode (image.buffer, 1, quality);
-			return BytesUtil.createBytes (data.length, data.b);
+			return Bytes.ofLengthAndData (data.length, data.b);
 			
 		#elseif (js && html5)
 		

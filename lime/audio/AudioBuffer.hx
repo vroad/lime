@@ -3,7 +3,7 @@ package lime.audio;
 
 import haxe.io.Bytes;
 import lime.audio.openal.AL;
-import lime.utils.BytesUtil;
+import lime.utils.AnonBytesUtils;
 //import lime.net.URLLoader;
 //import lime.net.URLRequest;
 import lime.utils.UInt8Array;
@@ -90,7 +90,7 @@ class AudioBuffer {
 			var audioBuffer = new AudioBuffer ();
 			audioBuffer.bitsPerSample 	= data.bitsPerSample;
 			audioBuffer.channels = data.channels;
-			audioBuffer.data = data.data != null ? BytesUtil.getUInt8ArrayFromAnonBytes (data.data) : null;
+			audioBuffer.data = data.data != null ? AnonBytesUtils.getUInt8ArrayFromAnonBytes (data.data) : null;
 			audioBuffer.sampleRate = data.sampleRate;
 			audioBuffer.length = data.length;
 			audioBuffer.handle = data.handle;
@@ -142,7 +142,7 @@ class AudioBuffer {
 			var audioBuffer = new AudioBuffer ();
 			audioBuffer.bitsPerSample = data.bitsPerSample;
 			audioBuffer.channels = data.channels;
-			audioBuffer.data = data.data != null ? BytesUtil.getUInt8ArrayFromAnonBytes (data.data) : null;
+			audioBuffer.data = data.data != null ? AnonBytesUtils.getUInt8ArrayFromAnonBytes (data.data) : null;
 			audioBuffer.sampleRate = data.sampleRate;
 			audioBuffer.length = data.length;
 			audioBuffer.handle = data.handle;
