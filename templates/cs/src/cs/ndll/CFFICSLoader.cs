@@ -439,7 +439,7 @@ namespace cs.ndll
                     arr = new Array<int>(new int[arg1]);
                     break;
                 case hxValueType.valtFloat:
-                    arr = new Array<float>(new float[arg1]);
+                    arr = new Array<double>(new double[arg1]);
                     break;
                 case hxValueType.valtString:
                     arr = new Array<String>(new String[arg1]);
