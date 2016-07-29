@@ -65,6 +65,7 @@ namespace cs.ndll
             Pointer = IntPtr.Zero;
             finalizer = null;
             disposed = true;
+            GC.SuppressFinalize(this);
         }
 
         ~CSAbstract()
