@@ -1569,6 +1569,10 @@ class ProjectXMLParser extends HXProject {
 									
 									//ArrayHelper.addUnique (config.android.permissions, value);
 								
+								case "gradle-version":
+									
+									config.set ("android.gradle-version", value);
+								
 								default:
 									
 									name = formatAttributeName (attribute);

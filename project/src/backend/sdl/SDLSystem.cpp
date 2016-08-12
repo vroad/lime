@@ -105,7 +105,7 @@ namespace lime {
 				std::unique_ptr<char> utf8Str (WIN_StringToUTF8 (result));
 				return alloc_string (utf8Str.get ());
 				
-				#else
+				#elif !defined (ANDROID)
 				
 				std::string result = std::string (getenv ("HOME")) + std::string ("/Desktop");
 				return alloc_string_len (result.c_str (), result.size ());
@@ -128,6 +128,10 @@ namespace lime {
 				SHGetFolderPath (NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, result);
 				std::unique_ptr<char> utf8Str (WIN_StringToUTF8 (result));
 				return alloc_string (utf8Str.get ());
+				
+				#elif defined (ANDROID)
+				
+				return alloc_string ("/mnt/sdcard/Documents");
 				
 				#else
 				
@@ -189,6 +193,10 @@ namespace lime {
 				SHGetFolderPath (NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, result);
 				std::unique_ptr<char> utf8Str (WIN_StringToUTF8 (result));
 				return alloc_string (utf8Str.get ());
+				
+				#elif defined (ANDROID)
+				
+				return alloc_string ("/mnt/sdcard");
 				
 				#else
 				

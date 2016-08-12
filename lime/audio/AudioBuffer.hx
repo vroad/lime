@@ -63,19 +63,21 @@ class AudioBuffer {
 		#end
 		
 	}
-
-
+	
+	
 	#if lime_console
 	@:void
 	private static function finalize (a:AudioBuffer):Void {
-
+		
 		a.dispose ();
-
+		
 	}
 	#end
 	
 	
 	public static function fromBytes (bytes:Bytes, stream:Bool = false):AudioBuffer {
+		
+		if (bytes == null) return null;
 		
 		#if lime_console
 		
@@ -106,6 +108,8 @@ class AudioBuffer {
 	
 	
 	public static function fromFile (path:String, stream:Bool = false):AudioBuffer {
+		
+		if (path == null) return null;
 		
 		#if lime_console
 		

@@ -90,6 +90,8 @@ class Font {
 	
 	public static function fromBytes (bytes:Bytes):Font {
 		
+		if (bytes == null) return null;
+		
 		var font = new Font ();
 		font.__fromBytes (bytes);
 		
@@ -103,6 +105,8 @@ class Font {
 	
 	
 	public static function fromFile (path:String):Font {
+		
+		if (path == null) return null;
 		
 		var font = new Font ();
 		font.__fromFile (path);
