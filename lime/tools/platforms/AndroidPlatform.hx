@@ -81,7 +81,7 @@ class AndroidPlatform extends PlatformTarget {
 	
 	public override function build ():Void {
 		
-		var destination = targetDirectory + "/bin";
+		var destination = getDestination ();
 		var hxml = targetDirectory + "/haxe/" + buildType + ".hxml";
 		var sourceSet = destination + "/app/src/main";
 		
@@ -102,7 +102,7 @@ class AndroidPlatform extends PlatformTarget {
 			
 		} else {
 			
-			libDir = targetDirectory + "/bin/libs";
+			libDir = sourceSet + "/jniLibs";
 			
 		}
 		
@@ -201,9 +201,6 @@ class AndroidPlatform extends PlatformTarget {
 			CSHelper.buildSln (targetDirectory + "/obj", targetDirectory + "/obj/MainActivity.sln");
 			CSHelper.buildCSProj (targetDirectory + "/obj", targetDirectory + "/obj/MainActivity.csproj", "SignAndroidPackage");
 			
-			FileHelper.copyIfNewer (targetDirectory + "/obj/bin/" + (project.debug ? "Debug" : "Release") + "/" + project.meta.packageName + "-Signed.apk",
-				targetDirectory + "/bin/" + project.app.file + "-debug.apk");
-			
 		}
 		
 		if (targetType == "cs") {
@@ -263,12 +260,20 @@ class AndroidPlatform extends PlatformTarget {
 			
 		}
 		
-		var apkPath = FileSystem.fullPath (targetDirectory) + "/bin/app/build/outputs/apk/";
 		var apkSuffix = "-" + build + ".apk";
 		
-		File.copy (apkPath + "app" + apkSuffix, apkPath + project.app.file + apkSuffix);
+		var tmpApkPath = FileSystem.fullPath (targetDirectory) + switch (targetType) {
+			
+			case "cs": "/obj/bin/" + (project.debug ? "Debug" : "Release") + "/" + project.meta.packageName + "-Signed.apk";
+			default: "/bin/app/build/outputs/apk/app" + apkSuffix;
+			
+		};
 		
-		deviceID = AndroidHelper.install (project, apkPath + project.app.file + apkSuffix, deviceID);
+		var dstApkPath = FileSystem.fullPath (targetDirectory) + "/bin/" + project.app.file + apkSuffix;
+		trace (dstApkPath);
+		File.copy (tmpApkPath, dstApkPath);
+		
+		deviceID = AndroidHelper.install (project, dstApkPath, deviceID);
 		
 	}
 	
@@ -330,14 +335,28 @@ class AndroidPlatform extends PlatformTarget {
 		
 		//initialize (project);
 		
-		var destination = targetDirectory + "/bin";
+		var destination = getDestination ();
 		var sourceSet = destination + "/app/src/main";
-		PathHelper.mkdir (sourceSet);
-		PathHelper.mkdir (sourceSet + "/res/drawable-ldpi/");
-		PathHelper.mkdir (sourceSet + "/res/drawable-mdpi/");
-		PathHelper.mkdir (sourceSet + "/res/drawable-hdpi/");
-		PathHelper.mkdir (sourceSet + "/res/drawable-xhdpi/");
+		var assetDir;
+		var resourceDir;
 		
+		if (targetType == "cs") {
+			
+			assetDir = destination + "/Assets";
+			resourceDir = destination + "/Resources";
+			
+		} else {
+			
+			assetDir = sourceSet + "/assets";
+			resourceDir = sourceSet + "/res";
+			PathHelper.mkdir (sourceSet);
+			
+		}
+		
+		PathHelper.mkdir (resourceDir + "/drawable-ldpi/");
+		PathHelper.mkdir (resourceDir + "/drawable-mdpi/");
+		PathHelper.mkdir (resourceDir + "/drawable-hdpi/");
+		PathHelper.mkdir (resourceDir + "/drawable-xhdpi/");
 		
 		assetPaths = [];
 		for (asset in project.assets) {
@@ -355,15 +374,15 @@ class AndroidPlatform extends PlatformTarget {
 						//asset.flatName += ((extension != "") ? "." + extension : "");
 						
 						//asset.resourceName = asset.flatName;
-						targetPath = PathHelper.combine (sourceSet + "/assets/", asset.resourceName);
+						targetPath = PathHelper.combine (assetDir, asset.resourceName);
 						
 						//asset.resourceName = asset.id;
-						//targetPath = sourceSet + "/res/raw/" + asset.flatName + "." + Path.extension (asset.targetPath);
+						//targetPath = resourceDir + "/raw/" + asset.flatName + "." + Path.extension (asset.targetPath);
 					
 					//default:
 						
 						//asset.resourceName = asset.flatName;
-						//targetPath = sourceSet + "/assets/" + asset.resourceName;
+						//targetPath = assetDir + "/" + asset.resourceName;
 					
 				}
 				
@@ -428,7 +447,7 @@ class AndroidPlatform extends PlatformTarget {
 		
 		for (i in 0...iconTypes.length) {
 			
-			if (IconHelper.createIcon (icons, iconSizes[i], iconSizes[i], sourceSet + "/res/drawable-" + iconTypes[i] + "/icon.png")) {
+			if (IconHelper.createIcon (icons, iconSizes[i], iconSizes[i], resourceDir + "/drawable-" + iconTypes[i] + "/icon.png")) {
 				
 				context.HAS_ICON = true;
 				
@@ -436,7 +455,7 @@ class AndroidPlatform extends PlatformTarget {
 			
 		}
 		
-		IconHelper.createIcon (icons, 732, 412, sourceSet + "/res/drawable-xhdpi/ouya_icon.png");
+		IconHelper.createIcon (icons, 732, 412, resourceDir + "/drawable-xhdpi/ouya_icon.png");
 		
 		var packageDirectory = project.meta.packageName;
 		packageDirectory = sourceSet + "/java/" + packageDirectory.split (".").join ("/");
@@ -536,7 +555,7 @@ class AndroidPlatform extends PlatformTarget {
 			
 		}
 		
-		AssetHelper.createManifest (project, sourceSet + "/assets/manifest");
+		AssetHelper.createManifest (project, assetDir + "/manifest");
 		
 	}
 	
@@ -555,5 +574,13 @@ class AndroidPlatform extends PlatformTarget {
 		return resources;
 		
 	}
+	
+	
+	private function getDestination ():String {
+		
+		return targetDirectory + (targetType == "cs" ? "/obj" : "/bin");
+		
+	}
+	
 	
 }
