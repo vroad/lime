@@ -39,7 +39,7 @@ class Gamepad {
 	
 	public static function addMappings (mappings:Array<String>):Void {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		AddMappings (mappings);
 		#end
 		
@@ -78,7 +78,7 @@ class Gamepad {
 	
 	@:noCompletion private inline function get_guid ():String {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetDeviceGUID (this.id);
 		#elseif (js && html5)
 		var devices = Joystick.__getDeviceData ();
@@ -92,7 +92,7 @@ class Gamepad {
 	
 	@:noCompletion private inline function get_name ():String {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetDeviceName (this.id);
 		#elseif (js && html5)
 		var devices = Joystick.__getDeviceData ();
@@ -111,7 +111,7 @@ class Gamepad {
 	
 	
 	
-	#if (lime_native && !macro)
+	#if (lime_cffi && !macro)
 	@:cffi private static function AddMappings (mappings:Dynamic):Void;
 	@:cffi private static function GetDeviceGUID (id:Int):CString;
 	@:cffi private static function GetDeviceName (id:Int):CString;

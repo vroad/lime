@@ -20,7 +20,7 @@ class Deflate {
 	
 	public static function compress (bytes:Bytes):Bytes {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		var data = Zlib.Compress (ZlibType.DEFLATE, bytes);
 		if (data == null) return null;
@@ -52,7 +52,7 @@ class Deflate {
 	
 	public static function decompress (bytes:Bytes):Bytes {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		var data = Zlib.Decompress (ZlibType.DEFLATE, bytes);
 		if (data == null) return null;

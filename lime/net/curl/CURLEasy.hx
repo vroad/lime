@@ -26,7 +26,7 @@ class CURLEasy {
 	
 	public function cleanup ():Void {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		curl_easy_cleanup (handle);
 		#end
 		
@@ -35,7 +35,7 @@ class CURLEasy {
 	
 	public function duphandle ():CURLEasy {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		var handle = curl_easy_duphandle (handle);
 		return new CURLEasy (handle);
 		#else
@@ -47,7 +47,7 @@ class CURLEasy {
 	
 	public function escape (url:String, length:Int):String {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		return curl_easy_escape (handle, url, length);
 		#else
 		return null;
@@ -58,7 +58,7 @@ class CURLEasy {
 	
 	public function getinfo (info:CURLInfo):Dynamic {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		return curl_easy_getinfo_wrap (handle, info);
 		#else
 		return null;
@@ -69,7 +69,7 @@ class CURLEasy {
 	
 	public static function create ():CURLEasy {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		var handle = curl_easy_init ();
 		return new CURLEasy (handle);
 		#else
@@ -81,7 +81,7 @@ class CURLEasy {
 	
 	public function pause (bitMask:Int):CURLCode {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		return curl_easy_pause (handle, bitMask);
 		#else
 		return 0;
@@ -92,7 +92,7 @@ class CURLEasy {
 	
 	public function perform ():CURLCode {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		return curl_easy_perform (handle);
 		#else
 		return 0;
@@ -114,7 +114,7 @@ class CURLEasy {
 	
 	public function reset ():Void {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		curl_easy_reset (handle);
 		#end
 		
@@ -134,7 +134,7 @@ class CURLEasy {
 	
 	public function setopt (option:CURLOption, parameter:Dynamic):CURLCode {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		if (option == CURLOption.WRITEFUNCTION || option == CURLOption.HEADERFUNCTION) {
 			
 			parameter = __writeCallback.bind (parameter);
@@ -150,7 +150,7 @@ class CURLEasy {
 	
 	public function strerror (code:CURLCode):String {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		return curl_easy_strerror (cast (code, Int));
 		#else
 		return null;
@@ -161,7 +161,7 @@ class CURLEasy {
 	
 	public function unescape (url:String):String {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		return curl_easy_unescape_wrap (handle, url);
 		#else
 		return null;
@@ -172,7 +172,7 @@ class CURLEasy {
 	
 	private function __writeCallback (callback:Dynamic, output:Dynamic, size:Int, nmemb:Int):Int {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		var bytes:Bytes = null;
 		
 		if (output != null) {
@@ -192,7 +192,7 @@ class CURLEasy {
 	}
 	
 	
-	#if (lime_native && lime_curl && !macro)
+	#if (lime_cffi && lime_curl && !macro)
 	@:cffi private static function curl_easy_cleanup (handle:CURLEasyHandle):Void;
 	@:cffi private static function curl_easy_duphandle (handle:CURLEasyHandle):CURLEasyHandle;
 	@:cffi private static function curl_easy_escape (curl:CURLEasyHandle, url:CString, length:Int):CString;

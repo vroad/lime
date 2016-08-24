@@ -24,7 +24,7 @@ class LZMA {
 	
 	public static function compress (bytes:Bytes):Bytes {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		var data = Compress (bytes);
 		if (data == null) return null;
@@ -51,7 +51,7 @@ class LZMA {
 	
 	public static function decompress (bytes:Bytes):Bytes {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		var data = Decompress (bytes);
 		if (data == null) return null;
@@ -83,7 +83,7 @@ class LZMA {
 	
 	
 	
-	#if lime_native
+	#if lime_cffi
 	@:cffi private static function Compress (data:LimeBytes):AnonBytes { throw null; }
 	@:cffi private static function Decompress (data:LimeBytes):AnonBytes { throw null; }
 	#end

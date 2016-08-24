@@ -158,7 +158,7 @@ class System {
 	
 	public static function getDisplay (id:Int):Display {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		var displayInfo:Dynamic = GetDisplay (id);
 		
 		if (displayInfo != null) {
@@ -226,7 +226,7 @@ class System {
 		return flash.Lib.getTimer ();
 		#elseif js
 		return cast Date.now ().getTime ();
-		#elseif (lime_native && !disable_cffi && !macro)
+		#elseif (lime_cffi && !disable_cffi && !macro)
 		return cast GetTimer ();
 		#elseif cpp
 		return Std.int (untyped __global__.__time_stamp () * 1000);
@@ -259,7 +259,7 @@ class System {
 	
 	private static function get_allowScreenTimeout ():Bool {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetAllowScreenTimeout ();
 		#else
 		return true;
@@ -270,7 +270,7 @@ class System {
 	
 	private static function set_allowScreenTimeout (value:Bool):Bool {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		SetAllowScreenTimeout (value);
 		return value;
 		#else
@@ -282,7 +282,7 @@ class System {
 	
 	private static function get_applicationDirectory ():String {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetDirectory (SystemDirectory.APPLICATION, null, null);
 		#elseif flash
 		if (Capabilities.playerType == "Desktop") {
@@ -322,7 +322,7 @@ class System {
 			
 		}
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetDirectory (SystemDirectory.APPLICATION_STORAGE, company, file);
 		#elseif flash
 		if (Capabilities.playerType == "Desktop") {
@@ -343,7 +343,7 @@ class System {
 	
 	private static function get_desktopDirectory ():String {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetDirectory (SystemDirectory.DESKTOP, null, null);
 		#elseif flash
 		if (Capabilities.playerType == "Desktop") {
@@ -364,7 +364,7 @@ class System {
 	
 	private static function get_documentsDirectory ():String {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetDirectory (SystemDirectory.DOCUMENTS, null, null);
 		#elseif flash
 		if (Capabilities.playerType == "Desktop") {
@@ -385,7 +385,7 @@ class System {
 	
 	private static function get_fontsDirectory ():String {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetDirectory (SystemDirectory.FONTS, null, null);
 		#else
 		return null;
@@ -396,7 +396,7 @@ class System {
 	
 	private static function get_numDisplays ():Int {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetNumDisplays ();
 		#else
 		return 1;
@@ -407,7 +407,7 @@ class System {
 	
 	private static function get_userDirectory ():String {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetDirectory (SystemDirectory.USER, null, null);
 		#elseif flash
 		if (Capabilities.playerType == "Desktop") {
@@ -446,7 +446,7 @@ class System {
 	
 	
 	
-	#if (lime_native && !macro)
+	#if (lime_cffi && !macro)
 	@:cffi private static function GetAllowScreenTimeout():Bool;
 	@:cffi private static function GetDirectory (type:SystemDirectory, company:CString, title:CString):Dynamic;
 	@:cffi private static function GetDisplay(id:Int):Dynamic;

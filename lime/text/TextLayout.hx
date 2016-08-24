@@ -53,7 +53,7 @@ class TextLayout {
 		positions = [];
 		__dirty = true;
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		__handle = Create (__direction, __script, __language);
 		#end
 	}
@@ -63,7 +63,7 @@ class TextLayout {
 		
 		positions = [];
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		if (__handle != null && text != null && text != "" && font != null && font.src != null) {
 			
@@ -131,7 +131,7 @@ class TextLayout {
 		
 		__direction = value;
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		SetDirection (value);
 		#end
 		
@@ -181,7 +181,7 @@ class TextLayout {
 		
 		__language = value;
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		SetLanguage (value);
 		#end
 		
@@ -205,7 +205,7 @@ class TextLayout {
 		
 		__script = value;
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		SetScript (value);
 		#end
 		
@@ -245,7 +245,7 @@ class TextLayout {
 	
 	
 	
-	#if (lime_native && !macro)
+	#if (lime_cffi && !macro)
 	@:cffi private static function Create (direction:Int, script:CString, language:CString):TextLayoutHandle;
 	@:cffi private function Position (fontHandle:FontHandle, size:Int, textString:CString, data:LimeBytes):AnonBytes;
 	@:cffi private function SetDirection (direction:Int):Void;

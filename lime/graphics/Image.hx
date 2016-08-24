@@ -1155,7 +1155,7 @@ class Image {
 			
 			throw "Image.fromBytes not implemented for console target";
 			
-		#elseif (lime_native && !macro)
+		#elseif (lime_cffi && !macro)
 			
 			var data:Dynamic = lime_image_load (bytes);
 			
@@ -1219,7 +1219,7 @@ class Image {
 			// (issue #1019768)
 			if (image.complete) { }
 			
-		#elseif lime_native
+		#elseif lime_cffi
 			
 			var buffer = null;
 			
@@ -1274,7 +1274,7 @@ class Image {
 			
 			#if (!sys || disable_cffi || java || macro)
 			if (false) {}
-			#elseif lime_native
+			#elseif lime_cffi
 			if (CFFI.enabled) {
 				
 				var data:Dynamic = lime_image_load (path);
@@ -1628,7 +1628,7 @@ class Image {
 	
 	
 	
-	#if (lime_native && !macro)
+	#if (lime_cffi && !macro)
 	@:cffi private static function lime_image_load (data:Dynamic):Dynamic;
 	#end
 	

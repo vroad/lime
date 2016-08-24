@@ -11,7 +11,7 @@ class GZip {
 	
 	public static function compress (bytes:Bytes):Bytes {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		var data = Zlib.Compress (ZlibType.GZIP, bytes);
 		if (data == null) return null;
@@ -33,7 +33,7 @@ class GZip {
 	
 	public static function decompress (bytes:Bytes):Bytes {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		var data:Dynamic = Zlib.Decompress (ZlibType.GZIP, bytes);
 		if (data == null) return null;

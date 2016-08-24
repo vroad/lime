@@ -31,7 +31,7 @@ class CairoFontFace {
 	
 	public function status ():CairoStatus {
 		
-		#if (lime_cairo && lime_native && !macro)
+		#if (lime_cairo && lime_cffi && !macro)
 		return cairo_font_face_status (handle);
 		#else
 		return 0;

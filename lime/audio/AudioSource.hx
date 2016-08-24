@@ -60,7 +60,7 @@ class AudioSource {
 	private var __gain:Float = 1.0;
 	#end
 	
-	#if lime_native
+	#if lime_cffi
 	private var queueTimer:Timer;
 	private var format:Int;
 	
@@ -88,7 +88,7 @@ class AudioSource {
 		this.loops = loops;
 		id = 0;
 		playing = false;
-        #if lime_native
+        #if lime_cffi
 		bufferTime = 1000;
 		finishedDecoding = false;
         #end
@@ -110,7 +110,7 @@ class AudioSource {
 			
 			case OPENAL (alc, al):
 						
-				#if lime_native
+				#if lime_cffi
 				
 				if (id != 0) {
 					
@@ -139,7 +139,7 @@ class AudioSource {
 			
 			case OPENAL (alc, al):
 				
-				#if lime_native
+				#if lime_cffi
 				
 				if (buffer.id == 0) {
 					
@@ -415,7 +415,7 @@ class AudioSource {
 	
 	private function timer_onRun ():Void {
 		
-		#if lime_native
+		#if lime_cffi
 		
 		var sourceState:Int = AL.getSourcei (id, AL.SOURCE_STATE);
 		if (playing && !finishedDecoding)  {
@@ -476,7 +476,7 @@ class AudioSource {
 	
 	private function streamTimer_onRun () {
 		
-		#if lime_native
+		#if lime_cffi
 		
 		var sourceState:Int = AL.getSourcei (id, AL.SOURCE_STATE);
 		if (playing && !finishedDecoding) {
@@ -811,7 +811,7 @@ class AudioSource {
 	
 	private function getBufferSize ():Int {
 		
-        #if lime_native
+        #if lime_cffi
 		return Std.int (buffer.sampleRate * buffer.bitsPerSample / 8 * buffer.channels * Math.max (bufferTime, minimumBufferTime) / 1000 / streamBuffers.length);
         #else
         return 0;
@@ -821,7 +821,7 @@ class AudioSource {
 	
 	private function getMinimalBufferCountForLoop ():Int {
 		
-        #if lime_native
+        #if lime_cffi
 		return Std.int (Math.max (Math.floor (minimumBufferTime / length), 2));
         #else
         return 0;
@@ -878,7 +878,7 @@ class AudioSource {
 	}
 	
 	
-	#if lime_native
+	#if lime_cffi
 	@:cffi private static function lime_audio_stream_decode (handle:Dynamic, data:Dynamic, readSize:Int, writeOffset:Int):Int;
 	@:cffi private static function lime_audio_stream_seek (data:Dynamic, seconds:Float):Bool;
 	#end

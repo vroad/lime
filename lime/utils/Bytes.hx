@@ -67,7 +67,7 @@ class Bytes extends HaxeBytes {
 	}
 	
 	
-	#if (lime_native && !macro)
+	#if (lime_cffi && !macro)
 	public static function __fromNativePointer (data:Dynamic, length:Int):Bytes {
 		
 		var bytes:Dynamic = lime_bytes_from_data_pointer (data, length);

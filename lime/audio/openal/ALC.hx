@@ -42,7 +42,7 @@ class ALC {
 	
 	public static function closeDevice (device:ALDevice):Bool {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		return alcCloseDevice_wrap (device);
 		#else
 		return false;
@@ -53,7 +53,7 @@ class ALC {
 	
 	public static function createContext (device:ALDevice, attrlist:Array<Int> = null):ALContext {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		var handle:Dynamic = alcCreateContext_wrap (device, attrlist);
 		
 		if (handle != null) {
@@ -70,7 +70,7 @@ class ALC {
 	
 	public static function destroyContext (context:ALContext):Void {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		alcDestroyContext_wrap (context);
 		#end
 		
@@ -79,7 +79,7 @@ class ALC {
 	
 	public static function getContextsDevice (context:ALContext):ALDevice {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		var handle:CFFIPointer = alcGetContextsDevice_wrap (context);
 		
 		if (handle != null) {
@@ -103,7 +103,7 @@ class ALC {
 	
 	public static function getError (device:ALDevice):Int {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		return alcGetError (device);
 		#else
 		return 0;
@@ -130,7 +130,7 @@ class ALC {
 	
 	public static function getIntegerv (device:ALDevice, param:Int, size:Int):Array<Int> {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		return alcGetIntegerv_wrap (device, param, size);
 		#else
 		return null;
@@ -141,7 +141,7 @@ class ALC {
 	
 	public static function getString (device:ALDevice, param:Int):String {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		return alcGetString (device, param);
 		#else
 		return null;
@@ -152,7 +152,7 @@ class ALC {
 	
 	public static function makeContextCurrent (context:ALContext):Bool {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		currentContext = context;
 		return alcMakeContextCurrent_wrap (context);
 		#else
@@ -164,7 +164,7 @@ class ALC {
 	
 	public static function openDevice (deviceName:String = null):ALDevice {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		var handle = alcOpenDevice (deviceName);
 		
 		if (handle != null) {
@@ -181,7 +181,7 @@ class ALC {
 	
 	public static function processContext (context:ALContext):Void {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		alcProcessContext_wrap (context);
 		#end
 		
@@ -190,7 +190,7 @@ class ALC {
 	
 	public static function suspendContext (context:ALContext):Void {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		alcSuspendContext_wrap (context);
 		#end
 		
@@ -199,7 +199,7 @@ class ALC {
 	
 	public static function pauseDevice (device:ALDevice):Void {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		alcDevicePauseSOFT (device);
 		#end
 		
@@ -207,14 +207,14 @@ class ALC {
 	
 	public static function resumeDevice (device:ALDevice):Void {
 		
-		#if (lime_native && lime_openal && !macro)
+		#if (lime_cffi && lime_openal && !macro)
 		alcDeviceResumeSOFT (device);
 		#end
  		
 	}
 	
 	
-	#if (lime_native && lime_openal && !macro)
+	#if (lime_cffi && lime_openal && !macro)
 	@:cffi private static function alcCloseDevice_wrap (device:CFFIPointer):Bool;
 	@:cffi private static function alcCreateContext_wrap (device:CFFIPointer, attrlist:HxVector_Int):ALCContextWrapperHandle;
 	@:cffi private static function alcDestroyContext_wrap (context:CFFIPointer):Void;

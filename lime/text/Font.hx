@@ -18,7 +18,7 @@ import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
 #end
 
-#if (lime_native && !macro)
+#if (lime_cffi && !macro)
 import haxe.io.Path;
 #end
 
@@ -49,7 +49,7 @@ class Font {
 	public var unitsPerEM (get, null):Int;
 	
 	@:noCompletion private var __fontPath:String;
-	#if lime_native
+	#if lime_cffi
 	@:noCompletion private var __fontPathWithoutDirectory:String;
 	#end
 	
@@ -73,7 +73,7 @@ class Font {
 	
 	public function decompose ():NativeFontData {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		if (src == null) throw "Uninitialized font handle.";
 		var data:Dynamic = Decompose (1024 * 20);
@@ -95,7 +95,7 @@ class Font {
 		var font = new Font ();
 		font.__fromBytes (bytes);
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return (font.src != null) ? font : null;
 		#else
 		return font;
@@ -111,7 +111,7 @@ class Font {
 		var font = new Font ();
 		font.__fromFile (path);
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return (font.src != null) ? font : null;
 		#else
 		return font;
@@ -122,7 +122,7 @@ class Font {
 	
 	public function getGlyph (character:String):Glyph {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetGlyphIndex (character);
 		#else
 		return -1;
@@ -133,7 +133,7 @@ class Font {
 	
 	public function getGlyphs (characters:String = #if (display && haxe_ver < "3.2") "" #else "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^`'\"/\\&*()[]{}<>|:;_-+=?,. " #end):Array<Glyph> {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		var glyphs:Dynamic = GetGlyphIndices (characters);
 		return glyphs;
 		#else
@@ -145,7 +145,7 @@ class Font {
 	
 	public function getGlyphMetrics (glyph:Glyph):GlyphMetrics {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		var value:Dynamic = GetGlyphMetrics (glyph);
 		var metrics = new GlyphMetrics ();
 		
@@ -246,7 +246,7 @@ class Font {
 		
 		__fontPath = null;
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		__fontPathWithoutDirectory = null;
 		
@@ -267,7 +267,7 @@ class Font {
 		
 		__fontPath = path;
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		__fontPathWithoutDirectory = Path.withoutDirectory (__fontPath);
 		
@@ -286,7 +286,7 @@ class Font {
 	
 	@:noCompletion private function __setSize (size:Int):Void {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		SetSize (size);
 		#end
 		
@@ -302,7 +302,7 @@ class Font {
 	
 	private function get_ascender ():Int {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetAscender ();
 		#else
 		return 0;
@@ -313,7 +313,7 @@ class Font {
 	
 	private function get_descender ():Int {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetDescender ();
 		#else
 		return 0;
@@ -324,7 +324,7 @@ class Font {
 	
 	private function get_height ():Int {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetHeight ();
 		#else
 		return 0;
@@ -335,7 +335,7 @@ class Font {
 	
 	private function get_numGlyphs ():Int {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetNumGlyphs ();
 		#else
 		return 0;
@@ -346,7 +346,7 @@ class Font {
 	
 	private function get_underlinePosition ():Int {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetUnderlinePosition ();
 		#else
 		return 0;
@@ -357,7 +357,7 @@ class Font {
 	
 	private function get_underlineThickness ():Int {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetUnderlineThickness ();
 		#else
 		return 0;
@@ -368,7 +368,7 @@ class Font {
 	
 	private function get_unitsPerEM ():Int {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		return GetUnitsPerEM ();
 		#else
 		return 0;
@@ -384,7 +384,7 @@ class Font {
 	
 	
 	
-	#if (lime_native && !macro)
+	#if (lime_cffi && !macro)
 	@:cffi private function GetAscender ():Int;
 	@:cffi private function GetDescender ():Int;
 	@:cffi private function GetFamilyName ():StdWString;

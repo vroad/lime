@@ -31,7 +31,7 @@ class PNG {
 	
 	public static function decodeBytes (bytes:Bytes, decodeData:Bool = true):Image {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		var bufferData:Dynamic = lime_png_decode_bytes (bytes, decodeData);
 		
@@ -52,7 +52,7 @@ class PNG {
 	
 	public static function decodeFile (path:String, decodeData:Bool = true):Image {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		var bufferData:Dynamic = lime_png_decode_file (path, decodeData);
 		
@@ -85,7 +85,7 @@ class PNG {
 		
 		#if java
 		
-		#elseif (lime_native && sys && (!disable_cffi || !format) && !macro)
+		#elseif (lime_cffi && sys && (!disable_cffi || !format) && !macro)
 		
 		if (CFFI.enabled) {
 			
@@ -165,7 +165,7 @@ class PNG {
 	
 	
 	
-	#if (lime_native && !macro)
+	#if (lime_cffi && !macro)
 	@:cffi private static function lime_png_decode_bytes (data:Dynamic, decodeData:Bool):Dynamic;
 	@:cffi private static function lime_png_decode_file (path:String, decodeData:Bool):Dynamic;
 	@:cffi private static function lime_image_encode (data:Dynamic, type:Int, quality:Int):Dynamic;

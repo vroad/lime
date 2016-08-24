@@ -144,7 +144,7 @@ class CairoFontOptions {
 	
 	
 	
-	#if (lime_native && lime_cairo && !macro)
+	#if (lime_cffi && lime_cairo && !macro)
 	@:cffi private static function cairo_font_options_create ():CairoFontOptionsHandle;
 	@:cffi private static function cairo_font_options_get_antialias (handle:CairoFontOptionsHandle):Int;
 	@:cffi private static function cairo_font_options_get_hint_metrics (handle:CairoFontOptionsHandle):Int;

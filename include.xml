@@ -6,7 +6,7 @@
 	<haxedef name="native" if="native" />
 	
 	<haxedef name="lime-html5" if="html5" />
-	<haxedef name="lime-native" if="native" unless="doc" />
+	<haxedef name="lime-cffi" if="native" unless="doc" />
 	
 	<haxedef name="lime-has-separate-gl-context" />
 	

@@ -21,7 +21,7 @@ class Zlib {
 	
 	public static function compress (bytes:Bytes):Bytes {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		var data = Compress (ZlibType.ZLIB, bytes);
 		if (data == null) return null;
@@ -53,7 +53,7 @@ class Zlib {
 	
 	public static function decompress (bytes:Bytes):Bytes {
 		
-		#if (lime_native && !macro)
+		#if (lime_cffi && !macro)
 		
 		var data = Decompress (ZlibType.ZLIB, bytes);
 		if (data == null) return null;
@@ -90,7 +90,7 @@ class Zlib {
 	
 	
 	
-	#if lime_native
+	#if lime_cffi
 	@:noCompletion @:cffi private static function Compress (type:ZlibType, data:LimeBytes):Dynamic { throw null; }
 	@:noCompletion @:cffi private static function Decompress (type:ZlibType, data:LimeBytes):Dynamic { throw null; }
 	#end

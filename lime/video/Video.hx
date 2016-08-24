@@ -60,7 +60,7 @@ class Video {
 
 
 
-	#if lime_native
+	#if lime_cffi
 	private static var lime_video_play = System.load ("lime", "lime_video_play", 1);
 	private static var lime_video_open_url = System.load ("lime", "lime_video_open_url", 2);
 	private static var lime_video_set_texture = System.load ("lime", "lime_video_set_texture", 2);

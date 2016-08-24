@@ -24,7 +24,7 @@ class CURL {
 	
 	public static function getDate (date:String, now:Float):Float {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		return curl_getdate (date, now);
 		#else
 		return 0;
@@ -35,7 +35,7 @@ class CURL {
 	
 	public static function globalCleanup ():Void {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		curl_global_cleanup ();
 		#end
 		
@@ -44,7 +44,7 @@ class CURL {
 	
 	public static function globalInit (flags:Int):CURLCode {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		return curl_global_init (flags);
 		#else
 		return 0;
@@ -55,7 +55,7 @@ class CURL {
 	
 	public static function version ():String {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		return curl_version ();
 		#else
 		return null;
@@ -66,7 +66,7 @@ class CURL {
 	
 	public static function versionInfo (type:CURLVersion):Dynamic {
 		
-		#if (lime_native && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		return curl_version_info_wrap (type);
 		#else
 		return null;
