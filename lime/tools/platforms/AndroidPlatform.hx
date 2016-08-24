@@ -200,12 +200,6 @@ class AndroidPlatform extends PlatformTarget {
 			CSHelper.buildSln (targetDirectory + "/obj", targetDirectory + "/obj/MainActivity.sln");
 			CSHelper.buildCSProj (targetDirectory + "/obj", targetDirectory + "/obj/MainActivity.csproj", "SignAndroidPackage");
 			
-		}
-		
-		if (targetType == "cs") {
-			
-			
-			
 		} else {
 			
 			AndroidHelper.build (project, destination);
@@ -268,8 +262,9 @@ class AndroidPlatform extends PlatformTarget {
 			
 		};
 		
-		var dstApkPath = FileSystem.fullPath (targetDirectory) + "/bin/" + project.app.file + apkSuffix;
-		trace (dstApkPath);
+		var dstApkDir = FileSystem.fullPath (targetDirectory) + "/bin/";
+		FileSystem.createDirectory (dstApkDir);
+		var dstApkPath = dstApkDir + project.app.file + apkSuffix;
 		File.copy (tmpApkPath, dstApkPath);
 		
 		deviceID = AndroidHelper.install (project, dstApkPath, deviceID);
