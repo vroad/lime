@@ -3,7 +3,7 @@
 -cp ..
 -D lime-cairo
 -D lime-curl
--D lime-native
+-D lime-cffi
 -D lime-openal
 -D native
 -D bindings
