@@ -33,7 +33,6 @@ class AndroidPlatform extends PlatformTarget {
 	private var targetType:String;
 	private var templateDirectory:String;
 	private static var iconTypes:Array<String> = [ "ldpi", "mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi" ];
-	private static var csResourceDir:String = "Resources\\";
 	private var assetPaths:Array<String>;
 	private var appMainGUID:String;
 	
@@ -189,7 +188,7 @@ class AndroidPlatform extends PlatformTarget {
 			CSHelper.copySourceFiles (project.templatePaths, targetDirectory + "/obj/src");
 			FileHelper.copyFileTemplate (project.templatePaths, templateDirectory + "/AssemblyInfo.cs", targetDirectory + "/obj/src/AssemblyInfo.cs", project.templateContext);
 			var txtPath = targetDirectory + "/obj/hxcs_build.txt";
-			var resources = getResourcePaths (csResourceDir);
+			var resources = getResourcePaths ("Resources\\");
 			var sourceFiles = CSHelper.ndllSourceFiles.copy ();
 			sourceFiles.push ("AssemblyInfo");
 			CSHelper.addSourceFiles (txtPath, sourceFiles);
@@ -522,7 +521,7 @@ class AndroidPlatform extends PlatformTarget {
 			context.REFS = [];
 			context.SRCS = ["Sources\\MainActivity.cs"];
 			context.RES = [];
-			context.ANDROID_RESOURCES = getResourcePaths (csResourceDir);
+			context.ANDROID_RESOURCES = getResourcePaths ("Resources\\");
 			context.ANDROID_ASSETS = assetPaths;
 			context.ANDROID_NATIVE_LIBS = CSHelper.getAndroidNativeLibraryPaths (targetDirectory + "/obj/Libraries/", project.ndlls, project.architectures);
 			
