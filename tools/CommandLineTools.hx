@@ -257,6 +257,10 @@ class CommandLineTools {
 							target = Platform.HTML5;
 							targetFlags.set ("html5", "");
 						
+						case "mac", "macos":
+							
+							target = Platform.MAC;
+						
 						default:
 							
 							target = cast targetName.toLowerCase ();
@@ -1240,6 +1244,11 @@ class CommandLineTools {
 				
 				target = Platform.HTML5;
 				targetFlags.set ("html5", "");
+			
+			case "mac", "macos":
+				
+				target = Platform.MAC;
+				overrides.haxedefs.set ("macos", "");
 			
 			default:
 				
