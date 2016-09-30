@@ -154,10 +154,13 @@ class NativeApplication {
 		parent.onExit.dispatch (0);
 		return 0;
 		
-		#elseif (cpp || neko)
+		#elseif lime_cffi
 		
 		var result = Exec ();
+		
+		#if (!emscripten && !ios && !nodejs)
 		parent.onExit.dispatch (result);
+		#end
 		
 		return result;
 		

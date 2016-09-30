@@ -2,13 +2,15 @@
 #define LIME_AUDIO_OPENAL_OPENAL_BINDINGS_H
 
 
-#if defined(HX_MACOS) || defined(IPHONE)
+#if defined (IPHONE) || defined (TVOS) || (defined (HX_MACOS) && !defined (LIME_OPENALSOFT))
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
 #else
 #include "AL/al.h"
 #include "AL/alc.h"
+#ifdef LIME_OPENALSOFT
 #include "AL/alext.h"
+#endif
 #endif
 
 #include <audio/openal/ALCContextWrapper.h>

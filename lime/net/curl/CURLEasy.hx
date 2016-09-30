@@ -103,7 +103,7 @@ class CURLEasy {
 	
 	/*public static function recv (handle:Dynamic):CURLCode {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		return cast lime_curl_easy_perform (handle);
 		#else
 		return cast 0;
@@ -123,7 +123,7 @@ class CURLEasy {
 	
 	/*public static function send (handle:Dynamic):CURLCode {
 		
-		#if ((cpp || neko || nodejs) && lime_curl && !macro)
+		#if (lime_cffi && lime_curl && !macro)
 		return cast lime_curl_easy_perform (handle);
 		#else
 		return cast 0;

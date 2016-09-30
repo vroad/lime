@@ -82,7 +82,7 @@ namespace lime {
 			
 		}
 		
-		delete dashes;
+		delete[] dashes;
 		return result;
 		
 	}
@@ -225,6 +225,16 @@ namespace lime {
 		
 		cairo_show_glyphs (cairo, _glyphs, length);
 		cairo_glyph_free (_glyphs);
+		
+	}
+	
+	
+	void cairo_set_matrix_wrap (cairo_t* cairo, double a, double b, double c, double d, double tx, double ty) {
+		
+		cairo_matrix_t cm;
+		cairo_matrix_init (&cm, a, b, c, d, tx, ty);
+		
+		cairo_set_matrix (cairo, &cm);
 		
 	}
 	

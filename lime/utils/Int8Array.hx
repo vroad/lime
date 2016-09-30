@@ -13,6 +13,7 @@ package lime.utils;
         public inline function new<T>(
             ?elements:Int,
             ?array:Array<T>,
+            #if openfl ?vector:openfl.Vector<T>, #end
             ?view:ArrayBufferView,
             ?buffer:ArrayBuffer, ?byteoffset:Int = 0, ?len:Null<Int>
         ) {
@@ -20,6 +21,7 @@ package lime.utils;
                 this = new js.html.Int8Array( elements );
             } else if(array != null) {
                 this = new js.html.Int8Array( untyped array );
+            #if openfl } else if(vector != null) { this = new js.html.Int8Array( untyped untyped (vector).__array ); #end
             } else if(view != null) {
                 this = new js.html.Int8Array( untyped view );
             } else if(buffer != null) {
@@ -70,6 +72,7 @@ package lime.utils;
             ?elements:Int,
             ?buffer:ArrayBuffer,
             ?array:Array<T>,
+            #if openfl ?vector:openfl.Vector<T>, #end
             ?view:ArrayBufferView,
             ?byteoffset:Int = 0, ?len:Null<Int>
         ) {
@@ -78,6 +81,7 @@ package lime.utils;
                 this = new ArrayBufferView( elements, Int8 );
             } else if(array != null) {
                 this = new ArrayBufferView(0, Int8).initArray(array);
+            #if openfl } else if(vector != null) { this = new ArrayBufferView(0, Int8).initArray(untyped (vector).__array); #end
             } else if(view != null) {
                 this = new ArrayBufferView(0, Int8).initTypedArray(view);
             } else if(buffer != null) {
@@ -94,9 +98,9 @@ package lime.utils;
 
             //non spec haxe conversions
         inline public static function fromBytes( bytes:haxe.io.Bytes, ?byteOffset:Int=0, ?len:Int ) : Int8Array {
-            if(byteOffset == null) return new Int8Array(cast bytes.getData());
-            if(len == null) return new Int8Array(cast bytes.getData(), byteOffset);
-            return new Int8Array(cast bytes.getData(), byteOffset, len);
+            if(byteOffset == null) return new Int8Array(null, null, cast bytes.getData());
+            if(len == null) return new Int8Array(null, null, cast bytes.getData(), byteOffset);
+            return new Int8Array(null, null, cast bytes.getData(), byteOffset, len);
         }
 
         inline public function toBytes() : haxe.io.Bytes {

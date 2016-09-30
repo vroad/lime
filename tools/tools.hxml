@@ -1,9 +1,10 @@
 -main CommandLineTools
 -neko tools.n
 -D lime-curl
+-D lime-cffi
 -D lime
 -D lime-native
 -cp ..
 -lib format
 #-lib svg
--D optional_cffi
+-D optional-cffi

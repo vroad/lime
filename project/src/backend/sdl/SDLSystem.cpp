@@ -82,13 +82,17 @@ namespace lime {
 		
 		switch (type) {
 			
-			case APPLICATION:
+			case APPLICATION: {
 				
 				return alloc_string (SDL_GetBasePath ());
 				
-			case APPLICATION_STORAGE:
+			}
+				
+			case APPLICATION_STORAGE: {
 				
 				return alloc_string (SDL_GetPrefPath (company, title));
+				
+			}
 				
 			case DESKTOP: {
 				
@@ -101,9 +105,12 @@ namespace lime {
 				#elif defined (HX_WINDOWS)
 				
 				wchar_t result[MAX_PATH] = L"";
-				SHGetFolderPath (NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, result);
 				std::unique_ptr<char> utf8Str (WIN_StringToUTF8 (result));
 				return alloc_string (utf8Str.get ());
+				
+				#elif defined (IPHONE)
+				
+				return System::GetIOSDirectory (type);
 				
 				#elif !defined (ANDROID)
 				
@@ -190,9 +197,12 @@ namespace lime {
 				#elif defined (HX_WINDOWS)
 				
 				wchar_t result[MAX_PATH] = L"";
-				SHGetFolderPath (NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, result);
 				std::unique_ptr<char> utf8Str (WIN_StringToUTF8 (result));
 				return alloc_string (utf8Str.get ());
+				
+				#elif defined (IPHONE)
+				
+				return System::GetIOSDirectory (type);
 				
 				#elif defined (ANDROID)
 				

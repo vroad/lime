@@ -26,6 +26,9 @@ namespace lime {
 		public:
 			
 			static bool GetAllowScreenTimeout ();
+			#ifdef IPHONE
+			static value GetIOSDirectory (SystemDirectory type);
+			#endif
 			static value GetDirectory (SystemDirectory type, const char* company, const char* title);
 			static value GetDisplay (int id);
 			static int GetNumDisplays ();

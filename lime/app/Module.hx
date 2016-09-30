@@ -127,7 +127,11 @@ class Module implements IModule {
 	
 	@:noCompletion public function removeWindow (window:Window):Void {
 		
-		
+		if (window != null && __windows.indexOf (window) > -1) {
+			
+			__windows.remove (window);
+			
+		}
 		
 	}
 	
@@ -202,11 +206,7 @@ class Module implements IModule {
 	 * Called when a gamepad is connected
 	 * @param	gamepad	The gamepad that was connected
 	 */
-	public function onGamepadConnect (gamepad:Gamepad):Void {
-		
-		trace ("onGamepadConnect (module)");
-		
-	}
+	public function onGamepadConnect (gamepad:Gamepad):Void { }
 	
 	
 	/**

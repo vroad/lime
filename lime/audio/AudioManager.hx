@@ -82,7 +82,7 @@ class AudioManager {
 					if (currentContext != null) {
 						
 						var device = alc.getContextsDevice (currentContext);
-						ALC.resumeDevice (device);
+						alc.resumeDevice (device);
 						alc.processContext (currentContext);
 						
 					}
@@ -146,8 +146,8 @@ class AudioManager {
 						
 						alc.suspendContext (currentContext);
 						var device = alc.getContextsDevice (currentContext);
-						ALC.pauseDevice (device);
-					
+						alc.pauseDevice (device);
+						
 					}
 					
 					#end

@@ -57,6 +57,8 @@ namespace lime {
 	
 	void cairo_set_font_size_wrap (cairo_t* cairo, double size);
 	
+	void cairo_set_matrix_wrap (cairo_t* cairo, double a, double b, double c, double d, double tx, double ty);
+	
 	void cairo_show_glyphs_wrap (cairo_t* cairo, value glyphs);
 	
 }

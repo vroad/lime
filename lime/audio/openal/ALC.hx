@@ -179,10 +179,28 @@ class ALC {
 	}
 	
 	
+	public static function pauseDevice (device:ALDevice):Void {
+		
+		#if (lime_cffi && lime_openal && !macro)
+		alcDevicePauseSOFT (device);
+		#end
+		
+	}
+	
+	
 	public static function processContext (context:ALContext):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
 		alcProcessContext_wrap (context);
+		#end
+		
+	}
+	
+	
+	public static function resumeDevice (device:ALDevice):Void {
+		
+		#if (lime_cffi && lime_openal && !macro)
+		alcDeviceResumeSOFT (device);
 		#end
 		
 	}
@@ -194,23 +212,6 @@ class ALC {
 		alcSuspendContext_wrap (context);
 		#end
 		
-	}
-	
-	
-	public static function pauseDevice (device:ALDevice):Void {
-		
-		#if (lime_cffi && lime_openal && !macro)
-		alcDevicePauseSOFT (device);
-		#end
-		
-	}
-	
-	public static function resumeDevice (device:ALDevice):Void {
-		
-		#if (lime_cffi && lime_openal && !macro)
-		alcDeviceResumeSOFT (device);
-		#end
- 		
 	}
 	
 	

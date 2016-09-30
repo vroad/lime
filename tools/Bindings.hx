@@ -43,6 +43,7 @@ class Bindings {
 		filesElement.addChild (createCompilerFlagElement ("-DCAIRO_WIN32_STATIC_BUILD", "windows"));
 		filesElement.addChild (createCompilerFlagElement ("-DCAIRO_HAS_FT_FONT"));
 		filesElement.addChild (createCompilerFlagElement ("-DLIME_OPENAL"));
+		filesElement.addChild (createCompilerFlagElement ("-DLIME_OPENALSOFT"));
 		filesElement.addChild (createCompilerFlagElement ("-DAL_LIBTYPE_STATIC=1"));
 		filesElement.addChild (createCompilerFlagElement ("-DAL_ALEXT_PROTOTYPES"));
 		filesElement.addChild (createCompilerFlagElement ("-I${NATIVE_TOOLKIT_PATH}/curl/include/"));

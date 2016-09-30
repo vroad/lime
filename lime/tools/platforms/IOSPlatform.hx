@@ -106,9 +106,8 @@ class IOSPlatform extends PlatformTarget {
 		project.sources = PathHelper.relocatePaths (project.sources, PathHelper.combine (targetDirectory, project.app.file + "/haxe"));
 		//project.dependencies.push ("stdc++");
 		
-		if (project.certificate == null || project.certificate.identity == null) {
+		if (project.certificate != null && project.certificate.identity == null) {
 			
-			project.certificate = new Keystore ();
 			project.certificate.identity = "iPhone Developer";
 			
 		}
@@ -130,6 +129,12 @@ class IOSPlatform extends PlatformTarget {
 		context.HAS_ICON = false;
 		context.HAS_LAUNCH_IMAGE = false;
 		context.OBJC_ARC = false;
+		
+		if (project.certificate != null) {
+			
+			context.DEVELOPMENT_TEAM_ID = project.certificate.teamID;
+			
+		}
 		
 		context.linkedLibraries = [];
 		
@@ -177,7 +182,7 @@ class IOSPlatform extends PlatformTarget {
 		
 		if (project.config.getString ("ios.device", "universal") == "universal" || project.config.getString ("ios.device") == "iphone") {
 			
-			if (project.config.getFloat ("ios.deployment", 5.1) < 5) {
+			if (project.config.getFloat ("ios.deployment", 8) < 5) {
 				
 				ArrayHelper.addUnique (architectures, Architecture.ARMV6);
 				
@@ -220,7 +225,7 @@ class IOSPlatform extends PlatformTarget {
 		context.ARMV7S = armv7s;
 		context.ARM64 = arm64;
 		context.TARGET_DEVICES = switch (project.config.getString ("ios.device", "universal")) { case "iphone": "1"; case "ipad": "2"; default: "1,2";  }
-		context.DEPLOYMENT = project.config.getString ("ios.deployment", "5.1.1");
+		context.DEPLOYMENT = project.config.getString ("ios.deployment", "8.0");
 		
 		if (project.config.getString ("ios.compiler") == "llvm" || project.config.getString ("ios.compiler", "clang") == "clang") {
 			
@@ -228,7 +233,7 @@ class IOSPlatform extends PlatformTarget {
 			
 		}
 
-		//context.ENABLE_BITCODE = (project.config.getFloat ("ios.deployment", 5.1) >= 6);
+		//context.ENABLE_BITCODE = (project.config.getFloat ("ios.deployment", 8) >= 6);
 		context.ENABLE_BITCODE = project.config.getBool ("ios.enable-bitcode", false);
 		context.IOS_COMPILER = project.config.getString ("ios.compiler", "clang");
 		context.CPP_BUILD_LIBRARY = project.config.getString ("cpp.buildLibrary", "hxcpp");
@@ -411,20 +416,21 @@ class IOSPlatform extends PlatformTarget {
 		PathHelper.mkdir (projectDirectory + "/haxe/lime/installer");
 		
 		var iconSizes:Array<IconSize> = [
-			{ name : "Icon-Small.png", size : 29 },
-			{ name : "Icon-Small-40.png", size : 40 },
-			{ name : "Icon-Small-50.png", size : 50 },
-			{ name : "Icon.png", size : 57 },
-			{ name : "Icon-Small@2x.png", size : 58 },
-			{ name : "Icon-72.png", size : 72 },
-			{ name : "Icon-76.png", size : 76 },
-			{ name : "Icon-Small-40@2x.png", size : 80 },
-			{ name : "Icon-Small-50@2x.png", size : 100 },
-			{ name : "Icon@2x.png", size : 114 },
-			{ name : "Icon-60@2x.png", size : 120 },
-			{ name : "Icon-72@2x.png", size : 144 },
-			{ name : "Icon-76@2x.png", size : 152 },
-			{ name : "Icon-60@3x.png", size : 180 },
+			{ name: "Icon-Small.png", size: 29 },
+			{ name: "Icon-Small-40.png", size: 40 },
+			{ name: "Icon-Small-50.png", size: 50 },
+			{ name: "Icon.png", size: 57 },
+			{ name: "Icon-Small@2x.png", size: 58 },
+			{ name: "Icon-72.png", size: 72 },
+			{ name: "Icon-76.png", size: 76 },
+			{ name: "Icon-Small-40@2x.png", size: 80 },
+			{ name: "Icon-Small-50@2x.png", size: 100 },
+			{ name: "Icon@2x.png", size: 114 },
+			{ name: "Icon-60@2x.png", size: 120 },
+			{ name: "Icon-72@2x.png", size: 144 },
+			{ name: "Icon-76@2x.png", size: 152 },
+			{ name: "Icon-83.5@2x.png", size: 167 },
+			{ name: "Icon-60@3x.png", size: 180 },
 		];
 		
 		context.HAS_ICON = true;

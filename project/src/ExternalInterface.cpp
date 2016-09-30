@@ -25,6 +25,7 @@
 #include <system/CFFIPointer.h>
 #include <system/Clipboard.h>
 #include <system/JNI.h>
+#include <system/Locale.h>
 #include <system/SensorEvent.h>
 #include <system/System.h>
 #include <text/Font.h>

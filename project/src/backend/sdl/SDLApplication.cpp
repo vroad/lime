@@ -86,7 +86,7 @@ namespace lime {
 		
 		Init ();
 		
-		#ifdef EMSCRIPTEN
+		#if defined(IPHONE) || defined(EMSCRIPTEN)
 		
 		return 0;
 		
