@@ -49,6 +49,7 @@ class AudioSource {
 	private var id:UInt;
 	private var playing:Bool;
 	private var pauseTime:Int;
+	private var __completed:Bool;
 	private var __length:Null<Int>;
 	private var __loops:Int;
 	private var __position:Vector4;
@@ -87,6 +88,7 @@ class AudioSource {
 		
 		this.loops = loops;
 		id = 0;
+		__completed = false;
 		playing = false;
         #if lime_cffi
 		bufferTime = 1000;
@@ -197,7 +199,7 @@ class AudioSource {
 		#elseif flash
 		
 		if (channel != null) channel.stop ();
-		var channel = buffer.src.play (pauseTime / 1000);
+		channel = buffer.src.play (pauseTime / 1000 + offset, loops + 1);
 		
 		#elseif lime_console
 		
@@ -467,6 +469,9 @@ class AudioSource {
 			id = 0;
 			streamBuffers = null;
 			
+			__completed = true;
+			onComplete.dispatch ();
+			
 		}
 		
 		#end
@@ -609,7 +614,15 @@ class AudioSource {
 		
 		#elseif flash
 		
-		return Std.int (channel.position);
+		if (channel != null) {
+			
+			return Std.int (channel.position) - offset;
+			
+		} else {
+			
+			return 0;
+			
+		}
 		
 		#elseif lime_console
 		
@@ -618,9 +631,17 @@ class AudioSource {
 		
 		#else
 		
-		var time = Std.int (AL.getSourcef (id, AL.SEC_OFFSET) * 1000) - offset;
-		if (time < 0) return 0;
-		return time;
+		if (__completed) {
+			
+			return length;
+			
+		} else {
+			
+			var time = Std.int (AL.getSourcef (id, AL.SEC_OFFSET) * 1000) - offset;
+			if (time < 0) return 0;
+			return time;
+			
+		}
 		
 		#end
 		
@@ -744,7 +765,7 @@ class AudioSource {
 		
 		#elseif flash
 		
-		return Std.int (buffer.src.length);
+		return Std.int (buffer.src.length) - offset;
 		
 		#elseif lime_console
 		

@@ -138,7 +138,7 @@ namespace lime {
 	
 	static void val_to_hx_vector_int (value inArray, HxVector<int>& outVector) {
 		
-		int length = val_array_size (inArray);
+		int length = !val_is_null (inArray) ? val_array_size (inArray) : 0;
 		
 		if (length <= 0) {
 			

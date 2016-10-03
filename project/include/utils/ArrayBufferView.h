@@ -16,10 +16,14 @@ namespace lime {
 		
 		
 		ArrayBufferView ();
+		ArrayBufferView (int size);
+		ArrayBufferView (value inValue);
 		bool Set (value inValue);
 		unsigned char* Data () const;
 		int ByteOffset () const;
 		int ByteLength () const;
+		void Resize (int size);
+		value Value ();
 		
 	private:
 		

@@ -21,15 +21,29 @@ namespace lime {
 		
 		StringId* id = StringId::Get ();
 		
-		width = val_int (val_field (imageBuffer, id->width));
-		height = val_int (val_field (imageBuffer, id->height));
-		bitsPerPixel = val_int (val_field (imageBuffer, id->bitsPerPixel));
-		format = (PixelFormat)val_int (val_field (imageBuffer, id->format));
-		transparent = val_bool (val_field (imageBuffer, id->transparent));
-		value data_value = val_field (imageBuffer, id->data);
-		value buffer_value = val_field (data_value, id->buffer);
-		premultiplied = val_bool (val_field (imageBuffer, id->premultiplied));
-		data = new Bytes (buffer_value);
+		if (!val_is_null (imageBuffer)) {
+			
+			width = val_int (val_field (imageBuffer, id->width));
+			height = val_int (val_field (imageBuffer, id->height));
+			bitsPerPixel = val_int (val_field (imageBuffer, id->bitsPerPixel));
+			format = (PixelFormat)val_int (val_field (imageBuffer, id->format));
+			transparent = val_bool (val_field (imageBuffer, id->transparent));
+			premultiplied = val_bool (val_field (imageBuffer, id->premultiplied));
+			data = new ArrayBufferView (val_field (imageBuffer, id->data));
+			
+		} else {
+			
+			width = 0;
+			height = 0;
+			bitsPerPixel = 32;
+			format = RGBA32;
+			data = 0;
+			premultiplied = false;
+			transparent = false;
+			
+		}
+		
+		mValue = imageBuffer;
 		
 	}
 	
@@ -71,7 +85,7 @@ namespace lime {
 		
 		if (!this->data) {
 			
-			this->data = new Bytes (height * stride);
+			this->data = new ArrayBufferView (height * stride);
 			
 		} else {
 			
@@ -93,11 +107,16 @@ namespace lime {
 		
 		StringId* id = StringId::Get ();
 		
-		mValue = alloc_empty_object ();
+		if (val_is_null (mValue)) {
+			
+			mValue = alloc_empty_object ();
+			
+		}
+		
 		alloc_field (mValue, id->width, alloc_int (width));
 		alloc_field (mValue, id->height, alloc_int (height));
 		alloc_field (mValue, id->bitsPerPixel, alloc_int (bitsPerPixel));
-		alloc_field (mValue, id->data, data->Value ());
+		alloc_field (mValue, id->data, data ? data->Value () : alloc_null ());
 		alloc_field (mValue, id->transparent, alloc_bool (transparent));
 		alloc_field (mValue, id->format, alloc_int (format));
 		alloc_field (mValue, id->premultiplied, alloc_bool (premultiplied));
