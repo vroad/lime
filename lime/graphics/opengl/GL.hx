@@ -378,6 +378,8 @@ class GL {
 	
 	private static var context:GLRenderContext;
 	
+	private static var __currentProgram:GLProgram;
+	
 	
 	public static inline function activeTexture (texture:Int):Void {
 		
@@ -1255,6 +1257,8 @@ class GL {
 	
 	
 	public static inline function useProgram (program:GLProgram):Void {
+		
+		__currentProgram = program;
 		
 		context.useProgram (program);
 		
