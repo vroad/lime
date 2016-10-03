@@ -1,10 +1,10 @@
 #include <assert.h>
+#include <hx/CFFIExt.h>
 #include <system/System.h>
 #include <utils/Bytes.h>
 #include <utils/StringId.h>
 //#include <hx/CFFIPrimePatch.h>
 #include <hx/CFFIPrime.h>
-#include <hx/CFFIExt.h>
 
 namespace lime {
 	
@@ -116,15 +116,15 @@ namespace lime {
 	
 	Bytes::~Bytes () {
 		
-		if (_root) {
-			
-			delete _root;
-			
-		}
-		
 		if (_pin) {
 			
 			EXT_unpin_buffer (_pin);
+			
+		}
+		
+		if (_root) {
+			
+			delete _root;
 			
 		}
 		
