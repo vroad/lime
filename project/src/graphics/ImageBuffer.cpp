@@ -13,6 +13,7 @@ namespace lime {
 		data = 0;
 		premultiplied = false;
 		transparent = false;
+		mValue = 0;
 		
 	}
 	
