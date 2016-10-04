@@ -148,38 +148,6 @@ namespace lime {
 	}
 	
 	
-	value lime_bytes_from_data_pointer (double data, int length) {
-		
-		#ifndef LIME_NO_RAW_POINTER_ACCESS
-		intptr_t ptr = (intptr_t)data;
-		Bytes bytes = Bytes (length);
-		
-		if (ptr) {
-			
-			memcpy (bytes.Data (), (const void*)ptr, length);
-			
-		}
-		
-		return bytes.Value ();
-		#else
-		return alloc_null ();
-		#endif
-		
-	}
-	
-	
-	double lime_bytes_get_data_pointer (value bytes) {
-		
-		#ifndef LIME_NO_RAW_POINTER_ACCESS
-		Bytes data = Bytes (bytes);
-		return (intptr_t)data.Data ();
-		#else
-		return 0;
-		#endif
-		
-	}
-	
-	
 	value lime_bytes_read_file (HxString path) {
 		
 		Bytes data = Bytes (path.__s);
@@ -717,8 +685,6 @@ namespace lime {
 	DEFINE_PRIME2 (lime_audio_load);
 	DEFINE_PRIME2 (lime_audio_stream_seek);
 	DEFINE_PRIME4 (lime_audio_stream_decode);
-	DEFINE_PRIME2 (lime_bytes_from_data_pointer);
-	DEFINE_PRIME1 (lime_bytes_get_data_pointer);
 	DEFINE_PRIME1 (lime_bytes_read_file);
 	DEFINE_PRIME1 (lime_cffi_get_native_pointer);
 	#if 0
