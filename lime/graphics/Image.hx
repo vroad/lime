@@ -1161,7 +1161,7 @@ class Image {
 			
 			if (data != null) {
 				
-				__fromImageBuffer (new ImageBuffer (AnonBytesUtils.getUInt8ArrayFromAnonBytes (data.data), data.width, data.height, data.bitsPerPixel));
+				__fromImageBuffer (new ImageBuffer (AnonBytesUtils.getUInt8ArrayFromAnonBytes (data.data.buffer), data.width, data.height, data.bitsPerPixel));
 				
 				if (onload != null) {
 					
@@ -1281,7 +1281,7 @@ class Image {
 				
 				if (data != null) {
 					
-					var u8a = AnonBytesUtils.getUInt8ArrayFromAnonBytes (data.data);
+					var u8a = AnonBytesUtils.getUInt8ArrayFromAnonBytes (data.data.buffer);
 					buffer = new ImageBuffer (u8a, data.width, data.height, data.bitsPerPixel, data.format);
 					
 				}

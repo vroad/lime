@@ -23,6 +23,8 @@ class AnonBytesUtils {
 		
 		#if js
 		return ab.b;
+		#elseif cs
+		return new UInt8Array (@:privateAccess new Bytes (ab.length, Reflect.field(ab, "b")));
 		#else
 		return new UInt8Array (@:privateAccess new Bytes (ab.length, ab.b));
 		#end

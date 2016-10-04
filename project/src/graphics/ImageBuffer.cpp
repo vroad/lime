@@ -106,6 +106,12 @@ namespace lime {
 	
 	value ImageBuffer::Value () {
 		
+		if (!data) {
+			
+			return alloc_null ();
+			
+		}
+		
 		StringId* id = StringId::Get ();
 		
 		if (val_is_null (mValue)) {
@@ -117,7 +123,7 @@ namespace lime {
 		alloc_field (mValue, id->width, alloc_int (width));
 		alloc_field (mValue, id->height, alloc_int (height));
 		alloc_field (mValue, id->bitsPerPixel, alloc_int (bitsPerPixel));
-		alloc_field (mValue, id->data, data ? data->Value () : alloc_null ());
+		alloc_field (mValue, id->data, data->Value ());
 		alloc_field (mValue, id->transparent, alloc_bool (transparent));
 		alloc_field (mValue, id->format, alloc_int (format));
 		alloc_field (mValue, id->premultiplied, alloc_bool (premultiplied));

@@ -113,6 +113,12 @@ namespace lime {
 	
 	value ArrayBufferView::Value () {
 		
+		if (!data) {
+			
+			return alloc_null ();
+			
+		}
+		
 		if (val_is_null (_value)) {
 			
 			_value = alloc_empty_object ();
@@ -121,9 +127,9 @@ namespace lime {
 		
 		StringId* id = StringId::Get ();
 		
-		alloc_field (_value, id->buffer, data ? data->Value () : alloc_null ());
+		alloc_field (_value, id->buffer, data->Value ());
+		alloc_field (_value, id->byteOffset, alloc_int (byteOffset));
 		alloc_field (_value, id->byteLength, alloc_int (byteLength));
-		alloc_field (_value, id->length, alloc_int (byteLength));
 		return _value;
 		
 	}
