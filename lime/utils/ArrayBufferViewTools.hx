@@ -57,3 +57,19 @@ class Int32ArrayTools {
 	
 	
 }
+
+class UInt8ArrayTools {
+	
+	
+	public static function fromAnonArrayBufferView (aab:AnonArrayBufferView):UInt8Array {
+		
+		#if js
+		return new UInt8Array (aab.buffer, aab.byteOffset, aab.byteLength);
+		#else
+		return new UInt8Array (@:privateAccess new Bytes (aab.byteLength, aab.buffer), aab.byteOffset, aab.byteLength);
+		#end
+		
+	}
+	
+	
+}

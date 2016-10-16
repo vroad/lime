@@ -22,6 +22,7 @@ import lime.system.CFFI;
 import lime.utils.AnonBytesUtils;
 import lime.utils.ArrayBuffer;
 import lime.utils.UInt8Array;
+import lime.utils.ArrayBufferViewTools.UInt8ArrayTools;
 
 #if (js && html5)
 import js.html.CanvasElement;
@@ -1161,7 +1162,7 @@ class Image {
 			
 			if (data != null) {
 				
-				__fromImageBuffer (new ImageBuffer (AnonBytesUtils.getUInt8ArrayFromAnonBytes (data.data.buffer), data.width, data.height, data.bitsPerPixel));
+				__fromImageBuffer (new ImageBuffer (UInt8ArrayTools.fromAnonArrayBufferView (data.data), data.width, data.height, data.bitsPerPixel));
 				
 				if (onload != null) {
 					
