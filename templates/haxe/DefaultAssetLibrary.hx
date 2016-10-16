@@ -196,12 +196,11 @@ class DefaultAssetLibrary extends AssetLibrary {
 		
 		#elseif html5
 		
-		return null;
-		//return new Sound (new URLRequest (path.get (id)));
+		return Preloader.audioBuffers.get (path.get (id));
 		
 		#else
 		
-		if (className.exists(id)) return AudioBuffer.fromBytes (cast (Type.createInstance (className.get (id), []), Bytes));
+		if (className.exists (id)) return AudioBuffer.fromBytes (cast (Type.createInstance (className.get (id), []), Bytes));
 		else return AudioBuffer.fromFile (rootPath + path.get (id), stream);
 		
 		#end
@@ -412,19 +411,39 @@ class DefaultAssetLibrary extends AssetLibrary {
 	
 	public override function isLocal (id:String, type:String):Bool {
 		
-		var requestedType = type != null ? cast (type, AssetType) : null;
-		
 		#if flash
 		
-		//if (requestedType != AssetType.MUSIC && requestedType != AssetType.SOUND) {
-			
-			return className.exists (id);
-			
-		//}
+		return className.exists (id);
 		
-		#end
+		#elseif html5
+		
+		var requestedType = type != null ? cast (type, AssetType) : null;
+		
+		return switch (requestedType) {
+			
+			case FONT:
+				
+				className.exists (id);
+			
+			case IMAGE:
+				
+				Preloader.images.exists (path.get (id));
+			
+			case MUSIC, SOUND:
+				
+				Preloader.audioBuffers.exists (path.get (id));
+			
+			default:
+				
+				Preloader.loaders.exists (path.get (id));
+			
+		}
+		
+		#else
 		
 		return true;
+		
+		#end
 		
 	}
 	
@@ -453,45 +472,19 @@ class DefaultAssetLibrary extends AssetLibrary {
 		
 		var promise = new Promise<AudioBuffer> ();
 		
-		#if (flash)
-		
-		if (path.exists (id)) {
+		if (Assets.isLocal (id)) {
 			
-			var soundLoader = new Sound ();
-			soundLoader.addEventListener (Event.COMPLETE, function (event) {
-				
-				var audioBuffer:AudioBuffer = new AudioBuffer();
-				audioBuffer.src = event.currentTarget;
-				promise.complete (audioBuffer);
-				
-			});
-			soundLoader.addEventListener (ProgressEvent.PROGRESS, function (event) {
-				
-				if (event.bytesTotal == 0) {
-					
-					promise.progress (0);
-					
-				} else {
-					
-					promise.progress (event.bytesLoaded / event.bytesTotal);
-					
-				}
-				
-			});
-			soundLoader.addEventListener (IOErrorEvent.IO_ERROR, promise.error);
-			soundLoader.load (new URLRequest (path.get (id)));
+			promise.completeWith (new Future<AudioBuffer> (function () return getAudioBuffer (id, stream)));
+			
+		} else if (path.exists (id)) {
+			
+			promise.completeWith (AudioBuffer.loadFromFile (path.get (id)));
 			
 		} else {
 			
-			promise.complete (getAudioBuffer (id, stream));
+			promise.error (null);
 			
 		}
-		
-		#else
-		
-		promise.completeWith (new Future<AudioBuffer> (function () return getAudioBuffer (id, stream)));
-		
-		#end
 		
 		return promise.future;
 		

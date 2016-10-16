@@ -1200,7 +1200,6 @@ class Assets {
 		if (fields != null) {
 			
 			var constructor = macro {
-
 				
 				super ();
 				
@@ -1351,7 +1350,7 @@ class Assets {
 		}
 		
 		if (path != null && path != "") {
-
+			
 			#if lime_console
 			throw "not implemented";
 			#end
