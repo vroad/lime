@@ -13,7 +13,6 @@
 #endif
 #endif
 
-#include <audio/openal/ALCContextWrapper.h>
 
 #include <utils/ArrayBufferView.h>
 #include <utils/HxVector.h>
@@ -21,42 +20,55 @@
 
 namespace lime {
 	
+	class ALBuffer;
+	class ALSource;
+	class ALCContextWrapper;
+	class ALCDeviceWrapper;
+	typedef ALCContextWrapper ALCContextWrapper_Nullable;
 	
-	void alBufferData_wrap (int buffer, int format, ArrayBufferView* data, int size, int freq);
+	void alBufferData_wrap (ALBuffer* buffer, int format, ArrayBufferView* data, int size, int freq);
 	
-	void alBufferfv_wrap (int buffer, int param, const HxVector<float>& values);
+	void alBuffer3f_wrap (ALBuffer* buffer, int param, float value1, float value2, float value3);
 	
-	void alBufferiv_wrap (int buffer, int param, const HxVector<int>& values);
+	void alBuffer3i_wrap (ALBuffer* buffer, int param, int value1, int value2, int value3);
 	
-	void alDeleteBuffer_wrap (int buffer);
+	void alBufferf_wrap (ALBuffer* buffer, int param, float value);
 	
-	void alDeleteBuffers_wrap (const HxVector<int>& buffers);
+	void alBufferfv_wrap (ALBuffer* buffer, int param, const HxVector<float>& values);
 	
-	void alDeleteSource_wrap (int source);
+	void alBufferi_wrap (ALBuffer* buffer, int param, int value);
 	
-	void alDeleteSources_wrap (const HxVector<int>& sources);
+	void alBufferiv_wrap (ALBuffer* buffer, int param, const HxVector<int>& values);
+	
+	void alDeleteBuffer_wrap (value buffer);
+	
+	void alDeleteBuffers_wrap (value buffers);
+	
+	void alDeleteSource_wrap (value source);
+	
+	void alDeleteSources_wrap (value sources);
 	
 	value alGetBooleanv_wrap (int param, int count);
 	
-	int alGenBuffer_wrap ();
+	ALBuffer* alGenBuffer_wrap (ALCContextWrapper* wrapper);
 	
-	value alGenBuffers_wrap (int n);
+	value alGenBuffers_wrap (ALCContextWrapper* wrapper, int n);
 	
-	int alGenSource_wrap ();
+	ALSource* alGenSource_wrap (ALCContextWrapper* wrapper);
 	
-	value alGenSources_wrap (int n);
+	value alGenSources_wrap (ALCContextWrapper* wrapper, int n);
 	
-	value alGetBuffer3f_wrap (int buffer, int param);
+	value alGetBuffer3f_wrap (ALBuffer* buffer, int param);
 	
-	value alGetBuffer3i_wrap (int buffer, int param);
+	value alGetBuffer3i_wrap (ALBuffer* buffer, int param);
 	
-	float alGetBufferf_wrap (int buffer, int param);
+	float alGetBufferf_wrap (ALBuffer* buffer, int param);
 	
-	value alGetBufferfv_wrap (int buffer, int param, int count);
+	value alGetBufferfv_wrap (ALBuffer* buffer, int param, int count);
 	
-	int alGetBufferi_wrap (int buffer, int param);
+	int alGetBufferi_wrap (ALBuffer* buffer, int param);
 	
-	value alGetBufferiv_wrap (int buffer, int param, int count);
+	value alGetBufferiv_wrap (ALBuffer* buffer, int param, int count);
 	
 	value alGetDoublev_wrap (int param, int count);
 	
@@ -76,58 +88,84 @@ namespace lime {
 	
 	value alGetListeneriv_wrap (int param, int count);
 	
-	value alGetSource3f_wrap (int source, int param);
+	value alGetSource3f_wrap (ALSource* source, int param);
 	
-	value alGetSource3i_wrap (int source, int param);
+	value alGetSource3i_wrap (ALSource* source, int param);
 	
-	float alGetSourcef_wrap (int source, int param);
+	float alGetSourcef_wrap (ALSource* source, int param);
 	
-	value alGetSourcefv_wrap (int source, int param, int count);
+	value alGetSourcefv_wrap (ALSource* source, int param, int count);
 	
-	int alGetSourcei_wrap (int source, int param);
+	int alGetSourcei_wrap (ALSource* source, int param);
 	
-	value alGetSourceiv_wrap (int source, int param, int count);
+	value alGetSourceiv_wrap (ALSource* source, int param, int count);
+	
+	bool alIsBuffer_wrap (ALBuffer* buffer);
+	
+	bool alIsSource_wrap (ALSource* source);
 	
 	void alListenerfv_wrap (int param, const HxVector<float>& values);
 	
 	void alListeneriv_wrap (int param, const HxVector<int>& values);
 	
-	void alSourcePausev_wrap (int n, const HxVector<int>& sources);
+	void alSource3f_wrap (ALSource* source, int param, float value1, float value2, float value3);
 	
-	void alSourcePlayv_wrap (int n, const HxVector<int>& sources);
+	void alSource3i_wrap (ALSource* source, int param, int value1, int value2, int value3);
 	
-	void alSourceQueueBuffers_wrap (int source, int nb, const HxVector<int>& buffers);
+	void alSourceBuffer (ALSource* source, value inBuffer);
 	
-	void alSourceRewindv_wrap (int n, const HxVector<int>& sources);
+	void alSourcePause_wrap (ALSource* source);
 	
-	void alSourceStopv_wrap (int n, const HxVector<int>& sources);
+	void alSourcePausev_wrap (value inSources);
 	
-	value alSourceUnqueueBuffers_wrap (int source, int nb);
+	void alSourcePlay_wrap (ALSource* source);
 	
-	void alSourcefv_wrap (int source, int param, const HxVector<float>& values);
+	void alSourcePlayv_wrap (value inSources);
 	
-	void alSourceiv_wrap (int source, int param, const HxVector<int>& values);
+	void alSourceQueueBuffers_wrap (ALSource* source, int nb, value inBuffers);
+	
+	void alSourceRewind_wrap (ALSource* source);
+	
+	void alSourceRewindv_wrap (value inSources);
+	
+	void alSourceStop_wrap (ALSource* source);
+	
+	void alSourceStopv_wrap (value inSources);
+	
+	value alSourceUnqueueBuffers_wrap (ALSource* source, int nb);
+	
+	void alSourcef_wrap (ALSource* source, int param, float value);
+	
+	void alSourcefv_wrap (ALSource* source, int param, const HxVector<float>& values);
+	
+	void alSourcei_wrap (ALSource* source, int param, int value);
+	
+	void alSourceiv_wrap (ALSource* source, int param, const HxVector<int>& values);
 	
 	bool alcCloseDevice_wrap (value device);
 	
-	ALCContextWrapper* alcCreateContext_wrap (value device, const HxVector<int>& attrList);
+	ALCContextWrapper* alcCreateContext_wrap (ALCDeviceWrapper* deviceWrapper, const HxVector<int>& attrList);
 	
 	void alcDestroyContext_wrap (value context);
 	
-	value alcGetContextsDevice_wrap (ALCContextWrapper* contextWrap);
+	void alcDevicePauseSOFT_wrap (ALCDeviceWrapper* wrapper);
 	
-	value alcGetIntegerv_wrap (ALCdevice* alcDevice, int param, int size);
+	void alcDeviceResumeSOFT_wrap (ALCDeviceWrapper* wrapper);
+	
+	int alcGetError_wrap (ALCDeviceWrapper* wrapper);
+	
+	value alcGetIntegerv_wrap (ALCDeviceWrapper* wrapper, int param, int size);
+	
+	const char* alcGetString_wrap (ALCDeviceWrapper* wrapper, int param);
 	
 	bool alcMakeContextCurrent_wrap (ALCContextWrapper_Nullable* contextWrap);
+	
+	ALCDeviceWrapper* alcOpenDevice_wrap (const char* deviceName);
 	
 	void alcProcessContext_wrap (ALCContextWrapper* contextWrap);
 	
 	void alcSuspendContext_wrap (ALCContextWrapper* contextWrap);
 	
-	
-	ALCdevice* val_to_ALCdevice (value inHandle);
-	
-	value ALCdevice_to_val (ALCdevice* inInstance);
 	
 }
 

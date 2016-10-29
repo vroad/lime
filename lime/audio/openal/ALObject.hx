@@ -7,14 +7,15 @@ import lime.system.CFFIPointer;
 @:allow(lime.audio.openal.ALC)
 
 
-class ALDevice extends ALObject {
+class ALObject {
 	
+	/** The native AL handle/id. read only */
+	private var handle (default, null) : CFFIPointer;
 	
 	private function new (handle:CFFIPointer) {
 		
-		super (handle);
+		this.handle = handle;
 		
 	}
-	
 	
 }

@@ -7,12 +7,14 @@ import lime.system.CFFIPointer;
 @:allow(lime.audio.openal.ALC)
 
 
-abstract ALContext(CFFIPointer) from CFFIPointer to CFFIPointer {
+class ALContext extends ALObject {
 	
+	public var device(default, null):ALDevice;
 	
-	private inline function new (handle:CFFIPointer) {
+	private function new (handle:CFFIPointer, device:ALDevice) {
 		
-		this = handle;
+		super (handle);
+		this.device = device;
 		
 	}
 	

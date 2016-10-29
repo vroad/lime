@@ -21,8 +21,10 @@ namespace lime {
 		static void Reset ();
 		
 		vkind Application;
+		vkind ALBuffer;
 		vkind ALCContextWrapper;
-		vkind ALCdevice;
+		vkind ALCDeviceWrapper;
+		vkind ALSource;
 		vkind CURL;
 		vkind Font;
 		vkind GLContext;

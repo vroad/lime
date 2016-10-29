@@ -1,29 +1,14 @@
 <interface>
 
-<include name="Common.xml"/>
+<include name="ALCommon.xml"/>
 
-<typemap method="in" type="lime::ALCContextWrapper*">  $1 = val_to_ALCContextWrapper($input);</typemap>
+<typemap method="in" type="ALCDeviceWrapper*">  $1 = val_to_ALCDeviceWrapper($input);</typemap>
 
-<typemap method="out" type="lime::ALCContextWrapper*">  $result = ALCContextWrapper_to_val($input);</typemap>
+<typemap method="out" type="ALCDeviceWrapper*">  $result = ALCDeviceWrapper_to_val($input);</typemap>
 
-<typemap method="check" type="lime::ALCContextWrapper*">
+<typemap method="check" type="ALCDeviceWrapper*">
   if ($1 == NULL) {
-    val_throw (alloc_string ("ALCContextWrapper handle can't be null"));
-    $return;
-  }
-</typemap>
-
-<typemap method="in" type="lime::ALCContextWrapper_Nullable*">  $1 = val_to_ALCContextWrapper($input);</typemap>
-
-<typemap method="out" type="lime::ALCContextWrapper_Nullable*">  $result = ALCContextWrapper_to_val($input);</typemap>
-
-<typemap method="in" type="ALCdevice*">  $1 = val_to_ALCdevice($input);</typemap>
-
-<typemap method="out" type="ALCdevice*">  $result = ALCdevice_to_val($input);</typemap>
-
-<typemap method="check" type="ALCdevice*">
-  if ($1 == NULL) {
-    val_throw (alloc_string ("ALCdevice handle can't be null"));
+    val_throw (alloc_string ("ALCDeviceWraperHandle handle can't be null"));
     $return;
   }
 </typemap>
@@ -31,6 +16,8 @@
 <insert>
 <![CDATA[
 #include <audio/openal/OpenALBindings.h>
+#include <audio/openal/ALCContextWrapper.h>
+#include <audio/openal/ALCDeviceWrapper.h>
 
 using namespace lime;
 

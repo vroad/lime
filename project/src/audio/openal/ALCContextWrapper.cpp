@@ -1,24 +1,73 @@
 #include <audio/openal/ALCContextWrapper.h>
+#include <audio/openal/ALCDeviceWrapper.h>
 #include <utils/Kinds.h>
 #include <utils/PointerUtils.h>
+#include <assert.h>
 
 namespace lime {
 	
-	ALCContextWrapper::ALCContextWrapper (ALCcontext* context, value device) {
+	
+	ALCContextWrapper::ALCContextWrapper (ALCcontext* context, ALCDeviceWrapper* deviceWrapper) {
 		
-		alcContext = context;
-		alcDevice.reset (new AutoGCRoot (device));
+		this->alcContext = context;
+		this->deviceWrapper = deviceWrapper;
+		this->deviceWrapper->AddRef();
+		refCount = 1;
 		
 	}
+	
 	
 	ALCContextWrapper::~ALCContextWrapper () {
 		
 		ALCcontext* currentContext = alcGetCurrentContext();
-		alcMakeContextCurrent (NULL);
+		
+		if (currentContext == this->alcContext) {
+			
+			alcMakeContextCurrent (NULL);
+			
+		}
+		
 		alcDestroyContext (alcContext);
-		alcMakeContextCurrent (currentContext);
+		this->deviceWrapper->Release ();
 		
 	}
+	
+	
+	void ALCContextWrapper::AddRef () {
+		
+		refCount++;
+		
+	}
+	
+	
+	void ALCContextWrapper::Release () {
+		
+		assert (refCount >= 1);
+		refCount--;
+		
+		if (refCount == 0) {
+			
+			delete this;
+			
+		}
+		
+	}
+	
+	
+	void release_ALCContextWrapper (ALCContextWrapper* wrapper) {
+		
+		wrapper->Release ();
+		
+	}
+	
+	
+	void gc_ALCContextWrapper (value inHandle) {
+		
+		ALCContextWrapper* wrapper = (ALCContextWrapper*)val_data (inHandle);
+		wrapper->Release ();
+		
+	}
+	
 	
 	ALCContextWrapper* val_to_ALCContextWrapper (value inHandle) {
 		
@@ -26,10 +75,12 @@ namespace lime {
 		
 	}
 	
+	
 	value ALCContextWrapper_to_val (ALCContextWrapper* inInstance) {
 		
-		return CFFIPointer (inInstance, lime_destroy_abstract<ALCContextWrapper>, Kinds::Get ()->ALCContextWrapper);
+		return CFFIPointer (inInstance, gc_ALCContextWrapper, Kinds::Get ()->ALCContextWrapper);
 		
 	}
+	
 	
 }

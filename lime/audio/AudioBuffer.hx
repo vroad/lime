@@ -7,6 +7,7 @@ import lime.app.Future;
 import lime.app.Promise;
 import lime.audio.openal.AL;
 import lime.audio.openal.ALBuffer;
+import lime.utils.AnonBytesUtils;
 import lime.utils.UInt8Array;
 
 #if howlerjs
@@ -95,11 +96,10 @@ class AudioBuffer {
 		if (data != null) {
 			
 			var audioBuffer = new AudioBuffer ();
-			audioBuffer.bitsPerSample 	= data.bitsPerSample;
+			audioBuffer.bitsPerSample = data.bitsPerSample;
 			audioBuffer.channels = data.channels;
 			audioBuffer.data = data.data != null ? AnonBytesUtils.getUInt8ArrayFromAnonBytes (data.data) : null;
 			audioBuffer.sampleRate = data.sampleRate;
-			audioBuffer.length = data.length;
 			audioBuffer.handle = data.handle;
 			return audioBuffer;
 			
@@ -171,7 +171,6 @@ class AudioBuffer {
 			audioBuffer.channels = data.channels;
 			audioBuffer.data = data.data != null ? AnonBytesUtils.getUInt8ArrayFromAnonBytes (data.data) : null;
 			audioBuffer.sampleRate = data.sampleRate;
-			audioBuffer.length = data.length;
 			audioBuffer.handle = data.handle;
 			return audioBuffer;
 			
@@ -210,6 +209,7 @@ class AudioBuffer {
 	}
 	
 	
+	public static function fromURL (url:String, handler:AudioBuffer->Void, stream:Bool = false):Void {
 		
 		#if (js && html5 && howlerjs)
 		

@@ -1,10 +1,13 @@
 <interface>
 
-<include name="Common.xml"/>
+<include name="ALCommon.xml" />
 
 <insert>
 <![CDATA[
 #include <audio/openal/OpenALBindings.h>
+#include <audio/openal/ALBuffer.h>
+#include <audio/openal/ALCContextWrapper.h>
+#include <audio/openal/ALSource.h>
 
 using namespace lime;
 

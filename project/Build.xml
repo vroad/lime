@@ -159,8 +159,11 @@
 			<compilerflag value="-DAL_LIBTYPE_STATIC=1" />
 			<compilerflag value="-DAL_ALEXT_PROTOTYPES" />
 			
-			<file name="src/audio/openal/OpenALBindings.cpp" />
+			<file name="src/audio/openal/ALBuffer.cpp" />
+			<file name="src/audio/openal/ALSource.cpp" />
 			<file name="src/audio/openal/ALCContextWrapper.cpp" />
+			<file name="src/audio/openal/ALCDeviceWrapper.cpp" />
+			<file name="src/audio/openal/OpenALBindings.cpp" />
 			
 		</section>
 		

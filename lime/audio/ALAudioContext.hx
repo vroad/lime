@@ -613,7 +613,7 @@ class ALAudioContext {
 	}
 	
 	
-	public function sourceUnqueueBuffer (source:ALSource):Int {
+	public function sourceUnqueueBuffer (source:ALSource):ALBuffer {
 		
 		return AL.sourceUnqueueBuffer (source);
 		

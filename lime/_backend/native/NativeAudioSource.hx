@@ -84,7 +84,7 @@ class NativeAudioSource {
 		}
 		
 		handle = AL.genSource ();
-		AL.sourcei (handle, AL.BUFFER, parent.buffer.__srcBuffer);
+		AL.sourceBuffer (handle, parent.buffer.__srcBuffer);
 		
 	}
 	

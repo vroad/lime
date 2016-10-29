@@ -7,8 +7,10 @@ namespace lime {
 	Kinds::Kinds () {
 		
 		this->Application = alloc_kind ();
+		this->ALBuffer = alloc_kind ();
 		this->ALCContextWrapper = alloc_kind ();
-		this->ALCdevice = alloc_kind ();
+		this->ALCDeviceWrapper = alloc_kind ();
+		this->ALSource = alloc_kind ();
 		this->CURL = alloc_kind ();
 		this->Font = alloc_kind ();
 		this->GLContext = alloc_kind ();

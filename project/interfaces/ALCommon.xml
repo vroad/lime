@@ -1,0 +1,42 @@
+<interface>
+
+<include name="Common.xml"/>
+
+<typemap method="in" type="lime::ALBuffer*">  $1 = val_to_ALBuffer($input);</typemap>
+
+<typemap method="out" type="lime::ALBuffer*">  $result = ALBuffer_to_val($input);</typemap>
+
+<typemap method="check" type="lime::ALBuffer*">
+  if ($1 == NULL) {
+    val_throw (alloc_string ("ALBuffer handle can't be null"));
+    $return;
+  }
+</typemap>
+
+<typemap method="in" type="lime::ALCContextWrapper*">  $1 = val_to_ALCContextWrapper($input);</typemap>
+
+<typemap method="out" type="lime::ALCContextWrapper*">  $result = ALCContextWrapper_to_val($input);</typemap>
+
+<typemap method="check" type="lime::ALCContextWrapper*">
+  if ($1 == NULL) {
+    val_throw (alloc_string ("ALCContextWrapper handle can't be null"));
+    $return;
+  }
+</typemap>
+
+<typemap method="in" type="lime::ALCContextWrapper_Nullable*">  $1 = val_to_ALCContextWrapper($input);</typemap>
+
+<typemap method="out" type="lime::ALCContextWrapper_Nullable*">  $result = ALCContextWrapper_to_val($input);</typemap>s
+
+<typemap method="in" type="lime::ALSource*">  $1 = val_to_ALSource($input);</typemap>
+
+<typemap method="out" type="lime::ALSource*">  $result = ALSource_to_val($input);</typemap>
+
+<typemap method="check" type="lime::ALSource*">
+  if ($1 == NULL) {
+    val_throw (alloc_string ("ALSource handle can't be null"));
+    $return;
+  }
+</typemap>
+
+</interface>

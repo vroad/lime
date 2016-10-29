@@ -1,4 +1,8 @@
 #include <audio/openal/OpenALBindings.h>
+#include <audio/openal/ALBuffer.h>
+#include <audio/openal/ALSource.h>
+#include <audio/openal/ALCContextWrapper.h>
+#include <audio/openal/ALCDeviceWrapper.h>
 
 //#include <hx/CFFIPrimePatch.h>
 #include <hx/CFFIExt.h>
@@ -8,93 +12,212 @@
 #include <utils/Kinds.h>
 #include <utils/PointerWrapper.h>
 #include <utils/HxVector.h>
+#include <memory>
 #include <vector>
 
 namespace lime {
 	
+	std::unique_ptr<ALCContextWrapper, decltype(&release_ALCContextWrapper)> currentContext (NULL, release_ALCContextWrapper);
 	
-	void gc_alc_device (value device) {
+	std::vector<ALuint> getRawBuffers (value inBuffers) {
 		
-		ALCdevice* alcDevice = (ALCdevice*)val_data (device);
-		alcCloseDevice (alcDevice);
-		free_abstract (device);
+		ALuint size = val_array_size (inBuffers);
+		std::vector<ALuint> buffers (size);
 		
-	}
-	
-	void alBufferData_wrap (int buffer, int format, ArrayBufferView* data, int size, int freq) {
+		if (size == 0) {
+			
+			return buffers;
+			
+		}
 		
-		alBufferData (buffer, format, data ? data->Data () : NULL, data ? data->ByteLength () : 0, freq);
+		for (int i = 0; i < size; i++) {
+			
+			ALBuffer* buffer = val_to_ALBuffer (val_array_i (inBuffers, i));
+			buffers[i] = buffer != NULL ? buffer->buffer : 0;
+			
+		}
 		
-	}
-	
-	void alBufferfv_wrap (int buffer, int param, const HxVector<float>& values) {
-		
-		alBufferfv (buffer, param, values.Data ());
-		
-	}
-	
-	void alBufferiv_wrap (int buffer, int param, const HxVector<int>& values) {
-		
-		alBufferiv (buffer, param, values.Data ());
+		return buffers;
 		
 	}
 	
 	
-	void alDeleteBuffer_wrap (int buffer) {
+	std::vector<ALuint> getRawSources (value inSources) {
 		
-		ALuint data = buffer;
-		alDeleteBuffers ((ALuint)1, &data);
+		ALuint size = val_array_size (inSources);
+		std::vector<ALuint> sources (size);
 		
-	}
-	
-	
-	void alDeleteBuffers_wrap (const HxVector<int>& buffers) {
+		if (size == 0) {
+			
+			return sources;
+			
+		}
 		
-		alDeleteBuffers (buffers.Length (), (const ALuint*)buffers.Data ());
+		for (int i = 0; i < size; i++) {
+			
+			ALSource* source = val_to_ALSource (val_array_i (inSources, i));
+			sources[i] = source != NULL ? source->source : 0;
+			
+		}
 		
-	}
-	
-	
-	void alDeleteSource_wrap (int source) {
-		
-		ALuint data = source;
-		alDeleteSources(1, &data);
-		
-	}
-	
-	
-	void alDeleteSources_wrap (const HxVector<int>& sources) {
-		
-		alDeleteSources (sources.Length (), (const ALuint*)sources.Data ());
+		return sources;
 		
 	}
 	
 	
-	int alGenBuffer_wrap () {
+	void alBufferData_wrap (ALBuffer* buffer, int format, ArrayBufferView* data, int size, int freq) {
+		
+		alBufferData (buffer->buffer, format, data ? data->Data () : NULL, data ? data->ByteLength () : 0, freq);
+		
+	}
+	
+	
+	void alBuffer3f_wrap (ALBuffer* buffer, int param, float value1, float value2, float value3) {
+		
+		alBuffer3f (buffer->buffer, param, value1, value2, value3);
+		
+	}
+	
+	
+	void alBuffer3i_wrap (ALBuffer* buffer, int param, int value1, int value2, int value3) {
+		
+		alBuffer3i (buffer->buffer, param, value1, value2, value3);
+		
+	}
+	
+	
+	void alBufferf_wrap (ALBuffer* buffer, int param, float value) {
+		
+		alBufferf (buffer->buffer, param, value);
+		
+	}
+	
+	
+	void alBufferfv_wrap (ALBuffer* buffer, int param, const HxVector<float>& values) {
+		
+		alBufferfv (buffer->buffer, param, values.Data ());
+		
+	}
+	
+	void alBufferiv_wrap (ALBuffer* buffer, int param, const HxVector<int>& values) {
+		
+		alBufferiv (buffer->buffer, param, values.Data ());
+		
+	}
+	
+	
+	void alBufferi_wrap (ALBuffer* buffer, int param, int value) {
+		
+		alBufferi (buffer->buffer, param, value);
+		
+	}
+	
+	
+	void alDeleteBuffer_wrap (value buffer) {
+		
+		ALBuffer* buf = val_to_ALBuffer (buffer);
+		if (buf != 0) {
+			
+			alDeleteBuffers (1, &buf->buffer);
+			free_abstract (buffer);
+			
+		}
+		
+	}
+	
+	
+	void alDeleteBuffers_wrap (value buffers) {
+		
+		if (val_is_null (buffers)) {
+			
+			return;
+			
+		}
+		
+		int size = val_array_size (buffers);
+		for (int i = 0; i < size; i++) {
+			
+			value val = val_array_i (buffers, i);
+			ALBuffer* buffer = val_to_ALBuffer (val);
+			
+			if (buffer != 0) {
+				
+				alDeleteBuffers ((ALuint)1, &buffer->buffer);
+				
+			}
+			
+		}
+		
+	}
+	
+	
+	void alDeleteSource_wrap (value source) {
+		
+		ALSource* src = val_to_ALSource (source);
+		
+		if (src != 0) {
+			
+			alDeleteSources((ALuint)1, &src->source);
+			free_abstract (source);
+			
+		}
+		
+	}
+	
+	
+	void alDeleteSources_wrap (value sources) {
+		
+		if (val_is_null (sources)) {
+			
+			return;
+			
+		}
+		
+		int size = val_array_size (sources);
+		for (int i = 0; i < size; i++) {
+			
+			value source = val_array_i (sources, i);
+			ALSource* src = val_to_ALSource (source);
+			
+			if (source != 0) {
+				
+				alDeleteBuffers (1, &src->source);
+				
+			}
+			
+			free_abstract (source);
+			
+		}
+		
+	}
+	
+	
+	ALBuffer* alGenBuffer_wrap (ALCContextWrapper* wrapper) {
 		
 		ALuint buffer;
 		alGenBuffers ((ALuint)1, &buffer);
-		return buffer;
+		return new ALBuffer (wrapper, buffer);
 		
 	}
 	
 	
-	value alGenBuffers_wrap (int n) {
-
+	value alGenBuffers_wrap (ALCContextWrapper* wrapper, int n) {
+		
 		if (n <= 0) {
-
+			
 			return alloc_null ();
-
+			
 		}
 		
 		std::vector<ALuint> buffers (n);
 		alGenBuffers (n, &buffers[0]);
 		
-		value result = alloc_array_type_wrap (n, valtInt);
+		value result = alloc_array (n);
 		
 		for (int i = 0; i < n; i++) {
 			
-			val_array_set_i (result, i, alloc_int (buffers[i]));
+			ALBuffer* buf = new ALBuffer (wrapper, buffers[i]);
+			val_array_set_i (result, i, ALBuffer_to_val (buf));
 			
 		}
 		
@@ -103,16 +226,16 @@ namespace lime {
 	}
 	
 	
-	int alGenSource_wrap () {
+	ALSource* alGenSource_wrap (ALCContextWrapper* wrapper) {
 		
 		ALuint source;
 		alGenSources ((ALuint)1, &source);
-		return source;
+		return new ALSource (wrapper, source);
 		
 	}
 	
 	
-	value alGenSources_wrap (int n) {
+	value alGenSources_wrap (ALCContextWrapper* wrapper, int n) {
 
 		if (n <= 0) {
 
@@ -123,11 +246,12 @@ namespace lime {
 		std::vector<ALuint> sources (n);
 		alGenSources (n, &sources[0]);
 		
-		value result = alloc_array_type_wrap (n, valtInt);
+		value result = alloc_array (n);
 		
 		for (int i = 0; i < n; i++) {
 			
-			val_array_set_i (result, i, alloc_int (sources[i]));
+			ALSource* src = new ALSource (wrapper, sources[i]);
+			val_array_set_i (result, i, ALSource_to_val (src));
 			
 		}
 		
@@ -160,11 +284,11 @@ namespace lime {
 	}
 	
 	
-	value alGetBuffer3f_wrap (int buffer, int param) {
+	value alGetBuffer3f_wrap (ALBuffer* buffer, int param) {
 		
 		ALfloat val1, val2, val3;
 		
-		alGetBuffer3f (buffer, param, &val1, &val2, &val3);
+		alGetBuffer3f (buffer->buffer, param, &val1, &val2, &val3);
 		
 		value result = alloc_array_type_wrap (3, valtFloat);
 		val_array_set_i (result, 0, alloc_float (val1));
@@ -175,11 +299,11 @@ namespace lime {
 	}
 	
 	
-	value alGetBuffer3i_wrap (int buffer, int param) {
+	value alGetBuffer3i_wrap (ALBuffer* buffer, int param) {
 		
 		ALint val1, val2, val3;
 		
-		alGetBuffer3i (buffer, param, &val1, &val2, &val3);
+		alGetBuffer3i (buffer->buffer, param, &val1, &val2, &val3);
 		
 		value result = alloc_array_type_wrap (3, valtInt);
 		val_array_set_i (result, 0, alloc_int(val1));
@@ -190,16 +314,16 @@ namespace lime {
 	}
 	
 	
-	float alGetBufferf_wrap (int buffer, int param) {
+	float alGetBufferf_wrap (ALBuffer* buffer, int param) {
 		
 		ALfloat data;
-		alGetBufferf (buffer, param, &data);
+		alGetBufferf (buffer->buffer, param, &data);
 		return data;
 		
 	}
 	
 	
-	value alGetBufferfv_wrap (int buffer, int param, int count) {
+	value alGetBufferfv_wrap (ALBuffer* buffer, int param, int count) {
 
 		if (count <= 0) {
 
@@ -208,7 +332,7 @@ namespace lime {
 		}
 		
 		std::vector<ALfloat> values (count);
-		alGetBufferfv (buffer, param, &values[0]);
+		alGetBufferfv (buffer->buffer, param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtFloat);
 		
@@ -223,16 +347,16 @@ namespace lime {
 	}
 	
 	
-	int alGetBufferi_wrap (int buffer, int param) {
+	int alGetBufferi_wrap (ALBuffer* buffer, int param) {
 		
 		ALint data;
-		alGetBufferi (buffer, param, &data);
+		alGetBufferi (buffer->buffer, param, &data);
 		return data;
 		
 	}
 	
 	
-	value alGetBufferiv_wrap (int buffer, int param, int count) {
+	value alGetBufferiv_wrap (ALBuffer* buffer, int param, int count) {
 
 		if (count <= 0) {
 
@@ -241,7 +365,7 @@ namespace lime {
 		}
 		
 		std::vector<ALint> values (count);
-		alGetBufferiv (buffer, param, &values[0]);
+		alGetBufferiv (buffer->buffer, param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtInt);
 		
@@ -424,11 +548,11 @@ namespace lime {
 	}
 	
 	
-	value alGetSource3f_wrap (int source, int param) {
+	value alGetSource3f_wrap (ALSource* source, int param) {
 		
 		ALfloat val1, val2, val3;
 		
-		alGetSource3f (source, param, &val1, &val2, &val3);
+		alGetSource3f (source->source, param, &val1, &val2, &val3);
 		
 		value result = alloc_array_type_wrap (3, valtFloat);
 		val_array_set_i (result, 0, alloc_float (val1));
@@ -439,11 +563,11 @@ namespace lime {
 	}
 	
 	
-	value alGetSource3i_wrap (int source, int param) {
+	value alGetSource3i_wrap (ALSource* source, int param) {
 		
 		ALint val1, val2, val3;
 		
-		alGetSource3i (source, param, &val1, &val2, &val3);
+		alGetSource3i (source->source, param, &val1, &val2, &val3);
 		
 		value result = alloc_array_type_wrap (3, valtInt);
 		val_array_set_i (result, 1, alloc_int (val1));
@@ -454,16 +578,16 @@ namespace lime {
 	}
 	
 	
-	float alGetSourcef_wrap (int source, int param) {
+	float alGetSourcef_wrap (ALSource* source, int param) {
 		
 		ALfloat data;
-		alGetSourcef (source, param, &data);
+		alGetSourcef (source->source, param, &data);
 		return data;
 		
 	}
 	
 	
-	value alGetSourcefv_wrap (int source, int param, int count) {
+	value alGetSourcefv_wrap (ALSource* source, int param, int count) {
 
 		if (count <= 0) {
 
@@ -472,7 +596,7 @@ namespace lime {
 		}
 		
 		std::vector<ALfloat> values (count);
-		alGetSourcefv (source, param, &values[0]);
+		alGetSourcefv (source->source, param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtFloat);
 		
@@ -487,16 +611,16 @@ namespace lime {
 	}
 	
 	
-	int alGetSourcei_wrap (int source, int param) {
+	int alGetSourcei_wrap (ALSource* source, int param) {
 		
 		ALint data;
-		alGetSourcei (source, param, &data);
+		alGetSourcei (source->source, param, &data);
 		return data;
 		
 	}
 	
 	
-	value alGetSourceiv_wrap (int source, int param, int count) {
+	value alGetSourceiv_wrap (ALSource* source, int param, int count) {
 
 		if (count <= 0) {
 
@@ -505,7 +629,7 @@ namespace lime {
 		}
 		
 		std::vector<ALint> values (count);
-		alGetSourceiv (source, param, &values[0]);
+		alGetSourceiv (source->source, param, &values[0]);
 		
 		value result = alloc_array_type_wrap (count, valtInt);
 		
@@ -516,6 +640,20 @@ namespace lime {
 		}
 		
 		return result;
+		
+	}
+	
+	
+	bool alIsBuffer_wrap (ALBuffer* buffer) {
+		
+		return alIsBuffer (buffer->buffer);
+		
+	}
+	
+	
+	bool alIsSource_wrap (ALSource* source) {
+		
+		return alIsSource (source->source);
 		
 	}
 	
@@ -534,57 +672,164 @@ namespace lime {
 	}
 	
 	
-	void alSourcePausev_wrap (int n, const HxVector<int>& sources) {
+	void alSource3f_wrap (ALSource* source, int param, float value1, float value2, float value3) {
 		
-		alSourcePausev (n, (const ALuint*)sources.Data ());
-		
-	}
-	
-	
-	void alSourcePlayv_wrap (int n, const HxVector<int>& sources) {
-		
-		alSourcePlayv (n, (const ALuint*)sources.Data ());
+		alSource3f (source->source, param, value1, value2, value3);
 		
 	}
 	
 	
-	void alSourceQueueBuffers_wrap (int source, int nb, const HxVector<int>& buffers) {
+	void alSource3i_wrap (ALSource* source, int param, int value1, int value2, int value3) {
+		
+		alSource3i (source->source, param, value1, value2, value3);
+		
+	}
+	
+	
+	void alSourceBuffer (ALSource* source, value inBuffer) {
+		
+		ALBuffer* buffer = val_to_ALBuffer (inBuffer);
+		alSourcei (source->source, AL_BUFFER, buffer->buffer);
+		source->SetBuffer (inBuffer);
+		
+	}
+	
+	
+	void alSourcePause_wrap (ALSource* source) {
+		
+		alSourcePause (source->source);
+		
+	}
+	
+	
+	void alSourcePausev_wrap (value inSources) {
+		
+		std::vector<ALuint> sources = getRawSources (inSources);
+		
+		if (sources.size ()) {
 			
-		alSourceQueueBuffers (source, nb, (const ALuint*)buffers.Data ());
-		
-	}
-	
-	
-	void alSourceRewindv_wrap (int n, const HxVector<int>& sources) {
+			alSourcePausev (sources.size (), &sources[0]);
 			
-		alSourceRewindv (n, (const ALuint*)sources.Data ());
-		
-	}
-	
-	
-	void alSourceStopv_wrap (int n, const HxVector<int>& sources) {
-		
-		alSourceStopv (n, (const ALuint*)sources.Data ());
-		
-	}
-	
-	
-	value alSourceUnqueueBuffers_wrap (int source, int nb) {
-
-		if (nb <= 0) {
-
-			return alloc_null ();
-
 		}
 		
-		std::vector<ALuint> buffers (nb);
-		alSourceUnqueueBuffers (source, nb, &buffers[0]);
+	}
+	
+	
+	void alSourcePlay_wrap (ALSource* source) {
 		
-		value result = alloc_array_type_wrap (nb, valtInt);
+		alSourcePlay (source->source);
+		
+	}
+	
+	
+	void alSourcePlayv_wrap (value inSources) {
+		
+		std::vector<ALuint> sources = getRawSources (inSources);
+		
+		if (sources.size ()) {
+			
+			alSourcePlayv (sources.size (), &sources[0]);
+			
+		}
+		
+	}
+	
+	
+	void alSourceQueueBuffers_wrap (ALSource* source, int nb, value inBuffers) {
+		
+		int size = val_array_size (inBuffers);
+		
+		if (size == 0) {
+			
+			return;
+			
+		}
+		
+		std::vector<ALuint> rawBuffers (size);
+		
+		for (int i = 0; i < size; i++) {
+			
+			value val = val_array_i (inBuffers, i);
+			ALBuffer* buffer = val_to_ALBuffer (val);
+			
+			if (buffer != NULL) {
+				
+				rawBuffers[i] = buffer != NULL ? buffer->buffer : 0;
+				source->AddQueuedBuffer (val);
+				
+			} else {
+				
+				rawBuffers[i] = 0;
+				
+			}
+			
+		}
+		
+		if (size) {
+			
+			alSourceQueueBuffers (source->source, nb, &rawBuffers[0]);
+			
+		}
+		
+	}
+	
+	
+	void alSourceRewind_wrap (ALSource* source) {
+		
+		alSourceRewind (source->source);
+		
+	}
+	
+	
+	void alSourceRewindv_wrap (value inSources) {
+		
+		std::vector<ALuint> sources = getRawSources (inSources);
+		
+		if (sources.size ()) {
+			
+			alSourceRewindv (sources.size (), &sources[0]);
+			
+		}
+		
+	}
+	
+	
+	void alSourceStop_wrap (ALSource* source) {
+		
+		alSourceStop (source->source);
+		
+	}
+	
+	
+	void alSourceStopv_wrap (value inSources) {
+		
+		std::vector<ALuint> sources = getRawSources (inSources);
+		
+		if (sources.size ()) {
+			
+			alSourceStopv (sources.size (), &sources[0]);
+			
+		}
+		
+	}
+	
+	
+	value alSourceUnqueueBuffers_wrap (ALSource* source, int nb) {
+		
+		if (nb <= 0) {
+			
+			return alloc_null ();
+			
+		}
+		
+		std::vector<ALuint> rawBuffers (nb);
+		alSourceUnqueueBuffers (source->source, nb, &rawBuffers[0]);
+		
+		value result = alloc_array (nb);
 		
 		for (int i = 0; i < nb; i++) {
 			
-			val_array_set_i (result, i, alloc_int (buffers[i]));
+			val_array_set_i (result, i, source->RemoveQueuedBufferById (rawBuffers[i]));
 			
 		}
 		
@@ -593,35 +838,54 @@ namespace lime {
 	}
 	
 	
-	void alSourcefv_wrap (int source, int param, const HxVector<float>& values) {
+	void alSourcef_wrap (ALSource* source, int param, float value) {
 		
-		alSourcefv (source, param, values.Data ());
+		alSourcef (source->source, param, value);
 		
 	}
 	
 	
-	void alSourceiv_wrap (int source, int param, const HxVector<int>& values) {
+	void alSourcefv_wrap (ALSource* source, int param, const HxVector<float>& values) {
 		
-		alSourceiv (source, param, values.Data ());
+		alSourcefv (source->source, param, values.Data ());
+		
+	}
+	
+	
+	void alSourcei_wrap (ALSource* source, int param, int value) {
+		
+		alSourcei (source->source, param, value);
+		
+	}
+	
+	
+	void alSourceiv_wrap (ALSource* source, int param, const HxVector<int>& values) {
+		
+		alSourceiv (source->source, param, values.Data ());
 		
 	}
 	
 	
 	bool alcCloseDevice_wrap (value device) {
 		
-		ALCdevice* alcDevice = val_to_ALCdevice (device);
-		bool result = alcCloseDevice (alcDevice);
-		free_abstract (device);
-		return result;
+		ALCDeviceWrapper* wrapper = val_to_ALCDeviceWrapper (device);
+		
+		if (wrapper) {
+			
+			wrapper->Release ();
+			free_abstract (device);
+			
+		}
+		
+		return true;
 		
 	}
 	
 	
-	ALCContextWrapper* alcCreateContext_wrap (value device, const HxVector<int>& attrList) {
+	ALCContextWrapper* alcCreateContext_wrap (ALCDeviceWrapper* deviceWrapper, const HxVector<int>& attrList) {
 		
-		ALCdevice* alcDevice = val_to_ALCdevice (device);
-		ALCcontext* alcContext = alcCreateContext (alcDevice, attrList.Data ());
-		return alcContext != NULL ? new ALCContextWrapper (alcContext, device) : NULL;
+		ALCcontext* alcContext = alcCreateContext (deviceWrapper->alcDevice, attrList.Data ());
+		return alcContext != NULL ? new ALCContextWrapper (alcContext, deviceWrapper) : NULL;
 		
 	}
 	
@@ -629,20 +893,38 @@ namespace lime {
 	void alcDestroyContext_wrap (value context) {
 		
 		ALCContextWrapper* contextWrap = val_to_ALCContextWrapper (context);
-		delete contextWrap;
+		contextWrap->Release ();
 		free_abstract (context);
 		
 	}
 	
 	
-	value alcGetContextsDevice_wrap (ALCContextWrapper* contextWrap) {
+	void alcDevicePauseSOFT_wrap (ALCDeviceWrapper* wrapper) {
 		
-		return contextWrap->alcDevice->get ();
+		#ifdef LIME_OPENALSOFT
+		alcDevicePauseSOFT (wrapper->alcDevice);
+		#endif
 		
 	}
 	
 	
-	value alcGetIntegerv_wrap (ALCdevice* alcDevice, int param, int size) {
+	void alcDeviceResumeSOFT_wrap (ALCDeviceWrapper* wrapper) {
+		
+		#ifdef LIME_OPENALSOFT
+		alcDeviceResumeSOFT (wrapper->alcDevice);
+		#endif
+		
+	}
+	
+	
+	int alcGetError_wrap (ALCDeviceWrapper* wrapper) {
+		
+		return alcGetError (wrapper->alcDevice);
+		
+	}
+	
+	
+	value alcGetIntegerv_wrap (ALCDeviceWrapper* wrapper, int param, int size) {
 		
 		if (size <= 0) {
 			
@@ -651,7 +933,7 @@ namespace lime {
 		}
 		
 		std::vector<ALCint> values (size);
-		alcGetIntegerv (alcDevice, param, size, &values[0]);
+		alcGetIntegerv (wrapper->alcDevice, param, size, &values[0]);
 		
 		value result = alloc_array_type_wrap (size, valtInt);
 		
@@ -666,10 +948,39 @@ namespace lime {
 	}
 	
 	
+	const char* alcGetString_wrap (ALCDeviceWrapper* wrapper, int param) {
+		
+		return alcGetString (wrapper->alcDevice, param);
+		
+	}
+	
+	
 	bool alcMakeContextCurrent_wrap (ALCContextWrapper_Nullable* contextWrap) {
 		
 		ALCcontext* alcContext = contextWrap != NULL ? contextWrap->alcContext : NULL;
-		return alcMakeContextCurrent (alcContext);
+		bool result = alcMakeContextCurrent (alcContext);
+		
+		if (result && currentContext.get () != contextWrap) {
+			
+			currentContext.reset (contextWrap);
+			
+			if (currentContext) {
+				
+				currentContext->AddRef ();
+				
+			}
+			
+		}
+		
+		return result;
+		
+	}
+	
+	
+	ALCDeviceWrapper* alcOpenDevice_wrap (const char* deviceName) {
+		
+		ALCDeviceWrapper* wrapper = ALCDeviceWrapper::Create (deviceName);
+		return wrapper;
 		
 	}
 	
@@ -686,19 +997,6 @@ namespace lime {
 		
 		ALCcontext* alcContext = contextWrap != NULL ? contextWrap->alcContext : NULL;
 		return alcSuspendContext (alcContext);
-		
-	}
-	
-	
-	ALCdevice* val_to_ALCdevice (value inHandle) {
-		
-		return lime_abstract_to_pointer<ALCdevice> (inHandle, Kinds::Get ()->ALCdevice);
-		
-	}
-	
-	value ALCdevice_to_val (ALCdevice* inInstance) {
-		
-		return CFFIPointer (inInstance, gc_alc_device, Kinds::Get ()->ALCdevice);
 		
 	}
 	

@@ -1,31 +1,32 @@
 #ifndef LIME_AUDIO_OPENAL_ALC_CONTEXT_WRAPPER_H
 #define LIME_AUDIO_OPENAL_ALC_CONTEXT_WRAPPER_H
 
+#include <audio/openal/OpenALBindings.h>
 #include <hx/CFFI.h>
-#include <memory>
-
-#if defined(HX_MACOS) || defined(IPHONE)
-#include <OpenAL/alc.h>
-#else
-#include "AL/alc.h"
-#endif
+#include <vector>
 
 namespace lime {
+	
 	
 	class ALCContextWrapper {
 		
 	public:
 		
-		ALCContextWrapper (ALCcontext* context, value device);
+		ALCContextWrapper (ALCcontext* context, ALCDeviceWrapper* deviceWrapper);
 		
 		~ALCContextWrapper ();
 		
+		void AddRef ();
+		
+		void Release ();
+		
 		ALCcontext* alcContext;
-		std::unique_ptr<AutoGCRoot> alcDevice;
+		ALCDeviceWrapper* deviceWrapper;
+		int refCount;
 		
 	};
 	
-	typedef ALCContextWrapper ALCContextWrapper_Nullable;
+	void release_ALCContextWrapper (ALCContextWrapper* wrapper);
 	
 	ALCContextWrapper* val_to_ALCContextWrapper (value inHandle);
 	

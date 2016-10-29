@@ -6,12 +6,12 @@ import lime.system.CFFIPointer;
 @:allow(lime.audio.openal.AL)
 
 
-abstract ALSource(CFFIPointer) from CFFIPointer to CFFIPointer {
+class ALSource extends ALObject {
 	
 	
-	private inline function new (handle:CFFIPointer) {
+	private function new (handle:CFFIPointer) {
 		
-		this = handle;
+		super (handle);
 		
 	}
 	
