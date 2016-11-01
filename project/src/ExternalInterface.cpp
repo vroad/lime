@@ -34,6 +34,7 @@
 #include <ui/FileDialog.h>
 #include <ui/Gamepad.h>
 #include <ui/GamepadEvent.h>
+#include <ui/Haptic.h>
 #include <ui/Joystick.h>
 #include <ui/JoystickEvent.h>
 #include <ui/KeyEvent.h>
@@ -559,6 +560,15 @@ namespace lime {
 	}
 	
 	
+	void lime_haptic_vibrate (int period, int duration) {
+		
+		#ifdef IPHONE
+		Haptic::Vibrate (period, duration);
+		#endif
+		
+	}
+	
+	
 	void lime_neko_execute (HxString module) {
 		
 		#ifdef LIME_NEKO
@@ -696,6 +706,7 @@ namespace lime {
 	DEFINE_PRIME2 (lime_file_dialog_open_file);
 	DEFINE_PRIME2 (lime_file_dialog_open_files);
 	DEFINE_PRIME2 (lime_file_dialog_save_file);
+	DEFINE_PRIME2v (lime_haptic_vibrate);
 	DEFINE_PRIME3v (lime_image_data_util_color_transform);
 	DEFINE_PRIME6v (lime_image_data_util_copy_channel);
 	DEFINE_PRIME7v (lime_image_data_util_copy_pixels);

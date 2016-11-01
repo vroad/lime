@@ -4,7 +4,6 @@ package;
 //import openfl.text.Font;
 //import openfl.utils.ByteArray;
 //import openfl.utils.CompressionAlgorithm;
-import haxe.Json;
 import haxe.Serializer;
 import haxe.Unserializer;
 import haxe.io.Path;
@@ -20,8 +19,8 @@ import utils.publish.*;
 import utils.CreateTemplate;
 import utils.JavaExternGenerator;
 import utils.PlatformSetup;
-	
-	
+
+
 class CommandLineTools {
 	
 	
@@ -33,6 +32,7 @@ class CommandLineTools {
 	private var additionalArguments:Array <String>;
 	private var command:String;
 	private var debug:Bool;
+	private var environment:Map<String, String>;
 	private var includePaths:Array <String>;
 	private var overrides:HXProject;
 	private var project:HXProject;
@@ -49,6 +49,7 @@ class CommandLineTools {
 		additionalArguments = new Array <String> ();
 		command = "";
 		debug = false;
+		environment = Sys.environment ();
 		includePaths = new Array <String> ();
 		projectDefines = new Map <String, String> ();
 		targetFlags = new Map <String, String> ();
@@ -62,7 +63,7 @@ class CommandLineTools {
 		PathHelper.haxelibOverrides.set ("lime-tools", PathHelper.combine (PathHelper.getHaxelib (new Haxelib ("lime")), "tools"));
 		
 		processArguments ();
-		version = getVersion ();
+		version = HaxelibHelper.getVersion ();
 		
 		if (targetFlags.exists ("openfl")) {
 			
@@ -89,6 +90,10 @@ class CommandLineTools {
 			case "help":
 				
 				displayHelp ();
+			
+			case "config":
+				
+				displayConfig ();
 			
 			case "setup":
 				
@@ -269,9 +274,11 @@ class CommandLineTools {
 					}
 					
 					HXProject._command = command;
+					HXProject._environment = environment;
 					HXProject._debug = debug;
 					HXProject._target = target;
 					HXProject._targetFlags = targetFlags;
+					HXProject._userDefines = userDefines;
 					
 					var project = null;
 					
@@ -773,6 +780,31 @@ class CommandLineTools {
 	}
 	
 	
+	private function displayConfig ():Void {
+		
+		var config = getLimeConfig ();
+		
+		if (words.length == 0) {
+			
+			LogHelper.println (File.getContent (Sys.getEnv ("LIME_CONFIG")));
+			
+		} else {
+			
+			if (config.defines.exists (words[0])) {
+				
+				LogHelper.println (config.defines.get (words[0]));
+				
+			} else {
+				
+				LogHelper.error ("\"" + words[0] + "\" is undefined");
+				
+			}
+			
+		}
+		
+	}
+	
+	
 	private function displayHelp ():Void {
 		
 		displayInfo ();
@@ -876,7 +908,7 @@ class CommandLineTools {
 			LogHelper.println ("\x1b[37m            888                                   \x1b[0m");
 			
 			LogHelper.println ("");
-			LogHelper.println ("\x1b[1mOpenFL Command-Line Tools\x1b[0;1m (" + getVersion (new Haxelib ("openfl")) + "-L" + StringHelper.generateUUID (5, null, StringHelper.generateHashCode (version)) + ")\x1b[0m");
+			LogHelper.println ("\x1b[1mOpenFL Command-Line Tools\x1b[0;1m (" + HaxelibHelper.getVersion (new Haxelib ("openfl")) + "-L" + StringHelper.generateUUID (5, null, StringHelper.generateHashCode (version)) + ")\x1b[0m");
 			
 		} else {
 			
@@ -1004,7 +1036,7 @@ class CommandLineTools {
 			
 		} else if (targetFlags.exists ("java-externs")) {
 			
-			var config = getHXCPPConfig ();
+			var config = getLimeConfig ();
 			var sourcePath = words[0];
 			var targetPath = words[1];
 			
@@ -1017,7 +1049,41 @@ class CommandLineTools {
 	
 	private function getBuildNumber (project:HXProject, increment:Bool = true):Void {
 		
-		if (project.meta.buildNumber == null) {
+		var buildNumber = project.meta.buildNumber;
+		
+		if (buildNumber == null || StringTools.startsWith (buildNumber, "git")) {
+			
+			var cache = LogHelper.mute;
+			LogHelper.mute = true;
+			
+			var output = ProcessHelper.runProcess ("", "git", [ "rev-list", "HEAD", "--count" ], true, true, true);
+			
+			LogHelper.mute = cache;
+			
+			if (output != null) {
+				
+				var value = Std.parseInt (output);
+				
+				if (value != null) {
+					
+					if (buildNumber != null && buildNumber.indexOf ("+") > -1) {
+						
+						var modifier = Std.parseInt (buildNumber.substr (buildNumber.indexOf ("+") + 1));
+						
+						if (modifier != null) {
+							
+							value += modifier;
+							
+						}
+						
+					}
+					
+					project.meta.buildNumber = Std.string (value);
+					return;
+					
+				}
+				
+			}
 			
 			var versionFile = PathHelper.combine (project.app.path, ".build");
 			var version = 1;
@@ -1060,20 +1126,19 @@ class CommandLineTools {
 				
 			}
 			
-			
 		}
 		
 	}
 	
 	
-	public static function getHXCPPConfig ():HXProject {
+	public static function getLimeConfig ():HXProject {
 		
 		var environment = Sys.environment ();
 		var config = "";
 		
-		if (environment.exists ("HXCPP_CONFIG")) {
+		if (environment.exists ("LIME_CONFIG")) {
 			
-			config = environment.get ("HXCPP_CONFIG");
+			config = environment.get ("LIME_CONFIG");
 			
 		} else {
 			
@@ -1089,13 +1154,13 @@ class CommandLineTools {
 				
 			} else {
 				
-				LogHelper.warn ("HXCPP config might be missing (Environment has no \"HOME\" variable)");
+				LogHelper.warn ("Lime config might be missing (Environment has no \"HOME\" variable)");
 				
 				return null;
 				
 			}
 			
-			config = home + "/.hxcpp_config.xml";
+			config = home + "/.lime/config.xml";
 			
 			if (PlatformHelper.hostPlatform == Platform.WINDOWS) {
 				
@@ -1103,35 +1168,63 @@ class CommandLineTools {
 				
 			}
 			
+			if (!FileSystem.exists (config)) {
+				
+				PathHelper.mkdir (Path.directory (config));
+				
+				var hxcppConfig = null;
+				
+				if (environment.exists ("HXCPP_CONFIG")) {
+					
+					hxcppConfig = environment.get ("HXCPP_CONFIG");
+					
+				} else {
+					
+					hxcppConfig = home + "/.hxcpp_config.xml";
+					
+				}
+				
+				if (FileSystem.exists (hxcppConfig)) {
+					
+					var vars = new ProjectXMLParser (hxcppConfig);
+					
+					for (key in vars.defines.keys ()) {
+						
+						if (key != key.toUpperCase ()) {
+							
+							vars.defines.remove (key);
+							
+						}
+						
+					}
+					
+					PlatformSetup.writeConfig (config, vars.defines);
+					
+				} else {
+					
+					PlatformSetup.writeConfig (config, new Map ());
+					
+				}
+				
+			}
+			
+			Sys.putEnv ("LIME_CONFIG", config);
+			
 		}
 		
 		if (FileSystem.exists (config)) {
 			
-			LogHelper.info ("", LogHelper.accentColor + "Reading HXCPP config: " + config + LogHelper.resetColor);
+			LogHelper.info ("", LogHelper.accentColor + "Reading Lime config: " + config + LogHelper.resetColor);
 			
 			return new ProjectXMLParser (config);
 			
 		} else {
 			
-			LogHelper.warn ("", "Could not read HXCPP config: " + config);
+			LogHelper.warn ("", "Could not read Lime config: " + config);
 			
 		}
 		
 		return null;
-		
-	}
-	
-	
-	private function getVersion (haxelib:Haxelib = null):String {
-		
-		if (haxelib == null) {
-			
-			haxelib = new Haxelib ("lime");
-			
-		}
-		
-		var json = Json.parse (File.getContent (PathHelper.getHaxelib (haxelib, true) + "/haxelib.json"));
-		return json.version;
 		
 	}
 	
@@ -1252,7 +1345,7 @@ class CommandLineTools {
 			
 		}
 		
-		var config = getHXCPPConfig ();
+		var config = getLimeConfig ();
 		
 		if (config != null) {
 			
@@ -1300,17 +1393,60 @@ class CommandLineTools {
 		
 		if (PlatformHelper.hostPlatform == Platform.WINDOWS) {
 			
-			if (Sys.getEnv ("JAVA_HOME") != null) {
+			if (environment.get ("JAVA_HOME") != null) {
 				
-				var javaPath = PathHelper.combine (Sys.getEnv ("JAVA_HOME"), "bin");
+				var javaPath = PathHelper.combine (environment.get ("JAVA_HOME"), "bin");
+				var value;
 				
 				if (PlatformHelper.hostPlatform == Platform.WINDOWS) {
 					
-					Sys.putEnv ("PATH", javaPath + ";" + Sys.getEnv ("PATH"));
+					value = javaPath + ";" + Sys.getEnv ("PATH");
 					
 				} else {
 					
-					Sys.putEnv ("PATH", javaPath + ":" + Sys.getEnv ("PATH"));
+					value = javaPath + ":" + Sys.getEnv ("PATH");
+					
+				}
+				
+				environment.set ("PATH", value);
+				Sys.putEnv ("PATH", value);
+				
+			}
+			
+		}
+		
+		try {
+			
+			var process = new Process ("haxe", [ "-version" ]);
+			var haxeVersion = StringTools.trim (process.stderr.readAll ().toString ());
+			process.close ();
+			
+			environment.set ("haxe", haxeVersion);
+			environment.set ("haxe_ver", haxeVersion);
+			
+			environment.set ("haxe" + haxeVersion.split (".")[0], "1");
+			
+		} catch (e:Dynamic) {}
+		
+		if (!environment.exists ("HAXE_STD_PATH")) {
+			
+			if (PlatformHelper.hostPlatform == Platform.WINDOWS) {
+				
+				environment.set ("HAXE_STD_PATH", "C:\\HaxeToolkit\\haxe\\std\\");
+				
+			} else {
+				
+				if (FileSystem.exists ("/usr/lib/haxe")) {
+					
+					environment.set ("HAXE_STD_PATH", "/usr/lib/haxe/std");
+					
+				} else if (FileSystem.exists ("/usr/share/haxe")) {
+					
+					environment.set ("HAXE_STD_PATH", "/usr/share/haxe/std");
+					
+				} else {
+					
+					environment.set ("HAXE_STD_PATH", "/usr/local/lib/haxe/std");
 					
 				}
 				
@@ -1322,9 +1458,10 @@ class CommandLineTools {
 			
 			HXProject._command = command;
 			HXProject._debug = debug;
+			HXProject._environment = environment;
 			HXProject._target = target;
 			HXProject._targetFlags = targetFlags;
-            HXProject._userDefines = userDefines;
+			HXProject._userDefines = userDefines;
 			
 			try { Sys.setCwd (Path.directory (projectFile)); } catch (e:Dynamic) {}
 			
@@ -1436,6 +1573,7 @@ class CommandLineTools {
 					
 				} else {
 					
+					project.targetFlags.set (key, projectDefines.get (key));
 					targetFlags.set (key, projectDefines.get (key));
 					
 				}

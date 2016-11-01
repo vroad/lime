@@ -11,6 +11,7 @@ class HTML5AudioSource {
 	
 	
 	private var completed:Bool;
+	private var gain:Float;
 	private var id:Int;
 	private var length:Int;
 	private var loops:Int;
@@ -23,6 +24,7 @@ class HTML5AudioSource {
 		
 		this.parent = parent;
 		
+		gain = 1;
 		position = new Vector4 ();
 		
 	}
@@ -58,6 +60,10 @@ class HTML5AudioSource {
 		
 		completed = false;
 		id = parent.buffer.__srcHowl.play ();
+		
+		setGain (parent.gain);
+		setPosition (parent.position);
+		
 		parent.buffer.__srcHowl.on ("end", howl_onEnd, id);
 		
 		setCurrentTime (time);
@@ -165,7 +171,9 @@ class HTML5AudioSource {
 		if (parent.buffer != null) {
 			
 			//if (playing) buffer.__srcHowl.play (id);
-			parent.buffer.__srcHowl.seek ((value + parent.offset) / 1000, id);
+			var pos = (value + parent.offset) / 1000;
+			if ( pos < 0 ) pos = 0;
+			parent.buffer.__srcHowl.seek (pos, id);
 			
 		}
 		
@@ -178,17 +186,7 @@ class HTML5AudioSource {
 	
 	public function getGain ():Float {
 		
-		#if howlerjs
-		
-		if (parent.buffer != null) {
-			
-			return parent.buffer.__srcHowl.volume (id);
-			
-		}
-		
-		#end
-		
-		return 0;
+		return gain;
 		
 	}
 	
@@ -205,7 +203,7 @@ class HTML5AudioSource {
 		
 		#end
 		
-		return value;
+		return gain = value;
 		
 	}
 	

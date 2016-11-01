@@ -5,6 +5,7 @@ import haxe.io.Path;
 import haxe.xml.Fast;
 import lime.tools.helpers.ArrayHelper;
 import lime.tools.helpers.CommandHelper;
+import lime.tools.helpers.HaxelibHelper;
 import lime.tools.helpers.LogHelper;
 import lime.tools.helpers.ObjectHelper;
 import lime.tools.helpers.PathHelper;
@@ -127,11 +128,13 @@ class ProjectXMLParser extends HXProject {
 			
 		}
 		
-		defines.set ("haxe3", "1");
-		
 		if (debug) {
 			
 			defines.set ("debug", "1");
+			
+		} else if (targetFlags.exists ("final")) {
+			
+			defines.set ("final", "1");
 			
 		} else {
 			
@@ -176,7 +179,11 @@ class ProjectXMLParser extends HXProject {
 					required = substitute (required);
 					var check = StringTools.trim (required);
 					
-					if (check != "" && !defines.exists (check) && (environment == null || !environment.exists (check)) && check != command) {
+					if (check == "false") {
+						
+						matchRequired = false;
+						
+					} else if (check != "" && check != "true" && !defines.exists (check) && (environment == null || !environment.exists (check)) && check != command) {
 						
 						matchRequired = false;
 						
@@ -754,6 +761,191 @@ class ProjectXMLParser extends HXProject {
 	}
 	
 	
+	private function parseModuleElement (element:Fast, basePath:String = "", moduleData:ModuleData = null):Void {
+		
+		var topLevel = (moduleData == null);
+		
+		var exclude = "";
+		var include = "*";
+		
+		if (element.has.include) {
+			
+			include = substitute (element.att.include);
+			
+		}
+		
+		if (element.has.exclude) {
+			
+			exclude = substitute (element.att.exclude);
+			
+		}
+		
+		if (moduleData == null) {
+			
+			var name = substitute (element.att.name);
+			
+			if (modules.exists (name)) {
+				
+				moduleData = modules.get (name);
+				
+			} else {
+				
+				moduleData = new ModuleData (name);
+				modules.set (name, moduleData);
+				
+			}
+			
+		}
+		
+		switch (element.name) {
+			
+			case "module":
+				
+				if (element.has.source) {
+					
+					var source = PathHelper.combine (basePath, substitute (element.att.source));
+					
+					if (!FileSystem.exists (source)) {
+						
+						LogHelper.error ("Could not find module source \"" + source + "\"");
+						return;
+						
+					}
+					
+					moduleData.haxeflags.push ("-cp " + source);
+					
+					var path = source;
+					
+					if (element.has.resolve ("package")) {
+						
+						path = PathHelper.combine (source, StringTools.replace (substitute (element.att.resolve ("package")), ".", "/"));
+						
+					}
+					
+					parseModuleElementSource (source, moduleData, include.split ("|"), exclude.split ("|"), path);
+					
+				}
+			
+			case "source":
+				
+				if (element.has.path) {
+					
+					var source = PathHelper.combine (basePath, substitute (element.att.path));
+					
+					if (!FileSystem.exists (source)) {
+						
+						LogHelper.error ("Could not find module source \"" + source + "\"");
+						return;
+						
+					}
+					
+					moduleData.haxeflags.push ("-cp " + source);
+					
+					var path = source;
+					
+					if (element.has.resolve ("package")) {
+						
+						path = PathHelper.combine (source, StringTools.replace (substitute (element.att.resolve ("package")), ".", "/"));
+						
+					}
+					
+					parseModuleElementSource (source, moduleData, include.split ("|"), exclude.split ("|"), path);
+					
+				}
+			
+			case "class":
+				
+				moduleData.classNames.push (substitute (element.att.name));
+			
+			case "haxedef":
+				
+				var value = substitute (element.att.name);
+				
+				if (element.has.value) {
+					
+					value += "=" + substitute (element.att.value);
+					
+				}
+				
+				moduleData.haxeflags.push ("-D " + value);
+			
+			case "haxeflag":
+				
+				var flag = substitute (element.att.name);
+				
+				if (element.has.value) {
+					
+					flag += " " + substitute (element.att.value);
+					
+				}
+				
+				moduleData.haxeflags.push (substitute (flag));
+			
+			case "include":
+				
+				moduleData.includeTypes.push (substitute (element.att.type));
+			
+			case "exclude":
+				
+				moduleData.excludeTypes.push (substitute (element.att.type));
+			
+		}
+		
+		if (topLevel) {
+			
+			for (childElement in element.elements) {
+				
+				if (isValidElement (childElement, "")) {
+					
+					parseModuleElement (childElement, basePath, moduleData);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
+	
+	
+	private function parseModuleElementSource (source:String, moduleData:ModuleData, include:Array<String>, exclude:Array<String>, currentPath:String):Void {
+		
+		var files = FileSystem.readDirectory (currentPath);
+		var filePath, className;
+		
+		for (file in files) {
+			
+			filePath = PathHelper.combine (currentPath, file);
+			
+			if (FileSystem.isDirectory (filePath)) {
+				
+				parseModuleElementSource (source, moduleData, include, exclude, filePath);
+				
+			} else {
+				
+				if (Path.extension (file) != "hx") continue;
+				
+				className = StringTools.replace (filePath, source, "");
+				className = StringTools.replace (className, "\\", "/");
+				
+				while (StringTools.startsWith (className, "/")) className = className.substr (1);
+				
+				className = StringTools.replace (className, "/", ".");
+				className = StringTools.replace (className, ".hx", "");
+				
+				if (filter (className, include, exclude)) {
+					
+					moduleData.classNames.push (className);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
+	
+	
 	private function parseOutputElement (element:Fast):Void {
 		
 		if (element.has.name) {
@@ -887,7 +1079,39 @@ class ProjectXMLParser extends HXProject {
 					
 					case "echo":
 						
-						Sys.println (substitute (element.att.value));
+						LogHelper.println (substitute (element.att.value));
+					
+					case "log":
+						
+						var verbose = "";
+						
+						if (element.has.verbose) {
+							
+							verbose = substitute (element.att.verbose);
+							
+						}
+						
+						if (element.has.error) {
+							
+							LogHelper.error (substitute (element.att.error), verbose);
+							
+						} else if (element.has.warn) {
+							
+							LogHelper.warn (substitute (element.att.warn), verbose);
+							
+						} else if (element.has.info) {
+							
+							LogHelper.info (substitute (element.att.info), verbose);
+							
+						} else if (element.has.value) {
+							
+							LogHelper.info (substitute (element.att.value), verbose);
+							
+						} else if (verbose != "") {
+							
+							LogHelper.info ("", verbose);
+							
+						}
 					
 					case "path":
 						
@@ -1069,6 +1293,12 @@ class ProjectXMLParser extends HXProject {
 						} else {
 							
 							PathHelper.haxelibOverrides.set (name, path);
+							
+						}
+						
+						if (!defines.exists (haxelib.name)) {
+							
+							defines.set (haxelib.name, HaxelibHelper.getVersion (haxelib));
 							
 						}
 						
@@ -1366,6 +1596,10 @@ class ProjectXMLParser extends HXProject {
 							libraries.push (new Library (path, name, type, embed, preload, generate, prefix));
 							
 						}
+					
+					case "module":
+						
+						parseModuleElement (element, extensionPath);
 					
 					case "ssl":
 						
@@ -1884,53 +2118,90 @@ class ProjectXMLParser extends HXProject {
 	}
 	
 	
+	private function replaceVariable (string:String):String {
+		
+		if (string.substr (0, 8) == "haxelib:") {
+			
+			var path = PathHelper.getHaxelib (new Haxelib (string.substr (8)), true);
+			return PathHelper.standardize (path);
+			
+		} else if (defines.exists (string)) {
+			
+			return defines.get (string);
+			
+		} else if (environment != null && environment.exists (string)) {
+			
+			return environment.get (string);
+			
+		} else {
+			
+			var substring = StringTools.replace (string, " ", "");
+			var index, value;
+			
+			if (substring.indexOf ("==") > -1) {
+				
+				index = substring.indexOf ("==");
+				value = replaceVariable (substring.substr (0, index));
+				
+				return Std.string (value == substring.substr (index + 2));
+				
+			} else if (substring.indexOf ("!=") > -1) {
+				
+				index = substring.indexOf ("!=");
+				value = replaceVariable (substring.substr (0, index));
+				
+				return Std.string (value != substring.substr (index + 2));
+				
+			} else if (substring.indexOf ("<=") > -1) {
+				
+				index = substring.indexOf ("<=");
+				value = replaceVariable (substring.substr (0, index));
+				
+				return Std.string (value <= substring.substr (index + 2));
+				
+			} else if (substring.indexOf ("<") > -1) {
+				
+				index = substring.indexOf ("<");
+				value = replaceVariable (substring.substr (0, index));
+				
+				return Std.string (value < substring.substr (index + 1));
+				
+			} else if (substring.indexOf (">=") > -1) {
+				
+				index = substring.indexOf (">=");
+				value = replaceVariable (substring.substr (0, index));
+				
+				return Std.string (value >= substring.substr (index + 2));
+				
+			} else if (substring.indexOf (">") > -1) {
+				
+				index = substring.indexOf (">");
+				value = replaceVariable (substring.substr (0, index));
+				
+				return Std.string (value > substring.substr (index + 1));
+				
+			}
+			
+		}
+		
+		return string;
+		
+	}
+	
+	
 	private function substitute (string:String):String {
 		
 		var newString = string;
 		
 		while (doubleVarMatch.match (newString)) {
 			
-			var substring = doubleVarMatch.matched (1);
-			
-			if (substring.substr (0, 8) == "haxelib:") {
-				
-				var path = PathHelper.getHaxelib (new Haxelib (substring.substr (8)), true);
-				substring = PathHelper.standardize (path);
-				
-			} else if (defines.exists (substring)) {
-				
-				substring = defines.get (substring);
-				
-			} else if (environment != null && environment.exists (substring)) {
-				
-				substring = environment.get (substring);
-				
-			}
-			
-			newString = doubleVarMatch.matchedLeft () + "${" + substring + "}" + doubleVarMatch.matchedRight ();
+			newString = doubleVarMatch.matchedLeft () + "${" + replaceVariable (doubleVarMatch.matched (1)) + "}" + doubleVarMatch.matchedRight ();
 			
 		}
 		
 		while (varMatch.match (newString)) {
 			
-			var substring = varMatch.matched (1);
-			
-			if (substring.substr (0, 8) == "haxelib:") {
-				
-				var path = PathHelper.getHaxelib (new Haxelib (substring.substr (8)), true);
-				substring = PathHelper.standardize (path);
-				
-			} else if (defines.exists (substring)) {
-				
-				substring = defines.get (substring);
-				
-			} else if (environment != null && environment.exists (substring)) {
-				
-				substring = environment.get (substring);
-				
-			}
-			
-			newString = varMatch.matchedLeft () + substring + varMatch.matchedRight ();
+			newString = varMatch.matchedLeft () + replaceVariable (varMatch.matched (1)) + varMatch.matchedRight ();
 			
 		}
 		

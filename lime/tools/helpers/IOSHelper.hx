@@ -85,33 +85,52 @@ class IOSHelper {
 	}
 	
 	
-	private static function getIOSVersion (project:HXProject):Void {
+	public static function getIOSVersion (project:HXProject):Void {
 		
-		if (!project.environment.exists("IPHONE_VER")) {
-			if (!project.environment.exists("DEVELOPER_DIR")) {
-				var proc = new Process("xcode-select", ["--print-path"]);
-				var developer_dir = proc.stdout.readLine();
-				proc.close();
-				project.environment.set("DEVELOPER_DIR", developer_dir);
-			}
-			var dev_path = project.environment.get("DEVELOPER_DIR") + "/Platforms/iPhoneOS.platform/Developer/SDKs";
+		if (!project.environment.exists ("IPHONE_VER") || project.environment.get ("IPHONE_VER") == "4.2") {
 			
-			if (FileSystem.exists (dev_path)) {
-				var best = "";
-				var files = FileSystem.readDirectory (dev_path);
-				var extract_version = ~/^iPhoneOS(.*).sdk$/;
+			if (!project.environment.exists("DEVELOPER_DIR")) {
+				
+				var process = new Process ("xcode-select", [ "--print-path" ]);
+				var developerDir = process.stdout.readLine ();
+				process.close ();
+				
+				project.environment.set ("DEVELOPER_DIR", developerDir);
+				
+			}
+			
+			var devPath = project.environment.get ("DEVELOPER_DIR") + "/Platforms/iPhoneOS.platform/Developer/SDKs";
+			
+			if (FileSystem.exists (devPath)) {
+				
+				var files = FileSystem.readDirectory (devPath);
+				var extractVersion = ~/^iPhoneOS(.*).sdk$/;
+				var best = "", version;
 				
 				for (file in files) {
-					if (extract_version.match (file)) {
-						var ver = extract_version.matched (1);
-						if (ver > best)
-							best = ver;
+					
+					if (extractVersion.match (file)) {
+						
+						version = extractVersion.matched (1);
+						
+						if (Std.parseFloat (version) > Std.parseFloat (best)) {
+							
+							best = version;
+							
+						}
+						
 					}
+					
 				}
 				
-				if (best != "")
+				if (best != "") {
+					
 					project.environment.set ("IPHONE_VER", best);
+					
+				}
+				
 			}
+			
 		}
 		
 	}
@@ -196,72 +215,91 @@ class IOSHelper {
 			}
 			
 			var templatePaths = [ PathHelper.combine (PathHelper.getHaxelib (new Haxelib ("lime")), "templates") ].concat (project.templatePaths);
-			var launcher = PathHelper.findTemplate (templatePaths, "bin/ios-sim");
-			Sys.command ("chmod", [ "+x", launcher ]);
-
-            // device config
-            var defaultDevice = "iphone-6";
-            var devices:Array<String> = ["iphone-4s", "iphone-5", "iphone-5s", "iphone-6-plus", "iphone-6", "ipad-2", "ipad-retina", "ipad-air"];
-            var oldDevices:Map<String, String> = ["iphone" => "iphone-6", "ipad" => "ipad-air"];
-
-            var deviceFlag:String = null;
-            var deviceTypeID = null;
-
-            // check if old device flag and convert to current
-            for (key in oldDevices.keys())
-            {
-                if (project.targetFlags.exists(key))
-                {
-                    deviceFlag = oldDevices[key];
-                    break;
-                }
-            }
-
-            // check known device in command line args
-            if(deviceFlag == null)
-            {
-                for( i in 0...devices.length )
-                {
-                    if (project.targetFlags.exists(devices[i]))
-                    {
-                        deviceFlag = devices[i];
-                        break;
-                    }
-                }
-            }
-
-            // default to iphone 6
-            if(deviceFlag == null)
-                deviceFlag = defaultDevice;
-
-            // check if device is available
-            // $ ios-sim showdevicetypes
-            var devicesOutput:String = ProcessHelper.runProcess ("", launcher, [ "showdevicetypes" ] );
-            var deviceTypeList:Array<String> = devicesOutput.split("\n");
-
-            for ( i in 0...deviceTypeList.length )
-            {
-                var r:EReg = new EReg(deviceFlag+",", "i");
-                if(r.match(deviceTypeList[i]))
-                {
-                    deviceTypeID = deviceTypeList[i];
-                    break;
-                }
-            }
-
-            if(deviceTypeID == null)
-                LogHelper.warn("Device \""+deviceFlag+"\" was not found");
-            else
-                LogHelper.info("Launch app on \""+deviceTypeID+"\"");
-
-
-            // run command with --devicetypeid if exists
-            if(deviceTypeID != null)
-                ProcessHelper.runCommand ("", launcher, [ "launch", FileSystem.fullPath (applicationPath), /*"--sdk", project.environment.get ("IPHONE_VER"),*/ "--devicetypeid", deviceTypeID, "--timeout", "60" ] );
-            else
-                ProcessHelper.runCommand ("", launcher, [ "launch", FileSystem.fullPath (applicationPath), /*"--sdk", project.environment.get ("IPHONE_VER"), "--devicetypeid", deviceTypeID,*/ "--timeout", "60" ] );
-
-        } else {
+			
+			var output = ProcessHelper.runProcess ("", "xcrun", [ "simctl", "list", "devices" ]);
+			var lines = output.split ("\n");
+			var foundSection = false;
+			
+			var device, deviceID;
+			var devices = new Map<String, String> ();
+			
+			var currentDeviceID = null;
+			
+			for (line in lines) {
+				
+				if (StringTools.startsWith (line, "--")) {
+					
+					if (line.indexOf ("iOS") > -1) {
+						
+						foundSection = true;
+						
+					} else if (foundSection) {
+						
+						break;
+						
+					}
+					
+				} else if (foundSection) {
+					
+					device = StringTools.trim (line);
+					device = device.substring (0, device.indexOf ("(") - 1);
+					device = device.toLowerCase ();
+					device = StringTools.replace (device, " ", "-");
+					
+					deviceID = line.substring (line.indexOf ("(") + 1, line.indexOf (")"));
+					
+					if (deviceID.indexOf ("inch") > -1) {
+						
+						var startIndex = line.indexOf (")") + 2;
+						deviceID = line.substring (line.indexOf ("(", startIndex) + 1, line.indexOf (")", startIndex));
+						
+					}
+					
+					devices.set (device, deviceID);
+					
+					if (project.targetFlags.exists (device)) {
+						
+						currentDeviceID = deviceID;
+						break;
+						
+					}
+					
+				}
+				
+			}
+			
+			if (currentDeviceID == null) {
+				
+				if (project.targetFlags.exists ("ipad")) {
+					
+					currentDeviceID = devices.get ("ipad-air");
+					
+				} else {
+					
+					currentDeviceID = devices.get ("iphone-6");
+					
+				}
+				
+			}
+			
+			try {
+				
+				ProcessHelper.runProcess ("", "open", [ "-Ra", "iOS Simulator" ], true, false);
+				ProcessHelper.runCommand ("", "open", [ "-a", "iOS Simulator", "--args", "-CurrentDeviceUDID", currentDeviceID ]);
+				
+			} catch (e:Dynamic) {
+				
+				ProcessHelper.runCommand ("", "open", [ "-a", "Simulator", "--args", "-CurrentDeviceUDID", currentDeviceID ]);
+				
+			}
+			
+			waitForDeviceState ("xcrun", [ "simctl", "uninstall", currentDeviceID, project.meta.packageName ]);
+			waitForDeviceState ("xcrun", [ "simctl", "install", currentDeviceID, applicationPath ]);			
+			waitForDeviceState ("xcrun", [ "simctl", "launch", currentDeviceID, project.meta.packageName ]);
+						
+			ProcessHelper.runCommand ("", "tail", [ "-F", "~/Library/Logs/CoreSimulator/" + currentDeviceID + "/system.log"]);
+			
+		} else {
 			
 			var applicationPath = "";
 			
@@ -281,7 +319,7 @@ class IOSHelper {
 			
 			var xcodeVersion = getXcodeVersion ();
 			
-			ProcessHelper.runCommand ("", launcher, [ "install", "--noninteractive", "--debug", "--timeout", "5", "--bundle", FileSystem.fullPath (applicationPath) ]);
+			ProcessHelper.runCommand ("", launcher, [ "install", "--noninteractive", "--debug", "--bundle", FileSystem.fullPath (applicationPath) ]);
 			
 		}
 		
@@ -321,6 +359,29 @@ class IOSHelper {
 		commands.push (applicationPath);
 		
 		ProcessHelper.runCommand (workingDirectory, "codesign", commands, true, true);
+		
+	}
+	
+	
+	private static function waitForDeviceState (command:String, args:Array<String>):Void {
+		
+		var output;
+		
+		while (true) {
+			
+			output = ProcessHelper.runProcess ("", command, args, true, true, true);
+			
+			if (output != null && output.toLowerCase ().indexOf ("invalid device state") > -1) {
+				
+				Sys.sleep (3);
+				
+			} else {
+				
+				break;
+				
+			}
+			
+		}
 		
 	}
 	

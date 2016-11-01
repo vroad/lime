@@ -1,5 +1,4 @@
-import ::APP_MAIN::;
-import lime.Assets;
+package;
 
 
 @:access(lime.app.Application)
@@ -13,55 +12,8 @@ class ApplicationMain {
 	
 	private static var app:lime.app.Application;
 	
-	public static function create ():Void {
-		
-		preloader = new ::if (PRELOADER_NAME != "")::::PRELOADER_NAME::::else::lime.app.Preloader::end:: ();
-		
-		#if !munit
-		app = new ::APP_MAIN:: ();
-		app.setPreloader (preloader);
-		app.create (config);
-		#end
-		
-		preloader.onComplete.add (start);
-		preloader.create (config);
-		
-		#if (js && html5)
-		var urls = [];
-		var types = [];
-		
-		::foreach assets::::if (embed)::
-		urls.push ("::resourceName::");
-		::if (type == "image")::types.push (AssetType.IMAGE);
-		::elseif (type == "binary")::types.push (AssetType.BINARY);
-		::elseif (type == "text")::types.push (AssetType.TEXT);
-		::elseif (type == "font")::types.push (AssetType.FONT);
-		::elseif (type == "sound")::types.push (AssetType.SOUND);
-		::elseif (type == "music")::types.push (AssetType.MUSIC);
-		::else::types.push (null);::end::
-		::end::::end::
-		
-		if (config.assetsPrefix != null) {
-			
-			for (i in 0...urls.length) {
-				
-				if (types[i] != AssetType.FONT) {
-					
-					urls[i] = config.assetsPrefix + urls[i];
-					
-				}
-				
-			}
-			
-		}
-		
-		preloader.load (urls, types);
-		#end
-		
-	}
 	
-	
-	public static function main ():Void {
+	public static function main () {
 		
 		config = {
 			
@@ -108,7 +60,119 @@ class ApplicationMain {
 	}
 	
 	
+	public static function create ():Void {
+		
+		preloader = new ::if (PRELOADER_NAME != "")::::PRELOADER_NAME::::else::lime.app.Preloader::end:: ();
+		
+		#if !munit
+		app = new ::APP_MAIN:: ();
+		app.setPreloader (preloader);
+		app.create (config);
+		#end
+		
+		preloader.onComplete.add (start);
+		preloader.create (config);
+		
+		#if (js && html5)
+		var urls = [];
+		var types = [];
+		
+		::foreach assets::::if (embed)::
+		urls.push ("::resourceName::");
+		::if (type == "image")::types.push (lime.Assets.AssetType.IMAGE);
+		::elseif (type == "binary")::types.push (lime.Assets.AssetType.BINARY);
+		::elseif (type == "text")::types.push (lime.Assets.AssetType.TEXT);
+		::elseif (type == "font")::types.push (lime.Assets.AssetType.FONT);
+		::elseif (type == "sound")::types.push (lime.Assets.AssetType.SOUND);
+		::elseif (type == "music")::types.push (lime.Assets.AssetType.MUSIC);
+		::else::types.push (null);::end::
+		::end::::end::
+		
+		if (config.assetsPrefix != null) {
+			
+			for (i in 0...urls.length) {
+				
+				if (types[i] != lime.Assets.AssetType.FONT) {
+					
+					urls[i] = config.assetsPrefix + urls[i];
+					
+				}
+				
+			}
+			
+		}
+		
+		preloader.load (urls, types);
+		#end
+		
+	}
+	
+	
+	#if (js && html5)
+	@:keep @:expose("lime.embed")
+	public static function embed (element:Dynamic, width:Null<Int> = null, height:Null<Int> = null, background:String = null, assetsPrefix:String = null) {
+		
+		var htmlElement:js.html.Element = null;
+		
+		if (Std.is (element, String)) {
+			
+			htmlElement = cast js.Browser.document.getElementById (cast (element, String));
+			
+		} else if (element == null) {
+			
+			htmlElement = cast js.Browser.document.createElement ("div");
+			
+		} else {
+			
+			htmlElement = cast element;
+			
+		}
+		
+		var color = null;
+		
+		if (background != null && background != "") {
+			
+			background = StringTools.replace (background, "#", "");
+			
+			if (background.indexOf ("0x") > -1) {
+				
+				color = Std.parseInt (background);
+				
+			} else {
+				
+				color = Std.parseInt ("0x" + background);
+				
+			}
+			
+		}
+		
+		if (width == null) {
+			
+			width = 0;
+			
+		}
+		
+		if (height == null) {
+			
+			height = 0;
+			
+		}
+		
+		config.windows[0].background = color;
+		config.windows[0].element = htmlElement;
+		config.windows[0].width = width;
+		config.windows[0].height = height;
+		config.assetsPrefix = assetsPrefix;
+		
+		create ();
+		
+	}
+	#end
+	
+	
 	public static function start ():Void {
+		
+		lime.Assets.registerLibrary ("default", new DefaultAssetLibrary ());
 		
 		#if !munit
 		

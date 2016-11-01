@@ -7,6 +7,7 @@ import haxe.Serializer;
 import haxe.Unserializer;
 import lime.tools.helpers.ArrayHelper;
 import lime.tools.helpers.CompatibilityHelper;
+import lime.tools.helpers.HaxelibHelper;
 import lime.tools.helpers.LogHelper;
 import lime.tools.helpers.ObjectHelper;
 import lime.tools.helpers.PathHelper;
@@ -49,6 +50,7 @@ class HXProject {
 	public var libraries:Array <Library>;
 	public var libraryHandlers:Map <String, String>;
 	public var meta:MetaData;
+	public var modules:Map<String, ModuleData>;
 	public var ndlls:Array <NDLL>;
 	public var platformType:PlatformType;
 	public var postBuildCallbacks:Array <CLICommand>;
@@ -70,6 +72,7 @@ class HXProject {
 	
 	public static var _command:String;
 	public static var _debug:Bool;
+	public static var _environment:Map<String, String>;
 	public static var _target:Platform;
 	public static var _targetFlags:Map<String, String>;
 	public static var _templatePaths:Array<String>;
@@ -94,6 +97,7 @@ class HXProject {
 		HXProject._targetFlags = Unserializer.run (args[4]);
 		HXProject._templatePaths = Unserializer.run (args[5]);
 		if (args.length > 6) HXProject._userDefines = Unserializer.run (args[6]);
+		if (args.length > 7) HXProject._environment = Unserializer.run (args[7]);
 		
 		initialize ();
 		
@@ -133,7 +137,7 @@ class HXProject {
 				
 				platformType = PlatformType.WEB;
 				architectures = [];
-				
+			
 			case HTML5, FIREFOX, EMSCRIPTEN:
 				
 				platformType = PlatformType.WEB;
@@ -143,6 +147,8 @@ class HXProject {
 				defaultWindow.height = 0;
 				defaultWindow.fps = 60;
 				
+				defaultWindow.allowHighDPI = false;
+			
 			case ANDROID, BLACKBERRY, IOS, TIZEN, WEBOS, TVOS:
 				
 				platformType = PlatformType.MOBILE;
@@ -177,7 +183,7 @@ class HXProject {
 				defaultWindow.height = 0;
 				defaultWindow.fullscreen = true;
 				defaultWindow.requireShaders = true;
-				
+			
 			case WINDOWS, MAC, LINUX:
 				
 				platformType = PlatformType.DESKTOP;
@@ -199,7 +205,7 @@ class HXProject {
 				// TODO: Better handle platform type for pluggable targets
 				
 				platformType = PlatformType.CONSOLE;
-
+				
 				defaultWindow.width = 0;
 				defaultWindow.height = 0;
 				defaultWindow.fps = 60;
@@ -224,7 +230,17 @@ class HXProject {
 		}
 		
 		dependencies = new Array <Dependency> ();
-		environment = Sys.environment ();
+		
+		if (_environment != null) {
+			
+			environment = _environment;
+			
+		} else {
+			
+			environment = Sys.environment ();
+			
+		}
+		
 		haxedefs = new Map <String, Dynamic> ();
 		haxeflags = new Array <String> ();
 		haxelibs = new Array <Haxelib> ();
@@ -232,6 +248,7 @@ class HXProject {
 		javaPaths = new Array <String> ();
 		libraries = new Array <Library> ();
 		libraryHandlers = new Map <String, String> ();
+		modules = new Map<String, ModuleData> ();
 		ndlls = new Array <NDLL> ();
 		postBuildCallbacks = new Array <CLICommand> ();
 		preBuildCallbacks = new Array <CLICommand> ();
@@ -239,8 +256,6 @@ class HXProject {
 		samplePaths = new Array <String> ();
 		splashScreens = new Array <SplashScreen> ();
 		targetHandlers = new Map <String, String> ();
-		
-		
 		
 	}
 	
@@ -323,6 +338,12 @@ class HXProject {
 		
 		ObjectHelper.copyFields (meta, project.meta);
 		
+		for (key in modules.keys ()) {
+			
+			project.modules.set (key, modules.get (key).clone ());
+			
+		}
+		
 		for (ndll in ndlls) {
 			
 			project.ndlls.push (ndll.clone ());
@@ -368,7 +389,7 @@ class HXProject {
 	}
 	
 	
-	private function filter (text:String, include:Array <String> = null, exclude:Array <String> = null):Bool {
+	private function filter (text:String, include:Array<String> = null, exclude:Array<String> = null):Bool {
 		
 		if (include == null) {
 			
@@ -428,7 +449,7 @@ class HXProject {
 	#if lime
 	
 	public static function fromFile (projectFile:String, userDefines:Map<String, Dynamic> = null, includePaths:Array<String> = null):HXProject {
-        
+		
 		var project:HXProject = null;
 		
 		var path = FileSystem.fullPath (Path.withoutDirectory (projectFile));
@@ -443,7 +464,7 @@ class HXProject {
 		FileHelper.copyFile (path, classFile);
 		
 		ProcessHelper.runCommand ("", "haxe", [ name, "-main", "lime.project.HXProject", "-cp", tempDirectory, "-neko", nekoOutput, "-cp", PathHelper.combine (PathHelper.getHaxelib (new Haxelib ("lime")), "tools"), "-lib", "lime", "-D", "lime-curl", "-D", "native", "-D", "lime-native", "-D", "lime-cffi" ]);
-		ProcessHelper.runCommand ("", "neko", [ FileSystem.fullPath (nekoOutput), HXProject._command, name, Std.string (HXProject._target), Std.string (HXProject._debug), Serializer.run (HXProject._targetFlags), Serializer.run (HXProject._templatePaths), Serializer.run (HXProject._userDefines), temporaryFile ]);
+		ProcessHelper.runCommand ("", "neko", [ FileSystem.fullPath (nekoOutput), HXProject._command, name, Std.string (HXProject._target), Std.string (HXProject._debug), Serializer.run (HXProject._targetFlags), Serializer.run (HXProject._templatePaths), Serializer.run (HXProject._userDefines), Serializer.run (HXProject._environment), temporaryFile ]);
 		
 		var tPaths:Array<String> = [];
 		try {
@@ -498,6 +519,12 @@ class HXProject {
 			return null;
 			
 		}
+		
+		//if (!userDefines.exists (haxelib.name)) {
+			//
+			//userDefines.set (haxelib.name, HaxelibHelper.getVersion (haxelib));
+			//
+		//}
 		
 		return HXProject.fromPath (path, userDefines);
 		
@@ -742,6 +769,21 @@ class HXProject {
 			icons = ArrayHelper.concatUnique (icons, project.icons);
 			javaPaths = ArrayHelper.concatUnique (javaPaths, project.javaPaths, true);
 			libraries = ArrayHelper.concatUnique (libraries, project.libraries, true);
+			
+			for (key in project.modules.keys ()) {
+				
+				if (modules.exists (key)) {
+					
+					modules.get (key).merge (project.modules.get (key));
+					
+				} else {
+					
+					modules.set (key, project.modules.get (key));
+					
+				}
+				
+			}
+			
 			ndlls = ArrayHelper.concatUnique (ndlls, project.ndlls);
 			postBuildCallbacks = postBuildCallbacks.concat (project.postBuildCallbacks);
 			preBuildCallbacks = preBuildCallbacks.concat (project.preBuildCallbacks);
@@ -973,6 +1015,8 @@ class HXProject {
 						
 						var font = Font.fromFile (asset.sourcePath);
 						embeddedAsset.fontName = font.name;
+						
+						LogHelper.info ("", " - \x1b[1mDetecting font name:\x1b[0m " + asset.sourcePath + " \x1b[3;37m->\x1b[0m \"" + font.name + "\"");
 						
 					} catch (e:Dynamic) {}
 					

@@ -181,7 +181,7 @@ class CFFI {
 	
 	public static macro function loadPrime (library:String, method:String, signature:String, lazy:Bool = false):Dynamic {
 		
-		#if ((haxe_ver >= 3.2) && !display)
+		#if !display
 		return cpp.Prime.load (library, method, signature, lazy);
 		#else
 		var args = signature.length - 1;
@@ -1136,7 +1136,7 @@ class CFFI {
 	
 	private static function __getFunctionType (args:Array<{ name : String, opt : Bool, t : Type }>, result:Type) {
 		
-		#if ((haxe_ver >= 3.2) && !disable_cffi && !display)
+		#if (!disable_cffi && !display)
 		var useCPPTypes = Context.defined ("cpp");
 		#else
 		var useCPPTypes = false;

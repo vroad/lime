@@ -14,7 +14,7 @@ import lime.utils.ArrayBufferView;
 using lime.utils.ArrayBufferViewTools;
 using Lambda;
 
-#if ((haxe_ver >= 3.2) && cpp)
+#if cpp
 import cpp.Float32;
 #else
 @:cffiCppType("float", "cpp.Float32")

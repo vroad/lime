@@ -10,7 +10,7 @@ import lime.utils.Int32Array;
 import lime.system.CFFIPointer;
 import lime.system.System;
 
-#if ((haxe_ver >= 3.2) && cpp)
+#if cpp
 import cpp.Float32;
 #else
 typedef Float32 = Float;

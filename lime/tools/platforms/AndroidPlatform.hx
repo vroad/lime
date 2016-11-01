@@ -245,11 +245,11 @@ class AndroidPlatform extends PlatformTarget {
 	
 	public override function install ():Void {
 		
-		var build = "debug";
+		var build = "-debug";
 		
 		if (project.certificate != null) {
 			
-			build = "release";
+			build = "-release";
 			
 		}
 		

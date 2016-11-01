@@ -1,3 +1,33 @@
+3.4.0 (10/31/2016)
+------------------
+
+* Moved Lime config from ~/.hxcpp_config.xml to ~/.lime/config.xml
+* Added a new "lime config" command to print the current config
+* Added "lime config VARNAME" command to print a value from the current config
+* Added initial support for modular HTML5 builds (generates separate lime.js)
+* Added support for comparisons in project XML (like ${haxe >= 3.2.1})
+* Added lime.ui.Haptic for initial support of vibrate on iOS/Android
+* Added `<log />` to project XML for info/warning/error/verbose messages
+* Added a build-time error if Haxe is less than 3.2.0
+* Added support for GIT-based meta build number value
+* Added initial high-DPI support for HTML5
+* Updated SDL to version 2.0.5
+* Improved support for Android immersive mode
+* Improved idle performance on macOS
+* Improved Gradle template to output APK filenames based on build type
+* Improved verbose messages for embedded fonts
+* Removed Neko template binaries, updated tools to use host version
+* Fixed IPHONE_VER issues with certain versions of HXCPP
+* Fixed iOS device deployment on macOS Sierra
+* Fixed iOS simulator deployment on macOS Sierra
+* Fixed node.js HTTP server support on macOS Sierra
+* Fixed duplicate symbol error on iOS
+* Fixed support for older CPUs without SSE4 instruction support
+* Fixed crash on negative seek position for HTML5 AudioSource
+* Fixed initial gain and position when playing HTML5 AudioSource sound
+* Fixed compatibility issues with current Haxe development versions
+
+
 3.3.0 (10/10/2016)
 -----------------
 
@@ -7,21 +37,21 @@
 * Added automatic garbage collection to OpenAL bindings
 * Improved the behavior of AudioSource, added Howler.js for HTML5
 * Improved CFFI bindings to prevent early GC of bytes
-* Improved the behavior of *.hxp project files
+* Improved the behavior of \*.hxp project files
 * Improved support for the C# target
-* Improved <meta build-id="" /> to allow a value of 0
+* Improved `<meta build-number="" />` to allow a value of 0
 * Improved support for "-lib lime" from plain HXML
 * Implemented relative mouse movement events for Flash and HTML5
 * Implemented Locale support for Android
 * Updated the behavior of "lime run" to imply "trace" (unless "-notrace")
 * Updated Android template to allow submission to non-touchscreen devices
-* Fixed support for <java path="" /> on Android
+* Fixed support for `<java path="" />` on Android
 * Fixed the value of Assets.isLocal for certain non-embedded assets
 * Fixed an issue affecting touch events after an HTML5 build was rotated
 * Fixed use of a custom HAXELIB_PATH for iOS builds (in Xcode)
 * Fixed numpad key values in HTML5
 * Fixed C++ casting when converting openfl.Vector to Float32Array
-* Fixed support for <window allow-high-dpi="true" />
+* Fixed support for `<window allow-high-dpi="true" />`
 * Fixed Android compilation using debug
 
 
@@ -85,7 +115,7 @@
 3.0.1 (07/20/2016)
 ------------------
 
-* Improved the exclude/include filter behavior on <asset /> tags
+* Improved the exclude/include filter behavior on `<asset />` tags
 * Fixed an issue that caused Window to duplicate event dispatches
 * Fixed the name of generated folder for HTML5 output
 * Fixed support for OpenAL getSource3f
@@ -168,7 +198,7 @@
 * Ensured that OpenAL is disabled in static builds by default
 * Fixed support for the current Haxe development build
 * Fixed the setup command to ensure all requested dependencies
-* Fixed a compile error when using <source /> and an empty path
+* Fixed a compile error when using `<source />` and an empty path
 * Fixed the -notrace flag (to disable "trace" on "test" commands)
 
 
@@ -179,7 +209,7 @@
 * Added support for Lime event canceling
 * Added default keyboard shortcuts for toggling fullscreen
 * Added default Android back button behavior to quit
-* Added support for <window resizable="false" /> on HTML5 template
+* Added support for `<window resizable="false" />` on HTML5 template
 * Changed iOS default system font path to be more generic
 * Fixed issues with OGG decoding on newer Android NDK
 * Fixed AudioSource complete event when setting currentTime or length
@@ -533,7 +563,7 @@
 * Add cubic support to font decomposition
 * Added Cairo window resize handling
 * Added Cairo Freetype support
-* Added check to remove duplicated <dependency /> references
+* Added check to remove duplicated `<dependency />` references
 * Minor fix to image premultiply alpha
 * Minor fix to "lime create" command
 * Minor fix to rectangle.transform

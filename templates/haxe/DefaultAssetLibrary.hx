@@ -14,6 +14,7 @@ import lime.net.HTTPRequest;
 import lime.system.CFFI;
 import lime.text.Font;
 import lime.utils.Bytes;
+import lime.utils.Log;
 import lime.utils.UInt8Array;
 import lime.Assets;
 
@@ -503,7 +504,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 			loader.dataFormat = flash.net.URLLoaderDataFormat.BINARY;
 			loader.addEventListener (Event.COMPLETE, function (event:Event) {
 				
-				var bytes = Bytes.ofData (event.currentTarget.data);
+				var bytes = Bytes.ofData (loader.data);
 				promise.complete (bytes);
 				
 			});
@@ -564,7 +565,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 			var loader = new Loader ();
 			loader.contentLoaderInfo.addEventListener (Event.COMPLETE, function (event:Event) {
 				
-				var bitmapData = cast (event.currentTarget.content, Bitmap).bitmapData;
+				var bitmapData = cast (loader.content, Bitmap).bitmapData;
 				promise.complete (Image.fromBitmapData (bitmapData));
 				
 			});
@@ -670,13 +671,13 @@ class DefaultAssetLibrary extends AssetLibrary {
 				
 			} else {
 				
-				trace ("Warning: Could not load asset manifest (bytes was null)");
+				Log.warn ("Could not load asset manifest (bytes was null)");
 				
 			}
 		
 		} catch (e:Dynamic) {
 			
-			trace ('Warning: Could not load asset manifest (${e})');
+			Log.warn ('Could not load asset manifest (${e})');
 			
 		}
 		

@@ -4,14 +4,10 @@ package lime._backend.html5;
 import haxe.Timer;
 import js.html.CanvasElement;
 import js.html.DivElement;
-#if (haxe_ver >= 3.2)
 import js.html.Element;
 import js.html.FocusEvent;
 import js.html.InputElement;
 import js.html.InputEvent;
-#else
-import js.html.HtmlElement;
-#end
 import js.html.MouseEvent;
 import js.html.TouchEvent;
 import js.Browser;
@@ -24,11 +20,6 @@ import lime.ui.Joystick;
 import lime.ui.Touch;
 import lime.ui.Window;
 
-#if (haxe_ver < 3.2)
-typedef FocusEvent = js.html.Event;
-typedef InputElement = Dynamic;
-typedef InputEvent = js.html.Event;
-#end
 
 @:access(lime.app.Application)
 @:access(lime.ui.Gamepad)
@@ -44,7 +35,7 @@ class HTML5Window {
 	
 	public var canvas:CanvasElement;
 	public var div:DivElement;
-	public var element:#if (haxe_ver >= 3.2) Element #else HtmlElement #end;
+	public var element:Element;
 	#if stats
 	public var stats:Dynamic;
 	#end
@@ -55,6 +46,7 @@ class HTML5Window {
 	private var enableTextEvents:Bool;
 	private var parent:Window;
 	private var primaryTouch:Touch;
+	private var scale = 1.0;
 	private var setHeight:Int;
 	private var setWidth:Int;
 	private var unusedTouchesPool = new List<Touch> ();
@@ -70,6 +62,16 @@ class HTML5Window {
 			
 		}
 		
+		#if !dom
+		if (parent.config != null && Reflect.hasField (parent.config, "allowHighDPI") && parent.config.allowHighDPI) {
+			
+			scale = Browser.window.devicePixelRatio;
+			
+		}
+		#end
+		
+		parent.__scale = scale;
+		
 		cacheMouseX = 0;
 		cacheMouseY = 0;
 		
@@ -80,11 +82,7 @@ class HTML5Window {
 		
 		if (message != null) {
 			
-			#if (haxe_ver >= 3.2)
 			Browser.alert (message);
-			#else
-			js.Lib.alert (message);
-			#end
 			
 		}
 		
@@ -161,8 +159,11 @@ class HTML5Window {
 		
 		if (canvas != null) {
 			
-			canvas.width = parent.width;
-			canvas.height = parent.height;
+			canvas.width = Math.round (parent.width * scale);
+			canvas.height = Math.round (parent.height * scale);
+			
+			canvas.style.width = parent.width + "px";
+			canvas.style.height = parent.height + "px";
 			
 		} else {
 			
@@ -388,8 +389,11 @@ class HTML5Window {
 						
 						if (element != cast canvas) {
 							
-							canvas.width = element.clientWidth;
-							canvas.height = element.clientHeight;
+							canvas.width = Math.round (element.clientWidth * scale);
+							canvas.height = Math.round (element.clientHeight * scale);
+							
+							canvas.style.width = element.clientWidth + "px";
+							canvas.style.height = element.clientHeight + "px";
 							
 						}
 						
@@ -404,7 +408,7 @@ class HTML5Window {
 				
 			} else {
 				
-				var scaleX = (setWidth  != 0) ? (element.clientWidth  / setWidth)  : 1;
+				var scaleX = (setWidth != 0) ? (element.clientWidth / setWidth) : 1;
 				var scaleY = (setHeight != 0) ? (element.clientHeight / setHeight) : 1;
 				
 				var targetWidth = element.clientWidth;
