@@ -136,7 +136,12 @@ namespace lime {
 		
 		value pin = data.Pin ();
 		cairo_surface_t *surface = cairo_image_surface_create_for_data (data.Data (), format, width, height, stride);
-		cairo_surface_set_user_data (surface, &userData, pin, gc_pin);
+		
+		if (pin) {
+			
+			cairo_surface_set_user_data (surface, &userData, pin, gc_pin);
+			
+		}
 		
 		return surface;
 		

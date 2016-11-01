@@ -223,14 +223,14 @@ namespace lime {
 				
 				if (useBuffer) {
 					
-					buffer b = val_to_buffer (val_field (_value, id->b));
-					buffer_set_size (b, size);
+					buffer b = alloc_buffer_len (size);
+					alloc_field (_value, id->b, buffer_val (b));
 					_data = (unsigned char*)buffer_data (b);
 					
 				} else {
 					
 					value s = alloc_raw_string (size);
-					memcpy ((char *)val_string (s), val_string (val_field (_value, id->b)), _length);
+					//memcpy ((char *)val_string (s), val_string (val_field (_value, id->b)), _length);
 					alloc_field (_value, id->b, s);
 					_data = (unsigned char*)val_string (s);
 					

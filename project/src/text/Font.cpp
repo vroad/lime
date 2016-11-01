@@ -384,7 +384,11 @@ namespace lime {
 			
 		}
 		
-		Bytes::Unpin (faceMemoryPin);
+		if (faceMemoryPin) {
+			
+			Bytes::Unpin (faceMemoryPin);
+			
+		}
 		
 	}
 	
