@@ -5,7 +5,6 @@
 #include <audio/AudioBuffer.h>
 #include <utils/Resource.h>
 
-class OggVorbis_File;
 
 namespace lime {
 	
@@ -15,9 +14,7 @@ namespace lime {
 		
 		public:
 			
-			static bool Decode (Resource *resource, AudioBuffer *audioBuffer, bool stream);
-			static bool SeekStream (OggVorbis_File *oggFile, double seconds);
-			static int DecodeStream (OggVorbis_File *oggFile, Bytes *data, int readSize, int writeOffset);
+			static bool Decode (Resource *resource, AudioBuffer *audioBuffer);
 		
 		
 	};

@@ -195,7 +195,7 @@ namespace lime {
 			
 			imageBuffer->Resize (width, height, 32);
 			const unsigned int stride = imageBuffer->Stride ();
-			unsigned char *bytes = imageBuffer->data->Data ();
+			unsigned char *bytes = imageBuffer->data.Data ();
 			
 			int number_of_passes = png_set_interlace_handling (png_ptr);
 			
@@ -268,7 +268,7 @@ namespace lime {
 		png_write_info (png_ptr, info_ptr);
 		
 		bool do_alpha = (color_type == PNG_COLOR_TYPE_RGBA);
-		unsigned char* imageData = imageBuffer->data->Data();
+		unsigned char* imageData = imageBuffer->data.Data();
 		int stride = imageBuffer->Stride ();
 		
 		{

@@ -22,10 +22,9 @@ namespace lime {
 	cairo_user_data_key_t userData;
 	
 	
-	void gc_bytes (void* inData) {
+	void gc_pin (void* inData) {
 		
-		Bytes* data = (Bytes*)inData;
-		delete data;
+		Bytes::Unpin ((value)inData);
 		
 	}
 	
@@ -127,18 +126,17 @@ namespace lime {
 	
 	cairo_surface_t* cairo_image_surface_create_for_bytes (value inData, cairo_format_t format, int width, int height, int stride) {
 		
-		Bytes *data = new Bytes ();
+		Bytes data;
 		
-		if (!data->Set (inData)) {
+		if (!data.Set (inData)) {
 			
-			delete data;
 			return NULL;
 			
 		}
 		
-		data->Pin ();
-		cairo_surface_t *surface = cairo_image_surface_create_for_data (data->Data (), format, width, height, stride);
-		cairo_surface_set_user_data (surface, &userData, data, gc_bytes);
+		value pin = data.Pin ();
+		cairo_surface_t *surface = cairo_image_surface_create_for_data (data.Data (), format, width, height, stride);
+		cairo_surface_set_user_data (surface, &userData, pin, gc_pin);
 		
 		return surface;
 		

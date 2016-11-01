@@ -187,7 +187,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 	}
 	
 	
-	public override function getAudioBuffer (id:String, stream:Bool = false):AudioBuffer {
+	public override function getAudioBuffer (id:String):AudioBuffer {
 		
 		#if flash
 		
@@ -202,7 +202,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 		#else
 		
 		if (className.exists (id)) return AudioBuffer.fromBytes (cast (Type.createInstance (className.get (id), []), Bytes));
-		else return AudioBuffer.fromFile (rootPath + path.get (id), stream);
+		else return AudioBuffer.fromFile (rootPath + path.get (id));
 		
 		#end
 		
@@ -270,7 +270,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 		var src = Type.createInstance (className.get (id), []);
 		
 		var font = new Font (src.fontName);
-		@:privateAccess font.src = src;
+		font.src = src;
 		return font;
 		
 		#elseif html5
@@ -469,13 +469,13 @@ class DefaultAssetLibrary extends AssetLibrary {
 	}
 	
 	
-	public override function loadAudioBuffer (id:String, stream:Bool = false):Future<AudioBuffer> {
+	public override function loadAudioBuffer (id:String):Future<AudioBuffer> {
 		
 		var promise = new Promise<AudioBuffer> ();
 		
 		if (Assets.isLocal (id)) {
 			
-			promise.completeWith (new Future<AudioBuffer> (function () return getAudioBuffer (id, stream)));
+			promise.completeWith (new Future<AudioBuffer> (function () return getAudioBuffer (id)));
 			
 		} else if (path.exists (id)) {
 			

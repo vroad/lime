@@ -65,6 +65,10 @@ class Cairo {
 			handle = cairo_create (surface.handle);
 			#end
 			
+		} else {
+
+		    throw ("surface shouldn't be null");
+
 		}
 		
 		target = surface;

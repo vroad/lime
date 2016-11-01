@@ -30,8 +30,6 @@ namespace lime
 		
 		bitsPerSample = val_id ("bitsPerSample");
 		channels = val_id ("channels");
-		handle = val_id ("handle");
-		sourceData = val_id ("sourceData");
 		data = val_id ("data");
 		sampleRate = val_id ("sampleRate");
 		length = val_id ("length");

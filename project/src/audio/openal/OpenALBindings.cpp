@@ -893,6 +893,7 @@ namespace lime {
 	void alcDestroyContext_wrap (value context) {
 		
 		ALCContextWrapper* contextWrap = val_to_ALCContextWrapper (context);
+		contextWrap->Dispose ();
 		contextWrap->Release ();
 		free_abstract (context);
 		

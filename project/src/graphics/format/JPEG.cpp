@@ -289,7 +289,7 @@ namespace lime {
 				int components = cinfo.output_components;
 				imageBuffer->Resize (cinfo.output_width, cinfo.output_height, 32);
 				
-				unsigned char *bytes = imageBuffer->data->Data ();
+				unsigned char *bytes = imageBuffer->data.Data ();
 				scanline = new unsigned char [imageBuffer->width * components];
 				
 				while (cinfo.output_scanline < cinfo.output_height) {
@@ -375,7 +375,7 @@ namespace lime {
 		jpeg_start_compress (&cinfo, TRUE);
 		
 		JSAMPROW row_pointer = &row_buf[0];
-		unsigned char* imageData = imageBuffer->data->Data();
+		unsigned char* imageData = imageBuffer->data.Data();
 		int stride = imageBuffer->Stride ();
 		
 		while (cinfo.next_scanline < cinfo.image_height) {

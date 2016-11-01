@@ -1,10 +1,6 @@
-#include <assert.h>
 #include <hx/CFFIExt.h>
-#include <system/System.h>
 #include <utils/Bytes.h>
 #include <utils/StringId.h>
-//#include <hx/CFFIPrimePatch.h>
-#include <hx/CFFIPrime.h>
 
 namespace lime {
 	
@@ -36,8 +32,7 @@ namespace lime {
 		
 		_data = 0;
 		_length = 0;
-		_root = 0;
-		_pin = 0;
+		_value = 0;
 		
 	}
 	
@@ -48,8 +43,7 @@ namespace lime {
 		
 		_data = 0;
 		_length = 0;
-		_root = 0;
-		_pin = 0;
+		_value = 0;
 		
 		Resize (size);
 		
@@ -62,8 +56,7 @@ namespace lime {
 		
 		_data = 0;
 		_length = 0;
-		_root = 0;
-		_pin = 0;
+		_value = 0;
 		
 		Set (bytes);
 		
@@ -76,14 +69,9 @@ namespace lime {
 		
 		_data = 0;
 		_length = 0;
-		_root = 0;
-		_pin = 0;
+		_value = 0;
 		
-		FILE_HANDLE *file = lime::fopen (path, "rb");
-		
-		ReadFile (file);
-		
-		lime::fclose (file);
+		ReadFile (path);
 		
 	}
 	
@@ -94,39 +82,23 @@ namespace lime {
 		
 		_data = 0;
 		_length = 0;
-		_root = 0;
-		_pin = 0;
+		_value = 0;
 		
 		Set (data);
 		
 	}
 	
 	
-	Bytes::Bytes (const Bytes &other) {
-		
-		initialize ();
-		
-		_data = other._data;
-		_length = other._length;
-		_root = other._root != NULL ? new AutoGCRoot (other._root->get ()) : 0;
-		_pin = 0;
+	Bytes::~Bytes () {
 		
 	}
 	
 	
-	Bytes::~Bytes () {
+	void Bytes::Clear () {
 		
-		if (_pin) {
-			
-			EXT_unpin_buffer (_pin);
-			
-		}
-		
-		if (_root) {
-			
-			delete _root;
-			
-		}
+		_data = 0;
+		_length = 0;
+		_value = 0;
 		
 	}
 	
@@ -152,26 +124,83 @@ namespace lime {
 	}
 	
 	
+	value Bytes::Pin () {
+		
+		if (!HAS_pin_buffer ()) {
+			
+			return 0;
+			
+		}
+		
+		StringId *id = StringId::Get ();
+		value b = val_field (_value, id->b);
+		buffer buf = val_to_buffer (b);
+		value pin = EXT_pin_buffer (buf);
+		
+		return pin;
+		
+	}
+	
+	
+	int Bytes::ReadFile (const char* path) {
+		
+		FILE_HANDLE *file = lime::fopen (path, "rb");
+		
+		if (file) {
+			
+			int result = ReadFile (file);
+			lime::fclose (file);
+			return result;
+			
+		} else {
+			
+			return 0;
+			
+		}
+		
+	}
+	
+	
+	int Bytes::ReadFile (FILE_HANDLE *file) {
+		
+		if (!file) {
+			
+			return 0;
+			
+		}
+		
+		lime::fseek (file, 0, SEEK_END);
+		int size = lime::ftell (file);
+		lime::fseek (file, 0, SEEK_SET);
+		
+		if (size > 0) {
+			
+			Resize (size);
+			int status = lime::fread (_data, _length, 1, file);
+			return status;
+			
+		} else {
+			
+			return 0;
+			
+		}
+		
+	}
+	
+	
 	void Bytes::Resize (int size) {
 		
 		if (size != _length) {
 			
-			value val;
-			
-			if (!_root) {
+			if (!_value) {
 				
-				val = alloc_empty_object ();
-				_root = new AutoGCRoot (val);
-				
-			} else {
-				
-				val = _root->get ();
+				_value = alloc_empty_object ();
 				
 			}
-
-			StringId* id = StringId::Get ();
 			
-			if (val_is_null (val_field (val, id->b))) {
+			StringId *id = StringId::Get ();
+			
+			if (val_is_null (val_field (_value, id->b))) {
 				
 				value dataValue;
 				
@@ -188,29 +217,28 @@ namespace lime {
 					
 				}
 				
-				alloc_field (val, id->b, dataValue);
+				alloc_field (_value, id->b, dataValue);
 				
 			} else {
-
-				int copySize = size < _length ? size : _length;
 				
 				if (useBuffer) {
 					
-					buffer b = alloc_buffer_len (size);
+					buffer b = val_to_buffer (val_field (_value, id->b));
+					buffer_set_size (b, size);
 					_data = (unsigned char*)buffer_data (b);
-					alloc_field (val, id->b, buffer_val (b));
 					
 				} else {
 					
 					value s = alloc_raw_string (size);
-					alloc_field (val, id->b, s);
+					memcpy ((char *)val_string (s), val_string (val_field (_value, id->b)), _length);
+					alloc_field (_value, id->b, s);
 					_data = (unsigned char*)val_string (s);
 					
 				}
 				
 			}
 			
-			alloc_field (val, id->length, alloc_int (size));
+			alloc_field (_value, id->length, alloc_int (size));
 			
 		}
 		
@@ -225,31 +253,13 @@ namespace lime {
 			
 			_length = 0;
 			_data = 0;
-			
-			if (_root) {
-				
-				delete _root;
-				
-			}
-			
-			_root = 0;
-			return false;
+			_value = 0;
 			
 		} else {
 			
 			StringId* id = StringId::Get ();
-			
-			if (_root == NULL) {
-				
-				_root = new AutoGCRoot (bytes);
-				
-			} else {
-				
-				_root->set (bytes);
-				
-			}
-			
 			_length = val_int (val_field (bytes, id->length));
+			_value = bytes;
 			
 			if (_length > 0) {
 				
@@ -302,13 +312,16 @@ namespace lime {
 			_data = 0;
 			_length = 0;
 			
-			if (_root) {
-				
-				delete _root;
-				
-			}
+		}
+		
+	}
+	
+	
+	void Bytes::Unpin (value pin) {
+		
+		if (HAS_unpin_buffer ()) {
 			
-			_root = 0;
+			EXT_unpin_buffer (pin);
 			
 		}
 		
@@ -317,9 +330,9 @@ namespace lime {
 	
 	value Bytes::Value () {
 		
-		if (_root) {
+		if (_value) {
 			
-			return _root->get ();
+			return _value;
 			
 		} else {
 			
@@ -328,79 +341,6 @@ namespace lime {
 		}
 		
 	}
-	
-	
-	int Bytes::ReadFile (FILE_HANDLE *file) {
-		
-		if (!file) {
-			
-			return 0;
-			
-		}
-		
-		lime::fseek (file, 0, SEEK_END);
-		int size = lime::ftell (file);
-		lime::fseek (file, 0, SEEK_SET);
-		
-		Resize (size);
-		
-		if (size > 0) {
-			
-			return lime::fread (_data, _length, 1, file);
-			
-		}
-		
-		return 0;
-		
-	}
-	
-	
-	void Bytes::Pin () {
-		
-		if (!_root || !HAS_pin_buffer ()) {
-			
-			return;
-			
-		}
-		
-		assert (_pin == 0);
-		value val = _root->get ();
-		StringId* id = StringId::Get ();
-		value b = val_field (val, id->b);
-		buffer buf = val_to_buffer (b);
-		_pin = EXT_pin_buffer (buf);
-		
-	}
-	
-	
-	void lime_bytes_overwrite_file (HxString inFilename, value inBytes) {
-		
-		// file is created if it doesn't exist,
-		// if it exists, it is truncated to zero
-		FILE_HANDLE *file = lime::fopen (inFilename.__s, "wb");
-		
-		if (!file) {
-			
-			#ifdef ANDROID
-			// [todo]
-			#endif
-			
-		}
-		
-		Bytes bytes (inBytes);
-		
-		// The function fwrite() writes nitems objects, each size bytes long, to the
-		// stream pointed to by stream, obtaining them from the location given by
-		// ptr.
-		// fwrite(const void *restrict ptr, size_t size, size_t nitems, FILE *restrict stream);
-		lime::fwrite (bytes.Data (), 1, bytes.Length (), file);
-		
-		lime::fclose (file);
-		
-	}
-	
-	
-	DEFINE_PRIME2v (lime_bytes_overwrite_file);
 	
 	
 }

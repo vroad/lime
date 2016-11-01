@@ -1,20 +1,18 @@
 #include <audio/format/OGG.h>
-#include <audio/OggAudioStream.h>
 #include <system/System.h>
 #include <vorbis/vorbisfile.h>
-#include <memory>
-#include <utils/SafeDelete.h>
 
-// 0 for Little-Endian, 1 for Big-Endian
-#ifdef HXCPP_BIG_ENDIAN
-#define BUFFER_READ_TYPE 1
-#else
-#define BUFFER_READ_TYPE 0
-#endif
-
-#define READ_MAX 4096
 
 namespace lime {
+	
+	
+	typedef struct {
+		
+		unsigned char* data;
+		ogg_int64_t size;
+		ogg_int64_t pos;
+		
+	} OAL_OggMemoryFile;
 	
 	
 	static size_t OAL_OggBufferRead (void* dest, size_t eltSize, size_t nelts, OAL_OggMemoryFile* src) {
@@ -106,10 +104,11 @@ namespace lime {
 	};
 	
 	
-	bool OGG::Decode (Resource *resource, AudioBuffer *audioBuffer, bool stream) {
+	bool OGG::Decode (Resource *resource, AudioBuffer *audioBuffer) {
 		
-		std::unique_ptr<OggVorbis_File> oggFile(new OggVorbis_File ());
-		std::unique_ptr<OAL_OggMemoryFile> fakeFile;
+		OggVorbis_File oggFile;
+		Bytes data;
+		OAL_OggMemoryFile fakeFile;
 		
 		if (resource->path) {
 			
@@ -123,7 +122,7 @@ namespace lime {
 			
 			if (file->isFile ()) {
 				
-				if (ov_open (file->getFile (), oggFile.get (), NULL, file->getLength ()) != 0) {
+				if (ov_open (file->getFile (), &oggFile, NULL, file->getLength ()) != 0) {
 					
 					lime::fclose (file);
 					return false;
@@ -132,23 +131,15 @@ namespace lime {
 				
 			} else {
 				
-				audioBuffer->sourceData = new Bytes ();
-				int status = audioBuffer->sourceData->ReadFile (file);
 				lime::fclose (file);
-				file = 0;
+				data.ReadFile (resource->path);
 				
-				if (!status) {
-					
-					return false;
-					
-				}
+				fakeFile = OAL_OggMemoryFile ();
+				fakeFile.data = data.Data ();
+				fakeFile.size = data.Length ();
+				fakeFile.pos = 0;
 				
-				fakeFile.reset (new OAL_OggMemoryFile ());
-				fakeFile->data = audioBuffer->sourceData->Data ();
-				fakeFile->size = audioBuffer->sourceData->Length ();
-				fakeFile->pos = 0;
-				
-				if (ov_open_callbacks (fakeFile.get (), oggFile.get (), NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
+				if (ov_open_callbacks (&fakeFile, &oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
 					
 					return false;
 					
@@ -158,13 +149,12 @@ namespace lime {
 			
 		} else {
 			
-			audioBuffer->sourceData = new Bytes (*resource->data);
-			fakeFile.reset (new OAL_OggMemoryFile ());
-			fakeFile->data = audioBuffer->sourceData->Data ();
-			fakeFile->size = audioBuffer->sourceData->Length ();
-			fakeFile->pos = 0;
+			fakeFile = OAL_OggMemoryFile ();
+			fakeFile.data = resource->data->Data ();
+			fakeFile.size = resource->data->Length ();
+			fakeFile.pos = 0;
 			
-			if (ov_open_callbacks (fakeFile.get (), oggFile.get (), NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
+			if (ov_open_callbacks (&fakeFile, &oggFile, NULL, 0, OAL_CALLBACKS_BUFFER) != 0) {
 				
 				return false;
 				
@@ -172,15 +162,25 @@ namespace lime {
 			
 		}
 		
+		// 0 for Little-Endian, 1 for Big-Endian
+		#ifdef HXCPP_BIG_ENDIAN
+		#define BUFFER_READ_TYPE 1
+		#else
+		#define BUFFER_READ_TYPE 0
+		#endif
+		
 		int bitStream;
 		long bytes = 1;
 		int totalBytes = 0;
 		
-		vorbis_info *pInfo = ov_info (oggFile.get (), -1);
+		#define BUFFER_SIZE 4096
+		
+		vorbis_info *pInfo = ov_info (&oggFile, -1);
 		
 		if (pInfo == NULL) {
 			
 			//LOG_SOUND("FAILED TO READ OGG SOUND INFO, IS THIS EVEN AN OGG FILE?\n");
+			ov_clear (&oggFile);
 			return false;
 			
 		}
@@ -190,71 +190,29 @@ namespace lime {
 		
 		audioBuffer->bitsPerSample = 16;
 		
-		int dataLength = ov_pcm_total (oggFile.get (), -1) * audioBuffer->channels * audioBuffer->bitsPerSample / 8;
-		audioBuffer->length = dataLength;
+		int dataLength = ov_pcm_total (&oggFile, -1) * audioBuffer->channels * audioBuffer->bitsPerSample / 8;
+		audioBuffer->data.Resize (dataLength);
 		
-		if (!stream) {
+		while (bytes > 0) {
 			
-			audioBuffer->data = new Bytes (dataLength);
-			
-			while (bytes > 0) {
-				
-				bytes = ov_read (oggFile.get (), (char *)audioBuffer->data->Data () + totalBytes, READ_MAX, BUFFER_READ_TYPE, 2, 1, &bitStream);
-				totalBytes += bytes;
-				
-			}
-			
-			if (dataLength != totalBytes) {
-				
-				audioBuffer->data->Resize (totalBytes);
-				
-			}
+			bytes = ov_read (&oggFile, (char *)audioBuffer->data.Data () + totalBytes, BUFFER_SIZE, BUFFER_READ_TYPE, 2, 1, &bitStream);
+			totalBytes += bytes;
 			
 		}
 		
-		if (!stream) {
+		if (dataLength != totalBytes) {
 			
-			SafeDelete (audioBuffer->sourceData);
-			
-		} else {
-			
-			if (audioBuffer->sourceData != NULL) {
-				
-				audioBuffer->sourceData->Pin ();
-				
-			}
-			
-			audioBuffer->handle = new OggAudioStream (oggFile.release (), fakeFile.release ());
+			audioBuffer->data.Resize (totalBytes);
 			
 		}
+		
+		ov_clear (&oggFile);
+		
+		#undef BUFFER_READ_TYPE
 		
 		return true;
 		
 	}
 	
-	bool OGG::SeekStream (OggVorbis_File *oggFile, double seconds) {
-		
-		return ov_time_seek (oggFile, seconds) == 0;
-		
-	}
-	
-	int OGG::DecodeStream (OggVorbis_File *oggFile, Bytes *data, int readSize, int writeOffset) {
-		
-		int bitStream;
-		int remainBytes = readSize;
-		int totalBytes = 0;
-		
-		int bytes;
-		do {
-			
-			size_t readBufferSize = READ_MAX < remainBytes ? READ_MAX : remainBytes;
-			bytes = ov_read (oggFile, ((char *)data->Data ()) + writeOffset + totalBytes, readBufferSize, BUFFER_READ_TYPE, 2, 1, &bitStream);
-			remainBytes -= bytes;
-			totalBytes += bytes;
-			
-		} while (bytes > 0 && remainBytes > 0);
-
-		return totalBytes;
-	}
 	
 }

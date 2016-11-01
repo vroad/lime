@@ -65,7 +65,7 @@ namespace lime {
 			
 			void* library;
 			void* face;
-			Bytes *faceMemory;
+			value faceMemoryPin;
 			
 		private:
 			

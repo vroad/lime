@@ -274,7 +274,7 @@ namespace lime {
 		
 		this->library = 0;
 		this->face = 0;
-		this->faceMemory = 0;
+		this->faceMemoryPin = 0;
 		
 		if (resource) {
 			
@@ -291,7 +291,6 @@ namespace lime {
 				
 				FT_Face face;
 				FILE_HANDLE *file = NULL;
-				Bytes *faceMemory = NULL;
 				
 				if (resource->path) {
 					
@@ -310,27 +309,27 @@ namespace lime {
 						
 					} else {
 						
-						faceMemory = new Bytes ();
-						int status = faceMemory->ReadFile (file);
+						Bytes faceMemory;
+						int status = faceMemory.ReadFile (file);
 						lime::fclose (file);
 						file = 0;
 						
 						if (!status) {
 							
 							FT_Done_FreeType (library);
-							delete faceMemory;
 							return;
 							
 						}
 
-						error = FT_New_Memory_Face (library, faceMemory->Data (), faceMemory->Length (), faceIndex, &face);
+						error = FT_New_Memory_Face (library, faceMemory.Data (), faceMemory.Length (), faceIndex, &face);
+						this->faceMemoryPin = faceMemory.Pin ();
 						
 					}
 					
 				} else {
 					
-					faceMemory = new Bytes(*resource->data);
-					error = FT_New_Memory_Face (library, faceMemory->Data (), faceMemory->Length (), faceIndex, &face);
+					error = FT_New_Memory_Face (library, resource->data->Data (), resource->data->Length (), faceIndex, &face);
+					this->faceMemoryPin = resource->data->Pin ();
 					
 				}
 				
@@ -345,7 +344,6 @@ namespace lime {
 					
 					this->library = library;
 					this->face = face;
-					this->faceMemory = faceMemory;
 					
 					/* Set charmap
 					 *
@@ -369,12 +367,6 @@ namespace lime {
 						
 					}
 					
-				} else {
-
-					FT_Done_FreeType (library);
-
-					delete faceMemory;
-
 				}
 				
 			}
@@ -385,17 +377,14 @@ namespace lime {
 	
 	
 	Font::~Font () {
-
+		
 		if (library) {
 			
 			FT_Done_FreeType ((FT_Library)library);
-			library = 0;
-			face = 0;
 			
 		}
-
-		delete faceMemory;
-		faceMemory = 0;
+		
+		Bytes::Unpin (faceMemoryPin);
 		
 	}
 	

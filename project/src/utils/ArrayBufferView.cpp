@@ -6,90 +6,36 @@
 namespace lime {
 	
 	
+	// TODO: ByteOffset?
+	
+	
 	ArrayBufferView::ArrayBufferView () {
 		
-		_value = 0;
-		byteOffset = 0;
 		byteLength = 0;
+		length = 0;
+		mValue = 0;
 		
 	}
 	
 	
 	ArrayBufferView::ArrayBufferView (int size) {
 		
-		data.reset (new Bytes (size));
-		byteOffset = 0;
+		buffer.Resize (size);
 		byteLength = size;
-		_value = 0;
+		length = size;
+		mValue = 0;
 		
 	}
 	
 	
-	ArrayBufferView::ArrayBufferView (value inValue) {
+	ArrayBufferView::ArrayBufferView (value arrayBufferView) {
 		
-		Set (inValue);
-		
-	}
-	
-	
-	bool ArrayBufferView::Set (value inValue) {
-		
-		_value = inValue;
-		
-		if (val_is_null (inValue)) {
-			
-			data.reset (NULL);
-			byteOffset = 0;
-			byteLength = 0;
-			return false;
-			
-		}
-		
-		StringId* id = StringId::Get ();
-		value inBytes = val_field (inValue, id->buffer);
-		byteOffset = val_int (val_field (inValue, id->byteOffset));
-		byteLength = val_int (val_field (inValue, id->byteLength));
-		
-		if (!data) {
-			
-			data.reset (new Bytes ());
-			
-		}
-		
-		if (!data->Set (inBytes)) {
-			
-			data.reset (NULL);
-			byteOffset = 0;
-			byteLength = 0;
-			return false;
-			
-		}
-		
-		if (byteLength < 0 || (byteOffset + byteLength) > data->Length ()) {
-			
-			data.reset (NULL);
-			byteOffset = 0;
-			byteLength = 0;
-			val_throw (alloc_string ("Invalid ArrayBufferView offset/length"));
-			return false;
-			
-		}
-		
-		return true;
+		Set (arrayBufferView);
 		
 	}
 	
 	
-	unsigned char* ArrayBufferView::Data () const {
-		
-		return data ? byteOffset + data->Data () : NULL;
-		
-	}
-	
-	
-	int ArrayBufferView::ByteOffset () const {
-		
-		return byteOffset;
+	ArrayBufferView::~ArrayBufferView () {
 		
 	}
 	
@@ -101,36 +47,92 @@ namespace lime {
 	}
 	
 	
+	void ArrayBufferView::Clear () {
+		
+		buffer.Clear ();
+		byteLength = 0;
+		length = 0;
+		mValue = 0;
+		
+	}
+	
+	
+	unsigned char *ArrayBufferView::Data () {
+		
+		return buffer.Data ();
+		
+	}
+	
+	
+	const unsigned char *ArrayBufferView::Data () const {
+		
+		return buffer.Data ();
+		
+	}
+	
+	
+	int ArrayBufferView::Length () const {
+		
+		return buffer.Length ();
+		
+	}
+	
+	
 	void ArrayBufferView::Resize (int size) {
 		
-		assert (data);
-		
-		data->Resize (size);
+		buffer.Resize (size);
 		byteLength = size;
+		length = size;
+		
+	}
+	
+	
+	void ArrayBufferView::Set (value arrayBufferView) {
+		
+		StringId* id = StringId::Get ();
+		
+		if (!val_is_null (arrayBufferView)) {
+			
+			buffer.Set (val_field (arrayBufferView, id->buffer));
+			byteLength = val_int (val_field (arrayBufferView, id->byteLength));
+			length = val_int (val_field (arrayBufferView, id->length));
+			
+		} else {
+			
+			buffer.Clear ();
+			byteLength = 0;
+			length = 0;
+			
+		}
+		
+		mValue = arrayBufferView;
+		
+	}
+	
+	
+	void ArrayBufferView::Set (const QuickVec<unsigned char> data) {
+		
+		buffer.Set (data);
+		byteLength = buffer.Length ();
+		length = byteLength;
 		
 	}
 	
 	
 	value ArrayBufferView::Value () {
 		
-		if (!data) {
-			
-			return alloc_null ();
-			
-		}
-		
-		if (val_is_null (_value)) {
-			
-			_value = alloc_empty_object ();
-			
-		}
-		
 		StringId* id = StringId::Get ();
 		
-		alloc_field (_value, id->buffer, data->Value ());
-		alloc_field (_value, id->byteOffset, alloc_int (byteOffset));
-		alloc_field (_value, id->byteLength, alloc_int (byteLength));
-		return _value;
+		if (mValue == 0 || val_is_null (mValue)) {
+			
+			mValue = alloc_empty_object ();
+			
+		}
+		
+		alloc_field (mValue, id->buffer, buffer.Value ());
+		alloc_field (mValue, id->byteLength, alloc_int (byteLength));
+		alloc_field (mValue, id->length, alloc_int (length));
+		return mValue;
 		
 	}
 	

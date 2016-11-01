@@ -75,7 +75,7 @@ namespace lime {
 	}
 	
 	
-	value lime_audio_load (value data, bool stream) {
+	value lime_audio_load (value data) {
 		
 		AudioBuffer audioBuffer;
 		Resource resource;
@@ -100,7 +100,7 @@ namespace lime {
 		}
 		
 		#ifdef LIME_OGG
-		if (OGG::Decode (&resource, &audioBuffer, stream)) {
+		if (OGG::Decode (&resource, &audioBuffer)) {
 			
 			return audioBuffer.Value ();
 			
@@ -108,43 +108,6 @@ namespace lime {
 		#endif
 		
 		return alloc_null ();
-		
-	}
-	
-	
-	bool lime_audio_stream_seek (value handle, double seconds) {
-		
-		AudioStream *stream = (AudioStream*)val_data (handle);
-		
-		#ifdef LIME_OGG
-		if (stream->format == OggFormat) {
-			
-			OggAudioStream *oggStream = (OggAudioStream*)stream;
-			return OGG::SeekStream (oggStream->file, seconds);
-			
-		}
-		#endif
-		
-		return false;
-	}
-	
-	
-	int lime_audio_stream_decode (value handle, value data, int readSize, int writeOffset) {
-		
-		AudioStream *stream = (AudioStream*)val_data (handle);
-		
-		Bytes bytes = Bytes (data);
-		
-		#ifdef LIME_OGG
-		if (stream->format == OggFormat) {
-			
-			OggAudioStream *oggStream = (OggAudioStream*)stream;
-			return OGG::DecodeStream (oggStream->file, &bytes, readSize, writeOffset);
-			
-		}
-		#endif 
-		
-		return 0;
 		
 	}
 	
@@ -692,9 +655,7 @@ namespace lime {
 	
 	
 	DEFINE_PRIME0v (lime_reset);
-	DEFINE_PRIME2 (lime_audio_load);
-	DEFINE_PRIME2 (lime_audio_stream_seek);
-	DEFINE_PRIME4 (lime_audio_stream_decode);
+	DEFINE_PRIME1 (lime_audio_load);
 	DEFINE_PRIME1 (lime_bytes_read_file);
 	DEFINE_PRIME1 (lime_cffi_get_native_pointer);
 	#if 0

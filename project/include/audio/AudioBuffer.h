@@ -42,10 +42,7 @@ namespace lime {
 			int bitsPerSample;
 			int channels;
 			int sampleRate;
-			int length;
-			AudioStream *handle;
-			Bytes *sourceData;
-			Bytes *data;
+			Bytes data;
 			
 		private:
 			

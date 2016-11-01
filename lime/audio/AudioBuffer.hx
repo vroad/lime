@@ -81,7 +81,7 @@ class AudioBuffer {
 	#end
 	
 	
-	public static function fromBytes (bytes:Bytes, stream:Bool = false):AudioBuffer {
+	public static function fromBytes (bytes:Bytes):AudioBuffer {
 		
 		if (bytes == null) return null;
 		
@@ -91,7 +91,7 @@ class AudioBuffer {
 		
 		#elseif (lime_cffi && !macro)
 		
-		var data:Dynamic = lime_audio_load (bytes, stream);
+		var data:Dynamic = lime_audio_load (bytes);
 		
 		if (data != null) {
 			
@@ -100,7 +100,6 @@ class AudioBuffer {
 			audioBuffer.channels = data.channels;
 			audioBuffer.data = data.data != null ? AnonBytesUtils.getUInt8ArrayFromAnonBytes (data.data) : null;
 			audioBuffer.sampleRate = data.sampleRate;
-			audioBuffer.handle = data.handle;
 			return audioBuffer;
 			
 		}
@@ -112,7 +111,7 @@ class AudioBuffer {
 	}
 	
 	
-	public static function fromFile (path:String, stream:Bool = false):AudioBuffer {
+	public static function fromFile (path:String):AudioBuffer {
 		
 		if (path == null) return null;
 		
@@ -162,7 +161,7 @@ class AudioBuffer {
 		
 		#elseif (lime_cffi && !macro)
 		
-		var data:Dynamic = lime_audio_load (path, stream);
+		var data:Dynamic = lime_audio_load (path);
 		
 		if (data != null) {
 			
@@ -171,7 +170,6 @@ class AudioBuffer {
 			audioBuffer.channels = data.channels;
 			audioBuffer.data = data.data != null ? AnonBytesUtils.getUInt8ArrayFromAnonBytes (data.data) : null;
 			audioBuffer.sampleRate = data.sampleRate;
-			audioBuffer.handle = data.handle;
 			return audioBuffer;
 			
 		}
@@ -209,7 +207,7 @@ class AudioBuffer {
 	}
 	
 	
-	public static function fromURL (url:String, handler:AudioBuffer->Void, stream:Bool = false):Void {
+	public static function fromURL (url:String, handler:AudioBuffer->Void):Void {
 		
 		#if (js && html5 && howlerjs)
 		
@@ -223,7 +221,7 @@ class AudioBuffer {
 		
 		if (url != null && url.indexOf ("http://") == -1 && url.indexOf ("https://") == -1) {
 			
-			handler (AudioBuffer.fromFile (url, stream));
+			handler (AudioBuffer.fromFile (url));
 			
 		} else {
 			
@@ -451,7 +449,7 @@ class AudioBuffer {
 	
 	
 	#if (lime_cffi && !macro)
-	@:cffi private static function lime_audio_load (data:Dynamic, stream:Bool):Dynamic;
+	@:cffi private static function lime_audio_load (data:Dynamic):Dynamic;
 	#end
 	
 	

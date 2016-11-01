@@ -20,8 +20,11 @@ namespace lime {
 		
 		void Release ();
 		
+		void Dispose ();
+		
 		ALCcontext* alcContext;
 		ALCDeviceWrapper* deviceWrapper;
+		bool disposed;
 		int refCount;
 		
 	};

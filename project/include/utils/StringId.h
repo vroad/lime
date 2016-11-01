@@ -35,11 +35,8 @@ namespace lime {
 		
 		int bitsPerSample;
 		int channels;
-		int handle;
-		int sourceData;
 		int data;
 		int sampleRate;
-		int length;
 		
 		//
 		// Bytes
@@ -198,7 +195,7 @@ namespace lime {
 		// TextEvent
 		//
 		
-		//int length;
+		int length;
 		int start;
 		int text;
 		//int type;

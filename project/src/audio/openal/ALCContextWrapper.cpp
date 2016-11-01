@@ -12,6 +12,7 @@ namespace lime {
 		this->alcContext = context;
 		this->deviceWrapper = deviceWrapper;
 		this->deviceWrapper->AddRef();
+		disposed = false;
 		refCount = 1;
 		
 	}
@@ -19,16 +20,7 @@ namespace lime {
 	
 	ALCContextWrapper::~ALCContextWrapper () {
 		
-		ALCcontext* currentContext = alcGetCurrentContext();
-		
-		if (currentContext == this->alcContext) {
-			
-			alcMakeContextCurrent (NULL);
-			
-		}
-		
-		alcDestroyContext (alcContext);
-		this->deviceWrapper->Release ();
+		Dispose ();
 		
 	}
 	
@@ -50,6 +42,32 @@ namespace lime {
 			delete this;
 			
 		}
+		
+	}
+	
+	
+	void ALCContextWrapper::Dispose () {
+		
+		if (disposed) {
+			
+			return;
+			
+		}
+		
+		ALCcontext* currentContext = alcGetCurrentContext();
+		
+		if (currentContext == this->alcContext) {
+			
+			alcMakeContextCurrent (NULL);
+			
+		}
+		
+		alcDestroyContext (alcContext);
+		this->deviceWrapper->Release ();
+		this->alcContext = NULL;
+		this->deviceWrapper = NULL;
+		
+		disposed = true;
 		
 	}
 	

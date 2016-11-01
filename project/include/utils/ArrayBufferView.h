@@ -4,7 +4,7 @@
 
 #include <hx/CFFI.h>
 #include <utils/Bytes.h>
-#include <memory>
+
 
 namespace lime {
 	
@@ -12,26 +12,30 @@ namespace lime {
 	class ArrayBufferView {
 		
 		
-	public:
+		public:
+			
+			ArrayBufferView ();
+			ArrayBufferView (int size);
+			ArrayBufferView (value arrayBufferView);
+			~ArrayBufferView ();
+			
+			int ByteLength () const;
+			void Clear ();
+			unsigned char *Data ();
+			const unsigned char *Data () const;
+			int Length () const;
+			void Resize (int size);
+			void Set (value bytes);
+			void Set (const QuickVec<unsigned char> data);
+			value Value ();
+			
+			Bytes buffer;
+			int byteLength;
+			int length;
 		
-		
-		ArrayBufferView ();
-		ArrayBufferView (int size);
-		ArrayBufferView (value inValue);
-		bool Set (value inValue);
-		unsigned char* Data () const;
-		int ByteOffset () const;
-		int ByteLength () const;
-		void Resize (int size);
-		value Value ();
-		
-	private:
-		
-		
-		std::unique_ptr<Bytes> data;
-		value _value;
-		int byteOffset;
-		int byteLength;
+		private:
+			
+			value mValue;
 		
 		
 	};

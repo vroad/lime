@@ -10,7 +10,10 @@
 namespace lime {
 	
 	
-	struct Bytes {
+	class Bytes {
+		
+		
+	public:
 		
 		
 		Bytes ();
@@ -18,24 +21,25 @@ namespace lime {
 		Bytes (value bytes);
 		Bytes (const char* path);
 		Bytes (const QuickVec<unsigned char> data);
-		Bytes (const Bytes &other);
 		~Bytes ();
 		
+		void Clear ();
 		unsigned char *Data ();
 		const unsigned char *Data () const;
 		int Length () const;
-		void ReadFile (const char* path);
+		value Pin ();
+		int ReadFile (const char* path);
+		int ReadFile (FILE_HANDLE *file);
 		void Resize (int size);
 		bool Set (value bytes);
 		void Set (const QuickVec<unsigned char> data);
+		static void Unpin (value pin);
 		value Value ();
-		int ReadFile (FILE_HANDLE *file);
-		void Pin ();
 		
 		unsigned char *_data;
 		int _length;
-		AutoGCRoot *_root;
-		value _pin;
+		value _value;
+		
 		
 	};
 	
