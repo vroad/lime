@@ -1,11 +1,14 @@
 package lime.system;
+
+#if cs
 import cs.ndll.NDLLFunction;
 import cs.NativeArray;
+#end
 
 class CSFunctionLoader
 {
 	public static function load (name:String, func:String, args:Int):Dynamic {
-		
+		#if cs
 		var func:NDLLFunction = NDLLFunction.Load (name, func, args);
 		
 		if (func == null) {
@@ -75,6 +78,7 @@ class CSFunctionLoader
 			
 		}
 		
+		#end
 		return null;
 		
 	}
