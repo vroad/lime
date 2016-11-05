@@ -96,7 +96,7 @@
 			<class name="js.Browser" />
 			<class name="js.Cookie" />
 			<class name="js.Error" />
-			<class name="js.Lib" />
+			<!-- <class name="js.Lib" /> -->
 			<class name="js.Promise" />
 			<class name="js.RegExp" />
 			<class name="js.Selection" />
@@ -105,11 +105,11 @@
 			<class name="HxOverrides" />
 			<class name="List" />
 			<class name="Math" />
-			<class name="Reflect" />
+			<!-- <class name="Reflect" /> -->
 			<!-- <class name="Std" /> -->
 			<class name="StringBuf" />
 			<class name="StringTools" />
-			<class name="Type" />
+			<!-- <class name="Type" /> -->
 			
 			<include type="haxe.ds._StringMap.StringMapIterator" />
 			<include type="haxe.ds.TreeNode" />
