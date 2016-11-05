@@ -4,7 +4,6 @@ import haxe.io.Bytes;
 import haxe.io.Path;
 import lime.graphics.opengl.GLTexture;
 import lime.system.System;
-import lime.utils.ByteArray;
 
 typedef VideoCaps =
 {
