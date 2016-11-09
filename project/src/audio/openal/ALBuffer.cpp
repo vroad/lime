@@ -18,7 +18,12 @@ namespace lime {
 	ALBuffer::~ALBuffer () {
 		
 		// TODO: Support for multiple contexts
-		alDeleteBuffers (1, &buffer);
+		if (!contextWrapper->disposed) {
+			
+			alDeleteBuffers (1, &buffer);
+			
+		}
+		
 		contextWrapper->Release ();
 		
 	}

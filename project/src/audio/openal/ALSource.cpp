@@ -27,9 +27,13 @@ namespace lime {
 			
 		}
 		
-		// TODO: Support deleting sources automatically
 		// TODO: Support for multiple contexts
-		//alDeleteSources (1, &source);
+		if (!this->contextWrapper->disposed) {
+			
+			alDeleteSources (1, &source);
+			
+		}
+		
 		this->contextWrapper->Release ();
 		
 	}
