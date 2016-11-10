@@ -116,8 +116,13 @@ namespace lime {
 	void alDeleteBuffer_wrap (value buffer) {
 		
 		ALBuffer* buf = val_to_ALBuffer (buffer);
-		delete buf;
-		free_abstract (buffer);
+		
+		if (buf != NULL) {
+			
+			delete buf;
+			free_abstract (buffer);
+			
+		}
 		
 	}
 	
@@ -130,8 +135,13 @@ namespace lime {
 			
 			value val = val_array_i (buffers, i);
 			ALBuffer* buf = val_to_ALBuffer (val);
-			delete buf;
-			free_abstract (val);
+			
+			if (buf != NULL) {
+				
+				delete buf;
+				free_abstract (val);
+				
+			}
 			
 		}
 		
@@ -141,8 +151,13 @@ namespace lime {
 	void alDeleteSource_wrap (value source) {
 		
 		ALSource* src = val_to_ALSource (source);
-		delete src;
-		free_abstract (source);
+		
+		if (src != NULL) {
+			
+			delete src;
+			free_abstract (source);
+			
+		}
 		
 	}
 	
@@ -150,12 +165,18 @@ namespace lime {
 	void alDeleteSources_wrap (value sources) {
 		
 		int size = val_array_size (sources);
+		
 		for (int i = 0; i < size; i++) {
 			
 			value source = val_array_i (sources, i);
 			ALSource* src = val_to_ALSource (source);
-			delete src;
-			free_abstract (source);
+			
+			if (src != NULL) {
+				
+				delete src;
+				free_abstract (source);
+				
+			}
 			
 		}
 		

@@ -160,7 +160,7 @@ class AL {
 	public static function deleteBuffer (buffer:ALBuffer):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alDeleteBuffer_wrap (buffer.handle);
+		alDeleteBuffer_wrap (buffer != null ? buffer.handle : null);
 		#end
 		
 	}
@@ -178,7 +178,7 @@ class AL {
 	public static function deleteSource (source:ALSource):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alDeleteSource_wrap (source.handle);
+		alDeleteSource_wrap (source != null ? source.handle : null);
 		#end
 		
 	}
@@ -589,7 +589,7 @@ class AL {
 	public static function getSource3f (source:ALSource, param:Int):Array<Float> {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		return alGetSource3f_wrap (source.handle != null ? source.handle : null, param);
+		return alGetSource3f_wrap (source != null ? source.handle : null, param);
 		#else
 		return null;
 		#end
@@ -600,7 +600,7 @@ class AL {
 	public static function getSourcef (source:ALSource, param:Int):Float {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		return alGetSourcef_wrap (source.handle != null ? source.handle : null, param);
+		return alGetSourcef_wrap (source != null ? source.handle : null, param);
 		#else
 		return 0;
 		#end
@@ -611,7 +611,7 @@ class AL {
 	public static function getSource3i (source:ALSource, param:Int):Array<Int> {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		return alGetSource3i_wrap (source.handle != null ? source.handle : null, param);
+		return alGetSource3i_wrap (source != null ? source.handle : null, param);
 		#else
 		return null;
 		#end
@@ -622,7 +622,7 @@ class AL {
 	public static function getSourcefv (source:ALSource, param:Int, count:Int = 1):Array<Float> {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		return alGetSourcefv_wrap (source.handle != null ? source.handle : null, param, count);
+		return alGetSourcefv_wrap (source != null ? source.handle : null, param, count);
 		#else
 		return null;
 		#end
@@ -633,7 +633,7 @@ class AL {
 	public static function getSourcei (source:ALSource, param:Int):Dynamic {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		return alGetSourcei_wrap (source.handle != null ? source.handle : null, param);
+		return alGetSourcei_wrap (source != null ? source.handle : null, param);
 		#else
 		return 0;
 		#end
@@ -644,7 +644,7 @@ class AL {
 	public static function getSourceiv (source:ALSource, param:Int, count:Int = 1):Array<Int> {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		return alGetSourceiv_wrap (source.handle != null ? source.handle : null, param, count);
+		return alGetSourceiv_wrap (source != null ? source.handle : null, param, count);
 		#else
 		return null;
 		#end
@@ -666,7 +666,7 @@ class AL {
 	public static function isBuffer (buffer:ALBuffer):Bool {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		return alIsBuffer_wrap (buffer.handle);
+		return alIsBuffer_wrap (buffer != null ? buffer.handle : null);
 		#else
 		return false;
 		#end
@@ -699,7 +699,7 @@ class AL {
 	public static function isSource (source:ALSource):Bool {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		return alIsSource_wrap (source.handle);
+		return alIsSource_wrap (source != null ? source.handle : null);
 		#else
 		return false;
 		#end
@@ -764,7 +764,7 @@ class AL {
 	public static function source3f (source:ALSource, param:Int, value1:Float, value2:Float, value3:Float):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alSource3f_wrap (source.handle != null ? source.handle : null, param, value1, value2, value3);
+		alSource3f_wrap (source != null ? source.handle : null, param, value1, value2, value3);
 		#end
 		
 	}
@@ -773,7 +773,7 @@ class AL {
 	public static function source3i (source:ALSource, param:Int, value1:Int, value2:Int, value3:Int):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alSource3i_wrap (source.handle != null ? source.handle : null, param, value1, value2, value3);
+		alSource3i_wrap (source != null ? source.handle : null, param, value1, value2, value3);
 		#end
 		
 	}
@@ -782,7 +782,7 @@ class AL {
 	public static function sourcef (source:ALSource, param:Int, value:Float):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alSourcef_wrap (source.handle != null ? source.handle : null, param, value);
+		alSourcef_wrap (source != null ? source.handle : null, param, value);
 		#end
 		
 	}
@@ -791,7 +791,7 @@ class AL {
 	public static function sourcefv (source:ALSource, param:Int, values:Array<Float>):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alSourcefv_wrap (source.handle != null ? source.handle : null, param, values);
+		alSourcefv_wrap (source != null ? source.handle : null, param, values);
 		#end
 		
 	}
@@ -800,7 +800,7 @@ class AL {
 	public static function sourcei (source:ALSource, param:Int, value:Int):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alSourcei_wrap (source.handle != null ? source.handle : null, param, value);
+		alSourcei_wrap (source != null ? source.handle : null, param, value);
 		#end
 		
 	}
@@ -809,7 +809,7 @@ class AL {
 	public static function sourceiv (source:ALSource, param:Int, values:Array<Int>):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alSourceiv_wrap (source.handle != null ? source.handle : null, param, values);
+		alSourceiv_wrap (source != null ? source.handle : null, param, values);
 		#end
 		
 	}
@@ -818,7 +818,7 @@ class AL {
 	public static function sourceBuffer (source:ALSource, buffer:ALBuffer):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alSourceBuffer (source.handle != null ? source.handle : null, buffer.handle);
+		alSourceBuffer (source != null ? source.handle : null, buffer.handle);
 		#end
 		
 	}
@@ -827,7 +827,7 @@ class AL {
 	public static function sourcePlay (source:ALSource):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alSourcePlay_wrap (source.handle);
+		alSourcePlay_wrap (source != null ? source.handle : null);
 		#end
 		
 	}
@@ -850,7 +850,7 @@ class AL {
 	public static function sourceStop (source:ALSource):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alSourceStop_wrap (source.handle);
+		alSourceStop_wrap (source != null ? source.handle : null);
 		#end
 		
 	}
@@ -868,7 +868,7 @@ class AL {
 	public static function sourceRewind (source:ALSource):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alSourceRewind_wrap (source.handle);
+		alSourceRewind_wrap (source != null ? source.handle : null);
 		#end
 		
 	}
@@ -886,7 +886,7 @@ class AL {
 	public static function sourcePause (source:ALSource):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alSourcePause_wrap (source.handle);
+		alSourcePause_wrap (source != null ? source.handle : null);
 		#end
 		
 	}
@@ -905,7 +905,7 @@ class AL {
 		
 		#if (lime_cffi && lime_openal && !macro)
 		var buffers:Array<ALBufferHandle> = buffer != null ? [ buffer.handle ] : null;
-		alSourceQueueBuffers_wrap (source.handle != null ? source.handle : null, 1, buffers);
+		alSourceQueueBuffers_wrap (source != null ? source.handle : null, 1, buffers);
 		#end
 		
 	}
@@ -914,7 +914,7 @@ class AL {
 	public static function sourceQueueBuffers (source:ALSource, nb:Int, buffers:Array<ALBuffer>):Void {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		alSourceQueueBuffers_wrap (source.handle != null ? source.handle : null, nb, __getHandlesFromBuffers (buffers));
+		alSourceQueueBuffers_wrap (source != null ? source.handle : null, nb, __getHandlesFromBuffers (buffers));
 		#end
 		
 	}
@@ -923,7 +923,7 @@ class AL {
 	public static function sourceUnqueueBuffer (source:ALSource):ALBuffer {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		var res = alSourceUnqueueBuffers_wrap (source.handle != null ? source.handle : null, 1);
+		var res = alSourceUnqueueBuffers_wrap (source != null ? source.handle : null, 1);
 		return res[0];
 		#else
 		return null;
@@ -935,7 +935,7 @@ class AL {
 	public static function sourceUnqueueBuffers (source:ALSource, nb:Int):Array<ALBuffer> {
 		
 		#if (lime_cffi && lime_openal && !macro)
-		return alSourceUnqueueBuffers_wrap (source.handle != null ? source.handle : null, nb);
+		return alSourceUnqueueBuffers_wrap (source != null ? source.handle : null, nb);
 		#else
 		return null;
 		#end
