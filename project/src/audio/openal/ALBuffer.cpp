@@ -46,7 +46,7 @@ namespace lime {
 	
 	value ALBuffer_to_val (ALBuffer* inInstance) {
 		
-		return CFFIPointer (inInstance, gc_ALBuffer, Kinds::Get ()->ALBuffer);
+		return inInstance != NULL ? CFFIPointer (inInstance, gc_ALBuffer, Kinds::Get ()->ALBuffer) : NULL;
 		
 	}
 	

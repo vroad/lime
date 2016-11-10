@@ -119,7 +119,7 @@ namespace lime {
 	
 	value ALSource_to_val (ALSource* inInstance) {
 		
-		return CFFIPointer (inInstance, gc_ALSource, Kinds::Get ()->ALSource);
+		return inInstance != NULL ? CFFIPointer (inInstance, gc_ALSource, Kinds::Get ()->ALSource) : NULL;
 		
 	}
 	

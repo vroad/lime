@@ -29,6 +29,7 @@ import lime._backend.native.ApplicationHandle;
 #end
 
 @:access(haxe.Timer)
+@:access(lime._backend.native.NativeAudioSource)
 @:access(lime._backend.native.NativeRenderer)
 @:access(lime.app.Application)
 @:access(lime.graphics.Renderer)
@@ -210,6 +211,7 @@ class NativeApplication {
 			case UPDATE:
 				
 				updateTimer ();
+				NativeAudioSource.updatePlayingSources ();
 				parent.onUpdate.dispatch (applicationEventInfo.deltaTime);
 			
 			case EXIT:

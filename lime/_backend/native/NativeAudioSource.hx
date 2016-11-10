@@ -21,7 +21,9 @@ class NativeAudioSource {
 	private var parent:AudioSource;
 	private var playing:Bool;
 	private var position:Vector4;
-	private var timer:Timer;
+	
+	
+	private static var __playingSources:Array<NativeAudioSource> = new Array ();
 	
 	
 	public function new (parent:AudioSource) {
@@ -36,20 +38,37 @@ class NativeAudioSource {
 	
 	public function dispose ():Void {
 		
-		if (handle != null) {
-			
-			AL.deleteSource (handle);
-			
-		}
+		AL.deleteSource (handle);
+		handle = null;
 		
 	}
 	
 	
-	public function init ():Void {
+	public function init ():Bool {
+		
+		if (handle == null) {
+			
+			handle = AL.genSource ();
+			
+			if (handle == null) {
+				
+				trace ("Failed to create ALSource");
+				return false;
+				
+			}
+			
+		}
 		
 		if (parent.buffer.__srcBuffer == null) {
 			
 			parent.buffer.__srcBuffer = AL.genBuffer ();
+			
+			if (parent.buffer.__srcBuffer == null) {
+				
+				trace ("Failed to create ALBuffer");
+				return false;
+				
+			}
 			
 			var format = 0;
 			
@@ -83,15 +102,21 @@ class NativeAudioSource {
 			
 		}
 		
-		handle = AL.genSource ();
 		AL.sourceBuffer (handle, parent.buffer.__srcBuffer);
+		return true;
 		
 	}
 	
 	
 	public function play ():Void {
 		
-		if (playing || handle == null) {
+		if (playing) {
+			
+			return;
+			
+		}
+		
+		if (!init ()) {
 			
 			return;
 			
@@ -99,11 +124,9 @@ class NativeAudioSource {
 		
 		playing = true;
 		
-		var time = getCurrentTime ();
-		
 		AL.sourcePlay (handle);
 		
-		setCurrentTime (time);
+		__playingSources.push (this);
 		
 	}
 	
@@ -113,12 +136,6 @@ class NativeAudioSource {
 		playing = false;
 		AL.sourcePause (handle);
 		
-		if (timer != null) {
-			
-			timer.stop ();
-			
-		}
-		
 	}
 	
 	
@@ -126,12 +143,7 @@ class NativeAudioSource {
 		
 		playing = false;
 		AL.sourceStop (handle);
-		
-		if (timer != null) {
-			
-			timer.stop ();
-			
-		}
+		dispose ();
 		
 	}
 	
@@ -143,7 +155,7 @@ class NativeAudioSource {
 	
 	
 	
-	private function timer_onRun () {
+	private function onComplete () {
 		
 		playing = false;
 		
@@ -157,7 +169,7 @@ class NativeAudioSource {
 		} else {
 			
 			AL.sourceStop (handle);
-			timer.stop ();
+			dispose ();
 			
 		}
 		
@@ -166,6 +178,32 @@ class NativeAudioSource {
 		
 	}
 	
+	
+	private static function updatePlayingSources () {
+		
+		var foundNull:Bool = false;
+		
+		for (i in 0 ... __playingSources.length) {
+			
+			var source = __playingSources[i];
+			
+			if (AL.getSourcei (source.handle, AL.SOURCE_STATE) == AL.STOPPED) {
+				
+				__playingSources[i] = null;
+				source.onComplete ();
+				foundNull = true;
+				
+			}
+			
+		}
+		
+		if (foundNull) {
+			
+			__playingSources = __playingSources.filter (function (val) { return val != null; });
+			
+		}
+		
+	}
 	
 	
 	
@@ -198,30 +236,6 @@ class NativeAudioSource {
 			AL.sourceRewind (handle);
 			if (playing) AL.sourcePlay (handle);
 			AL.sourcef (handle, AL.SEC_OFFSET, (value + parent.offset) / 1000);
-			
-		}
-		
-		if (playing) {
-			
-			if (timer != null) {
-				
-				timer.stop ();
-				
-			}
-			
-			var timeRemaining = getLength () - value;
-			
-			if (timeRemaining > 0) {
-				
-				completed = false;
-				timer = new Timer (timeRemaining);
-				timer.run = timer_onRun;
-				
-			} else {
-				
-				completed = true;
-				
-			}
 			
 		}
 		
@@ -260,25 +274,6 @@ class NativeAudioSource {
 	
 	
 	public function setLength (value:Int):Int {
-		
-		if (playing && length != value) {
-			
-			if (timer != null) {
-				
-				timer.stop ();
-				
-			}
-			
-			var timeRemaining = value - getCurrentTime ();
-			
-			if (timeRemaining > 0) {
-				
-				timer = new Timer (timeRemaining);
-				timer.run = timer_onRun;
-				
-			}
-			
-		}
 		
 		return length = value;
 		

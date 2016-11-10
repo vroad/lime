@@ -166,7 +166,8 @@ namespace lime {
 		
 		ALuint buffer;
 		alGenBuffers ((ALuint)1, &buffer);
-		return new ALBuffer (wrapper, buffer);
+		ALenum error = alGetError ();
+		return error == AL_NO_ERROR ? new ALBuffer (wrapper, buffer) : NULL;
 		
 	}
 	
@@ -181,12 +182,20 @@ namespace lime {
 		
 		std::vector<ALuint> buffers (n);
 		alGenBuffers (n, &buffers[0]);
+		ALenum error = alGetError ();
+		
+		if (error != AL_NO_ERROR) {
+			
+			return alloc_null ();
+			
+		}
 		
 		value result = alloc_array (n);
 		
 		for (int i = 0; i < n; i++) {
 			
-			ALBuffer* buf = new ALBuffer (wrapper, buffers[i]);
+			ALuint buffer = buffers[i];
+			ALBuffer* buf = buffer != 0 ? new ALBuffer (wrapper, buffers[i]) : NULL;
 			val_array_set_i (result, i, ALBuffer_to_val (buf));
 			
 		}
@@ -200,27 +209,36 @@ namespace lime {
 		
 		ALuint source;
 		alGenSources ((ALuint)1, &source);
-		return new ALSource (wrapper, source);
+		ALenum error = alGetError ();
+		return error == AL_NO_ERROR ? new ALSource (wrapper, source) : NULL;
 		
 	}
 	
 	
 	value alGenSources_wrap (ALCContextWrapper* wrapper, int n) {
-
+		
 		if (n <= 0) {
-
+			
 			return alloc_null ();
-
+			
 		}
 		
 		std::vector<ALuint> sources (n);
 		alGenSources (n, &sources[0]);
+		ALenum error = alGetError ();
+		
+		if (error != AL_NO_ERROR) {
+			
+			return alloc_null ();
+			
+		}
 		
 		value result = alloc_array (n);
 		
 		for (int i = 0; i < n; i++) {
 			
-			ALSource* src = new ALSource (wrapper, sources[i]);
+			ALuint source = sources[i];
+			ALSource* src = source != 0 ? new ALSource (wrapper, source) : NULL;
 			val_array_set_i (result, i, ALSource_to_val (src));
 			
 		}
