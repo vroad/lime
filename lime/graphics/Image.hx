@@ -1161,7 +1161,7 @@ class Image {
 			var imageBuffer:ImageBuffer = null;
 			
 			#if !cs
-			imageBuffer = lime_image_load (bytes, new ImageBuffer (new UInt8Array (Bytes.alloc (0))));
+			imageBuffer = lime_image_load (bytes, null);
 			#else
 			var data = lime_image_load (bytes, null);
 			if (data != null) {
@@ -1287,9 +1287,7 @@ class Image {
 			#else
 			if (CFFI.enabled) {
 				
-				#if !cs
-				buffer = lime_image_load (path, new ImageBuffer (new UInt8Array (Bytes.alloc (0))));
-				#else
+				#if 1
 				var data = lime_image_load (path, null);
 				if (data != null) {
 					buffer = new ImageBuffer (new UInt8Array (@:privateAccess new Bytes (data.data.buffer.length, data.data.buffer.b)), data.width, data.height, data.bitsPerPixel);

@@ -114,6 +114,14 @@ namespace lime {
 		
 	}
 	
+	static void allocateTest () {
+		
+		for (int i = 0; i < 100; i++)
+		{
+			buffer testBuf = alloc_buffer_len (1048576 * 10);
+		}
+		
+	}
 	
 	value ArrayBufferView::Value () {
 		
@@ -126,11 +134,13 @@ namespace lime {
 			
 		}
 		
-		if (val_is_null (mValue)) {
+		if (!mValue || val_is_null (mValue)) {
 			
 			mValue = alloc_empty_object ();
 			
 		}
+		
+		allocateTest ();
 		
 		alloc_field (mValue, id_buffer, buffer ? buffer->Value () : alloc_null ());
 		alloc_field (mValue, id_byteLength, alloc_int (byteLength));
